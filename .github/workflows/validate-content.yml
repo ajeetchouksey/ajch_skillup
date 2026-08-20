@@ -1,0 +1,31 @@
+name: Validate SkillUp content
+
+on:
+  pull_request:
+    paths:
+      - 'content/skillup/**'
+      - 'scripts/validate-content.mjs'
+  push:
+    branches: [main]
+    paths:
+      - 'content/skillup/**'
+      - 'scripts/validate-content.mjs'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate content schema
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+          node scripts/validate-content.mjs \
+            content/skillup/catalog.json \
+            content/skillup/**/index.json \
+            content/skillup/**/task-statements.json \
+            content/skillup/**/questions/*.json \
+            content/skillup/**/notes/*.md

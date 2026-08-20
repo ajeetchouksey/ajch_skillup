@@ -1,0 +1,14 @@
+{
+  "name": "ajch_skillup",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Canonical content source for Aarya's SkillUp exam-prep tracks. See README.md.",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-content.mjs content/skillup/catalog.json content/skillup/*/index.json content/skillup/*/task-statements.json content/skillup/*/questions/*.json content/skillup/*/notes/*.md",
+    "catalog": "python3 scripts/generate-catalog.py"
+  },
+  "dependencies": {
+    "sharp": "^0.35.2"
+  }
+}
