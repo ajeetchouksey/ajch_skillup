@@ -13,7 +13,7 @@ This repository is the canonical content source for Aarya's SkillUp exam-prep tr
   - `images/` — diagrams referenced from notes (as `/content/skillup/{examId}/images/{file}`)
 - `content/skillup/catalog.json` — **auto-generated**, aggregates every exam's `index.json`. Never hand-edit; regenerate with `scripts/generate-catalog.py`.
 - `.claude/agents/` — the 4 content-authoring agents for this vertical
-- `.claude/skills/exam-registry/`, `.claude/skills/content-analysis/` — schema reference skills these agents load
+- `.claude/skills/` — `exam-registry` and `content-analysis` (schema reference), `question-generator` (MCQ authoring patterns Assessment Engineer requires before writing), `content-standard` (platform-wide quality bar for MCQs, notes, and scenarios)
 - `.github/workflows/validate-content.yml` — automated schema validation on PR/push
 - `scripts/validate-content.mjs` — schema validator (canonical copy, synced from `ajch_platform`)
 - `scripts/generate-catalog.py` — regenerates `catalog.json` from each exam's `index.json`, recounting questions from the actual question files
@@ -95,5 +95,6 @@ python3 scripts/generate-catalog.py
 
 - `.claude/agents/curriculum-engineer.md`, `assessment-engineer.md`, `docs-engineer.md`, `scenario-engineer.md`
 - `.claude/skills/exam-registry/SKILL.md` — full schema reference
+- `.claude/skills/question-generator/SKILL.md`, `.claude/skills/content-standard/SKILL.md`
 - `.github/workflows/validate-content.yml`
 - `scripts/validate-content.mjs`, `scripts/generate-catalog.py`
