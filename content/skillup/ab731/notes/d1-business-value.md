@@ -15,6 +15,16 @@
 
 ---
 
+## 🗺️ Which Domain Covers This? (Quick Reference)
+
+| Domain | Topics Covered |
+|---|---|
+| **D1 — Business Value** | Generative vs traditional AI, tokens & cost, ROI, RAG vs fine-tuning, prompt engineering, security threats, agents vs Copilot, use-case prioritisation |
+| **D2 — Microsoft AI Apps & Services** | Microsoft 365 Copilot features, Copilot Studio, Azure AI Foundry, agent-building tools, product-specific capabilities |
+| **D3 — Implementation & Adoption** | Responsible AI principles, governance & AI Council, adoption barriers & champions, licensing models, Centre of Excellence, culture change |
+
+---
+
 ## 1.1 Generative AI vs Other AI Types
 
 | Type | What it does | Example |
@@ -49,12 +59,28 @@
 
 ---
 
+## 1.2b RAG vs Fine-tune Decision Framework
+
+When the exam asks *"how should the business customise AI?"*, use this decision logic:
+
+| Question | If YES → | If NO → |
+|---|---|---|
+| Is the business problem about accessing current/private data? | **RAG** — ground the model in your documents | Continue to next question |
+| Does the model need a completely different writing style or domain vocabulary? | **Fine-tuning** — adjust model weights | Use prompt engineering first |
+| Is the cost of fine-tuning justified by the expected volume? | **Fine-tuning** | **RAG** — cheaper and more flexible |
+| Does the output require verifiable citations? | **RAG** — returns source references | Fine-tuning has no source traceability |
+
+<div class="note-important"><strong>Exam rule:</strong> RAG is ALWAYS the right first answer for "how do we use our company's own data with AI?" — fine-tuning is for vocabulary and style, not for injecting facts.</div>
+
+---
+
 ## 1.3 Cost Drivers: Tokens & ROI
 
 ### Tokens
 - The basic unit of text an LLM processes — roughly ¾ of a word, or ~4 characters
 - **You pay for tokens IN (prompt) and tokens OUT (response)**
 - Longer prompts = higher cost; longer responses = higher cost
+- **Context window** — the maximum combined prompt + response tokens a model can hold in a single request; content beyond this limit gets truncated or dropped
 
 | Cost lever | How to optimise |
 |---|---|
@@ -67,6 +93,8 @@
 For a business leader, ROI = (Value saved / generated) ÷ Cost of AI usage
 
 <div class="note-important"><strong>Three ROI lenses:</strong><br/>1. <strong>Time savings</strong> — hours saved on repetitive tasks × hourly rate<br/>2. <strong>Quality lift</strong> — fewer errors, higher output quality<br/>3. <strong>Scalability</strong> — same headcount, more output (AI doesn't get tired)</div>
+
+📎 See D3 §3.7 (Copilot Licence Types) and §3.8 (Foundry Tools Subscription Models) for the cost/licensing models behind these ROI numbers.
 
 ---
 
@@ -177,6 +205,12 @@ The exam tests that you know AI introduces **new** attack surfaces beyond tradit
 | **Model extraction** | Attacker probes the model to replicate it |
 | **Sensitive data leakage** | Model outputs training data or user data from previous sessions |
 
+**Application security:** Validate and sanitise inputs. Use access controls. Don't pass raw user input directly to the model with full privileges.
+
+**Authentication requirements:** Users should be authenticated before accessing AI features connected to sensitive org data (e.g., Copilot + Microsoft Graph).
+
+<div class="note-important"><strong>Microsoft's approach:</strong> Microsoft 365 Copilot respects existing M365 permissions. A user can only access data through Copilot that they could already access directly. The AI doesn't bypass security boundaries.</div>
+
 ---
 
 ## 1.10 AI Agents — Agentic AI vs Copilot
@@ -253,39 +287,11 @@ Not all AI use cases are worth doing first. Prioritise using three dimensions:
 | "Specialised domain vocabulary" | → Fine-tuning (when prompt + RAG can't bridge the gap) |
 | "Copilot vs Agent" | → Copilot = assistive (prompted). Agent = autonomous (acts on goals) |
 | "Pilot success metric" | → KPIs: time saved, adoption rate, error reduction |
-
-**Application security:** Validate and sanitise inputs. Use access controls. Don't pass raw user input directly to the model with full privileges.
-
-**Authentication requirements:** Users should be authenticated before accessing AI features connected to sensitive org data (e.g., Copilot + Microsoft Graph).
-
-<div class="note-important"><strong>Microsoft's approach:</strong> Microsoft 365 Copilot respects existing M365 permissions. A user can only access data through Copilot that they could already access directly. The AI doesn't bypass security boundaries.</div>
-
----
-
-## 🎯 Domain 1 Exam Traps
-
-| Trap | What the exam tests |
-|---|---|
-| "Generate" vs "classify" | Gen AI creates; ML classifies. Don't confuse. |
-| Fine-tune vs RAG | Try RAG first. Fine-tune only for specialised domain vocabulary. |
+| "Generate" vs "classify" (framing nuance) | Gen AI creates; ML classifies. Don't confuse. |
+| Fine-tune vs RAG (which first?) | Try RAG first. Fine-tune only for specialised domain vocabulary. |
 | Hallucination mitigation | RAG + human review, NOT just better prompts |
 | ROI calculation | Think time savings + quality + scalability |
 | Bias types | Know historical, representation, and measurement bias by name |
-
----
-
-## 1.2b RAG vs Fine-tune Decision Framework
-
-When the exam asks *"how should the business customise AI?"*, use this decision logic:
-
-| Question | If YES → | If NO → |
-|---|---|---|
-| Is the business problem about accessing current/private data? | **RAG** — ground the model in your documents | Continue to next question |
-| Does the model need a completely different writing style or domain vocabulary? | **Fine-tuning** — adjust model weights | Use prompt engineering first |
-| Is the cost of fine-tuning justified by the expected volume? | **Fine-tuning** | **RAG** — cheaper and more flexible |
-| Does the output require verifiable citations? | **RAG** — returns source references | Fine-tuning has no source traceability |
-
-<div class="note-important"><strong>Exam rule:</strong> RAG is ALWAYS the right first answer for "how do we use our company's own data with AI?" — fine-tuning is for vocabulary and style, not for injecting facts.</div>
 
 ---
 
