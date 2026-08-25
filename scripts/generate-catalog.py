@@ -65,7 +65,7 @@ def generate_catalog() -> None:
     with open(out, "w", encoding="utf-8") as f:
         json.dump(catalog, f, indent=2)
         f.write("\n")
-    print(f"Catalog written: {len(skills)} skills → {out}")
+    print(f"Catalog written: {len(skills)} skills -> {out}")
 
 
 if __name__ == "__main__":
