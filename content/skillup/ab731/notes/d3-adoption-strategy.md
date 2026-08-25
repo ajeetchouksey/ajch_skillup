@@ -249,7 +249,6 @@ Microsoft's framework for scaling AI across an organisation follows four phases:
 <div class="note-important"><strong>AI Council vs CoE — exam distinction:</strong><br/>Council = WHAT AI we do and SHOULD we do it (strategy + ethics)<br/>CoE = HOW we build it well (technical standards, reusable patterns, mentoring)</div>
 
 <div class="note-scribble">The "empower SMEs" phase is important: a legal expert using AI to build their own contract review agent is MORE powerful than IT building one for them. SMEs bring domain knowledge; AI brings speed and scale. Copilot Studio enables this without coding.</div>
-| "Commitment tiers" | Foundry Tools only — reserved throughput for production workloads |
 
 ---
 

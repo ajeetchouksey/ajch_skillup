@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.1.1",
-  "contentUpdatedAt": "2026-08-06",
+  "contentVersion": "1.1.2",
+  "contentUpdatedAt": "2026-08-25",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -13,7 +13,8 @@
   "changelog": [
     { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 3 domains, 46 questions" },
     { "version": "1.1.0", "date": "2026-08-06", "type": "minor", "summary": "Backfilled difficulty on all 46 questions; fixed correct-field type on d3-013/014/015/016; stripped option letter prefixes" },
-    { "version": "1.1.1", "date": "2026-08-06", "type": "patch", "summary": "Enriched D1/D2/D3 notes: RAG vs fine-tune decision tree, Build/Buy/Extend callout, CoE section, licensing framework, and hard question patterns for all three domains" }
+    { "version": "1.1.1", "date": "2026-08-06", "type": "patch", "summary": "Enriched D1/D2/D3 notes: RAG vs fine-tune decision tree, Build/Buy/Extend callout, CoE section, licensing framework, and hard question patterns for all three domains" },
+    { "version": "1.1.2", "date": "2026-08-25", "type": "patch", "summary": "Fixed D1: merged duplicate Exam Traps sections, relocated orphaned security content into §1.9, repositioned misplaced §1.2b before §1.3. Fixed D3: removed orphaned duplicate Commitment-tiers table fragment. Added context-window definition, cross-domain quick-reference table, and D1→D3 licensing cross-reference." }
   ],
   "id": "ab731",
   "examCode": "AB-731",
