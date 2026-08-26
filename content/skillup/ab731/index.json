@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.1.2",
-  "contentUpdatedAt": "2026-08-25",
+  "contentVersion": "1.2.0",
+  "contentUpdatedAt": "2026-08-26",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -14,7 +14,8 @@
     { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 3 domains, 46 questions" },
     { "version": "1.1.0", "date": "2026-08-06", "type": "minor", "summary": "Backfilled difficulty on all 46 questions; fixed correct-field type on d3-013/014/015/016; stripped option letter prefixes" },
     { "version": "1.1.1", "date": "2026-08-06", "type": "patch", "summary": "Enriched D1/D2/D3 notes: RAG vs fine-tune decision tree, Build/Buy/Extend callout, CoE section, licensing framework, and hard question patterns for all three domains" },
-    { "version": "1.1.2", "date": "2026-08-25", "type": "patch", "summary": "Fixed D1: merged duplicate Exam Traps sections, relocated orphaned security content into §1.9, repositioned misplaced §1.2b before §1.3. Fixed D3: removed orphaned duplicate Commitment-tiers table fragment. Added context-window definition, cross-domain quick-reference table, and D1→D3 licensing cross-reference." }
+    { "version": "1.1.2", "date": "2026-08-25", "type": "patch", "summary": "Fixed D1: merged duplicate Exam Traps sections, relocated orphaned security content into §1.9, repositioned misplaced §1.2b before §1.3. Fixed D3: removed orphaned duplicate Commitment-tiers table fragment. Added context-window definition, cross-domain quick-reference table, and D1→D3 licensing cross-reference." },
+    { "version": "1.2.0", "date": "2026-08-26", "type": "minor", "summary": "D1 gap-fill: added 6 questions (ab731-d1-016..021) closing task 1.6 (previously zero questions — model selection + all 3 untested §1.9 security threats: prompt injection, data poisoning, model extraction), plus one more each for tasks 1.4 (RAG-vs-fine-tune decision framework) and 1.5 (agent vs RPA). Added the exam's first-ever scenario, ab731-scenario-001, spanning D1+D3." }
   ],
   "id": "ab731",
   "examCode": "AB-731",
@@ -22,7 +23,7 @@
   "shortTitle": "AB-731",
   "contentLevel": "101",
   "description": "Designed for business decision-makers at all levels. Covers recognising AI transformation opportunities, selecting Microsoft 365 Copilot and Foundry Tools, planning responsible AI adoption, and driving innovation — no coding required.",
-  "questions": 46,
+  "questions": 52,
   "duration": "45 min",
   "passScore": "700/1000",
   "passThreshold": 70,
@@ -57,6 +58,9 @@
     "content/skillup/ab731/questions/ab731-domain1.json",
     "content/skillup/ab731/questions/ab731-domain2.json",
     "content/skillup/ab731/questions/ab731-domain3.json"
+  ],
+  "scenarioFiles": [
+    "content/skillup/ab731/scenarios/ab731-ai-steering-committee.json"
   ],
   "resources": [
     {
