@@ -49,6 +49,7 @@
           "title": "Apply grounding, RAG, and contextualisation techniques",
           "questionIds": [
             "ab731-d1-005",
+            "ab731-d1-020",
             "ab731-d2-011"
           ]
         },
@@ -56,13 +57,19 @@
           "id": "1.5",
           "title": "Evaluate AI agents and agentic automation",
           "questionIds": [
-            "ab731-d1-013"
+            "ab731-d1-013",
+            "ab731-d1-019"
           ]
         },
         {
           "id": "1.6",
           "title": "Select AI models and address security considerations",
-          "questionIds": []
+          "questionIds": [
+            "ab731-d1-016",
+            "ab731-d1-017",
+            "ab731-d1-018",
+            "ab731-d1-021"
+          ]
         }
       ]
     },
