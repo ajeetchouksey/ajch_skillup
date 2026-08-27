@@ -1,0 +1,19 @@
+# CODEOWNERS — required reviewer assignments per path
+# Every PR must be approved by the owner(s) listed for the changed files.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Default: catch-all ────────────────────────────────────────────────────
+*                                   @ajeetchouksey @ajchava
+
+# ── Exam content — the published product ────────────────────────────────────
+/content/skillup/                   @ajeetchouksey @ajchava
+
+# ── Agent pipeline definitions — canonical copies live in ajch_platform and
+# are synced here via sync-vertical-agents.mjs; hand-edits here get
+# overwritten on the next sync, so a change here should be rare ───────────
+/.claude/                           @ajeetchouksey @ajchava
+
+# ── CI/CD and validation — highest protection ───────────────────────────────
+/.github/workflows/                 @ajeetchouksey @ajchava
+/.github/CODEOWNERS                 @ajeetchouksey @ajchava
+/scripts/validate-content.mjs       @ajeetchouksey @ajchava
