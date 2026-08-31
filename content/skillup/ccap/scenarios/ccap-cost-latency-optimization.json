@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-003",
+  "title": "Diagnosing a Cost and Latency Spike in a Contract Review Assistant",
+  "description": "Tests the ability to diagnose cost and latency problems arising from prompt design and model selection choices, apply prompt caching and context-window optimization, and validate that fixes preserve quality through a proper evaluation regression.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 17,
+  "domains": [2, 4],
+  "scenario": {
+    "background": "Clarion Review, a legal-tech SaaS company, offers a Claude-powered assistant that reviews incoming vendor contracts against a firm's 40-page negotiation playbook and flags clauses that deviate from it. Attorneys work through a contract in a single multi-turn session, asking follow-up questions as they go. Over the last quarter, usage grew 4x, and both p95 latency (now 14 seconds per turn, up from 4) and monthly inference spend (tripled) have become a problem, with no corresponding improvement in review quality.",
+    "characters": [
+      {
+        "name": "Lena Ostrowski",
+        "role": "Product Manager",
+        "concern": "Attorneys are complaining that the assistant feels sluggish mid-review; a 14-second wait per turn is disrupting their workflow and threatening renewal of the product's top account."
+      },
+      {
+        "name": "Raj Kapoor",
+        "role": "ML Platform Engineer",
+        "concern": "Inference costs have tripled month over month as usage grew, and he needs to bring the cost-per-review down without quietly degrading the flagged-clause accuracy attorneys depend on."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-003-q1",
+      "stem": "Raj traces the cost spike to the 40-page playbook being included as raw text in every single API call within a review session — including the fifth follow-up question in a session where the playbook text hasn't changed since the first call. What is the most effective fix?",
+      "options": [
+        "Shorten the playbook to 10 pages so less text is sent per call, accepting some loss of guidance detail",
+        "Mark the static playbook content as a cacheable prompt prefix so repeated calls within and across sessions reuse the cached version instead of being reprocessed at full input cost and latency each turn",
+        "Switch to a model with a larger context window so the playbook fits more efficiently",
+        "Move the playbook into the conversation history as an early user turn instead of the system prompt, so it only needs to be sent once per session"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because prompt caching is designed exactly for this pattern — a large, static block of content (the playbook) that repeats identically across many calls — and it cuts both the cost and latency of reprocessing that content on every turn, without touching the playbook's actual guidance. A fails because shortening the playbook trades away real content the review quality depends on, which is a quality risk, not a caching fix. C fails because a larger context window changes how much can fit, not how much is billed or how fast repeated identical content is processed. D fails because moving the playbook into conversation history doesn't make it cacheable by itself and still leaves it being resent as part of a growing history on every turn if the underlying prefix isn't marked for caching."
+    },
+    {
+      "id": "ccap-scenario-003-q2",
+      "stem": "Raj also finds that every request — including simple classification steps like determining whether an uploaded document is a redline of an existing contract or a brand-new draft — is routed to Clarion's largest, most capable Claude model. What model-selection change addresses this cost and latency contributor?",
+      "options": [
+        "Keep every request on the largest model, since using different models for different sub-tasks adds engineering complexity that isn't worth the savings",
+        "Route simple, well-defined sub-tasks (like the redline/new-draft classification) to a smaller, faster model, and reserve the largest model for the complex clause-by-clause reasoning that actually needs its capability",
+        "Move all sub-tasks, including complex clause reasoning, to the smallest available model to minimize cost uniformly",
+        "Replace the classification step with a keyword search for the word 'redline' in the filename, removing the model call entirely regardless of accuracy trade-offs"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because tiering requests by task complexity — routing simple, structured classification to a smaller/faster model and reserving the most capable model for genuinely complex reasoning — reduces cost and latency on the high-volume simple steps without weakening the step that needs full capability. A fails because it pays premium cost and latency for a task that doesn't require it, purely to avoid modest engineering complexity. C fails because pushing the complex clause-reasoning step to the smallest model risks degrading exactly the accuracy attorneys rely on, trading quality for cost with no validation. D fails because relying on filename conventions is unreliable — the actual document content, not its filename, determines whether it's a redline, and this would silently misclassify documents."
+    },
+    {
+      "id": "ccap-scenario-003-q3",
+      "stem": "In long review sessions, Clarion resends the full raw conversation transcript on every turn, so cost and latency grow roughly quadratically as a session extends across dozens of turns. Which context-window optimization addresses this?",
+      "options": [
+        "Cap sessions at exactly 5 turns and force attorneys to start a new session after that, regardless of whether the review is complete",
+        "Periodically summarize or prune older turns, retaining only the relevant running state (e.g., a structured list of clauses flagged so far and their status) instead of the full raw transcript, so context grows with information density rather than turn count",
+        "Increase the context window ceiling so the growing transcript never gets truncated, regardless of the cost implications",
+        "Remove conversation history entirely and treat every turn as a stateless, independent call"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because pruning or summarizing older turns into compact structured state keeps the context focused on what's actually needed for the next turn, breaking the quadratic growth pattern while preserving the information (flagged clauses, decisions made) the review actually depends on. A fails because it arbitrarily interrupts a review that may legitimately need more than 5 turns, degrading the user experience rather than fixing the underlying cost driver. C fails because it addresses the symptom (truncation) while making the actual cost and latency problem worse by allowing the transcript to keep growing unchecked. D fails because dropping history entirely would lose the context of clauses already discussed and decisions already made, breaking the assistant's ability to handle coherent follow-up questions."
+    },
+    {
+      "id": "ccap-scenario-003-q4",
+      "stem": "After implementing caching, model tiering, and context pruning, Lena wants confidence the changes haven't quietly reduced review quality before rolling them out to all customers. What should the team do before shipping?",
+      "options": [
+        "Ship the changes immediately based on the measured latency and cost improvements, since those were the stated goals",
+        "Run a regression evaluation against a held-out set of contracts with known, human-labeled flagged-clause ground truth, comparing flagged-clause accuracy (not just cost and latency) between the old and new pipeline before rollout",
+        "Ask a few attorneys informally whether the assistant 'feels' as good as before, and ship if no one complains within a week",
+        "Skip evaluation since caching and model tiering are purely infrastructure changes that don't touch the model's reasoning quality"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because cost and latency improvements say nothing about whether flagged-clause accuracy held up, especially given that model tiering routes some sub-tasks to a different model — a held-out evaluation set with known ground truth is what actually validates quality didn't regress before customers are affected. A fails because it ships based on the metrics the team set out to fix while never checking the metric that matters most to attorneys: correctness. C fails because informal, low-volume anecdotal feedback is not a reliable signal and won't catch a systematic accuracy regression that only shows up on certain clause types. D fails because model tiering explicitly changes which model reasons about which sub-task, which is exactly the kind of change that can shift output quality and needs to be evaluated, not assumed safe."
+    }
+  ],
+  "keyLearnings": [
+    "Static content repeated identically across calls (like a reference playbook) is a textbook case for prompt caching, cutting both cost and latency without touching the content itself.",
+    "Model selection should be tiered by task complexity — routing simple, structured sub-tasks to smaller/faster models and reserving the most capable model for genuinely complex reasoning reduces cost without degrading the tasks that need full capability.",
+    "Unbounded conversation history causes quadratic cost and latency growth in long sessions; pruning or summarizing older turns into compact structured state keeps context proportional to information need, not turn count.",
+    "Cost and latency optimizations must be validated against a quality regression evaluation before rollout — improving efficiency metrics alone does not confirm that accuracy was preserved, especially when model selection changed."
+  ]
+}

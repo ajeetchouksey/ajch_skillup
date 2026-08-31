@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-006",
+  "title": "Approval Gates for a Regulated Multi-Agent Workflow",
+  "description": "Halcyon Health Compliance runs a three-agent triage-diagnosis-fix pipeline against clinical-trial data pipeline code. The scenario tests classifying autonomy levels by risk and reversibility, avoiding over-approval that stalls delivery, escalating based on blast radius across an agent handoff, and maintaining the audit trail a compliance review will need later.",
+  "examId": "gh600",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [6, 5],
+  "scenario": {
+    "background": "Halcyon Health Compliance operates a multi-agent pipeline for its clinical-trial data platform: a triage agent classifies incoming issues, a diagnosis agent investigates root causes, and a fix agent implements and proposes changes. Because the codebase touches regulated patient data, the compliance team is defining exactly which actions across this pipeline can run autonomously and which require a human approval gate before executing.",
+    "characters": [
+      {
+        "name": "Grace Muthoni",
+        "role": "Compliance Architect",
+        "concern": "Classifying each action in the pipeline by risk and reversibility, and placing human approval gates only where they are actually needed for irreversible or regulated actions."
+      },
+      {
+        "name": "Owen Baptiste",
+        "role": "Engineering Manager",
+        "concern": "Keeping the pipeline fast enough to be useful — worried that gating too many low-risk steps will slow the team down without making anything safer."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-006-q1",
+      "stem": "Grace is classifying two candidate actions in the pipeline: (1) the fix agent auto-labeling a triaged issue with a severity tag, and (2) the fix agent proposing a change to how patient records are filtered before being exported for an external audit. Which classification is correct?",
+      "options": [
+        "A: Both should require human approval, since both actions touch the clinical-trial codebase",
+        "B: Auto-labeling can remain fully autonomous; the patient-data filtering change should require human approval before it can be merged, given its regulatory sensitivity and the consequences of getting the filtering logic wrong",
+        "C: Both can remain fully autonomous, since the fix agent only proposes changes — a human still has to open the PR",
+        "D: The patient-data filtering change can remain fully autonomous as long as it passes automated tests, since tests are a sufficient substitute for human review on regulated code"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because autonomy classification should track actual risk and consequence, not just \"touches the codebase\" — labeling an issue has no effect on patient data or compliance posture, while a change to export-filtering logic directly affects what regulated data leaves the system and warrants human review before merge. A over-applies gating uniformly regardless of risk, which is the over-approval pattern Owen is worried about. C misstates the workflow — the scenario is about which changes can merge autonomously versus require approval, not who opens the PR. D substitutes automated tests for human judgment on a regulatory-sensitive change; tests can verify expected cases but can't substitute for a compliance-aware human review of filtering logic that governs what patient data is exposed."
+    },
+    {
+      "id": "gh600-scenario-006-q2",
+      "stem": "Owen reports that under the current policy, every single commit the fix agent makes — including whitespace-only formatting changes — requires human approval, and PRs now take three times longer to land because engineers must approve dozens of trivial commits per day. What should Grace change?",
+      "options": [
+        "A: Nothing — maximal approval coverage is always the safest choice for a regulated codebase",
+        "B: Remove human approval requirements entirely to restore velocity, and rely on downstream monitoring to catch any problems",
+        "C: Reserve human approval gates for changes that are irreversible, regulatory-sensitive, or touch patient-data handling, and let low-risk actions like whitespace or formatting-only commits proceed without a gate",
+        "D: Keep the blanket approval requirement, but assign a second reviewer to speed up approvals"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because gates should be sized to actual risk — trivial, reversible changes like whitespace formatting add review burden without reducing meaningful risk, while the regulatory-sensitive changes from Q1 genuinely need the gate. A is the over-approval anti-pattern itself: treating every action as equally risky doesn't make the codebase safer, it just makes reviewers rubber-stamp trivial items, which can dull scrutiny on the changes that actually matter. B overcorrects in the other direction, removing gates from genuinely risky actions along with the trivial ones. D doesn't fix the root problem — adding more reviewers to approve unnecessary gates just distributes the wasted effort rather than eliminating it."
+    },
+    {
+      "id": "gh600-scenario-006-q3",
+      "stem": "The diagnosis agent hands off a root-cause finding to the fix agent, which proposes a change to a shared validation utility used across multiple data pipelines, not just the one the original issue was reported against. What should determine whether this specific handoff requires escalation to a human before the fix agent's change proceeds?",
+      "options": [
+        "A: Whether the diagnosis agent's finding was confidently stated",
+        "B: The blast radius of the proposed change — since a shared utility affects multiple pipelines beyond the one originally reported, the potential consequences of an incorrect fix are broader than a single-pipeline change, which should raise the bar for approval regardless of how narrow the original issue was",
+        "C: Which agent authored the change, since the fix agent is generally considered more reliable than the diagnosis agent",
+        "D: How long the diagnosis-to-fix handoff took, since faster handoffs indicate higher confidence"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because escalation criteria should be driven by the actual scope of impact — a change to a shared utility touching multiple pipelines has a wider blast radius than the single-pipeline issue that triggered it, and that broadened scope is exactly the kind of signal that should raise the bar for human review, independent of how the original issue was framed. A conflates confidence in narration with correctness of scope, the same trap seen in detecting context drift. C is an irrelevant basis for escalation — escalation should depend on the action's consequences, not which agent role performed it. D treats handoff speed as a risk signal with no logical connection to the actual scope of the change."
+    },
+    {
+      "id": "gh600-scenario-006-q4",
+      "stem": "Halcyon's compliance team will audit this pipeline six months from now, likely after the engineers who originally supervised it have moved to other teams. What should Grace ensure exists now so that a future auditor can reconstruct what each agent did, why, and who approved which actions?",
+      "options": [
+        "A: A single aggregate count of how many PRs the pipeline produced over the period, since totals are sufficient for a compliance audit",
+        "B: A decision log and audit trail — including correlation/trace IDs linking triage, diagnosis, and fix agent activity for a given issue, along with records of what was approved and by whom — captured as the pipeline runs, not reconstructed later from memory",
+        "C: Nothing additional — GitHub's default commit history alone is sufficient to answer every compliance question an auditor might ask",
+        "D: A requirement that the original supervising engineers be available for the audit to explain their reasoning verbally"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a future audit needs to trace a specific outcome back through which agent did what, why, and which human approved which action — a correlation/trace ID linking activity across the triage, diagnosis, and fix agents for a given issue, plus recorded approval decisions, is exactly the durable, structured record that makes this reconstruction possible without relying on anyone's memory. A is too coarse — a total count says nothing about individual decisions or approvals. C understates what compliance audits typically require — commit history shows what changed but not necessarily why, which agent's reasoning drove it, or who approved a specific regulatory-sensitive action. D is fragile by design — the scenario explicitly notes the original engineers may have moved on, so the audit trail must stand on its own without depending on their availability."
+    }
+  ],
+  "keyLearnings": [
+    "Autonomy classification should track an action's actual risk and reversibility (does it affect regulated data, is it hard to undo), not surface traits like which codebase it touches or which agent performed it.",
+    "Over-approval — gating every action uniformly, including trivial and reversible ones — slows delivery without improving safety, and can dull reviewer scrutiny on the changes that genuinely need it.",
+    "Escalation criteria in a multi-agent handoff should be driven by the blast radius of the proposed change, not by how narrow the originating issue was or how confidently an upstream agent stated its findings.",
+    "A durable audit trail — decision logs and correlation IDs linking related agent activity, captured as the pipeline runs — is what makes a multi-agent workflow auditable months later, independent of whether the original supervising engineers are still available."
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-005",
+  "title": "Rolling Out a Clinical Documentation Assistant Under HIPAA",
+  "description": "Tests the ability to design a compliant data-handling and human-in-the-loop architecture for a regulated healthcare deployment, define the governance sign-off process required before scaling, and manage stakeholder communication with skeptical clinicians.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [5, 6],
+  "scenario": {
+    "background": "Harbor View Health, a regional hospital network, is piloting a Claude-based ambient scribe that listens to patient visits and drafts clinical notes for physicians to review. The pilot covers two outpatient clinics before any consideration of network-wide rollout. Physicians have expressed a mix of interest and skepticism — some worry about liability if an AI-drafted note contains an error they miss, and others worry the technology will be used to justify shorter visit times.",
+    "characters": [
+      {
+        "name": "Dr. Amara Osei",
+        "role": "Chief Medical Information Officer",
+        "concern": "Needs the rollout to be both HIPAA-compliant and genuinely trusted by physicians, since low adoption or a documentation error would undermine the entire program."
+      },
+      {
+        "name": "Frank DiLorenzo",
+        "role": "Compliance and Legal Counsel",
+        "concern": "Needs a defensible audit trail and a formal sign-off process before any expansion beyond the pilot, since the network is accountable to regulators for how patient data is handled."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-005-q1",
+      "stem": "Before any real patient audio or data reaches the Claude API, what must be in place?",
+      "options": [
+        "A signed Business Associate Agreement (BAA) with Anthropic covering PHI handling, use of an API configuration with appropriate data retention limits, and confirmation that PHI submitted through the API is not used to train models",
+        "A generic terms-of-service acceptance, since any API provider's standard terms are sufficient for handling patient data",
+        "Verbal assurance from the vendor's sales team that the platform is 'HIPAA-compliant,' which can be documented after the pilot begins",
+        "Nothing beyond standard API credentials, since PHI handling requirements only apply to data stored in the hospital's own systems, not to data passed through a third-party API"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because handling PHI through a third-party API requires a signed BAA establishing the vendor's obligations as a business associate under HIPAA, along with a data-retention and training-use configuration that keeps PHI from being retained or used beyond its intended purpose — these must be in place before, not after, any real patient data flows through the system. B fails because standard consumer terms of service do not include the HIPAA-specific obligations a BAA establishes and are not sufficient for PHI. C fails because a verbal assurance is not a compliance artifact; Frank needs a signed, auditable agreement before real data is at risk, not a promise to formalize things later. D fails because HIPAA's obligations follow the data, not just the storage location — PHI passed to any third-party processor, including an API call, is covered and requires the same protections."
+    },
+    {
+      "id": "ccap-scenario-005-q2",
+      "stem": "How should the ambient scribe's draft note enter the physician's workflow?",
+      "options": [
+        "The AI-generated note auto-populates directly into the patient's official chart, and the physician is notified they can edit it later if they notice an issue",
+        "The AI-generated note is clearly marked as an unsigned draft, requiring the physician to explicitly review, edit as needed, and approve it before it becomes part of the official record, with an audit trail distinguishing AI-generated content from physician edits",
+        "The AI-generated note bypasses physician review entirely for routine visit types, to save time, with spot-check review only for complex cases",
+        "The AI generates the note but sends it directly to the hospital's billing system before any clinical review, since billing codes need to be assigned quickly"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a clinical note becomes part of a legal medical record, and the physician's explicit review-and-approve step, combined with an audit trail distinguishing AI-generated content from physician edits, is what preserves both patient safety and the physician's ability to be accountable for what they signed off on. A fails because auto-populating the chart before review risks an unverified AI-drafted note becoming part of the official record, which is exactly the liability and safety concern physicians raised. C fails because skipping review for 'routine' visits assumes routine visits carry no risk of a documentation error, which is not a safe assumption and removes the human checkpoint physicians need to trust the system. D fails because sending unreviewed content to a downstream system like billing before clinical review compounds the risk — an error in the note could propagate into billing codes before anyone catches it."
+    },
+    {
+      "id": "ccap-scenario-005-q3",
+      "stem": "The pilot at the two outpatient clinics has been running for eight weeks. What must happen before Harbor View considers scaling the ambient scribe network-wide?",
+      "options": [
+        "Since the vendor demo showed strong results and two clinics have used it without a major incident, proceed directly to network-wide rollout to capture the benefit faster",
+        "A structured review by the clinical governance/AI safety committee of pilot data — including error rates, near-miss reviews, and physician feedback against pre-defined safety metrics — with a formal decision to expand, modify, or halt, before any scaling",
+        "Ask each department head informally whether their clinicians like the tool, and expand to any department that responds positively",
+        "Skip formal review since the pilot already generated positive physician feedback anecdotally, and formal review would only slow down a program that's clearly working"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because scaling a clinical AI tool from a small pilot to network-wide use requires a formal governance review against pre-defined safety metrics — not just 'no major incident' — to catch systematic error patterns, near-misses, and edge cases that a small pilot may not have surfaced, and to produce a documented, defensible decision. A fails because 'no major incident in a small pilot' is a low bar that doesn't rule out sub-threshold error patterns that would appear at scale, and skipping structured review removes the safety net a regulated deployment needs. C fails because informal department-head opinion is not equivalent to a structured review of actual error rates and near-misses, and it invites inconsistent, opinion-driven expansion decisions. D fails because positive anecdotal feedback is not a substitute for the safety-metric review Frank's compliance function requires — governance review exists precisely because anecdote can miss systematic risk."
+    },
+    {
+      "id": "ccap-scenario-005-q4",
+      "stem": "Some physicians remain skeptical, worried about liability for AI-drafted errors and concerned the technology could be used to justify shorter visits. What communication approach should Amara take to build genuine adoption?",
+      "options": [
+        "Mandate adoption network-wide by policy, since physician buy-in will naturally follow once the tool is required and physicians have no choice but to use it",
+        "Communicate transparently what the tool does and does not do, confirm explicitly that physicians retain final review authority and the associated liability structure is unchanged, provide training and a feedback channel, and phase the rollout with physician champions rather than mandating it top-down",
+        "Avoid discussing liability and visit-length concerns directly, since raising them might increase physician anxiety about the tool",
+        "Tell physicians the tool has been fully validated and errors are extremely unlikely, to reassure them without going into the specifics of the review process"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because durable adoption in a clinical setting depends on physicians trusting both the tool's boundaries and the surrounding process — being explicit that they retain review authority and that liability structure hasn't shifted directly addresses their stated concern, and phased rollout with champions plus a feedback channel builds trust incrementally rather than demanding blind compliance. A fails because mandating adoption without addressing the underlying liability and workload concerns breeds resentment and workaround behavior (e.g., rubber-stamping drafts without real review), which undermines the safety the human-in-the-loop design is meant to provide. C fails because avoiding the concerns physicians actually raised doesn't make them go away — it erodes trust when physicians feel their concerns weren't taken seriously. D fails because overstating validation ('extremely unlikely' errors) without transparency about the actual review process and metrics is misleading and could encourage physicians to under-review drafts, increasing risk."
+    }
+  ],
+  "keyLearnings": [
+    "PHI cannot flow through any third-party AI API without a signed Business Associate Agreement, appropriate data-retention configuration, and confirmation the data isn't used for model training — this must be established before, not after, real patient data is involved.",
+    "In clinical and other regulated workflows, AI-generated output should be clearly marked as a draft requiring explicit human review and approval before it becomes part of the official record, with an audit trail distinguishing AI content from human edits.",
+    "Scaling a regulated pilot to full deployment requires a formal governance review against pre-defined safety metrics, not just the absence of an obvious incident during a small pilot.",
+    "Stakeholder adoption in a regulated, high-stakes environment depends on transparently addressing the specific concerns stakeholders raise (liability, workload) rather than mandating adoption or avoiding the topic."
+  ]
+}

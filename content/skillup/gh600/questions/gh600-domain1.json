@@ -1,0 +1,354 @@
+[
+  {
+    "domain": 1,
+    "id": "gh600-d1-001",
+    "scenario": "Aiden, a platform engineer at Northwind Retail, is piloting GitHub Copilot coding agent on a backlog of well-scoped, labeled bugs before expanding its use to the rest of the team.",
+    "question": "Which of the following SDLC tasks is MOST appropriate to delegate to the Copilot coding agent?",
+    "options": [
+      "Approving the merge of a pull request that touches the payments service",
+      "Researching the repository, drafting a plan, and opening a pull request that fixes a well-scoped, labeled bug",
+      "Deciding whether to adopt a new authentication architecture for the platform",
+      "Rotating the production database credentials referenced in the incident runbook"
+    ],
+    "correct": 1,
+    "explanation": "The principle: agent delegation works best on well-bounded execution tasks with a defined start and end state (research, implement, test, open PR), while irreversible or judgment-heavy decisions (merge approval, security-sensitive changes, architecture direction) must stay with a human accountable for the outcome.\n\nWhy B is correct: a labeled, well-scoped bug gives the agent a clear acceptance criterion, and its output (branch, commits, PR) stays inside the normal review pipeline where a human still approves the merge.\n\nWhy the distractors fail:\n- A: merge approval is precisely the gate that keeps a human accountable for what ships; delegating it removes the review checkpoint entirely.\n- C: architecture decisions require weighing trade-offs and organizational context an agent isn't accountable for and can't own.\n- D: credential rotation is a security-sensitive operational action with production blast radius, and an agent misconfiguration here has no easy rollback.\n\nIn practice: teams onboarding coding agents typically start with labeled, narrowly-scoped bugs precisely because the acceptance criteria are clear and the human still reviews the resulting PR before merge.",
+    "tags": ["sdlc-delegation", "human-in-the-loop", "scenario-based", "application"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-002",
+    "scenario": "Priya, an engineering manager at Cascade Robotics, assigns the Copilot coding agent an issue titled \"Improve the checkout flow\" with no acceptance criteria. The agent's resulting pull request touches 14 files across three services, including the payment gateway.",
+    "question": "What is the most likely root cause of the scope creep in the agent's PR?",
+    "options": [
+      "The agent's session hit its execution time limit before completing testing",
+      "The issue lacked concrete acceptance criteria, so the agent inferred its own boundaries for what \"improve\" meant",
+      "The repository's custom instructions file was missing entirely",
+      "The agent was granted bypass-actor status on the branch protection ruleset"
+    ],
+    "correct": 1,
+    "explanation": "The principle: an agent's output boundaries are only as tight as the input task definition; ambiguous goals force the agent to fill gaps with its own inference of scope, which rarely matches the reviewer's intent.\n\nWhy B is correct: \"Improve the checkout flow\" has no acceptance criteria or file/service boundary, so the agent reasonably interpreted \"improve\" broadly across everything it judged relevant, including the payment gateway.\n\nWhy the distractors fail:\n- A: a time-limit cutoff would truncate work, not expand its surface area, so it doesn't explain scope creep.\n- C: missing custom instructions affects style and convention adherence, not the fundamental scope of the task.\n- D: bypass-actor status affects whether a PR can merge without review, not what changes the agent decides to make while executing.\n\nIn practice: writing a task with explicit acceptance criteria (\"fix X only, no other files\") before delegating is the single highest-leverage anti-scope-creep control, cheaper than reviewing an oversized diff after the fact.",
+    "tags": ["anti-pattern", "scope-creep", "task-definition", "analysis"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-003",
+    "scenario": "To speed up agent PR merges, an admin at Solstice Bank adds the Copilot coding agent as a bypass actor on the main branch ruleset so its PRs skip the required review check, reasoning that the agent already ran tests and linters before opening the PR.",
+    "question": "What is the biggest risk introduced by this configuration?",
+    "options": [
+      "The agent will no longer be able to run tests in its ephemeral environment",
+      "Passing automated checks will substitute for human review, so a plausible but incorrect change can merge without anyone evaluating intent or business risk",
+      "The agent's session logs will stop being generated for audit purposes",
+      "The repository's custom instructions will be ignored on future agent tasks"
+    ],
+    "correct": 1,
+    "explanation": "The principle: automated checks (tests, linters) verify that code behaves as written, but only a human reviewer evaluates whether the change is the right thing to do; bypassing review removes the layer that catches correct-but-wrong-intent changes.\n\nWhy B is correct: bypass-actor status lets the agent's PR merge as soon as CI is green, with no human confirming the change matches the issue's actual intent, doesn't introduce subtle security or business-logic issues, or fits the broader architecture — risks automated checks aren't designed to catch.\n\nWhy the distractors fail:\n- A: bypass-actor status is unrelated to the agent's ability to run its own ephemeral test/lint steps; those still execute normally.\n- C: session logs are generated independent of merge permissions; removing the review gate doesn't disable logging.\n- D: custom instructions govern how the agent works, not whether its PR needs review to merge — unaffected by ruleset bypass configuration.\n\nIn practice: the safer pattern is to keep the agent out of the bypass list and instead reduce reviewer friction elsewhere (fast CI, small diffs, clear PR descriptions) — review is the compensating control for autonomy, not a bottleneck to engineer around.",
+    "tags": ["anti-pattern", "branch-protection", "bypass-actor", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-004",
+    "scenario": "A tech lead at Anchor Logistics files one issue asking the coding agent to \"update the shared auth library and also update the three downstream services that consume it,\" expecting a single agent session to handle all four repositories in one PR.",
+    "question": "What should the tech lead expect given how Copilot coding agent sessions are scoped?",
+    "options": [
+      "The agent will open one pull request that spans all four repositories in a single diff",
+      "The agent session operates against a single repository, so cross-repo work requires separate tasks/sessions and separate PRs per repo",
+      "The agent will automatically fork the downstream repos into the auth library's repo before editing",
+      "The agent will pause and request the tech lead to merge the auth library changes before it starts on the downstream repos"
+    ],
+    "correct": 1,
+    "explanation": "The principle: coding agent tasks are bound to the repository context they're launched in — this is a platform constraint, not a suggestion, so work that crosses repository boundaries can't be captured as one atomic agent unit of work.\n\nWhy B is correct: because the agent session, branch, commits, and PR are all scoped to one repository, a task spanning four repos must be decomposed into four separate delegated tasks (with the downstream ones likely depending on the first PR merging), each producing its own reviewable PR.\n\nWhy the distractors fail:\n- A: there is no mechanism for a single PR to span multiple repositories in this workflow, so the agent cannot produce this output.\n- C: the agent doesn't fork or merge repositories together; it works within the repository it was invoked on.\n- D: the agent doesn't autonomously sequence and wait across repositories as described; that orchestration is a human responsibility when splitting the work into tasks.\n\nIn practice: when scoping a delegated task, check first whether it's confined to one repository — if not, break it into per-repo tasks with the human owning the sequencing between them.",
+    "tags": ["anti-pattern", "multi-repo-limitation", "sdlc-delegation", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-005",
+    "scenario": "Marcus, a staff engineer at Fenwick Media, assigns the coding agent a large refactor issue touching roughly 40 files, expecting it to complete in one session. The returned PR only refactors 12 files, and the session log shows the session stopped mid-task — but Marcus merges it anyway because tests pass.",
+    "question": "What went wrong in how Marcus handled this delegation?",
+    "options": [
+      "He should have granted the agent bypass-actor status to merge faster",
+      "He treated a partial, time-limit-truncated result as complete without checking the session log for the actual stopping condition",
+      "He should have disabled branch protection to let the agent finish across multiple sessions",
+      "He should have asked the agent to skip running tests to leave more time for the refactor itself"
+    ],
+    "correct": 1,
+    "explanation": "The principle: agent sessions run inside a bounded execution ceiling, and a task whose scope exceeds that ceiling doesn't fail loudly — it stops wherever it got to, so \"tests pass\" on a partial diff only tells you the completed portion is internally consistent, not that the task is done.\n\nWhy B is correct: the session log explicitly showed the agent stopped mid-task, which was the signal to catch before merge; passing tests on 12 of 40 intended files is fully compatible with a correctly-refactored subset and 28 files silently left in their old, now-inconsistent state.\n\nWhy the distractors fail:\n- A: bypass-actor status affects review requirements, not whether the agent's output is complete; it doesn't fix a truncation problem.\n- C: disabling branch protection removes a safety control and doesn't address session length; it also isn't how continuation across sessions works.\n- D: skipping tests would reduce signal, not increase completed scope, and removes a real quality gate for no benefit.\n\nIn practice: for large tasks, either scope the delegated unit of work to fit comfortably inside a single session's time budget, or explicitly re-review and re-run the agent on the remaining scope — and always read the session log's completion status, not just the final CI result.",
+    "tags": ["anti-pattern", "session-time-limit", "troubleshooting", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-006",
+    "scenario": "Devon, a QA lead at Cobalt Freight, adopts a team norm that any PR opened by the coding agent gets merged automatically once CI passes, \"since Copilot already checked its own work.\"",
+    "question": "Why is this norm a mismatch with how agent-authored PRs should be treated?",
+    "options": [
+      "Agent-authored PRs cannot trigger CI at all, so this norm is technically impossible to implement",
+      "An agent PR is a proposal for review like any human contributor's PR — CI passing confirms correctness of what was written, not that it's the right change to make",
+      "The coding agent is only able to open draft PRs, so auto-merge is blocked by GitHub regardless of the norm",
+      "Agent PRs must always be reviewed by two different people, so single-approval auto-merge is a policy violation"
+    ],
+    "correct": 1,
+    "explanation": "The principle: an agent-authored PR is still just a PR — a proposed diff plus a session log as its audit trail — and review-gating exists to catch mismatches between what was requested and what was actually built, a class of problem CI cannot detect.\n\nWhy B is correct: CI validates that code compiles, passes tests, and satisfies linters; it says nothing about whether the change correctly interprets the issue's intent, avoids unintended side effects, or is appropriate given business context — exactly what human review is for.\n\nWhy the distractors fail:\n- A: agent PRs run through the same CI pipeline as any other PR; nothing prevents CI from triggering on them.\n- C: draft-PR is a convention many teams deliberately choose for agent output, but it is not a platform-enforced requirement that blocks auto-merge on its own.\n- D: two-reviewer rules are an organizational policy choice some teams add, not an inherent requirement created specifically because a PR was agent-authored.\n\nIn practice: the durable safeguard is to treat \"agent-authored\" as informational metadata on the PR, not a bypass signal — the review gate that applies to a human's PR should apply identically to the agent's.",
+    "tags": ["anti-pattern", "review-gating", "human-in-the-loop", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-007",
+    "scenario": "Before assigning a data-pipeline bug fix to the coding agent, Elena, a delivery lead at Lumen Analytics, writes an issue that states the failing test name, the expected behavior, the files most likely involved, and a note that the fix must not change the public API.",
+    "question": "What is Elena doing by including this information before delegating the task?",
+    "options": [
+      "Defining the acceptance criteria and constraints the agent's output will be evaluated against",
+      "Pre-approving the agent's eventual pull request so it can bypass review",
+      "Granting the agent elevated repository permissions needed to start the session",
+      "Disabling the agent's ability to run tests so it focuses only on the code change"
+    ],
+    "correct": 0,
+    "explanation": "The principle: a well-formed agent task specifies inputs (context the agent needs), outputs (the branch/PR expected), and success criteria (what \"done and correct\" means) before any work starts — the same discipline good tickets require for human contributors, made explicit because the agent has no other source of shared context.\n\nWhy A is correct: the failing test name and the \"must not change the public API\" constraint are exactly the acceptance criteria and boundaries a reviewer will later check the resulting PR against.\n\nWhy the distractors fail:\n- B: writing a clear issue has nothing to do with review requirements on the resulting PR; the PR still goes through normal review.\n- C: issue content doesn't grant or change repository permissions; permissions are configured separately at the org/repo level.\n- D: nothing about specifying constraints disables the agent's own test execution — in fact a stated failing test gives the agent something concrete to verify against.\n\nIn practice: teams that see the highest-quality agent PRs consistently write tighter tickets, not more powerful agents — clarity upfront reduces both scope creep and review time downstream.",
+    "tags": ["task-definition", "success-criteria", "best-practice", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-008",
+    "scenario": "Raj, an SRE at Meridian Cloud, is deciding which of four pending tasks to delegate to the coding agent: (1) update a deprecated logging library call across the codebase, (2) approve and merge a PR into the release branch, (3) add unit tests for an existing utility function, (4) decide whether to migrate from REST to GraphQL for a public API.",
+    "question": "Which task should remain exclusively human-owned rather than delegated to the agent?",
+    "options": [
+      "Updating the deprecated logging library call",
+      "Approving and merging the pull request into the release branch",
+      "Adding unit tests for the existing utility function",
+      "Any task involving files under the /tests directory"
+    ],
+    "correct": 1,
+    "explanation": "The principle: delegation boundaries track accountability — an agent can produce a change, but the moment that change becomes binding (merged into a branch that ships) requires a human who owns the consequences to make that call.\n\nWhy B is correct: merge approval is the checkpoint where a change transitions from \"proposed\" to \"accepted,\" and that decision carries accountability that can't be delegated to the same system that authored the change.\n\nWhy the distractors fail:\n- A: a mechanical, well-scoped library-call update is a textbook example of appropriate agent delegation with low ambiguity and easy verification.\n- C: adding tests for existing, understood behavior is also a good delegation candidate — additive, low-risk, and easily reviewed.\n- D: the /tests directory framing is a red herring; delegability depends on task type and risk, not file location alone, so this generalization is false.\n\nIn practice: when triaging a backlog for delegation, ask whether completing the task also implies committing the organization to it — if yes, keep that decision step human-owned even if the mechanical work before it is delegated.",
+    "tags": ["human-in-the-loop", "sdlc-delegation", "scenario-based", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-009",
+    "scenario": "Tara, a platform architect at Orbital Systems, configures her team's coding agent workflow so it always produces a written implementation plan as its first output, before any file-modifying tool is invoked.",
+    "question": "What is the primary benefit of configuring planning as a distinct phase from execution?",
+    "options": [
+      "It lets a human review and validate the intended approach before any code-modifying action happens",
+      "It reduces the total number of commits the agent produces in its final PR",
+      "It allows the agent to skip writing tests since the plan already documents intent",
+      "It grants the agent access to additional MCP tools that are unavailable during execution"
+    ],
+    "correct": 0,
+    "explanation": "The principle: separating \"decide what to do\" from \"do it\" creates a natural checkpoint where a reviewable artifact exists before anything irreversible (a file edit, a commit, a shell command) happens — the same reason humans write design docs before implementation.\n\nWhy A is correct: a plan produced before execution gives a reviewer the chance to catch a misunderstanding of scope, an incorrect target file, or a destructive step before the agent ever touches the repository, which is strictly cheaper than catching it in a diff afterward.\n\nWhy the distractors fail:\n- B: commit count is a byproduct of how the agent executes, not something planning-phase separation is designed to control.\n- C: a plan documenting intent doesn't substitute for tests verifying behavior; skipping tests is unrelated and would be a quality regression.\n- D: tool availability is governed by the agent's tools/excludedTools configuration for that phase, not automatically expanded by having a planning step.\n\nIn practice: the plan-then-act split is the core mechanism that makes autonomous agent work reviewable at all — without it, the first artifact a human sees is already a completed, and possibly wrong, change.",
+    "tags": ["planning-phase", "human-in-the-loop", "configuration", "comprehension"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-010",
+    "scenario": "Ingrid, an engineering manager at Harborview Insurance, notices that when their coding agent narrates its intentions in free-form prose (\"I'll look at the auth module and probably update a few files\"), reviewers struggle to tell what will actually change before approving. She reconfigures the workflow so the plan step must output a structured task list with target files and specific actions.",
+    "question": "What problem does requiring structured plan output solve that free-form narration does not?",
+    "options": [
+      "It makes the agent execute faster because structured text parses more quickly than prose",
+      "It gives the reviewer a concrete, checkable artifact — specific files and actions — instead of vague intent that's hard to verify against the issue's scope",
+      "It eliminates the need for the agent to write a PR description afterward",
+      "It automatically grants the plan step write access to the repository"
+    ],
+    "correct": 1,
+    "explanation": "The principle: a plan is only useful as a review gate if it's specific enough to check against reality — \"probably update a few files\" can't be validated for scope, but naming exact files and actions can be checked line by line against the issue.\n\nWhy B is correct: structured output (a task list naming files and actions) turns the plan into a concrete artifact a reviewer can mentally diff against the acceptance criteria before execution starts, which is precisely what vague prose prevents.\n\nWhy the distractors fail:\n- A: execution speed is unaffected by whether the plan artifact is structured or prose; parsing overhead here is negligible either way.\n- C: a PR description is a separate artifact produced later, and structured planning doesn't remove the need for it.\n- D: the plan step's permissions are set independently by its tool configuration; producing structured output doesn't itself change access level.\n\nIn practice: reviewers should be suspicious of any agent plan step that can't be checked off item by item against the original issue — if the plan can't be falsified, it can't be validated.",
+    "tags": ["structured-plan", "plan-validation", "best-practice", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-011",
+    "scenario": "Sam, a security engineer at Vertex Aerospace, reviews an agent-generated implementation plan for a bug-fix task before approving it to proceed to execution.",
+    "question": "Which of the following should Sam prioritize checking in the plan before allowing execution to proceed?",
+    "options": [
+      "Whether the plan's scope matches the issue, avoids destructive operations, and targets the correct files/repository",
+      "Whether the plan uses the exact same terminology as the original issue text",
+      "Whether the plan is shorter than the eventual PR diff will be",
+      "Whether the plan was generated within the first 30 seconds of the session"
+    ],
+    "correct": 0,
+    "explanation": "The principle: a plan review exists to catch problems before they become code — scope drift, destructive operations, and wrong targets are the three failure modes that are cheap to fix in a plan and expensive to fix in a merged diff.\n\nWhy A is correct: confirming the proposed work matches the issue's actual scope, contains no irreversible or destructive steps (force-pushes, deletions, schema drops) not called for by the task, and points at the correct repo/files is exactly what determines whether execution should be allowed to proceed.\n\nWhy the distractors fail:\n- B: matching wording is a style preference with no bearing on whether the plan is actually correct or safe to execute.\n- C: plan length versus final diff size is not a meaningful safety or scope signal — a short plan can still be wrong, and a longer one can still be entirely correct.\n- D: generation speed says nothing about plan quality or correctness and isn't a validation criterion.\n\nIn practice: experienced reviewers treat plan review like a lightweight design review — three quick questions (right scope, no destructive steps, right target) catch the large majority of problems before any tool runs.",
+    "tags": ["plan-validation", "scenario-based", "evaluation"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-012",
+    "scenario": "Noor, a DevOps engineer at Solstice Bank, is configuring two custom agents: a \"planner\" agent that produces the implementation plan, and an \"executor\" agent that carries it out. She wants to guarantee the planner literally cannot modify the repository, even if its output is somehow misused.",
+    "question": "Which configuration best enforces this guarantee at the planner agent level?",
+    "options": [
+      "Set the planner agent's tools property to only read-only tools (such as grep/glob/view), withholding any edit- or bash-capable tools",
+      "Instruct the planner agent's system prompt to avoid making edits",
+      "Give the planner agent full tool access but rely on the executor agent to ignore any code changes the planner makes",
+      "Configure a post-execution CI check that reverts any files the planner agent touched"
+    ],
+    "correct": 0,
+    "explanation": "The principle: a guarantee enforced by capability (what tools an agent can even invoke) is structural and holds regardless of the agent's behavior, while a guarantee enforced by instruction is only a preference the model may or may not follow — capability-based controls are the only kind that hold under a misbehaving or misled agent.\n\nWhy A is correct: scoping the planner's tools property to read-only operations means edit and bash tools simply are not available to invoke, so there is no code path by which the planner can modify the repository — the constraint holds even if its reasoning or prompt handling goes wrong.\n\nWhy the distractors fail:\n- B: a system-prompt instruction is a soft guideline the model can deviate from under ambiguous or adversarial input (for example, prompt injection from a malicious issue body); it isn't a guarantee.\n- C: relying on the executor to \"ignore\" changes assumes the executor behaves correctly and doesn't address that damage from an unwanted edit may already be done to the working tree.\n- D: a post-hoc CI revert only cleans up after the fact; it doesn't prevent the modification from happening and could miss side effects (a triggered webhook, a partial commit) that occurred before the revert.\n\nIn practice: whenever an agent's role is \"propose, don't act,\" enforce that boundary through tool availability, not prompt wording — the same principle behind least-privilege access control applied to autonomous systems.",
+    "tags": ["tool-scoping", "planning-phase", "configuration", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-013",
+    "scenario": "Callum, a platform lead at Fenwick Media, uses a default orchestrator agent that coordinates work and delegates execution to specialized sub-agents. He wants the orchestrator itself to stay planning-only — reasoning, deciding, and handing off, but never directly running bash commands or editing files — even though it inherits a broad default toolset.",
+    "question": "What is the most precise way to enforce this without redefining the orchestrator's entire tool list from scratch?",
+    "options": [
+      "Use the excludedTools property on the orchestrator agent to remove edit- and bash-capable tools from its inherited default set",
+      "Rewrite the orchestrator's tools property to list every tool it should keep, one by one, from an empty baseline",
+      "Ask the sub-agents to reject any bash or edit calls that originate from the orchestrator",
+      "Rely on the orchestrator's system prompt to state that it delegates rather than executes directly"
+    ],
+    "correct": 0,
+    "explanation": "The principle: when an agent inherits a broad default toolset and you only need to remove a small number of capabilities, a denylist (excludedTools) is the minimal, precise edit — it changes exactly what's needed without having to reconstruct and maintain the full allowlist as defaults evolve.\n\nWhy A is correct: excludedTools subtracts the specific edit/bash tools from the orchestrator's inherited defaults, leaving everything else (read, search, delegation tools) intact — a small, targeted, and low-maintenance configuration change.\n\nWhy the distractors fail:\n- B: manually rebuilding the full tools allowlist from an empty baseline works but requires tracking every default tool the orchestrator should keep, and it silently breaks if the platform adds new default tools the team forgets to re-add.\n- C: sub-agents rejecting calls \"from the orchestrator\" isn't how tool invocation is scoped in this architecture — sub-agents don't inspect caller identity to enforce another agent's boundaries.\n- D: a prompt instruction is a soft constraint the orchestrator could deviate from, the same weakness as any instruction-only control rather than a capability-level restriction.\n\nIn practice: prefer excludedTools when removing a small number of capabilities from an otherwise-good default set, and reserve a full tools allowlist rewrite for cases where you're building a narrowly scoped agent from scratch.",
+    "tags": ["excluded-tools", "tool-scoping", "configuration", "application"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-014",
+    "scenario": "Beatriz, a release manager at Cobalt Freight, configures the coding agent workflow so that once a plan is generated, the agent opens its resulting changes as a draft pull request rather than a ready-for-review PR, marking it ready only after a teammate comments approval on the plan.",
+    "question": "What does this draft-PR gate primarily achieve?",
+    "options": [
+      "It prevents CI from running on the agent's branch until the PR is marked ready",
+      "It creates an explicit human checkpoint between the plan being produced and the changes being treated as ready to merge, without blocking the agent from doing the work asynchronously",
+      "It guarantees the agent cannot open more than one PR per repository",
+      "It automatically assigns code owners as required reviewers on the PR"
+    ],
+    "correct": 1,
+    "explanation": "The principle: an approval gate is only valuable if it doesn't force a human to sit and wait for the agent in real time — using the PR mechanism itself (draft state, comments, the ready-for-review transition) turns human oversight into an asynchronous checkpoint instead of a synchronous blocking conversation.\n\nWhy B is correct: marking the PR draft signals \"not yet approved for merge\" while still letting the agent commit and push work in the background; the teammate's comment and the ready-for-review transition become the recorded approval checkpoint before anything can be merged.\n\nWhy the distractors fail:\n- A: draft status doesn't prevent CI from running in GitHub's standard configuration; CI typically still executes on draft PRs, so this isn't the mechanism's purpose or effect.\n- C: draft state has no bearing on how many PRs an agent, or any actor, can open; that's not what this configuration controls.\n- D: draft PRs don't automatically add code owners as reviewers; that behavior depends on CODEOWNERS and branch protection settings configured separately.\n\nIn practice: async gates like draft-PR-plus-approval-comment let teams keep humans in the loop for judgment calls without requiring anyone to babysit the agent's execution in real time — the difference between controlled autonomy and either no oversight or no autonomy at all.",
+    "tags": ["draft-pr", "approval-gate", "best-practice", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-015",
+    "scenario": "Under deadline pressure, Yusuf, a tech lead at Anchor Logistics, disables the plan-review step and configures the agent to move straight from plan generation into execution and PR creation, planning to \"review the diff at the end instead.\"",
+    "question": "What risk does this configuration reintroduce?",
+    "options": [
+      "The agent will no longer produce commits, only a single squashed diff",
+      "Scope drift or unintended changes can occur during execution with no checkpoint to catch a wrong plan before code is actually written and committed",
+      "The agent will lose access to the repository's custom instructions during execution",
+      "CI will be unable to run against the resulting pull request"
+    ],
+    "correct": 1,
+    "explanation": "The principle: the value of a plan-review checkpoint comes specifically from catching problems before execution — removing that checkpoint doesn't make the agent's plans more accurate, it just moves the first point of human contact from \"before any change\" to \"after everything already happened.\"\n\nWhy B is correct: without plan validation, an incorrect scope or a subtly wrong approach only surfaces once the PR exists, at which point the agent may already have touched files, run destructive commands, or drifted well beyond the issue's intent — all more expensive to unwind than a plan revision would have been.\n\nWhy the distractors fail:\n- A: commit behavior during execution is unrelated to whether a plan-review step exists; the agent still commits normally as it works.\n- C: custom instructions are loaded as part of the agent's configured context regardless of whether a separate human plan-review gate exists.\n- D: CI triggers off the PR's existence and branch events, independent of whether a plan was reviewed beforehand.\n\nIn practice: \"review the diff at the end instead\" sounds equivalent to plan review but isn't — by the time there's a diff, the agent has already spent its execution budget on a direction nobody validated, so rework costs more than if the plan had been checked first.",
+    "tags": ["anti-pattern", "plan-validation", "planning-phase", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-016",
+    "scenario": "Layla, a build engineer at Orbital Systems, configures her org's two-agent workflow so that the execution-phase agent — and only the execution-phase agent — is granted tools capable of editing files and running bash commands, while the planning-phase agent keeps read-only access.",
+    "question": "What is the main architectural benefit of granting edit/bash capability only at the execution phase?",
+    "options": [
+      "It makes the execution phase run in a completely separate GitHub organization",
+      "It ensures the boundary between \"deciding what to do\" and \"actually doing it\" is enforced by tool availability, not by which phase happens to be invoked first",
+      "It removes the need for the execution phase to have any repository read access",
+      "It allows the planning phase to directly commit its plan as a file in the repository"
+    ],
+    "correct": 1,
+    "explanation": "The principle: splitting an autonomous workflow into phases only creates a real safety boundary if the capability difference between phases is enforced structurally — otherwise \"planning phase\" is just a label, and any phase could act if it happened to have the tools to do so.\n\nWhy B is correct: by giving edit/bash tools exclusively to the execution phase, the system guarantees that no matter what the planning phase reasons about or how it's prompted, it physically cannot make changes — the plan/act boundary is a property of the configuration, not of the model's cooperation.\n\nWhy the distractors fail:\n- A: tool scoping controls capability within a workflow; it has nothing to do with organizational boundaries or where the phase runs.\n- C: the execution phase still needs read access to understand the codebase it's editing; removing read access would break it, not improve the design.\n- D: allowing the planning phase to commit a plan file would require giving it write/edit capability, which directly contradicts the read-only boundary this configuration is meant to establish.\n\nIn practice: this pairs directly with restricting the planner's tools to read-only per-agent — together they make plan-then-act an enforced architecture rather than a hoped-for behavior.",
+    "tags": ["tool-scoping", "architecture", "execution-phase", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-017",
+    "scenario": "Grace, a GitHub org admin at BrightPath Health, enables GitHub Copilot coding agent at the organization level for all repositories, but the payments-processing repository's maintainers request that the agent remain disabled there due to compliance review requirements.",
+    "question": "What configuration approach satisfies both requirements?",
+    "options": [
+      "Disable Copilot coding agent org-wide instead, since a single repository's concerns should apply everywhere",
+      "Keep the org-level enablement policy on, and configure a per-repository opt-out for the payments-processing repository",
+      "Grant the payments-processing repository's maintainers admin rights over the entire organization's Copilot policy",
+      "Ask the payments-processing team to delete the repository and recreate it outside the organization"
+    ],
+    "correct": 1,
+    "explanation": "The principle: autonomy guardrails should operate at the granularity of the actual risk — org-wide enablement paired with per-repository opt-out lets an organization default to productivity while still respecting exceptions where a specific repo's risk profile warrants disabling the feature locally.\n\nWhy B is correct: this configuration gives every other team the benefit of the coding agent while cleanly excluding the one repository that has a documented compliance reason to opt out, without affecting anyone else.\n\nWhy the distractors fail:\n- A: disabling org-wide because one repository has a concern discards the benefit for every team that has no such concern; it fails to match the guardrail to the actual scope of the risk.\n- C: granting one team admin rights over the entire org's policy is a massive overreach relative to their actual need (opting out one repo) and creates a new governance risk.\n- D: recreating the repository outside the organization abandons the org's governance, security, and access controls entirely — a disproportionate and impractical response to a configuration need.\n\nIn practice: layered policy (org default plus repo-level override) is the standard pattern for balancing platform-wide productivity gains against localized compliance or risk requirements — reach for the narrowest override that solves the actual concern.",
+    "tags": ["enablement-policy", "configuration", "autonomy-guardrails", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-018",
+    "scenario": "Owen, a security architect at Meridian Cloud, is configuring a branch protection ruleset for the main branch. He wants the coding agent to be able to push commits directly to its own working branches without being blocked by rules meant for direct-to-main pushes, but he wants every PR — including the agent's — to still require the standard number of approving reviews before merge.",
+    "question": "How should Owen configure the ruleset's bypass list to achieve this?",
+    "options": [
+      "Add the coding agent as a bypass actor for the ruleset that governs pull request review requirements",
+      "Scope the bypass narrowly (for example, to rules that don't apply to the agent's own working branches) rather than to the rule requiring approving reviews before merge into main",
+      "Disable branch protection on main entirely while the agent is active, then re-enable it afterward",
+      "Add every repository collaborator as a bypass actor so the agent's reviewers aren't blocked either"
+    ],
+    "correct": 1,
+    "explanation": "The principle: bypass-actor lists should be scoped per-rule, not per-actor-wholesale — the goal is to remove friction on rules that don't serve their purpose for a given actor while preserving the specific rules that provide the actual compensating control (here, required review).\n\nWhy B is correct: scoping the bypass to only the rules that are irrelevant to the agent's own working branches (rules meant to stop humans pushing straight to main, for example) leaves the required-review rule fully intact for every PR, including the agent's, which is exactly the outcome Owen wants.\n\nWhy the distractors fail:\n- A: bypassing the rule that requires approving reviews is precisely what Owen does not want; it would let the agent's PRs merge without review, removing the human checkpoint he explicitly wants preserved.\n- C: disabling branch protection entirely removes every safeguard on main, not just the one causing friction, and re-enabling it later doesn't undo any merges that happened while it was off.\n- D: adding every collaborator as a bypass actor defeats the purpose of required review for human contributors too, a far broader and unrelated change from what the scenario calls for.\n\nIn practice: the discipline here is treating bypass configuration as \"which specific rule doesn't apply to this actor,\" not \"should this actor be exempt from protection\" — conflating the two is how teams accidentally disable the review gate they meant to keep.",
+    "tags": ["ruleset-configuration", "bypass-actor", "configuration", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-019",
+    "scenario": "Nadia, an engineering director at Cascade Robotics, is comparing two candidate agent tooling setups. Setup 1 has the agent commit incrementally to a branch, with each step viewable as a diff and a PR serving as the final record. Setup 2 has the agent perform its work through a separate automation pipeline that applies a single bulk change directly to main outside of GitHub's PR flow, with no intermediate commits.",
+    "question": "Why is Setup 1 preferable for observability and control?",
+    "options": [
+      "Setup 1 runs faster because commits are smaller than a bulk change",
+      "Setup 1 produces inspectable artifacts (commits, diffs, PR) inside standard developer tooling that a human can review at any point, while Setup 2's bulk change leaves no reviewable intermediate trace",
+      "Setup 1 requires fewer permissions than Setup 2 because it doesn't touch main directly",
+      "Setup 1 eliminates the need for CI because each commit is small enough to review manually"
+    ],
+    "correct": 1,
+    "explanation": "The principle: observability for autonomous agents depends on the work being visible through the same tooling humans already use to review changes — commits, diffs, and PRs are durable, inspectable, and familiar, while any path that bypasses them removes the audit trail exactly when it matters most.\n\nWhy B is correct: because each of the agent's steps in Setup 1 lands as a commit with a viewable diff, and the PR aggregates them into a single reviewable, audit-friendly record, a human (or a future investigator) can reconstruct exactly what happened and why — Setup 2's single bulk change to main has no equivalent trail of intermediate reasoning or steps.\n\nWhy the distractors fail:\n- A: commit granularity is not primarily a performance characteristic, and speed isn't the property being evaluated here — observability is.\n- C: permission requirements are a separate configuration concern from whether the resulting workflow produces reviewable artifacts; a setup could touch main directly and still be scoped narrowly, or vice versa.\n- D: small commits make manual review easier, but they don't eliminate the value or need for CI, which still validates behavior independent of diff size.\n\nIn practice: when evaluating any agent tooling integration, ask whether its output lands as standard, durable Git/GitHub artifacts or as an opaque side-channel — the former is auditable and reversible, the latter usually isn't.",
+    "tags": ["audit-trail", "observability", "comparison", "evaluation"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-020",
+    "scenario": "Felix, a tech lead at Lumen Analytics, initially requires every agent action to pause and wait for a reviewer to respond in a live chat session before continuing, which slows delivery because reviewers aren't always available. He switches the workflow to use PR comments and a draft-to-ready-for-review transition instead.",
+    "question": "What problem does this change primarily solve?",
+    "options": [
+      "It removes the need for any human review of the agent's work",
+      "It replaces a synchronous blocking approval step with an asynchronous checkpoint, so delivery isn't stalled waiting on a reviewer's real-time availability while human oversight is preserved",
+      "It gives the agent permission to merge its own PRs without any reviewer involvement",
+      "It shortens the agent's session time limit so it completes work faster"
+    ],
+    "correct": 1,
+    "explanation": "The principle: human-in-the-loop controls don't have to be synchronous to be effective — moving the checkpoint into artifacts a reviewer can engage with whenever they're available (PR comments, draft state) preserves the same oversight while removing the requirement that a human be present in real time.\n\nWhy B is correct: PR comments and the draft-to-ready-for-review transition let the reviewer weigh in whenever convenient, rather than forcing the agent and the delivery timeline to sit idle waiting for a live chat response, while the approval checkpoint itself still exists and still gates progress.\n\nWhy the distractors fail:\n- A: the change doesn't remove review, it changes its timing model; the draft-to-ready transition still requires a human action before the work is treated as approved.\n- C: nothing about async review grants the agent merge authority; standard branch protection and required-review rules still apply to the merge itself.\n- D: session time limits are a platform-level execution ceiling unrelated to how or when review happens; switching review models doesn't change that ceiling.\n\nIn practice: async-by-default is the pattern that scales human oversight across many concurrent agent tasks — synchronous blocking approval works for one agent session at a time but collapses as an organization runs agents at scale.",
+    "tags": ["async-review", "human-in-the-loop", "best-practice", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-021",
+    "scenario": "Diego, a platform engineer at Vertex Aerospace, wants his team to be notified automatically when a coding agent session starts, completes, or fails, without anyone having to poll the agent's status manually.",
+    "question": "What should Diego configure to achieve this?",
+    "options": [
+      "A custom instructions file describing the desired notification text",
+      "Subscribing to the agent's lifecycle/session events (such as started, completed, and failed) and routing them to the team's monitoring or notification system",
+      "A branch protection rule requiring a specific status check name",
+      "A scheduled workflow that runs every hour and greps the repository for new branches"
+    ],
+    "correct": 1,
+    "explanation": "The principle: observability at scale depends on push-based signals — event notifications for key lifecycle transitions — rather than a human or a script having to continuously poll for state changes.\n\nWhy B is correct: lifecycle/session events fired at started, completed, and failed checkpoints are exactly the mechanism designed to let external systems (chat notifications, dashboards, alerting) react to an agent's progress without manual polling.\n\nWhy the distractors fail:\n- A: custom instructions shape how the agent behaves during a task; they aren't a mechanism for emitting external monitoring notifications about session state.\n- C: a required status check name is part of merge gating on a PR, not a general-purpose notification mechanism for session lifecycle.\n- D: a polling workflow that greps for new branches is a reactive, delayed, and noisy substitute for the purpose-built event mechanism, and it wouldn't reliably report failures or completion state.\n\nIn practice: purpose-built lifecycle events let a human intervene at the right checkpoint (for example, a failed session) without needing to babysit every agent task in progress — the difference between monitoring at scale and manually watching a dashboard.",
+    "tags": ["lifecycle-events", "session-monitoring", "concept", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-022",
+    "scenario": "Amara, a director of engineering at Harborview Insurance, is designing her org's standard for how humans intervene in autonomous coding agent workflows. She wants reviewers to step in at meaningful checkpoints (plan review, PR review) without being required to actively monitor every tool call the agent makes during execution.",
+    "question": "Which design best satisfies this requirement?",
+    "options": [
+      "Require a reviewer to approve every individual tool call the agent makes in real time before it proceeds",
+      "Place review checkpoints only at the plan stage and the PR stage, using session/lifecycle events to alert reviewers if something needs attention in between, so oversight happens at meaningful decision points rather than continuously",
+      "Remove all review checkpoints and rely entirely on CI passing as the sole quality gate",
+      "Require the reviewer to be present in a live session for the full duration of every agent task"
+    ],
+    "correct": 1,
+    "explanation": "The principle: effective human oversight scales by concentrating review effort at the points where a decision actually branches the outcome (what to do, whether the result is acceptable) and using event-driven alerts to surface exceptions in between, rather than demanding continuous attention that doesn't scale past one task at a time.\n\nWhy B is correct: plan review catches wrong scope or destructive intent before execution, PR review catches problems in the final result, and lifecycle events (such as a failed step) surface exceptions that need attention in between — together this covers the meaningful decision points without requiring a human to watch every tool call.\n\nWhy the distractors fail:\n- A: approving every individual tool call turns the reviewer into a synchronous bottleneck for each step, which doesn't scale and defeats much of the purpose of delegating the work in the first place.\n- C: removing review checkpoints entirely reintroduces exactly the risk this design is meant to prevent — CI alone can't evaluate intent or business-context correctness.\n- D: requiring live presence for the full task duration is the same bottleneck as option A in a different form, and it doesn't leverage the async, event-driven tooling built for this purpose.\n\nIn practice: mature agent operating models are checkpoint-based, not continuous-supervision-based — the goal is for a human to spend attention proportional to the decision's risk, not proportional to the agent's wall-clock runtime.",
+    "tags": ["human-in-the-loop", "session-monitoring", "architecture", "evaluation"],
+    "difficulty": "hard"
+  }
+]

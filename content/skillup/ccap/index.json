@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "0.1.15",
+  "contentUpdatedAt": "2026-08-31",
+  "provider": "Anthropic",
+  "palette": {
+    "color": "#a78bfa",
+    "bg": "rgba(139,92,246,0.10)",
+    "border": "rgba(139,92,246,0.38)",
+    "glow": "rgba(139,92,246,0.18)",
+    "btn": "linear-gradient(135deg, #7c3aed, #6d28d9)"
+  },
+  "changelog": [
+    { "version": "0.1.0", "date": "2026-08-31", "type": "major", "summary": "Scaffolded — 7 domains, index.json grounded in the official CCAR-P Exam Guide (v1.0, effective July 2026)" },
+    { "version": "0.1.1", "date": "2026-08-31", "type": "patch", "summary": "Updated D1 notes: full Solution Design & Architecture content — patterns, multi-agent orchestration, decomposition, business value pillars, Deep Dive" },
+    { "version": "0.1.2", "date": "2026-08-31", "type": "patch", "summary": "Added 20 questions to domain D1 (Solution Design & Architecture)" },
+    { "version": "0.1.3", "date": "2026-08-31", "type": "patch", "summary": "Domain 2 notes added." },
+    { "version": "0.1.4", "date": "2026-08-31", "type": "patch", "summary": "Added 16 questions to domain D2 (Claude Models, Prompting & Context Engineering)" },
+    { "version": "0.1.5", "date": "2026-08-31", "type": "patch", "summary": "Domain 3 notes added." },
+    { "version": "0.1.6", "date": "2026-08-31", "type": "patch", "summary": "Added 23 questions to domain D3 (Integration)" },
+    { "version": "0.1.7", "date": "2026-08-31", "type": "patch", "summary": "Domain 4 notes added." },
+    { "version": "0.1.8", "date": "2026-08-31", "type": "patch", "summary": "Domain 4: 19 questions added." },
+    { "version": "0.1.9", "date": "2026-08-31", "type": "patch", "summary": "Domain 5 notes added." },
+    { "version": "0.1.10", "date": "2026-08-31", "type": "patch", "summary": "Added 17 questions to domain D5 (Governance, Safety & Risk Management)" },
+    { "version": "0.1.11", "date": "2026-08-31", "type": "patch", "summary": "Domain 6 notes added." },
+    { "version": "0.1.12", "date": "2026-08-31", "type": "patch", "summary": "Added 17 questions to domain D6 (Stakeholder Communication & Lifecycle Management)" },
+    { "version": "0.1.13", "date": "2026-08-31", "type": "patch", "summary": "Domain 7 notes added." },
+    { "version": "0.1.14", "date": "2026-08-31", "type": "patch", "summary": "Added 8 questions to domain D7 (Developer Productivity & Operational Enablement)" },
+    { "version": "0.1.15", "date": "2026-08-31", "type": "patch", "summary": "Added 6 scenarios: RAG pipeline design, multi-agent least-privilege, cost/latency optimization, production evaluation & A/B testing, regulated-industry governance rollout, and Claude Code developer enablement" }
+  ],
+  "id": "ccap",
+  "examCode": "CCAR-P",
+  "title": "Claude Certified Architect – Professional",
+  "shortTitle": "CCA-P",
+  "contentLevel": "301",
+  "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions — enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
+  "questions": 120,
+  "duration": "120 min",
+  "passScore": "720/1000",
+  "passThreshold": 72,
+  "examFee": "$175 USD",
+  "available": true,
+  "accentColor": "#7c3aed",
+  "colorScheme": "violet",
+  "domains": [
+    { "id": 1, "title": "Solution Design & Architecture", "weight": 17, "color": "bg-violet-600", "notesFile": "content/skillup/ccap/notes/ccap-d1-solution-design-and-architecture.md" },
+    { "id": 2, "title": "Claude Models, Prompting & Context Engineering", "weight": 13, "color": "bg-blue-600", "notesFile": "content/skillup/ccap/notes/ccap-d2-claude-models-prompting-and-context-engineering.md" },
+    { "id": 3, "title": "Integration", "weight": 19, "color": "bg-emerald-600", "notesFile": "content/skillup/ccap/notes/ccap-d3-integration.md" },
+    { "id": 4, "title": "Evaluation, Testing & Optimization", "weight": 16, "color": "bg-amber-600", "notesFile": "content/skillup/ccap/notes/ccap-d4-evaluation-testing-and-optimization.md" },
+    { "id": 5, "title": "Governance, Safety & Risk Management", "weight": 14, "color": "bg-rose-600", "notesFile": "content/skillup/ccap/notes/ccap-d5-governance-safety-and-risk-management.md" },
+    { "id": 6, "title": "Stakeholder Communication & Lifecycle Management", "weight": 14, "color": "bg-sky-600", "notesFile": "content/skillup/ccap/notes/ccap-d6-stakeholder-communication-and-lifecycle-management.md" },
+    { "id": 7, "title": "Developer Productivity & Operational Enablement", "weight": 7, "color": "bg-gray-600", "notesFile": "content/skillup/ccap/notes/ccap-d7-developer-productivity-and-operational-enablement.md" }
+  ],
+  "questionFiles": [
+    "content/skillup/ccap/questions/ccap-domain1.json",
+    "content/skillup/ccap/questions/ccap-domain2.json",
+    "content/skillup/ccap/questions/ccap-domain3.json",
+    "content/skillup/ccap/questions/ccap-domain4.json",
+    "content/skillup/ccap/questions/ccap-domain5.json",
+    "content/skillup/ccap/questions/ccap-domain6.json",
+    "content/skillup/ccap/questions/ccap-domain7.json"
+  ],
+  "scenarioFiles": [
+    "content/skillup/ccap/scenarios/ccap-enterprise-rag-pipeline-design.json",
+    "content/skillup/ccap/scenarios/ccap-multi-agent-support-least-privilege.json",
+    "content/skillup/ccap/scenarios/ccap-cost-latency-optimization.json",
+    "content/skillup/ccap/scenarios/ccap-production-evaluation-ab-testing.json",
+    "content/skillup/ccap/scenarios/ccap-regulated-industry-governance-rollout.json",
+    "content/skillup/ccap/scenarios/ccap-claude-code-developer-enablement.json"
+  ],
+  "resources": [
+    { "label": "Official Exam Page", "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-professional-certification" },
+    { "label": "Official Exam Guide (PDF)", "url": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf" },
+    { "label": "Anthropic Docs", "url": "https://docs.anthropic.com" },
+    { "label": "Anthropic Cookbook", "url": "https://github.com/anthropics/anthropic-cookbook" },
+    { "label": "MCP Docs", "url": "https://modelcontextprotocol.io" }
+  ],
+  "taskStatementsFile": "content/skillup/ccap/task-statements.json"
+}

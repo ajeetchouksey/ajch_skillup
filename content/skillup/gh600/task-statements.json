@@ -1,0 +1,427 @@
+{
+  "schemaVersion": "1.0",
+  "examCode": "GH-600",
+  "source": "Study guide for Exam GH-600: Developing in Agentic AI Systems (Microsoft Learn)",
+  "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/gh-600",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Prepare Agent Architecture and SDLC Processes",
+      "weight": 18,
+      "officialWeight": "15–20%",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "Integrate agents into the software development lifecycle (SDLC)",
+          "knowledge": [
+            "Anti-patterns in agent SDLC integration",
+            "Success criteria definition"
+          ],
+          "skills": [
+            "Identify steps for agents to perform and define inputs/outputs/success criteria"
+          ],
+          "questionIds": [
+            "gh600-d1-001",
+            "gh600-d1-002",
+            "gh600-d1-003",
+            "gh600-d1-004",
+            "gh600-d1-005",
+            "gh600-d1-006",
+            "gh600-d1-007",
+            "gh600-d1-008",
+            "gh600-d1-013",
+            "gh600-d1-015",
+            "gh600-d1-018",
+            "gh600-d1-020"
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Define boundaries between planning, reasoning, and action",
+          "knowledge": [
+            "Structured plan output",
+            "Plan validation and approval gating"
+          ],
+          "skills": [
+            "Configure agent planning distinct from execution; prevent action until approved"
+          ],
+          "questionIds": [
+            "gh600-d1-009",
+            "gh600-d1-010",
+            "gh600-d1-011",
+            "gh600-d1-012",
+            "gh600-d1-014",
+            "gh600-d1-016"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Configure observability and control for autonomous agents",
+          "knowledge": [
+            "Autonomy-level guardrails",
+            "Inspectable artifacts in standard dev tooling"
+          ],
+          "skills": [
+            "Configure human intervention for autonomous agents without slowing delivery"
+          ],
+          "questionIds": [
+            "gh600-d1-017",
+            "gh600-d1-019",
+            "gh600-d1-021",
+            "gh600-d1-022"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement Tool Use and Environment Interaction",
+      "weight": 23,
+      "officialWeight": "20–25%",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "Select and configure agent tools",
+          "knowledge": [
+            "Tool identification and configuration",
+            "Tool permission scoping"
+          ],
+          "skills": [
+            "Identify required tools and configure tool permissions"
+          ],
+          "questionIds": [
+            "gh600-d2-001",
+            "gh600-d2-002",
+            "gh600-d2-003",
+            "gh600-d2-004",
+            "gh600-d2-005",
+            "gh600-d2-006",
+            "gh600-d2-007",
+            "gh600-d2-008",
+            "gh600-d2-011",
+            "gh600-d2-015"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Configure MCP servers",
+          "knowledge": [
+            "MCP server configuration",
+            "GitHub remote MCP server",
+            "MCP registries and allow lists"
+          ],
+          "skills": [
+            "Add and scope MCP servers as agent tools"
+          ],
+          "questionIds": [
+            "gh600-d2-009",
+            "gh600-d2-010",
+            "gh600-d2-012",
+            "gh600-d2-013",
+            "gh600-d2-014",
+            "gh600-d2-024"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Integrate agents within development environments",
+          "knowledge": [
+            "Execution context evaluation",
+            "Repo/branch scoping",
+            "CI invocation"
+          ],
+          "skills": [
+            "Configure an agent's scope to a repository/branch and enable autonomous branch/PR creation"
+          ],
+          "questionIds": [
+            "gh600-d2-016",
+            "gh600-d2-017",
+            "gh600-d2-018",
+            "gh600-d2-019",
+            "gh600-d2-020",
+            "gh600-d2-021",
+            "gh600-d2-022",
+            "gh600-d2-023"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Operate agents with safe execution paths and robust error handling",
+          "knowledge": [
+            "Error handling, retries, rollbacks",
+            "Escalation paths and traceability"
+          ],
+          "skills": [
+            "Implement safe execution paths with accountability for agent actions"
+          ],
+          "questionIds": [
+            "gh600-d2-025",
+            "gh600-d2-026",
+            "gh600-d2-027",
+            "gh600-d2-028"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Manage Memory, State, and Execution",
+      "weight": 12,
+      "officialWeight": "10–15%",
+      "tasks": [
+        {
+          "id": "3.1",
+          "title": "Implement agent memory strategies",
+          "knowledge": [
+            "Short-term, long-term, and external memory",
+            "Memory expiration and pruning rules"
+          ],
+          "skills": [
+            "Scope agent memory to task-relevant information"
+          ],
+          "questionIds": [
+            "gh600-d3-001",
+            "gh600-d3-002",
+            "gh600-d3-003",
+            "gh600-d3-004",
+            "gh600-d3-005"
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Persist agent state and manage context drift",
+          "knowledge": [
+            "Durable artifacts for task progress",
+            "Context drift detection and correction"
+          ],
+          "skills": [
+            "Resume agent work without repeating steps or diverging from prior decisions"
+          ],
+          "questionIds": [
+            "gh600-d3-006",
+            "gh600-d3-007",
+            "gh600-d3-008",
+            "gh600-d3-009",
+            "gh600-d3-010",
+            "gh600-d3-011"
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Ensure continuity of agent memory and state across tools and environments",
+          "knowledge": [
+            "Shared state mechanisms",
+            "Conflicting and stale context prevention"
+          ],
+          "skills": [
+            "Share agent state across tools and environments reliably"
+          ],
+          "questionIds": [
+            "gh600-d3-012",
+            "gh600-d3-013",
+            "gh600-d3-014"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Perform Evaluation, Error Analysis, and Tuning",
+      "weight": 18,
+      "officialWeight": "15–20%",
+      "tasks": [
+        {
+          "id": "4.1",
+          "title": "Define success criteria and evaluation signals for agent tasks",
+          "knowledge": [
+            "Qualitative and quantitative evaluation signals",
+            "Automated scanning tools"
+          ],
+          "skills": [
+            "Align evaluation criteria with development intent"
+          ],
+          "questionIds": [
+            "gh600-d4-001",
+            "gh600-d4-002",
+            "gh600-d4-003",
+            "gh600-d4-004",
+            "gh600-d4-005",
+            "gh600-d4-006",
+            "gh600-d4-007",
+            "gh600-d4-014",
+            "gh600-d4-022"
+          ]
+        },
+        {
+          "id": "4.2",
+          "title": "Analyze agent failures and identify root causes",
+          "knowledge": [
+            "Logs, plans, traces, and workflow artifacts",
+            "Root-cause classification: reasoning error, tool misuse, context/environment issue"
+          ],
+          "skills": [
+            "Classify failure root causes from available evidence"
+          ],
+          "questionIds": [
+            "gh600-d4-008",
+            "gh600-d4-009",
+            "gh600-d4-010",
+            "gh600-d4-011",
+            "gh600-d4-012",
+            "gh600-d4-013",
+            "gh600-d4-015"
+          ]
+        },
+        {
+          "id": "4.3",
+          "title": "Tune agent behavior based on evaluation results",
+          "knowledge": [
+            "Instruction/workflow/constraint revision",
+            "Memory and tool-access refinement"
+          ],
+          "skills": [
+            "Tune agent behavior to close the loop on evaluation signals"
+          ],
+          "questionIds": [
+            "gh600-d4-016",
+            "gh600-d4-017",
+            "gh600-d4-018",
+            "gh600-d4-019",
+            "gh600-d4-020",
+            "gh600-d4-021"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Orchestrate Multi-Agent Coordination",
+      "weight": 17,
+      "officialWeight": "15–20%",
+      "tasks": [
+        {
+          "id": "5.1",
+          "title": "Operate and manage multi-agent workflows",
+          "knowledge": [
+            "Orchestration patterns",
+            "Agent isolation for parallel execution",
+            "Conflict detection/resolution"
+          ],
+          "skills": [
+            "Coordinate multiple agents while resolving overlapping/contradictory outputs"
+          ],
+          "questionIds": [
+            "gh600-d5-001",
+            "gh600-d5-002",
+            "gh600-d5-003",
+            "gh600-d5-004",
+            "gh600-d5-005",
+            "gh600-d5-014"
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Configure observability for multi-agent behavior using logs, artifacts, and operational signals",
+          "knowledge": [
+            "Audit-ready artifacts",
+            "Decision and handoff documentation"
+          ],
+          "skills": [
+            "Perform post-hoc analysis of multi-agent behavior"
+          ],
+          "questionIds": [
+            "gh600-d5-006",
+            "gh600-d5-007",
+            "gh600-d5-008",
+            "gh600-d5-009",
+            "gh600-d5-010",
+            "gh600-d5-019"
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Detect and respond to multi-agent failures and degraded behavior",
+          "knowledge": [
+            "Stalled/partial execution detection",
+            "Recovery patterns: rollback, human-in-the-loop"
+          ],
+          "skills": [
+            "Respond to degraded multi-agent coordination"
+          ],
+          "questionIds": [
+            "gh600-d5-011",
+            "gh600-d5-012",
+            "gh600-d5-013",
+            "gh600-d5-015"
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Manage the lifecycle of agents within multi-agent workflows",
+          "knowledge": [
+            "Adding/updating/replacing agents without disruption",
+            "Auditability during retirement"
+          ],
+          "skills": [
+            "Manage agent lifecycle while preserving continuity"
+          ],
+          "questionIds": [
+            "gh600-d5-016",
+            "gh600-d5-017",
+            "gh600-d5-018",
+            "gh600-d5-020"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Implement Guardrails and Accountability",
+      "weight": 12,
+      "officialWeight": "10–15%",
+      "tasks": [
+        {
+          "id": "6.1",
+          "title": "Define autonomy levels",
+          "knowledge": [
+            "Risk classification (operational/security/compliance)",
+            "Autonomy-level assignment"
+          ],
+          "skills": [
+            "Right-size human intervention against delivery speed and compliance"
+          ],
+          "questionIds": [
+            "gh600-d6-001",
+            "gh600-d6-002",
+            "gh600-d6-003",
+            "gh600-d6-004",
+            "gh600-d6-005",
+            "gh600-d6-006",
+            "gh600-d6-007",
+            "gh600-d6-012"
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Implement guardrails and human-in-the-loop workflows",
+          "knowledge": [
+            "Policy-violation blocking",
+            "Least-privilege scoping",
+            "Explicit authorization for irreversible changes"
+          ],
+          "skills": [
+            "Preserve execution velocity by minimizing approvals that don't reduce risk"
+          ],
+          "questionIds": [
+            "gh600-d6-008",
+            "gh600-d6-009",
+            "gh600-d6-010",
+            "gh600-d6-011",
+            "gh600-d6-013",
+            "gh600-d6-014"
+          ]
+        }
+      ]
+    }
+  ]
+}

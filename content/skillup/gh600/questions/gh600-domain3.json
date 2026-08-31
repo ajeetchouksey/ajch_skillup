@@ -1,0 +1,226 @@
+[
+  {
+    "domain": 3,
+    "id": "gh600-d3-001",
+    "scenario": "At Fenwick Logistics, an engineer is documenting what should happen to three different pieces of information a coding agent encounters while working on inventory-related tasks: (1) the rule that all commit messages must follow Conventional Commits — relevant to every task in the repo; (2) a scratch calculation the agent works out mid-task while computing a byte-alignment offset, useful only for the next few tool calls; (3) the current inventory database schema, which lives in a system accessed through an MCP server and is only relevant when a task actually touches inventory code.",
+    "question": "Which memory tier is the best fit for the inventory database schema described in item (3)?",
+    "options": [
+      "Short-term memory — keep it available in the session's context for the rest of every session just in case a task needs it",
+      "Long-term memory — add the full schema to the repo-wide custom instructions so every session loads it automatically",
+      "External memory — leave it in the MCP-connected system and retrieve it via a tool call only when a task actually touches inventory code",
+      "External memory — but copy the schema into the system prompt of every session so it's preloaded before external retrieval is needed"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: information that's only sometimes relevant to a task belongs in external memory — retrieved on demand through a tool call — rather than carried in every session's context by default; preloading something \"just in case\" spends finite context-window space on information most sessions will never use.\n\n**Why option C is correct**: the inventory schema is exactly this shape — some tasks need it, most inventory-unrelated sessions never will — so keeping it in its system of record (the MCP-connected database) and pulling it in only when a task's tool calls actually require it matches the information's real usage pattern.\n\n**Why the distractors fail**:\n- Short-term \"just in case\": nothing about the schema is specific to the current session's own reasoning; treating it as short-term context that happens to persist for the rest of a session still doesn't make it available to any future session, and it wastes context on tasks that never touch inventory code.\n- Long-term via custom instructions: this loads the entire schema into every single session from turn one, including sessions with nothing to do with inventory — the repo-wide item (1), Conventional Commits, is a correct fit for long-term memory precisely because every task needs it; the schema doesn't share that property.\n- External memory \"but preloaded\": this is a contradiction in terms — the defining property of external memory is that it's retrieved on demand, not carried by default; preloading it into the system prompt turns it into long-term memory in substance while still calling it external.\n\n**In practice**: the test for external memory isn't where the data technically lives, it's whether the agent fetches it only when the task calls for it — a schema, a linked issue, or an MCP-backed record that's preloaded into every session regardless of relevance has effectively been promoted to long-term memory, with all the context-budget cost that implies.",
+    "tags": ["memory-tiers", "external-memory", "MCP", "scoping"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-002",
+    "scenario": "Harrow Digital's monorepo has a `frontend/` directory using React conventions and a `backend/` directory using a completely different Python style guide. Currently, a single repo-wide `.github/copilot-instructions.md` file tries to describe both sets of conventions in one document. Sessions that only touch `backend/` still load the entire React section, and vice versa.",
+    "question": "What change best addresses the scoping problem described here?",
+    "options": [
+      "Delete the instructions file entirely, since a single unscoped file is worse than no long-term memory at all",
+      "Split the React conventions and the Python style guide into separate, path-scoped instruction files so each only loads for sessions working in the matching directory",
+      "Leave the single repo-wide file as-is, since long-term memory is reloaded fresh every session regardless of size",
+      "Move both sets of conventions into external memory, retrieved via a tool call at the start of every session"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: a memory tier existing (long-term memory, via custom instructions) doesn't mean every piece of content belongs in the same unscoped bucket — path scoping lets a session load only the guidance relevant to what it's actually touching, keeping the context window free of irrelevant detail that competes for the same attention as the guidance that actually matters.\n\n**Why option B is correct**: splitting into path-scoped instruction files means a `backend/`-only session loads only the Python guidance, and a `frontend/`-only session loads only the React guidance — each session's long-term memory now matches the scope of what it's working on, rather than being padded with conventions for a subsystem it will never touch.\n\n**Why the distractors fail**:\n- Deleting the file: this throws away genuinely useful long-term memory (both convention sets are real and needed by their respective subsystems) instead of fixing the scoping problem; it solves dilution by eliminating the guidance entirely.\n- Leaving it as-is: reload frequency isn't the issue here — the problem is that every session, frontend or backend, loads content it doesn't need, which is exactly the dilution scoping is meant to prevent regardless of how often the file itself is refreshed.\n- Moving to external memory: this constant, always-relevant-to-its-subsystem convention information isn't the \"retrieved occasionally, only when needed\" pattern external memory is for — both convention sets should load automatically for their respective sessions, which is what long-term memory (correctly scoped) is designed to do.\n\n**In practice**: the fix for an unscoped instructions file that's grown to cover multiple subsystems is almost never to remove or relocate the guidance — it's to split it along the same boundary the codebase is already split along, using `applyTo`-style path scoping so each session automatically gets exactly its own subsystem's rules.",
+    "tags": ["memory-scoping", "path-scoped-instructions", "custom-instructions", "long-term-memory"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-003",
+    "scenario": "Coral Peak Software wants its coding agent to be able to check the status of related tickets in an internal, MCP-connected ticketing system whenever a task references one. An engineer proposes instead pulling the full contents of the ticketing system into the repo's custom instructions file, so every session has it available from the start.",
+    "question": "Why is retrieving ticket data on demand via the MCP tool call the better design compared to preloading it into custom instructions?",
+    "options": [
+      "Custom instructions cannot technically contain data from an MCP server, so preloading isn't a supported configuration",
+      "MCP tool calls are always faster than reading from a preloaded context window, regardless of data size",
+      "Preloading would make the agent's tool list shorter, which improves reasoning quality independent of context size",
+      "Most sessions won't reference a ticket at all, so preloading the entire ticketing system's contents into every session wastes context-window space on information the majority of tasks will never use — retrieval on demand matches the data's actual, occasional-relevance usage pattern"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: external memory exists specifically for information that's relevant only sometimes and should be fetched through a tool call exactly when a task needs it, rather than carried in every session's context whether or not that particular task ever references it.\n\n**Why option D is correct**: ticket data is a textbook case of occasional relevance — some tasks will reference a specific ticket, most won't — so pulling it via an MCP tool call only when a task actually needs it keeps every other session's context clean, while preloading the entire ticketing system into custom instructions burdens every session, including ones with nothing to do with any ticket, with data most of them will never touch.\n\n**Why the distractors fail**:\n- \"Custom instructions cannot technically contain MCP data\": this isn't really the mechanism at issue — you could technically paste ticket data into a markdown file, the problem is that doing so is the wrong design choice, not a technical impossibility.\n- \"MCP calls are always faster\": speed isn't the deciding factor here and isn't reliably true in every case; the design reason to prefer on-demand retrieval is scope and relevance, not raw latency.\n- \"Shorter tool list improves reasoning independent of context size\": this conflates tool-list length with context-window usage — the actual problem with preloading is what it does to the context window's content, not the count of tools available.\n\n**In practice**: the decision test for any piece of information is \"would every future session need this from turn one, or only when this specific task calls for it?\" — ticket data answers \"only when needed,\" which is exactly what external memory, retrieved on demand, is designed to serve.",
+    "tags": ["external-memory", "MCP", "on-demand-retrieval", "memory-tiers"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-004",
+    "scenario": "During a long-running session at Meridian Health Records, the agent reasons early on — purely within its own context window — that a particular data-migration script should skip records with a null `patient_id`, and moves on to other work. That decision is never written into a commit message, a plan-artifact update, or a PR comment. Many turns later, as the session approaches the end of its work, that portion of the context has been pruned to make room for newer turns.",
+    "question": "What is the most likely consequence when a later step in the same session needs to act consistently with that earlier decision?",
+    "options": [
+      "The decision has effectively expired from the session's working context and later steps cannot reliably act on it, because it was never captured in a durable artifact before being pruned",
+      "The decision remains fully available for the rest of the session, since anything reasoned about once in a session is guaranteed to persist until the session ends",
+      "The decision automatically gets written to a commit message the moment the session ends, preserving it without any explicit action",
+      "The decision is preserved in long-term memory automatically, since custom instructions capture any significant reasoning from every session"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: even within a single long-running session, the context window is bounded — as a session runs longer, older turns can be pruned or summarized to make room for new work, so information from earlier in a long session that was never captured in a durable artifact can effectively expire before the session even ends, not just before the next session begins.\n\n**Why option A is correct**: because the null-`patient_id` decision was never written into a commit, plan update, or comment, it had no durable form to survive pruning — once that portion of context is pruned, later steps in the same session have no reliable way to recall or act consistently with it.\n\n**Why the distractors fail**:\n- \"Guaranteed to persist until session end\": this is precisely the assumption the exam trap warns against — within-session memory is not guaranteed to survive the whole session; pruning of older turns is a real mechanism, not a hypothetical edge case.\n- \"Automatically written to a commit at session end\": nothing about ending a session triggers capturing prior reasoning into a durable artifact; only an explicit action (a commit, a plan update, a comment) during the session does that, and none occurred here.\n- \"Preserved in long-term memory automatically\": long-term memory is populated by deliberately edited, version-controlled custom instructions — it does not passively absorb whatever an agent happens to reason about mid-session.\n\n**In practice**: any decision made mid-session that later steps in that same session will depend on needs to be written down — a commit, a plan-artifact update, a PR comment — before it can be assumed to survive; treating \"the agent reasoned about it earlier\" as sufficient is the single most common failure mode this domain tests.",
+    "tags": ["expiration", "pruning", "short-term-memory", "durable-artifacts"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-005",
+    "scenario": "Thistle & Vine's engineering team keeps a single repo-wide instructions file that has grown to cover checkout-flow conventions, warehouse-integration conventions, and marketing-site conventions all in one document, because \"it's easier to maintain one file.\" A session assigned a small marketing-site copy fix now loads all three sections' worth of guidance before it starts work.",
+    "question": "What is the most likely downside of this unscoped setup for the marketing-site copy-fix session?",
+    "options": [
+      "No meaningful downside — long-term memory has no effective size limit, so loading extra sections costs nothing",
+      "The session will be blocked from starting until an engineer manually removes the irrelevant sections",
+      "The session reasons over a context window padded with checkout-flow and warehouse-integration guidance it has no use for, which competes for the same attention as the marketing conventions it actually needs and increases the chance of applying the wrong convention",
+      "The session automatically ignores any section of the instructions file that doesn't match its file path, so there is no real effect"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: the context window is finite, and every irrelevant paragraph of loaded instructions competes for the same space and attention as the information a session actually needs — an agent reasoning over a context window padded with guidance for parts of the codebase it will never touch is measurably more likely to apply the wrong convention or miss the one that matters.\n\n**Why option C is correct**: the marketing-copy session gains nothing from checkout-flow or warehouse-integration guidance, but it still has to reason over all of it alongside the marketing conventions it actually needs — this is exactly the dilution effect that scoped instruction files exist to prevent.\n\n**Why the distractors fail**:\n- \"No effective size limit, costs nothing\": context windows are bounded, and loading unnecessary content is never free — it's the described downside, not a non-issue.\n- \"Session blocked until manually cleaned up\": nothing about an unscoped instructions file blocks a session from running; the failure mode is subtler (diluted attention/misapplied conventions), not an outright block.\n- \"Automatically ignores non-matching sections\": this describes what path-scoped instruction files would do by design, not a single unscoped, repo-wide file — a monolithic document with no `applyTo`-style scoping loads in full for every session regardless of what that session is touching.\n\n**In practice**: the fix here is the same one from the Harrow Digital case — split the monolithic file along subsystem boundaries into path-scoped instruction files, so a session touching only marketing copy loads only marketing conventions, not the full union of every subsystem's rules.",
+    "tags": ["memory-scoping", "path-scoped-instructions", "context-window", "long-term-memory"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-006",
+    "scenario": "An agent session at Anchorpoint Systems works through a multi-step refactor, producing a structured plan artifact before starting, incremental commits as it makes changes, and a PR description summarizing what changed and why. The session then ends and its ephemeral compute environment is discarded, exactly as designed.",
+    "question": "Which of these best explains why a completely different session — or a human with no prior context — could still reconstruct where the task stands?",
+    "options": [
+      "Because the underlying model retains a persistent memory of every session it has ever run, independent of any specific repository",
+      "Because the plan artifact, commits, and PR description are durable, version-controlled records living in Git and GitHub — not in the discarded compute environment — so they remain readable regardless of what happened to the session that produced them",
+      "Because GitHub automatically re-runs the original session's reasoning in the background after it ends, in case anyone asks",
+      "Because the session's chat transcript is cached indefinitely on GitHub's servers and can be replayed by any future session on request"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: because the execution environment itself is thrown away at session end, \"agent state\" in any meaningful sense has to live in Git and GitHub artifacts, not in the compute environment or the model's own memory — the plan artifact, commits, and PR description/thread together form a state record that doesn't depend on the agent's own memory at all.\n\n**Why option B is correct**: these artifacts are durable and version-controlled precisely because they live in the repository and platform, not in the ephemeral environment — that's what lets an unrelated session or a human with zero prior context reconstruct what was decided and why, just by reading them.\n\n**Why the distractors fail**:\n- Persistent cross-session model memory: models don't retain a standing memory of prior sessions independent of the repository's own artifacts; assuming this exists is exactly the \"the agent already knows this\" trap the domain warns against.\n- Background re-running of reasoning: nothing re-executes a finished session's reasoning after it ends; the record that survives is whatever was written into commits, the plan, and the PR — not a replayable process.\n- Cached chat transcript replay: the durable, reconstructable record is the artifacts themselves (diffs, plan, description), not an assumed indefinite transcript cache that any future session can pull from on demand.\n\n**In practice**: the test for whether progress is actually \"state\" yet is whether someone with no access to the original session — reading GitHub alone — could tell what was decided and why; if the answer depends on the session's own memory surviving, it isn't durable state yet.",
+    "tags": ["durable-artifacts", "plan-artifact", "commit-history", "pr-thread"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-007",
+    "scenario": "A coding agent at Vantage Rail opens a draft pull request implementing a requested feature. The reviewer, Priya, leaves a follow-up comment on that same pull request: \"This breaks when the schedule list is empty — please handle that case too.\" A teammate suggests it would be cleaner to just trigger a brand-new agent session from the original issue to address the feedback.",
+    "question": "What is the better way to handle Priya's follow-up, and why?",
+    "options": [
+      "Trigger a brand-new session from the issue every time, since starting fresh guarantees the cleanest possible diff",
+      "Ask a different engineer to manually implement Priya's feedback, since agents should not be re-invoked on a PR they already opened",
+      "Trigger a new session on a new branch, then have a human merge whichever of the two resulting PRs looks better",
+      "Resume via the follow-up comment on the existing PR, letting the agent continue on the same branch, reading the existing commits and PR thread as its starting context"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: because progress is recorded in durable artifacts, an agent can resume a task exactly where it left off — a follow-up comment on the existing pull request lets the agent continue on the *same branch*, reading the existing commits and PR thread as context, rather than starting a new session with no memory of the work already done.\n\n**Why option D is correct**: resuming on the same branch means the second pass extends the state that's already there instead of re-deriving the whole plan or risking a divergent, parallel interpretation of the task — this is what makes iteration cheap and keeps the PR a single coherent unit.\n\n**Why the distractors fail**:\n- Brand-new session from the issue: this risks the new session re-deriving its own interpretation of the task from the issue alone, producing a second, divergent solution that conflicts with the first — now a reviewer has two partial answers to reconcile instead of one PR to approve.\n- Manual reassignment to a different engineer: this abandons the resumability the platform is specifically designed to support and isn't justified by anything in the scenario — there's no reason resuming the same agent on the same branch wouldn't work.\n- New session on a new branch, pick the better PR: this manufactures exactly the divergent-solutions problem the resume pattern exists to avoid, and adds reconciliation overhead with no benefit.\n\n**In practice**: the decision test is \"does this continue the existing branch's state, or is it genuinely a new, independent task?\" — a scoped bug-style follow-up on work already in flight is a continuation, and should be handled via a comment that resumes the same branch, not a fresh session.",
+    "tags": ["resuming-work", "branch-continuation", "durable-artifacts", "pr-thread"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-008",
+    "scenario": "A long-running agent session at Bramblewood Studios was assigned a narrowly scoped bug fix. Partway through, it starts making additional edits to adjacent, unrelated code that it judges would \"also improve\" that area. Each individual edit, viewed on its own, looks locally reasonable, and the session's own narration throughout stays confident and coherent.",
+    "question": "What is the most reliable way to determine whether this session has drifted from its original task?",
+    "options": [
+      "Compare the session's current diff against the original issue and the approved plan artifact — a durable reference that did not change along with the session's own trajectory",
+      "Ask the session directly whether it believes it is still on task, and trust its self-assessment if the answer sounds confident",
+      "Check whether the session's narration remains internally consistent from one turn to the next",
+      "Assume no drift has occurred as long as the session hasn't reported any errors or failures"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: context drift is the gap between what a task originally asked for and what a session's current trajectory is actually doing, growing gradually enough that no single step looks wrong in isolation — detecting it means checking the session's current state against something that didn't drift with it (the original issue, the approved plan, stated acceptance criteria), not checking the session's own reasoning against itself.\n\n**Why option A is correct**: the original issue and the approved plan artifact are external, unmoving reference points that exist independently of whatever the session has since talked itself into — comparing the current diff against them is the only check that can actually reveal a gap that's opened up gradually.\n\n**Why the distractors fail**:\n- Asking the session and trusting a confident answer: this is exactly the trap the domain warns about — a session's own narration staying coherent and confident is not evidence it hasn't drifted; drift is specifically the failure mode where every step still looks reasonable to the process that produced it.\n- Checking internal narrative consistency: consistency with itself says nothing about consistency with the original task — a session can narrate a steadily expanding scope in a perfectly coherent, self-consistent way the entire time.\n- Assuming no drift absent errors: drift doesn't manifest as an error or failure signal; it manifests as scope creep that executes successfully, which is exactly why an error-free run provides no assurance against it.\n\n**In practice**: for any session running longer than the task's expected shape, the question to ask is \"does the current diff still match the plan artifact and the issue's stated scope\" — checked against the artifact, never against whether the session still sounds coherent to itself.",
+    "tags": ["context-drift", "drift-detection", "plan-artifact", "durable-artifacts"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-009",
+    "scenario": "A reviewer at Solace Analytics notices, partway through a long agent session, that the diff has started to include changes clearly outside the original issue's stated scope. The reviewer wants to correct course without losing the legitimate work the session has already produced within scope.",
+    "question": "What is the most appropriate corrective action given this situation?",
+    "options": [
+      "Let the session continue uninterrupted, since interrupting a running session always loses more progress than it saves",
+      "Delete the branch entirely and file a new issue, discarding all work including the in-scope changes",
+      "Re-ground the session explicitly — for example, via a comment pointing it back at the original scope — rather than letting the drifted trajectory continue compounding",
+      "Wait for the session to finish entirely before taking any action, since mid-session correction isn't a supported pattern"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: correcting context drift means re-grounding explicitly — a human (or a gate) pointing the session back at the original scope via a comment, or in more severe cases, ending the session and restarting from the last known-good durable artifact — rather than letting a drifted session keep compounding its divergence.\n\n**Why option C is correct**: a comment that explicitly redirects the session back to the original issue's scope addresses the drift directly while preserving the legitimate, in-scope work already produced — it's the lighter-weight correction that fits a case where not all the session's work needs to be discarded.\n\n**Why the distractors fail**:\n- Letting it continue uninterrupted: this is the specific failure mode the scenario describes — an uncorrected drifted session keeps compounding its divergence from scope, producing an even larger, harder-to-review gap by the time anyone acts.\n- Deleting the branch and discarding everything: this is a more severe corrective action than the situation calls for — it throws away the legitimate in-scope work along with the out-of-scope drift, when a redirecting comment could have preserved the former while stopping the latter.\n- Waiting for the session to finish before acting: drift compounds the longer it goes unaddressed; waiting until the session naturally ends means the out-of-scope portion of the diff has had the maximum possible time to grow.\n\n**In practice**: the corrective action should match the severity of the drift — a redirecting comment for a session that's still recoverable and has produced valuable in-scope work, and a full restart from the last known-good artifact only when the drift has gone far enough that the accumulated trajectory itself can't be trusted.",
+    "tags": ["context-drift", "drift-correction", "resuming-work", "human-in-the-loop"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-010",
+    "scenario": "Midway through a task at Ridgeline Bank, the agent's plan artifact is explicitly revised — a reviewer approves adding handling for a newly discovered edge case that wasn't in the original issue but is genuinely necessary for the fix to be correct. The session's diff subsequently grows to cover this newly approved scope in addition to the original request.",
+    "question": "Does this expanded diff represent context drift?",
+    "options": [
+      "Yes — any diff larger than what the original issue described is drift by definition, regardless of whether the plan was later revised",
+      "No — drift specifically means the diff has diverged from the current approved scope; because the plan was explicitly revised and re-approved to include the edge case, a diff matching that updated plan is legitimately re-scoped work, not drift",
+      "Yes, but only because the session's own reasoning judged the edge case was necessary rather than a human requesting it first",
+      "No, because any diff produced by a session that includes commits is automatically considered in-scope by definition"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: drift specifically means the diff has diverged from the *current approved* scope — not that scope can never legitimately change; if the plan itself was explicitly revised and re-approved mid-task to cover newly discovered, genuinely necessary scope, an expanded diff that matches that updated plan is a legitimately re-scoped task, not drift.\n\n**Why option B is correct**: the scenario describes exactly this case — a reviewer explicitly approved the plan revision to include the edge case, so the session's larger diff is tracking an updated, approved reference point, which is the opposite of the unnoticed, ungoverned scope creep drift describes.\n\n**Why the distractors fail**:\n- \"Any diff larger than the original issue is drift by definition\": this ignores that the *plan* — the reference point drift is measured against — was itself explicitly and legitimately updated; measuring against the stale original issue after a proper re-approval is the wrong comparison.\n- \"Drift because the session's own reasoning judged it necessary\": the scenario specifies a reviewer approved the revision — this wasn't the session unilaterally deciding to expand scope on its own judgment, which is the actual pattern that would constitute drift.\n- \"Any diff with commits is automatically in-scope\": this is far too permissive and ignores the actual mechanism — the diff's legitimacy comes from matching an explicitly approved plan, not from the mere existence of commits.\n\n**In practice**: the test isn't \"has the diff grown beyond the original issue\" — it's \"does the current diff match the currently approved plan, whatever that plan now says\" — a re-approved, expanded plan changes the reference point drift is measured against.",
+    "tags": ["context-drift", "drift-detection", "plan-artifact", "scope-revision"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-011",
+    "scenario": "A task at Kestrel Aerospace involves an interactive coding-agent session that calls a built-in edit tool, queries an MCP-connected requirements-tracking server, and later triggers a separate CI environment that runs after the PR opens. None of these three exchange an in-memory conversation with each other.",
+    "question": "How should information one of these needs to remain consistent with what another produced actually be made available to it?",
+    "options": [
+      "It should be inferred automatically, since all tools invoked within the same overall task share a common in-memory conversation by default",
+      "It should be re-derived independently by each tool or environment from its own first-party data source, without cross-checking the others",
+      "It should be passed through the model's persistent cross-session memory, which all tools and environments can query directly",
+      "It should be passed explicitly through durable, inspectable artifacts — the commit, the PR description, and the issue thread — that each tool or environment can each read the same way, rather than assumed to be shared automatically"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: none of the built-in tools, MCP servers, or separate environments (like a triggered CI run) share an in-memory conversation with each other by default — each is invoked independently, so any state one of them needs to be consistent with what another produced has to be passed explicitly, not assumed; durable, inspectable artifacts are what gives different tools and environments a common, unambiguous reference point.\n\n**Why option D is correct**: the commit, the PR description, and the issue thread are readable the same way by the interactive session, an MCP server, and a separately-triggered CI run alike — routing state through these durable artifacts is what lets otherwise-disconnected tools and environments agree on the same facts.\n\n**Why the distractors fail**:\n- \"Shared in-memory conversation by default\": this is precisely the false assumption the scenario is testing — no such default sharing exists between independently invoked tools, MCP servers, and separate execution environments.\n- \"Re-derived independently, no cross-checking\": letting each tool maintain its own private view with no reconciliation is what produces conflicting context, exactly the failure mode this sub-objective exists to prevent.\n- \"Persistent cross-session model memory queryable by all tools\": no such mechanism exists in this domain's model — tools and environments don't share a queryable memory layer; the only reliable shared surface is the durable, version-controlled artifacts in Git and GitHub.\n\n**In practice**: whenever a task spans more than one tool or environment, the design question is \"is there one artifact both of these are supposed to agree with, and does each treat it as authoritative?\" — typically the GitHub issue/PR itself — rather than letting each tool's local view stand unreconciled.",
+    "tags": ["shared-state", "durable-artifacts", "MCP", "continuity"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-012",
+    "scenario": "An agent at Petrichor Labs queries an MCP-connected project-tracking server for an issue's status and receives \"open.\" Moments later, in a separate tool call, it checks GitHub's own live issue state and finds it was actually closed by a human minutes earlier. The MCP server's cached view hadn't yet reflected the closure.",
+    "question": "Which source should the agent's configuration treat as authoritative when these two disagree?",
+    "options": [
+      "GitHub's own live state — the issue, the PR, the repository as it currently exists — is the ground truth the task is ultimately judged against, so it should be preferred whenever it conflicts with a cache or secondary integration",
+      "Whichever source responded most recently, since recency of the tool call is the correct tiebreaker for conflicting context",
+      "The MCP server's response, since MCP-connected sources are always more current than GitHub's own UI-driven state",
+      "Neither — the agent should average or blend the two conflicting answers into an intermediate conclusion"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: conflicting context is the specific failure where two sources an agent trusts disagree about the same fact; preventing it starts with recognizing that not all sources are equally authoritative — GitHub's own live state is the ground truth a coding agent's task is ultimately judged against, and any other source (a cache, a snapshot, a secondary integration) is only useful to the extent it's kept consistent with that ground truth.\n\n**Why option A is correct**: the scenario is a direct instance of a cached secondary source (the MCP server) lagging behind GitHub's live state — designating GitHub's live state as authoritative resolves the conflict correctly and matches what the scenario shows actually happened (a human closed the issue, and GitHub reflects that).\n\n**Why the distractors fail**:\n- \"Whichever responded most recently\": recency of the tool call has no necessary relationship to which source is actually current — a stale cache queried a second ago is still stale; this produces arbitrary, undesigned behavior rather than a reliable resolution.\n- \"MCP sources are always more current\": this is backwards for this scenario and not a safe general assumption — the MCP server's cached view is exactly what lagged behind reality here; there's no inherent property making MCP-connected sources more current than GitHub's own live state.\n- \"Average or blend the answers\": \"open\" and \"closed\" aren't values that can be meaningfully blended into an intermediate state — a binary status conflict requires picking the authoritative source, not synthesizing a compromise.\n\n**In practice**: when two available sources could describe the same entity, the configuration question is \"which of these is the system of record, and does the agent prefer it when they disagree?\" — for a coding agent's task, that's consistently GitHub's own live state.",
+    "tags": ["conflicting-context", "source-of-truth", "MCP", "continuity"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-013",
+    "scenario": "A long-running session at Northwind Traders has its environment seeded once, at the start, by a `copilot-setup-steps` workflow. Several hours into the session, a colleague's unrelated PR merges a breaking change to a shared dependency the session's code depends on. The session's own environment has no mechanism to notice this and continues running against its original snapshot. Its internal test suite continues to pass throughout.",
+    "question": "What is the correct way to interpret the session's continued internal test passes given this situation?",
+    "options": [
+      "They confirm the change is fully safe against the current repository state, since a coding agent's own test runs are equivalent to CI",
+      "They confirm the environment successfully auto-resynced with the dependency change partway through the session, which is why tests still pass",
+      "They only confirm internal consistency with the session's original, now-stale environment snapshot — not safety against the current state of the target branch — so the real CI run against current main after the PR opens is the check that actually matters",
+      "They are irrelevant, since a session's internal tests are discarded along with the ephemeral environment and never influence anything"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: a session's environment is seeded once, at the start, by a setup workflow — if the session then runs long enough for the underlying repository state to change elsewhere, the agent's already-running environment has no mechanism to notice and doesn't automatically re-sync; a session's internal test pass therefore only reflects consistency with its own snapshot, not with whatever the repository actually looks like by the time the PR is reviewed.\n\n**Why option C is correct**: the scenario explicitly describes the dependency change merging after the session's environment was seeded, with no resync mechanism — so the continued internal passes are consistent with the stale snapshot the session is still running against, not proof the change is safe against the current, updated target branch; the real CI run that executes against current `main` after the PR opens is what actually validates against reality.\n\n**Why the distractors fail**:\n- \"Fully safe, session tests equivalent to CI\": this is precisely the exam-trap pattern this domain calls out — treating a session's own internal validation as equivalent to the real CI run against current `main` ignores that the session's environment can be stale relative to the target branch.\n- \"Auto-resynced partway through\": nothing in the scenario or the underlying mechanism supports this — environments are seeded once at session start and don't automatically detect or pull in changes that land elsewhere afterward.\n- \"Irrelevant, discarded with the environment\": the test results still inform the agent's own confidence and reporting during the session; they aren't meaningless, they're just not a substitute for validation against the actual current repository state.\n\n**In practice**: for any long-running session, ask whether anything the environment assumed as fixed has actually changed elsewhere since it started — if the task is sensitive to that possibility, the real CI run against current `main`, not the session's own internal pass, is the final check.",
+    "tags": ["stale-context", "CI-validation", "environment-snapshot", "continuity"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-014",
+    "scenario": "A platform engineer at Emberlight Games is reviewing a coding agent's completed PR. The session's own log shows every internal test passed throughout the run. Before merging, the engineer wants to confirm the change is actually safe to ship against the repository's real current state.",
+    "question": "What should the engineer treat as the deciding validation signal before merging?",
+    "options": [
+      "The session's own internal test log, since a completed session's passing tests are the platform's final and authoritative validation step",
+      "The real CI run that executes against the current target branch after the PR opens, since it validates against the repository's actual current state rather than the session's possibly stale environment snapshot",
+      "Neither — validation should be skipped entirely for agent-authored PRs that already report internal test passes",
+      "The number of commits in the PR, since a larger, more incremental commit history is itself evidence of correctness"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: the real CI run that fires on the PR, executing against the current target branch, is the check that actually matters — a session's own internal test pass only confirms consistency with whatever the session's environment snapshot happened to contain, which can be stale relative to the repository's actual current state by the time a PR is reviewed.\n\n**Why option B is correct**: CI running against current `main` after the PR opens validates the change against reality as it exists at review time, independent of whatever the session's own environment snapshot did or didn't capture — this is the deciding signal precisely because it isn't subject to the staleness risk a long-running session's internal environment carries.\n\n**Why the distractors fail**:\n- Treating the session's internal log as final and authoritative: this repeats the exact trap the domain calls out — internal passes reflect the session's own snapshot, not necessarily the branch's current, real state.\n- Skipping validation for agent-authored PRs with reported passes: this discards the one check (real CI) specifically designed to catch staleness or drift the session's own internal view couldn't detect — the opposite of the correct response.\n- Commit count as evidence of correctness: the number of commits says nothing about whether the change is actually valid against current `main`; it's an unrelated proxy with no bearing on the actual safety question.\n\n**In practice**: before merging any agent-authored change — especially from a long-running session — treat the real CI run against the current target branch as the deciding signal, and treat the session's own reported internal passes as informative but not sufficient on their own.",
+    "tags": ["CI-validation", "stale-context", "environment-snapshot", "continuity"],
+    "difficulty": "medium"
+  }
+]

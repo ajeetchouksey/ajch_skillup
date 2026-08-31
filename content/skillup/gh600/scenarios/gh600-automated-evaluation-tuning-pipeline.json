@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-004",
+  "title": "Diagnosing and Tuning a Recurring Agent Failure",
+  "description": "Talbrook Analytics builds an evaluation pipeline for its bug-fixing coding agent and investigates a failed pull request. The scenario tests defining evaluation signals aligned with actual intent, writing task specifications that give an agent enough success criteria before delegation, performing root-cause analysis from an execution trace, and tuning agent behavior based on the findings.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [4, 1],
+  "scenario": {
+    "background": "Talbrook Analytics runs a coding agent against its bug backlog and wants a repeatable way to tell whether the agent's fixes are actually good, not just whether CI happens to pass. A recent PR passed every automated check but turned out not to work in practice, prompting the team to review both how they specify tasks up front and how they evaluate and tune the agent afterward.",
+    "characters": [
+      {
+        "name": "Dana Okafor",
+        "role": "QA Lead",
+        "concern": "Defining evaluation signals and task success criteria up front so agent-authored fixes can be judged against the team's actual intent, not just whether tests pass."
+      },
+      {
+        "name": "Ben Osei",
+        "role": "Staff Engineer",
+        "concern": "Reading execution traces to find the true root cause of failures, and turning that root cause into a concrete tuning change rather than a vague retry."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-004-q1",
+      "stem": "Before assigning a rate-limiting bug to the agent, Dana is drafting the task description. The first draft says only: \"Make sure the rate limiter actually works.\" What is the biggest problem with delegating the task in this form?",
+      "options": [
+        "A: The task is too short — longer task descriptions always produce better agent output regardless of content",
+        "B: It gives the agent no concrete success criteria or operational constraints, so both the agent's stopping point and any later evaluation of \"did it work\" are left to guesswork",
+        "C: Nothing is wrong — a capable agent should be able to infer the correct fix from the bug title alone",
+        "D: The task should be rewritten as a step-by-step implementation plan so the agent has no reasoning left to do"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a task with no stated success criteria (what \"working\" means, what must not change) or operational constraints leaves the agent to decide when it's done and leaves later evaluators with no defined bar to check the fix against — this is exactly the eval-alignment gap the team needs to avoid. A is false; length isn't the issue, missing criteria is. C is the underlying failure mode this task description invites, not an acceptable outcome. D over-corrects — removing the agent's reasoning entirely isn't necessary; specific, verifiable criteria is what's missing, not a full prescriptive script."
+    },
+    {
+      "id": "gh600-scenario-004-q2",
+      "stem": "Talbrook's automated evaluation harness for a caching-latency task checks only that new caching code was added and that existing unit tests still pass. It never measures request latency before and after the change. What is the problem with this harness?",
+      "options": [
+        "A: There is no problem — unit tests passing is always sufficient evidence that a performance-oriented change succeeded",
+        "B: The harness's signals don't align with the team's actual development intent — reducing latency — so a PR could pass every automated check while not actually improving performance at all",
+        "C: The harness should be removed entirely and replaced with a human reviewer manually judging every PR",
+        "D: The problem is that unit tests are the wrong kind of signal and should be replaced by counting lines of code changed"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because evaluation signals need to measure what the task actually intended to achieve; \"caching code exists and tests pass\" is a proxy that can be satisfied without the real goal (lower latency) being met at all — this is a classic eval-alignment gap. A conflates a necessary condition (not breaking existing tests) with a sufficient one (actually improving latency), which is exactly the gap in question. C throws away the useful parts of automation (fast, repeatable checks) instead of adding the missing latency measurement. D replaces one weak proxy with an even less meaningful one; line count says nothing about performance."
+    },
+    {
+      "id": "gh600-scenario-004-q3",
+      "stem": "Ben reviews the execution trace for the failed rate-limiter PR. It shows the agent correctly identified that request counts needed to be checked against a threshold, correctly selected the file-edit tool, and correctly targeted the right file and function — but it wrote the comparison as `count < limit` when the fix required `count >= limit` to trigger throttling. How should Ben classify this failure?",
+      "options": [
+        "A: A tool-misuse failure, since the agent used the edit tool when it should have used a different tool",
+        "B: A context/environment issue, since the agent was missing information about the runtime environment",
+        "C: A reasoning error — the agent selected the right tool and the right location but produced logic with an inverted comparison, which is a flaw in what it decided to write, not in tool selection or missing context",
+        "D: A plan-drift failure, since the agent's actions didn't match a plan it produced earlier"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because every mechanical step (tool choice, file, location) was right — the failure is specifically in the logic the agent wrote once it got there, which is the signature of a reasoning error rather than a tool-selection or missing-context problem. A is wrong because the edit tool was exactly the right tool for making the change; the trace shows no tool-selection failure. B is wrong because nothing in the trace suggests missing environmental information — the agent had what it needed and still wrote the wrong comparison. D is unsupported without evidence that the agent's committed change diverged from its own stated plan; the described failure is purely in the logic itself."
+    },
+    {
+      "id": "gh600-scenario-004-q4",
+      "stem": "Ben also notices this is the second time an inverted-comparison bug has slipped through on threshold-check logic. He wants to tune the agent's future behavior to reduce recurrence, without simply hoping the next attempt goes better. What is the most concrete tuning action to take?",
+      "options": [
+        "A: Re-run the same task again and hope the agent produces different logic this time",
+        "B: Add an explicit instruction or workflow step requiring the agent to write and check a boundary-condition test case for any new threshold comparison before considering the task complete",
+        "C: Remove the agent's ability to write comparison operators, restricting it to template-based fixes only",
+        "D: Increase the model's context window size so it can consider more of the codebase at once"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because tuning based on a root cause should target the specific failure mode — an explicit requirement to test the boundary condition of a threshold comparison directly addresses the class of bug (off-by-one/inverted comparisons) that has now recurred twice, converting a diagnosed pattern into a concrete workflow or instruction change. A repeats the same conditions and hopes for a different outcome, which isn't tuning at all. C removes far more capability than the actual problem requires and would break the agent's ability to do most bug fixes. D addresses context capacity, which has no demonstrated connection to this specific reasoning error — the trace showed the agent had the relevant code in view and still wrote the wrong comparison."
+    }
+  ],
+  "keyLearnings": [
+    "A task description with no stated success criteria or constraints leaves both the agent's stopping point and later evaluation of the result to guesswork — success criteria belong in the task, not just in the evaluation harness.",
+    "Evaluation signals must measure the actual development intent, not a proxy for it — tests passing and code existing are necessary conditions, not sufficient evidence that a performance or behavior goal was met.",
+    "Classifying a failure correctly from an execution trace (reasoning error vs. tool misuse vs. missing context vs. plan drift) determines what fix will actually prevent recurrence — misclassifying it leads to tuning the wrong thing.",
+    "Effective tuning after a root-cause finding targets the specific failure pattern with a concrete instruction or workflow change, rather than re-running the same task unchanged or over-restricting the agent's capability."
+  ]
+}

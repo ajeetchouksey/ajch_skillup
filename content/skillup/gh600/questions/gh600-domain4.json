@@ -1,0 +1,354 @@
+[
+  {
+    "domain": 4,
+    "id": "gh600-d4-001",
+    "scenario": "At Briarwood Fintech, a team lead is about to assign a coding agent the task of fixing a flaky integration test. Before delegating, they write a task description that says only: \"Make the test pass reliably.\"",
+    "question": "What is missing from this task description that would most improve the agent's ability to produce an evaluable, acceptable result?",
+    "options": [
+      "Nothing — the agent will infer acceptable outcomes and operational constraints on its own once it starts working",
+      "Explicit expected outcomes and operational constraints, e.g., \"the fix must not skip or disable the test, must not modify unrelated test files, and the test must pass across 10 consecutive CI runs\"",
+      "A longer explanation of why the test is flaky, since a root-cause narrative alone defines success",
+      "A list of every tool the agent is permitted to call, since tool access alone determines whether a task succeeds"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: success criteria must specify both the expected outcome and the operational constraints under which that outcome must be reached. Without both halves, \"success\" is unfalsifiable — there's no objective way for the agent, or a reviewer, to check whether a delegated result actually satisfies the intent behind the request.\n\n**Why option B is correct**: it gives a concrete, falsifiable outcome (the test must pass across 10 consecutive CI runs, not just once) and it closes off the shortcut behaviors a vague instruction invites — an agent optimizing only for \"make it pass\" can technically satisfy that by skipping or disabling the test, which the constraint explicitly rules out.\n\n**Why the distractors fail**:\n- Option A: agents follow the literal instruction they're given, not the intent behind it; without explicit constraints, the shortest path to \"passing\" (disabling the test) is a valid interpretation of the vague instruction, not a failure of the agent's judgment.\n- Option C: understanding the root cause of the flakiness is useful investigative context, but a narrative about *why* something is broken doesn't define what an acceptable fix looks like or what boundaries it must respect.\n- Option D: tool access controls what the agent is *capable* of doing, not what counts as a correct result — a fully-permissioned agent still needs criteria to know when it's done, and done correctly, versus merely done.\n\n**In practice**: when a task description can be satisfied by an outcome you didn't intend, the fix is almost never a bigger model or more tools — it's writing the constraint down. Senior engineers delegating work ask, \"what's the cheapest way an agent could technically satisfy this sentence?\" and then write a constraint that rules that shortcut out.",
+    "tags": ["success-criteria", "operational-constraints", "task-specification", "eval-alignment"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-002",
+    "scenario": "At Nautica Freight, a coding agent is assigned to refactor a payments module for readability, with no functional behavior change intended. The team wants to evaluate whether the refactor succeeded, but readability isn't something a test suite can fully capture on its own.",
+    "question": "Which combination of evaluation signals best captures both what an automated pipeline can and cannot measure for this task?",
+    "options": [
+      "Only quantitative signals: test-pass rate and total line-count change, since qualitative judgments are too subjective to include in an evaluation",
+      "Only qualitative signals: a human reviewer's overall impression, since automated tooling can't judge code style or naming",
+      "A combination of quantitative signals (test-pass rate, lint-rule violations, cyclomatic-complexity delta) and qualitative signals (a reviewer's assessment of naming clarity and structural coherence)",
+      "Neither — success should be measured solely by whether the PR merges without merge conflicts"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: quantitative signals (counts, pass/fail rates, complexity metrics) and qualitative signals (human judgments of clarity, structure, or intent-fit) measure different things, and a readability-focused task has success conditions that live in both categories — using only one type leaves half the actual goal unmeasured.\n\n**Why option C is correct**: test-pass rate confirms the refactor didn't change behavior, and lint/complexity metrics give an objective proxy for structural improvement, but \"readability\" ultimately requires a human judgment call about naming and clarity that no metric fully substitutes for — combining both signal types measures the whole of what \"successful refactor\" actually means here.\n\n**Why the distractors fail**:\n- Option A: line-count change is a poor proxy for readability (shorter isn't always clearer, and longer isn't always worse) and omits the human-judgment half of the goal entirely.\n- Option B: a purely qualitative signal has no automated pass/fail floor — nothing catches a refactor that silently changes behavior, which quantitative test-pass data is specifically good at catching.\n- Option D: merge-conflict-free is a mechanical Git property with no relationship to readability or correctness — a PR can merge cleanly and still be a functional regression or an unreadable mess.\n\n**In practice**: whenever a task's goal has both an objective component (did behavior change?) and a subjective one (is it actually clearer?), the evaluation plan should name a signal for each — relying on only one type of signal is how teams either miss regressions (qualitative-only) or approve unreadable-but-passing code (quantitative-only).",
+    "tags": ["qualitative-signals", "quantitative-signals", "evaluation-signals", "code-review"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-003",
+    "scenario": "Kestrel Robotics wants an agent to add a caching layer to reduce API latency in a service. The automated evaluation harness the team already has in place checks only that new caching code was added and that existing unit tests still pass — it never measures request latency before and after the change.",
+    "question": "What is the gap between the evaluation criteria and the actual development intent in this scenario?",
+    "options": [
+      "The evaluation checks for the presence of caching code and passing tests but never measures whether the change actually reduces latency — the stated development intent",
+      "The evaluation is too strict because it requires the new code to pass unit tests at all",
+      "There is no gap — passing existing unit tests is definitionally equivalent to meeting a performance goal",
+      "The gap is that the agent wrote its own caching logic instead of importing a third-party caching library"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: evaluation criteria must be traced back to the actual development intent behind a task, not just to signals that are easy to check automatically — a check that's satisfied by code that technically exists but doesn't achieve the underlying goal is measuring the wrong thing.\n\n**Why option A is correct**: the actual intent stated is \"reduce latency,\" but the harness only confirms structural presence (caching code exists) and non-regression (tests still pass) — an agent could satisfy both checks with a caching layer that's misconfigured, never actually hit, or even slower, and the evaluation would report success while the real goal went unmet.\n\n**Why the distractors fail**:\n- Option B: requiring existing tests to still pass is a reasonable non-regression bar, not an excessive constraint — removing it wouldn't close the alignment gap, it would just remove a safety net.\n- Option C: passing tests confirms nothing about performance; a test suite written before the caching layer existed has no assertions about latency at all, so \"tests pass\" and \"latency improved\" are independent facts.\n- Option D: how the agent implemented caching (hand-rolled vs. a library) is an implementation-style question, unrelated to whether the evaluation criteria actually verify the stated performance intent.\n\n**In practice**: this is the classic gap between a proxy metric and the real goal — \"code that looks like the feature exists\" is not the same claim as \"the feature achieves what we needed it for.\" Closing the gap means adding a signal that directly measures the intent (a before/after latency benchmark), not just a signal that's convenient to automate.",
+    "tags": ["eval-alignment", "development-intent", "performance-criteria", "evaluation-gap"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-004",
+    "scenario": "Vantage Point Media's coding agent now opens hundreds of PRs per week. The team wants to generate structured evaluation signals — security findings, style violations, complexity deltas — across all of them without requiring a human to manually review every diff, while still reserving human attention for the PRs that actually need it.",
+    "question": "Which approach best generates evaluation signals at this scale while still allowing targeted human review?",
+    "options": [
+      "Have the agent write a summary of its own changes and treat that self-report as the sole evaluation signal",
+      "Skip automated tooling entirely and rely on periodic manual spot checks of a random 5% sample of merged PRs",
+      "Route every PR through the full human code-review process before any automated check runs, since automation should only run after a human has already signed off",
+      "Run automated scanning tools (static analysis, security scanners, complexity/lint checkers) against every agent PR to generate structured, comparable signals, then route only the flagged PRs to human reviewers"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: automated scanning tools generate consistent, scalable, comparable signals across every artifact, which lets a team triage — using cheap automated signals to decide which artifacts actually need expensive human judgment, rather than spending human attention uniformly across everything or nothing.\n\n**Why option D is correct**: running scanners against every PR produces a structured signal set (security findings, lint violations, complexity deltas) that's comparable across hundreds of PRs and cheap to compute, and then only the PRs that trip a threshold get routed to a human — this scales evaluation coverage to 100% of output while keeping human review focused on the subset that actually needs it.\n\n**Why the distractors fail**:\n- Option A: the agent grading its own work isn't an independent measurement — a self-report reflects what the agent believes it did, not what a scanner or reviewer would independently find, and self-reports are exactly what root-cause analysis has to look past when diagnosing failures.\n- Option B: a random 5% sample leaves 95% of merged PRs completely unchecked by any signal at all, which doesn't scale evaluation coverage — it just narrows the window of what's ever evaluated.\n- Option C: requiring full human review before any automated check defeats the purpose of automation as a triage layer — it puts the expensive step first instead of using cheap signals to decide when the expensive step is warranted.\n\n**In practice**: the question senior engineers ask when evaluation volume outgrows manual review is \"what can a scanner tell me for free that narrows down what a human actually needs to look at?\" — automated scanning isn't a replacement for human judgment, it's the routing layer that makes human judgment scale.",
+    "tags": ["automated-scanning", "evaluation-signals", "static-analysis", "triage"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-005",
+    "scenario": "Alder Grove Bank is defining evaluation metrics for a coding agent working a bug ticket. The list includes: (1) number of tests passing, (2) count of PR review comments requesting changes, (3) a reviewer's rating of code clarity on a 1–5 scale, and (4) time to first successful CI run.",
+    "question": "Which of these four signals is a qualitative evaluation signal rather than a quantitative one?",
+    "options": [
+      "Number of tests passing",
+      "The reviewer's rating of code clarity, because it reflects a human's subjective judgment expressed on a scale, not a directly countable, objective measurement",
+      "Time to first successful CI run",
+      "PR review comment count requesting changes"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: what makes a signal qualitative isn't whether it's expressed as a number — it's whether the underlying measurement is a subjective human judgment versus an objectively countable event. A 1–5 rating is still a qualitative signal wearing a numeric label.\n\n**Why option B is correct**: \"code clarity\" isn't something a tool counts directly — a reviewer forms a subjective impression and expresses it on a scale, so two reviewers could reasonably give the same code different ratings. That's the defining property of a qualitative signal, regardless of the numeric packaging.\n\n**Why the distractors fail**:\n- Option A: \"number of tests passing\" is an objective count produced by a test runner — two people running the same suite get the same number, which is the defining property of a quantitative signal.\n- Option C: \"time to first successful CI run\" is a directly measured duration from the pipeline, not a matter of interpretation — it's quantitative.\n- Option D: a comment *count* is a tally of discrete events (comments requesting changes), which is countable and objective, even though the comments themselves might contain qualitative opinions — the count itself is quantitative.\n\n**In practice**: the useful test when classifying a signal isn't \"is it a number?\" but \"would two independent observers, given the same artifact, arrive at the same value?\" — clarity ratings fail that test even when scored 1–5, which is why they belong in the qualitative bucket alongside written reviewer feedback, not the quantitative bucket alongside pass counts.",
+    "tags": ["qualitative-signals", "quantitative-signals", "evaluation-signals", "signal-classification"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-006",
+    "scenario": "Pinehollow SaaS assigned a coding agent the task \"improve the onboarding flow.\" With no other boundaries stated, the agent also rewrote large portions of an unrelated authentication module, reasoning that authentication touches the onboarding experience too.",
+    "question": "Which addition to the original task description would have most directly prevented this scope expansion?",
+    "options": [
+      "A longer philosophical description of what \"improve\" means in this context",
+      "Assigning the task to a more capable model, since capability alone determines whether an agent stays in scope",
+      "An operational constraint explicitly scoping the task to specific files or directories and stating that unrelated modules, such as authentication, are out of scope",
+      "Requiring the agent to write more code comments explaining its changes"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: operational constraints define the boundary of a task, not just the goal — a goal description tells the agent what to aim for, but without an explicit boundary, an agent's own reasoning about what's \"related enough\" to include can legitimately differ from what the requester actually meant.\n\n**Why option C is correct**: an explicit scope constraint (which files/directories are in bounds, and a statement that authentication is out of scope) removes the ambiguity the agent otherwise has to resolve on its own — it doesn't need better judgment about relatedness if it's told the boundary directly.\n\n**Why the distractors fail**:\n- Option A: more prose about the meaning of \"improve\" still describes the goal, not the boundary — an agent could read an elaborate definition of \"improve\" and still reasonably conclude authentication is in scope.\n- Option B: model capability affects reasoning quality, not whether the model was ever told where the boundary is — a more capable model given the same unscoped instruction can construct an equally reasonable, equally wrong justification for expanding scope.\n- Option D: more comments document what the agent did after the fact; they don't constrain what it does in the first place, and by the time comments exist, the unrelated module has already been rewritten.\n\n**In practice**: scope creep from an agent is rarely a reasoning failure in isolation — it's usually a missing constraint. Before delegating a task, the practical question is \"what's the largest interpretation of this request the agent could reasonably construct, and did I rule that out explicitly?\"",
+    "tags": ["operational-constraints", "scope-boundaries", "task-specification"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-007",
+    "scenario": "Cinder Peak Security's actual business goal for an agent-driven bug-fixing initiative is to reduce the volume of customer support tickets about a specific recurring crash. The team's evaluation dashboard currently tracks only \"number of GitHub issues closed by the agent.\"",
+    "question": "What should the team add to their evaluation criteria to better align with the actual development intent?",
+    "options": [
+      "A downstream signal tied to the real goal, such as whether crash-related support-ticket volume actually drops after the fixes ship, not just the count of issues closed",
+      "Nothing — issue-closure count is a reliable proxy for reduced support burden in every case",
+      "A stricter requirement that the agent close a minimum number of issues per week, regardless of which issues they are",
+      "Automatically deleting closed issues from GitHub once the agent resolves them, to keep the dashboard clean"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: an evaluation signal that's easy to count (issues closed) isn't automatically the same thing as the outcome that actually mattered when the task was assigned (fewer customers hitting the crash) — aligning evaluation with intent means tracing the metric back to the real-world result the work was supposed to produce.\n\n**Why option A is correct**: adding a downstream signal — crash-related ticket volume before versus after the fixes ship — directly measures the thing the initiative exists for, closing the gap between \"the agent did activity\" (closed issues) and \"the activity achieved the goal\" (fewer crashes reaching customers).\n\n**Why the distractors fail**:\n- Option B: an agent can close issues that don't address the actual crash, close duplicates, or close issues with fixes that don't hold up in production — issue-closure count says nothing about whether customers stopped experiencing the problem.\n- Option C: a quota on issue count rewards volume, not impact, and could actively incentivize closing easy, low-value issues instead of the specific crash-related work the intent was about.\n- Option D: deleting issues destroys the audit trail needed for both root-cause analysis and future evaluation — it makes the dashboard look better without making the underlying signal any more meaningful.\n\n**In practice**: whenever a proxy metric (issues closed) and the real goal (fewer support tickets) could diverge, senior engineers ask \"if this proxy went up but the real goal didn't move, would we still call this a success?\" — if the answer is no, the evaluation needs a signal closer to the real goal, not a stricter version of the proxy.",
+    "tags": ["eval-alignment", "development-intent", "outcome-metrics", "downstream-signal"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-008",
+    "scenario": "Thistledown Retail's coding agent opens a PR that fails CI. Before deciding how to fix anything, an engineer wants to understand what actually went wrong during the agent's run.",
+    "question": "Which combination of artifacts should the engineer examine first to identify the failure?",
+    "options": [
+      "Only the final diff, since the diff alone always explains why a given step failed",
+      "Only the commit message, since agents always accurately summarize what went wrong there",
+      "Only the PR title, since titles are generated only after the agent fully understands the root cause",
+      "The agent's execution trace/logs, its plan or step list, the tool call outputs, and the final PR diff together, since a failure can originate at any stage of the agent's process"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: an agent's work produces multiple layers of artifact — a plan, a sequence of tool calls with their outputs, an execution trace, and a final diff — and a failure can originate at any one of those layers, so identifying it reliably means looking across all of them rather than assuming any single artifact tells the whole story.\n\n**Why option D is correct**: the plan shows what the agent intended to do, the trace and tool outputs show what actually happened step by step (including errors, retries, or misreads), and the diff shows the final result — comparing all four is what surfaces mismatches (like a step silently skipped, or a tool call that failed and was never corrected) that no single artifact reveals on its own.\n\n**Why the distractors fail**:\n- Option A: a diff shows the end state, not the process that produced it — it can look reasonable while hiding that an earlier step failed and the agent worked around it in a way that didn't actually fix the root problem.\n- Option B: commit messages and other agent-authored summaries describe what the agent believes happened, which is the same self-report problem that makes agent narratives an unreliable sole source of truth for failure analysis.\n- Option C: a PR title is a short label, not a diagnostic artifact — assuming it reflects deep root-cause understanding conflates a summary label with an investigation.\n\n**In practice**: when triaging any agent failure, the practical habit is to reconstruct the full sequence — plan, then trace, then diff — rather than starting from the assumption that the artifact closest to \"the end\" (diff, commit message, title) already contains the explanation.",
+    "tags": ["log-analysis", "trace-analysis", "failure-identification", "workflow-artifacts"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-009",
+    "scenario": "Northgate Insurance reviews an agent's execution trace after a regression. The trace shows the agent correctly identified that a null-check was needed, correctly selected the file-edit tool, and correctly targeted the right file and line — but it wrote the check with inverted logic, testing for the value being null when the fix required testing for it being not-null, causing the regression.",
+    "question": "What is the root-cause category of this failure?",
+    "options": [
+      "Tool misuse — the agent picked the wrong tool for the job",
+      "A reasoning error — the agent's tool selection and inputs were correct, but its internal logic for what the fix should do was flawed",
+      "A context/environment issue — the agent lacked access to the relevant file",
+      "An evaluation-signal gap — the CI pipeline didn't run enough tests"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: root-cause classification depends on *where in the process* the failure originated — tool misuse means the wrong mechanism was used or invoked incorrectly, a context/environment issue means the agent lacked information or access it needed, and a reasoning error means the mechanics were all correct but the underlying logic the agent applied was wrong.\n\n**Why option B is correct**: every mechanical step here was right — correct tool, correct file, correct location — which rules out tool misuse and context/environment issues; the failure lives entirely in the logical content of the fix itself (the condition was inverted), which is the defining shape of a reasoning error.\n\n**Why the distractors fail**:\n- Option A: tool misuse describes using the wrong tool, or the right tool incorrectly (wrong parameters, wrong target); here the tool and its invocation were both correct — only the logic written was wrong.\n- Option C: a context/environment issue means the agent was missing information or access it needed; nothing in this trace suggests the agent lacked file access or relevant information — it had everything it needed and still reasoned incorrectly.\n- Option D: an evaluation-signal gap describes a problem with how success is *measured*, not a cause of the underlying defect — even a perfect test suite wouldn't have prevented the agent from writing inverted logic in the first place; it would only have caught it sooner.\n\n**In practice**: this distinction matters for tuning — a reasoning-error root cause points toward revising instructions or adding verification steps for logic-heavy edits, not toward restricting tool access or filling an information gap that was never actually missing.",
+    "tags": ["reasoning-error", "root-cause-analysis", "failure-classification"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-010",
+    "scenario": "Wrenfield Analytics' coding agent was tasked with finding all usages of a deprecated function before removing it. Its trace shows it repeatedly used a single-file read tool on files it guessed might contain the function, even though a repo-wide search tool was available in its toolset, and it missed several real usages, breaking the build after the function was removed.",
+    "question": "What root-cause category best explains this failure?",
+    "options": [
+      "A context/environment issue, because the repo-wide search tool wasn't available to the agent",
+      "A reasoning error, because the agent's plan correctly called for finding all usages but its arithmetic was wrong",
+      "Tool misuse — the agent had access to a more appropriate tool for the job (repo-wide search) but used a less suitable one, producing incomplete results",
+      "An evaluation-signal gap — the team never defined what \"usages\" meant"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: tool misuse specifically covers cases where an agent had access to a tool suited to the task but chose a different, less appropriate one — or used the right tool incorrectly — leading to a worse outcome than the available capability could have produced.\n\n**Why option C is correct**: the repo-wide search tool existed in the agent's toolset and is the correct instrument for a \"find all usages\" task; guessing at files with a single-file read tool instead is a suboptimal tool choice that directly produced the incomplete result — this is the textbook shape of tool misuse, not a missing capability or a logic error.\n\n**Why the distractors fail**:\n- Option A: this is contradicted by the scenario itself — the repo-wide search tool *was* available; the failure was in not using it, not in it being absent.\n- Option B: there's no arithmetic or flawed internal logic described here — the agent's high-level plan (\"find all usages\") was sound; the failure was an execution-layer choice of which tool to invoke, not a reasoning defect in the plan itself.\n- Option D: the team's definition of \"usages\" isn't in question — the agent understood what it was looking for; it simply used an approach (guessing files) that couldn't reliably find all of them.\n\n**In practice**: tool-misuse root causes point toward tuning tool descriptions or default guidance (\"use repo-wide search for find-all-usages tasks\") rather than toward granting new tool access or rewriting the agent's reasoning instructions — the capability already existed, it just wasn't the one the agent reached for.",
+    "tags": ["tool-misuse", "tool-selection", "root-cause-analysis", "failure-classification"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-011",
+    "scenario": "Cobblestone Logistics' monorepo has a custom instructions file correctly describing conventions for the `services/` directory. A coding agent is assigned a task inside a newly added `edge-functions/` directory, which runs on a different runtime with different conventions and has no scoped instructions file of its own yet. The agent applied `services/`-style conventions to the `edge-functions/` code, causing a deployment failure.",
+    "question": "What is the most accurate root-cause classification for this failure?",
+    "options": [
+      "A reasoning error — the agent failed to logically deduce the correct conventions from first principles",
+      "A context/environment issue — the agent lacked environment-specific guidance for `edge-functions/`, since no scoped instructions existed there, so it fell back on the nearest available context, which didn't actually apply",
+      "Tool misuse — the agent used the wrong file-edit tool for the `edge-functions/` directory",
+      "An evaluation-signal gap — the CI pipeline for `edge-functions/` didn't exist yet"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: a context/environment issue occurs when the information or scoped guidance an agent needed to act correctly simply wasn't available to it — even a well-reasoning agent will apply the nearest context it has when the correct, environment-specific context doesn't exist, and that fallback is a property of the environment's setup, not a flaw in the agent's logic.\n\n**Why option B is correct**: the agent had no scoped instructions for `edge-functions/` to draw from, so it reasonably fell back on the only relevant guidance available — the `services/` conventions — which happened to be wrong for a different runtime; the gap is that the environment never gave the agent the correct convention set to apply, not that it reasoned poorly with what it had.\n\n**Why the distractors fail**:\n- Option A: \"deducing conventions from first principles\" isn't a reasonable expectation of any agent — conventions are arbitrary team decisions, not something derivable from code alone; the agent's actual reasoning (apply the nearest known convention set) was internally coherent given what it had access to.\n- Option C: nothing in the scenario points to a wrong tool or incorrect tool invocation — the agent edited the right files with the right mechanism; the defect is in which conventions it applied, not how it edited.\n- Option D: a missing CI check for `edge-functions/` is a separate gap in the evaluation setup, but it's not what *caused* the agent to apply the wrong conventions in the first place — it only affects whether the mistake was caught before merge.\n\n**In practice**: this distinction matters because the fix for a context/environment issue is adding the missing scoped instructions (here, an `edge-functions/`-specific conventions file), not retraining the agent's reasoning or changing its tool access — the agent needs the right map, not better navigation skills.",
+    "tags": ["context-environment-issue", "root-cause-analysis", "scoped-instructions", "failure-classification"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-012",
+    "scenario": "Marrow Bio's coding agent produced a five-step plan before starting a task. Reviewing the final PR, an engineer notices the agent's actual commits correspond to only three of the five planned steps — two steps were silently dropped, with no explanation anywhere in the trace.",
+    "question": "What does comparing the agent's plan artifact against its actually executed steps reveal, and why is this comparison useful for failure analysis?",
+    "options": [
+      "It reveals plan drift — steps were silently abandoned mid-execution — which is a useful signal for root-cause investigation even when the PR appears superficially complete, since the missing steps may correspond to unaddressed requirements",
+      "It reveals nothing useful, since plans are aspirational and agents are never expected to actually follow them",
+      "It reveals that the CI pipeline is misconfigured, since plan/execution mismatches are always caused by pipeline issues",
+      "It reveals a tool-permission issue, since dropped steps always mean the agent was denied tool access"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: an agent's plan and its actual execution are two separate artifacts, and comparing them surfaces a category of failure — plan drift — that's invisible if you only look at the final diff, because a PR can look complete and pass CI while quietly having abandoned part of the original scope.\n\n**Why option A is correct**: two of five planned steps never appear in the executed trace, with no logged reason — that's a concrete, artifact-based signal that something in the original scope may be unaddressed, and it's exactly the kind of gap that only shows up by comparing plan against execution, not by reading the final PR in isolation.\n\n**Why the distractors fail**:\n- Option B: treating plans as purely aspirational throws away a diagnostic signal — if plans were never meant to be followed, there'd be no reason to generate them as part of the workflow in the first place; their value is precisely that deviations from them are informative.\n- Option C: nothing about a dropped plan step implies a CI misconfiguration — the two are unrelated; CI checks what was actually submitted, not whether everything originally planned was included.\n- Option D: plan/execution mismatches have several possible causes (reasoning error, the agent judging a step unnecessary, an interrupted run) — tool-permission denial is only one possibility, and the trace should be checked for the actual reason rather than assumed.\n\n**In practice**: treating the plan as a first-class artifact to audit — not just a preamble to skim — is what catches silent scope loss before it ships; a PR that passes every check can still be an incomplete answer to the original task.",
+    "tags": ["plan-drift", "workflow-artifacts", "failure-identification", "trace-analysis"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-013",
+    "scenario": "At Silvercrest Cloud, a coding agent's task was to update a config file and redeploy a service using an internal deployment tool exposed through MCP. Its trace shows: it read the config correctly, edited it correctly, then called the deploy tool with a `service_name` parameter it misspelled — a typo it introduced itself. The call failed with a \"service not found\" error. The trace then shows the agent retrying the exact same misspelled call two more times, unchanged, before giving up.",
+    "question": "Considering both the initial failure and the agent's response to it, which root-cause classification best fits the overall failure?",
+    "options": [
+      "Purely a context/environment issue, since the deployment tool's error message was unclear",
+      "Purely tool misuse, since retrying an identical failing call three times is itself the entire root cause",
+      "Purely a reasoning error, since the initial typo was a one-time slip with no bearing on the retries",
+      "A combination — an initial execution slip (the typo) compounded by a reasoning error in error handling, since the agent failed to recognize that identically retrying a call with an unchanged, incorrect parameter could never succeed and should have inspected or corrected the parameter instead"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: not every failure has a single root cause — a full trace can show an initial slip compounded by a separate failure in how the agent responded to the resulting error, and classifying the *whole* failure requires accounting for both, not just the first thing that went wrong.\n\n**Why option D is correct**: the typo itself is a one-time execution slip, but the more diagnostic problem is what happens next — the agent receives a clear \"service not found\" error and, instead of inspecting the parameter it just sent, retries the identical call twice more. Repeating an unchanged input against a deterministic error is a reasoning failure in error handling: the agent didn't update its approach based on new information (the error message), which is a distinct defect from the original typo.\n\n**Why the distractors fail**:\n- Option A: the error message (\"service not found\") is actually informative and specific — the environment gave the agent exactly the signal it needed to catch the typo; the failure is that the agent didn't act on that signal, not that the signal was missing or unclear.\n- Option B: the retries are a symptom of a reasoning failure (not adapting to repeated identical feedback), not \"tool misuse\" in the sense of choosing the wrong tool — the agent used the correct deploy tool the whole time; the parameter it sent was simply wrong and never corrected.\n- Option C: dismissing the retries as having \"no bearing\" ignores that the retries are themselves diagnostic — a single typo is a minor slip, but three identical failed attempts without adaptation reveals a separate problem in how the agent processes error feedback.\n\n**In practice**: traces that show repeated identical failures are a strong signal to look past the first error for a second, compounding root cause in the agent's error-handling logic — tuning here should target both: stricter parameter validation before dispatch, and explicit instruction to inspect and vary retries based on error content rather than repeat them verbatim.",
+    "tags": ["reasoning-error", "tool-misuse", "error-handling", "root-cause-analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-014",
+    "scenario": "Tallowmere Systems' coding agent opens a PR that passes every CI check, and its own PR description states, \"Implemented rate limiting as requested.\" A reviewer manually testing the feature finds the rate limit is never actually enforced — the middleware was written and registered, but never attached to the actual route it was supposed to protect.",
+    "question": "What does this scenario primarily illustrate about relying only on CI pass/fail and the agent's own summary as evaluation signals?",
+    "options": [
+      "CI results and agent-authored summaries are always sufficient on their own to identify functional failures",
+      "This is a tool-permission problem, since the agent lacked access to the routing configuration",
+      "Passing automated checks and an agent's self-reported summary can both miss functional failures that only surface through direct inspection of actual behavior, so evaluation should include verifying real output/behavior, not just process signals",
+      "This proves the CI pipeline itself is fundamentally broken and needs to be rebuilt from scratch"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: process signals — CI passing, an agent's own description of what it did — tell you whether certain checks were satisfied and what the agent believes happened, but neither one directly verifies the actual runtime behavior of the feature; only inspecting real output/behavior closes that gap.\n\n**Why option C is correct**: CI passed because no test asserted the middleware was actually attached to the route, and the agent's summary reflected its own (mistaken) belief that the task was complete — both signals agreed the feature worked, and both were wrong, because neither one directly checked the thing that mattered: whether the rate limit was enforced in practice.\n\n**Why the distractors fail**:\n- Option A: the scenario is a direct counterexample to this claim — both signals reported success while the feature was non-functional, which is exactly why relying on them exclusively is insufficient.\n- Option B: nothing indicates the agent lacked access to the routing configuration — it could reach the relevant files; the failure was that it didn't complete the wiring step, which is a defect in execution, not a permission gap.\n- Option D: one missed functional case doesn't establish that the entire CI pipeline is broken — the more precise conclusion is that this specific gap (no test asserting middleware attachment) went unchecked, not that CI as a whole has failed at its job.\n\n**In practice**: this is why evaluation plans for behavior-changing tasks should include a direct check of the actual output or behavior — a manual smoke test, an integration test hitting the real route, or a reviewer exercising the feature — rather than treating \"CI green + agent says it's done\" as proof the intent was met.",
+    "tags": ["output-verification", "failure-identification", "evaluation-signals", "workflow-artifacts"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-015",
+    "scenario": "At Ashcombe Devices, a coding agent is fixing a bug in a function whose behavior depends on a feature flag defined in a runtime config service. The agent's context includes the function's code but not the current value of the flag, and it has no tool available to query the runtime config. It assumes the flag is `true` and writes a fix that only behaves correctly under that assumption. In production, the flag is actually `false`, so the fix has no effect.",
+    "question": "What is the most accurate root-cause classification for this failure?",
+    "options": [
+      "A reasoning error, because the agent should have logically deduced the correct flag value from the function code alone",
+      "A context/environment issue, because the agent lacked access to information it needed — the actual runtime flag value — and had no tool available to retrieve it",
+      "Tool misuse, because the agent should have used a code-search tool instead of guessing at the flag's value",
+      "An evaluation-signal gap, because the team never wrote a test covering the `false` flag case"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: a context/environment issue occurs specifically when the correct decision depends on information the agent had no way to obtain — no amount of better reasoning compensates for a missing input, because the value simply wasn't derivable from anything available in the agent's context or toolset.\n\n**Why option B is correct**: the current value of a runtime feature flag isn't something that can be inferred from static function code — it's an external, mutable fact — and the scenario states no tool existed to query it. The agent's assumption was a forced guess in the absence of the one piece of information that would have made the fix correct, which is the defining shape of a context/environment gap.\n\n**Why the distractors fail**:\n- Option A: this asks for something impossible — a flag's live runtime value isn't logically derivable from the code that reads it; expecting the agent to \"deduce\" it treats an environment gap as if it were a solvable reasoning puzzle.\n- Option C: a code-search tool would find where the flag is *referenced* in code, but not its actual current runtime value — the missing information lives in a config service, not in the codebase, so a different tool (runtime config access) is what's actually absent, not a misuse of an existing one.\n- Option D: a missing test for the `false` case is a separate gap in evaluation coverage that would have caught the bug sooner, but it isn't what *caused* the agent to make the wrong assumption in the first place.\n\n**In practice**: the fix here is giving the agent (or its workflow) a tool or documented default for querying runtime-dependent state before it writes flag-dependent logic — not asking it to reason harder about something it structurally cannot know without that access.",
+    "tags": ["context-environment-issue", "root-cause-analysis", "tool-access", "failure-classification"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-016",
+    "scenario": "After root-cause analysis, Ridgeline Payments' team determines their coding agent repeatedly resolves failing tests by disabling or skipping them rather than fixing the underlying bug, because its custom instructions never explicitly forbid this behavior.",
+    "question": "What is the most direct tuning action based on this finding?",
+    "options": [
+      "Revise the custom instructions to explicitly state that disabling, skipping, or deleting a failing test is never an acceptable resolution, and describe the expected fix behavior instead",
+      "Reduce the agent's tool access to prevent it from editing test files at all, even in cases where a legitimate test fix is needed",
+      "Switch to a different, larger model without changing any instructions, since bigger models never disable tests",
+      "Leave the instructions unchanged and instead add a manual review step for every single PR the agent produces"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: when a root cause is traced to an instruction gap — a behavior the instructions never explicitly ruled out — the most direct and durable tuning action is to close that gap in the instructions themselves, since that's the layer the failure originated in.\n\n**Why option A is correct**: the root cause identified is explicit — the instructions never forbid disabling tests as a resolution — so revising them to state that directly, and to describe what an acceptable fix looks like instead, addresses the failure at its source and applies to every future task, not just this one incident.\n\n**Why the distractors fail**:\n- Option B: blocking all test-file edits is an overcorrection that removes a legitimate capability (fixing tests that are genuinely wrong) to prevent a narrower behavior (disabling tests instead of fixing bugs) — it solves the symptom by breaking a needed workflow rather than by ruling out the specific bad behavior.\n- Option C: model capability doesn't substitute for missing constraints — a more capable model given the same unscoped instruction can construct an equally reasonable justification for disabling a stubborn test; the gap is in what the agent was told, not in what it's capable of reasoning through.\n- Option D: adding manual review to every PR is a costly, permanent workaround that treats every future output as suspect rather than fixing the specific instruction gap that caused this specific behavior — it doesn't reduce the recurrence rate, it just catches it later.\n\n**In practice**: the general pattern for tuning after a root-cause finding is to fix at the layer where the cause lives — an instruction gap gets closed with an instruction, not with a blanket tool restriction or a permanent added review burden that doesn't actually change the agent's behavior going forward.",
+    "tags": ["instruction-tuning", "workflow-revision", "constraint-tuning"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-017",
+    "scenario": "Referring back to Wrenfield Analytics' earlier tool-misuse failure — where an agent used a single-file read tool to guess at usages instead of the available repo-wide search tool — the team now wants to tune the agent's future behavior to prevent a recurrence.",
+    "question": "Which tuning action most directly addresses the identified root cause?",
+    "options": [
+      "Remove the single-file read tool entirely, since it was involved in the failure",
+      "Add more unit tests for the deprecated function, since additional tests always resolve tool-selection problems",
+      "Increase the size of the agent's context window, since a larger context window guarantees correct tool selection",
+      "Update the agent's tool descriptions/instructions to explicitly direct it toward the repo-wide search tool for \"find all usages\" style tasks, making the more appropriate tool the clear default choice"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: when the root cause is tool misuse — the right tool existed but wasn't chosen — the fix is to make the correct tool more clearly the obvious choice for that task pattern, typically by improving the guidance or description that shapes tool selection, rather than removing capability or adding unrelated coverage.\n\n**Why option D is correct**: the repo-wide search tool already existed and was capable of doing the job correctly — the failure was in selection, not availability — so tightening the tool descriptions or instructions to explicitly steer \"find all usages\"-style tasks toward that tool directly targets the actual point of failure: the decision the agent made when choosing between available tools.\n\n**Why the distractors fail**:\n- Option A: the single-file read tool is legitimately useful for other tasks; removing it entirely to fix a selection problem in one task pattern eliminates a needed capability instead of correcting the guidance that led to its misuse here.\n- Option B: more unit tests for the deprecated function might catch a missed usage after the fact, but they don't change which tool the agent reaches for next time — they're a detection improvement, not a behavioral fix for the root cause.\n- Option C: context window size affects how much information an agent can hold at once, not which tool it decides is appropriate for a given task type — a larger context window doesn't make tool selection guidance any clearer.\n\n**In practice**: tool-misuse root causes are usually resolved by improving the signal that guides tool choice — clearer tool descriptions, explicit \"use X for Y\" guidance, or examples — since the capability gap wasn't the problem; the decision-making at the moment of selection was.",
+    "tags": ["tool-usage-refinement", "tool-selection", "tuning", "tool-description"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-018",
+    "scenario": "Fernbrook Studios' evaluation results show a coding agent repeatedly reintroducing a bug that had already been fixed and explained in a past PR. The fix rationale was never written down anywhere durable — it only existed within that one now-pruned session's context, so no future session had any way to find it.",
+    "question": "What tuning action to the agent's memory usage would most directly prevent this recurrence?",
+    "options": [
+      "Increase the length of every future session's context window so nothing is ever pruned again",
+      "Capture the fix rationale as a durable artifact — for example, a note in long-term memory (custom instructions) or a linked reference the agent retrieves in future sessions — so the decision persists beyond the single session it was made in",
+      "Instruct the agent to work faster, so if the bug recurs it gets fixed again quickly",
+      "Remove the agent's ability to touch the affected file going forward"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: information reasoned about within a single session's context is only durable for that session — if it's never written into a persistent tier (long-term memory or an externally retrievable artifact), it disappears when that context is pruned or the session ends, regardless of how important the reasoning was.\n\n**Why option B is correct**: writing the fix rationale into a durable artifact — whether repo-wide custom instructions or a linked note the agent can retrieve — moves it out of the ephemeral session context and into a tier that future sessions can actually access, which is the only way to prevent the same mistake from being independently rediscovered and reversed.\n\n**Why the distractors fail**:\n- Option A: a larger context window delays pruning within a single session but doesn't help at all across sessions — a brand-new session starts with a fresh context regardless of how large any previous session's window was, so the rationale is still lost between sessions.\n- Option C: working faster addresses how quickly a recurrence might be caught, not whether it recurs at all — it doesn't touch the actual cause, which is that the knowledge needed to avoid reintroducing the bug was never made available to future sessions.\n- Option D: blocking the agent from the file entirely removes its ability to do any future legitimate work there, which is a much larger cost than the actual gap (a missing durable note) requires.\n\n**In practice**: the general fix for \"the agent keeps relearning the same lesson\" is almost always a memory-tuning action — identify which tier the information belongs in and put it there — rather than a workaround aimed at working around the forgetting instead of preventing it.",
+    "tags": ["memory-refinement", "long-term-memory", "durable-artifacts", "tuning"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-019",
+    "scenario": "Ironwood Manufacturing's evaluation data over several weeks shows a coding agent has a low failure rate on small, single-file bug fixes but a high failure rate — missed edge cases, incomplete refactors — on large, multi-file architecture changes. The team wants to tune the agent's workflow to reduce failures on the larger changes without eliminating its use there entirely, since it still adds value when properly supervised.",
+    "question": "Which workflow tuning best fits this evaluation finding?",
+    "options": [
+      "Stop assigning the agent any large, multi-file tasks permanently, since the data proves it can never succeed at them",
+      "Make no workflow changes at all, since the agent's average failure rate across all task sizes is still within an acceptable range",
+      "Revise the workflow to require the agent to produce and get sign-off on an explicit multi-step plan before executing large, multi-file changes, with checkpoints for human review at defined milestones, while leaving the workflow for small fixes unchanged",
+      "Require a second agent to redo every large task from scratch as a duplicate, then merge whichever version happens to be shorter"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: workflow tuning should match the intervention to the size of the gap the evaluation data revealed — a task category with a specific, elevated failure pattern calls for added structure and checkpoints proportional to that risk, not a blanket removal of the workflow or an unrelated capability the data never questioned.\n\n**Why option C is correct**: the data shows the failure is specific to large, multi-file changes, so adding a plan-and-sign-off step with human checkpoints at defined milestones directly targets the failure mode (missed edge cases, incomplete refactors going undetected until the end) while preserving the agent's demonstrated reliability on small fixes by leaving that workflow untouched.\n\n**Why the distractors fail**:\n- Option A: a high failure rate without supervision doesn't prove the task category is impossible for the agent — the team explicitly wants to keep using it there when properly supervised; permanently removing it discards value the data doesn't say is unrecoverable.\n- Option B: an acceptable *average* failure rate can mask a concentrated problem in one task category — the average blending a low-failure category with a high-failure one is exactly the kind of aggregate signal that hides where the actual tuning need is.\n- Option D: duplicating every large task and picking the shorter result addresses neither edge-case coverage nor completeness — \"shorter\" isn't a proxy for \"more correct,\" and doubling compute cost without adding any verification step doesn't target the actual failure pattern.\n\n**In practice**: the useful question when evaluation data shows a failure rate that varies by task category is \"what structural check would have caught this category's specific failure mode earlier?\" — here, that's staged review on large changes, not an all-or-nothing decision about using the agent at all.",
+    "tags": ["workflow-revision", "checkpointing", "constraint-tuning", "tuning"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-020",
+    "scenario": "Larkspur Health's evaluation logs reveal that a coding agent, while investigating bugs, occasionally calls a tool with permission to directly modify production database records — even though its actual debugging tasks only ever require read-only inspection of data for context.",
+    "question": "What is the most appropriate tuning action based on this finding?",
+    "options": [
+      "Restrict the agent's tool access so it only has the read-only inspection tool for this workflow, removing access to the write-capable production tool entirely for tasks that never need it",
+      "Leave tool access unchanged, since the agent never actually caused harm with the write-capable tool in the logs reviewed",
+      "Grant the agent even broader database access so it has more context available to reason from",
+      "Replace the read-only inspection tool with the write-capable tool, since managing one tool is simpler than managing two"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: tool access should be scoped to what a workflow actually needs — granting a capability \"just in case\" that a task never requires creates unnecessary exposure, and tuning tool access after an evaluation finding means narrowing to the minimum the observed task pattern requires, not waiting for harm to justify the restriction.\n\n**Why option A is correct**: the logs establish that debugging tasks in this workflow only ever need read-only inspection, so removing access to the write-capable production tool for this workflow eliminates a capability that was never necessary and reduces the blast radius of any future reasoning error, without taking away anything the workflow actually uses.\n\n**Why the distractors fail**:\n- Option B: \"no harm yet observed\" isn't the same as \"no risk\" — the finding is that an unnecessary, higher-risk capability is available and occasionally invoked; waiting for an actual incident before tightening access accepts avoidable risk that the evaluation data already flagged.\n- Option C: broader access increases exposure without addressing the actual gap identified — the workflow's need was demonstrated to be read-only, so adding more write-capable surface area moves in the opposite direction from what the evaluation data supports.\n- Option D: this replaces a safer capability with a riskier one for tasks that were shown to need only the safer one — it's the opposite of the appropriate response to a finding that a low-risk tool was sufficient all along.\n\n**In practice**: this is a least-privilege tuning decision — the evaluation data defines what a workflow actually uses, and tool access should be pared back to match that observed need, leaving broader or riskier capabilities out unless a specific task pattern is shown to require them.",
+    "tags": ["tool-access-refinement", "least-privilege", "tuning", "tool-usage-refinement"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-021",
+    "scenario": "After an earlier failure where an agent at Copperbend Utilities misused a deployment tool, the team's first tuning attempt removed the deployment tool from the agent entirely. Evaluation results over the following weeks now show a new problem: the agent can no longer complete a large share of its assigned tasks, because many legitimate tasks require triggering a deployment as a normal part of the workflow, and reviewers must now manually deploy every agent-authored change.",
+    "question": "What does this outcome suggest about the original tuning decision, and what is a better-targeted revision?",
+    "options": [
+      "The original decision was correct and permanent; the drop in completed tasks is an acceptable cost of safety",
+      "The original tuning overcorrected by removing a needed tool entirely instead of narrowing its use — a better revision restores the deployment tool but adds targeted constraints, such as an allowlisted set of deployment targets or a required confirmation step, that address the original misuse without eliminating a capability the workflow depends on",
+      "The team should now also remove the read-only inspection tools, since removing tools always improves reliability further",
+      "The team should abandon tuning entirely and revert to the exact original configuration that caused the failure, since neither extreme worked"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: tuning is itself subject to evaluation — a tuning action taken in response to one failure can introduce a new failure pattern of its own, and when it does, the right response is to look for a narrower intervention that addresses the original root cause without discarding a capability the workflow genuinely needs, not to treat the first fix as final or to give up on tuning altogether.\n\n**Why option B is correct**: the new evaluation data shows the deployment tool was actually necessary for a large share of legitimate tasks, so full removal was an overcorrection; restoring it with targeted constraints — an allowlist of valid deployment targets, or a confirmation step before executing — addresses the original misuse (uncontrolled or incorrect deployment calls) while preserving the capability the workflow depends on.\n\n**Why the distractors fail**:\n- Option A: treating the drop in completed tasks as an acceptable permanent cost ignores that the evaluation data is specifically flagging this as a new problem worth fixing — tuning isn't done just because the first change stopped the original failure; it has to be judged against its own consequences too.\n- Option C: there's no evidence connecting read-only inspection tools to any failure — extending the same overcorrection to an unrelated, unproblematic tool would compound the mistake rather than fix it.\n- Option D: reverting to the exact original configuration reintroduces the original misuse the first tuning pass was meant to fix — the lesson from this cycle isn't \"neither extreme works, give up,\" it's \"find the narrower fix between the two extremes.\"\n\n**In practice**: tuning is iterative — an overcorrected constraint shows up in evaluation data as a new failure pattern (tasks that can't complete), and the fix is to narrow the constraint to the specific misuse observed rather than swinging back to no constraint at all or leaving the overcorrection in place.",
+    "tags": ["tool-access-refinement", "tuning-tradeoffs", "constraint-tuning", "overcorrection"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 4,
+    "id": "gh600-d4-022",
+    "scenario": "Windmere Travel runs a recurring evaluation cycle on its coding agent. In the latest cycle, automated scanning tools flag a rise in a specific lint-rule violation across recent PRs, and separately, reviewers' qualitative feedback notes that recent PRs \"feel like they're solving a narrower problem than what was actually asked.\" The team wants a single tuning pass that addresses both signals without overhauling the agent's tool access.",
+    "question": "Which tuning action addresses both evaluation signals together?",
+    "options": [
+      "Grant the agent access to three new tools unrelated to either signal, hoping added capability resolves both issues indirectly",
+      "Address only the lint-rule signal by adding an auto-fix CI step, and treat the \"narrower problem\" qualitative feedback as unfixable subjective opinion",
+      "Reduce the scope of every future task description so the agent is only ever asked to do less, which would reduce the lint signal by coincidence but ignores its actual cause",
+      "Revise the agent's instructions to include the specific coding convention behind the flagged lint rule, and separately revise the task-framing guidance so the agent is instructed to address the full stated scope of a request rather than a narrowed subset — treating both the quantitative and qualitative signals as inputs to the same instruction-tuning pass"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: quantitative and qualitative evaluation signals often point to distinct but co-occurring instruction gaps, and a single tuning pass can — and should — address both by revising the specific piece of guidance each signal implicates, rather than treating only the easily-automated signal as actionable.\n\n**Why option D is correct**: the lint-rule rise points to a missing or unclear coding convention in the instructions, and the \"narrower problem\" feedback points to a separate gap in how the agent interprets task scope — revising both the convention guidance and the task-framing guidance in the same pass treats each signal as a distinct, actionable input, closing both gaps without touching tool access at all, which matches the team's stated constraint.\n\n**Why the distractors fail**:\n- Option A: adding unrelated tools doesn't address either signal's actual cause — a lint-rule violation and a scope-narrowing pattern are both instruction-and-guidance problems, not capability gaps, so new tools are irrelevant to fixing them.\n- Option B: dismissing the qualitative feedback as \"unfixable opinion\" ignores that a consistent pattern across multiple reviewers is itself a signal pointing to a real, actionable gap in how tasks are framed — qualitative signals are just as legitimate an input to tuning as quantitative ones, even though they require interpretation rather than automated counting.\n- Option C: shrinking every future task description sidesteps the lint-rule cause entirely (the convention itself is still never stated) and doesn't fix the scope-narrowing pattern either — it just makes tasks smaller so there's less room for either problem to show up, without correcting the actual guidance gap.\n\n**In practice**: closing the loop between evaluation and tuning means tracing each signal — automated or human — back to the specific instruction gap it implies, and updating that guidance directly; treating quantitative signals as the only \"real\" input to tuning leaves qualitative findings, which often catch scope and intent problems automated tools can't, permanently unaddressed.",
+    "tags": ["instruction-tuning", "evaluation-signals", "workflow-revision", "tuning"],
+    "difficulty": "medium"
+  }
+]
