@@ -116,17 +116,46 @@ Before rolling out AI, a business leader must understand:
 
 ---
 
+## 3.6b Privacy, Data Protection, and Compliance Planning
+
+Privacy isn't a single checklist row — it's a planning discipline that has to happen **before** an AI feature goes live, especially for multinational organisations operating under multiple regulatory regimes.
+
+### Data residency and sovereignty
+- Determine **where processing happens** — which Azure region, and whether data crosses borders
+- Multinational organisations must check regional requirements (EU data may need to stay in EU regions under GDPR-style regimes; comparable sovereignty rules exist in other jurisdictions)
+- Data residency commitments differ per Microsoft cloud service — verify per-service, don't assume one blanket answer covers the whole tenant
+
+### Classify data exposure before rollout
+- Before enabling an AI feature, **classify what data types will be exposed to it** — PII, financial records, health data, trade secrets
+- Sensitive categories may need additional controls (sensitivity labels, DLP policies, restricted Copilot connectors) applied *before* the AI feature is turned on, not retrofitted after
+- This classification step feeds directly into the AI Council's use-case approval process (§3.3) — the Council shouldn't approve a use case until data classification is complete
+
+### Regulatory review checklist (pre-adoption)
+
+| Check | Why it matters |
+|---|---|
+| **Applicable regulations identified** | GDPR (EU) and equivalent regional data-protection regimes may apply depending on user location and data-subject location |
+| **Data processing agreements reviewed** | Confirm Microsoft's data processing terms meet the org's regulatory obligations |
+| **Data minimisation applied** | Only expose the data the AI feature actually needs — not the whole tenant |
+| **Retention and deletion policy set** | Know how long AI interaction logs / generated content are retained, and how to delete on request |
+
+<div class="note-important"><strong>Ties to governance:</strong> Privacy and compliance review isn't a separate workstream from the AI Council — it's an input to it. The AI Council (§3.3) reviews and approves use cases <em>using</em> this compliance checklist; the Centre of Excellence (§3.14) builds the reusable patterns (approved connector configs, data classification templates) that make compliant deployment repeatable across business units.</div>
+
+<div class="note-trap"><strong>Exam trap:</strong> "A multinational company wants to roll out Copilot across EU and US offices. What should be assessed first?" → Data residency and regulatory compliance (where data is processed, which regional laws apply) — NOT simply "buy more licences." Compliance review comes before technical rollout, the same way governance policy comes before deployment (§3.2).</div>
+
+---
+
 ## 3.7 Copilot Licence Types
 
-The exam tests **three Copilot licence models**:
+The exam tests **three distinct Copilot licence models** — don't collapse these into two:
 
 | Licence type | Description | Best for |
 |---|---|---|
-| **Included with Microsoft 365** | Basic Copilot features bundled (varies by M365 plan) | Small / existing M365 customers |
-| **Microsoft 365 Copilot (monthly subscription)** | Full M365 Copilot with Graph integration — per-user per-month | Committed org-wide rollout |
-| **Pay-as-you-go** | Metered usage via Azure (for Copilot extensibility / agents) | Variable workloads, pilot programmes |
+| **(a) Included with an existing Microsoft 365 subscription** | Certain AI capabilities are already included at no extra cost within an existing M365 subscription tier — no separate Copilot purchase required | Organisations that already have an eligible M365 plan and want baseline AI features without new procurement |
+| **(b) Microsoft 365 Copilot — fixed monthly per-user add-on licence** | Full M365 Copilot with Microsoft Graph integration, purchased as a separate add-on at a fixed price per user per month | Committed, predictable org-wide or department-wide rollout |
+| **(c) Pay-as-you-go** | Metered usage via Azure (for Copilot extensibility / custom agents) — you pay only for what's consumed, no per-seat commitment | Variable workloads, pilot programmes, bursty demand |
 
-<div class="note-scribble">Know the pattern: monthly subscription = predictable cost for known users. Pay-as-you-go = flexible, scales with usage, better for pilots or bursty demand.</div>
+<div class="note-scribble">Know the pattern: (a) included-with-subscription = zero incremental cost but baseline capability only. (b) fixed monthly add-on = predictable cost for known, committed users. (c) pay-as-you-go = flexible, scales with usage, best for pilots or unpredictable demand. The exam distinguishes all three — don't merge (a) into (b).</div>
 
 ---
 

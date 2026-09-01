@@ -11,7 +11,8 @@
           "questionIds": [
             "ab731-d1-001",
             "ab731-d1-007",
-            "ab731-d1-012"
+            "ab731-d1-012",
+            "ab731-d1-022"
           ]
         },
         {
@@ -92,7 +93,11 @@
         {
           "id": "2.2",
           "title": "Manage permissions, data access, and Microsoft Graph",
-          "questionIds": []
+          "questionIds": [
+            "ab731-d2-005",
+            "ab731-d2-010",
+            "ab731-d2-016"
+          ]
         },
         {
           "id": "2.3",
@@ -113,7 +118,11 @@
         {
           "id": "2.5",
           "title": "Map and automate business processes with AI",
-          "questionIds": []
+          "questionIds": [
+            "ab731-d2-009",
+            "ab731-d2-014",
+            "ab731-d2-017"
+          ]
         }
       ]
     },
@@ -151,12 +160,21 @@
         {
           "id": "3.4",
           "title": "Manage AI licensing and deployment economics",
-          "questionIds": []
+          "questionIds": [
+            "ab731-d3-006",
+            "ab731-d3-007",
+            "ab731-d2-015",
+            "ab731-d3-017"
+          ]
         },
         {
           "id": "3.5",
           "title": "Address privacy, data protection, and compliance",
-          "questionIds": []
+          "questionIds": [
+            "ab731-d1-011",
+            "ab731-d3-010",
+            "ab731-d3-018"
+          ]
         },
         {
           "id": "3.6",

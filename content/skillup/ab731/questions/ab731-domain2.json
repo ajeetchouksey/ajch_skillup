@@ -312,5 +312,47 @@
       "licensing"
     ],
     "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-016",
+    "scenario": "An enterprise with a highly permissive, decades-old SharePoint environment is preparing to roll out Microsoft 365 Copilot to 5,000 employees. The security team already understands that Copilot only surfaces content a user is already authorised to see through their existing Microsoft 365 permissions. However, they know the environment contains many historically over-shared sites — some set to 'Everyone except external users' — accumulated over years of ungoverned sharing, and they are concerned that at Copilot scale this long-standing overshare will suddenly become far more discoverable than it ever was through manual search.",
+    "question": "Beyond relying on the fact that Copilot inherits existing permissions, what proactive governance action should the security team take BEFORE the broad rollout?",
+    "options": [
+      "Nothing further is required — since Copilot only surfaces content a user is already authorised to see, permission inheritance alone is a sufficient control regardless of how the environment has been shared historically",
+      "Use SharePoint Advanced Management to identify and remediate oversharing, restrict content discoverability for sensitive or high-risk sites, and apply sensitivity labels — actively shrinking the pool of content Copilot and Graph-connected agents can retrieve before the broad rollout begins",
+      "Disable Microsoft Graph connectivity for Copilot entirely so it cannot query any SharePoint content until every one of the organisation's sites has been manually reviewed one by one",
+      "Require every employee to individually re-request access to each SharePoint site they currently use, so Copilot has a completely fresh permission baseline to work from"
+    ],
+    "correct": 1,
+    "explanation": "Permission inheritance is a passive control — it stops Copilot from bypassing security, but it does nothing to fix an environment where access was already granted more broadly than intended. At Copilot scale, content that was technically accessible but practically hard to find (buried in a site nobody actively searched) becomes trivially discoverable through natural-language queries, which is exactly the risk the security team has identified. The proactive step is to actively reduce the exposed surface area before rollout: SharePoint Advanced Management tooling can surface and help remediate overshared sites, content discoverability restrictions can hide sensitive sites from org-wide search and Copilot retrieval even when technically shared, and sensitivity labels add classification and protection that travels with the content. This is an active governance step, distinct from simply trusting that permissions already exist. Option A repeats the passive-inheritance misconception directly — it is true that Copilot respects existing permissions, but 'existing' is precisely the problem when those permissions were never properly governed; inheritance is necessary but not sufficient. Option C solves the problem by eliminating Copilot's core value (Graph-grounded answers over internal data) rather than fixing the underlying oversharing, and a full manual site-by-site review before any rollout is not a scalable or realistic proactive control at 5,000-user scale. Option D is operationally impractical and doesn't address the real issue — the problem isn't that access grants are stale from an authentication standpoint, it's that they were too broad in the first place; re-requesting access to the same overshared sites would simply recreate the same exposure.",
+    "tags": [
+      "microsoft-graph",
+      "governance",
+      "sharepoint-advanced-management",
+      "proactive-access-control"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-017",
+    "scenario": "An HR shared-services team currently handles new-hire onboarding by having each hiring manager individually chat with Copilot in Outlook to draft a welcome email, an IT ticket, and an access request — one interaction at a time. Nothing connects these steps together: the manager must remember to trigger each request separately across payroll, IT provisioning, and facilities, and there is no automatic handoff or status tracking between systems.",
+    "question": "The HR director wants to move from ad hoc Copilot chat assistance to a genuinely automated onboarding process. Which approach best achieves this?",
+    "options": [
+      "Keep using Copilot in Outlook, but give managers a more detailed prompt template that covers all onboarding steps in a single chat message",
+      "Build an agent in Copilot Studio that triggers automatically when a new hire is added to the HR system, and orchestrates the multi-step workflow end-to-end — creating the IT ticket, initiating system access provisioning, and notifying facilities — with status tracked across steps and human approval inserted only where required",
+      "Ask each system owner (IT, payroll, facilities) to separately pilot their own individual Copilot chat sessions for their portion of the onboarding process",
+      "Use Researcher in Copilot to compile a weekly report of that week's new hires so managers can manually action any outstanding onboarding tasks themselves"
+    ],
+    "correct": 1,
+    "explanation": "Genuine business process automation means a defined workflow runs end-to-end across systems in response to a trigger, with the person only needing to intervene at defined checkpoints — not that a human has a slightly better single chat interaction. A Copilot Studio agent triggered by a new-hire event and connected to the HR system, ticketing system, and facilities system can carry out the full multi-step sequence itself, tracking status and routing only the necessary approvals to a human, which is what genuinely automating (rather than just assisting) the process looks like. Option A improves the quality of a single manual chat interaction but still requires the manager to remember to open Copilot and trigger every step themselves each time — it doesn't remove the manual, disconnected nature of the process, it just makes one message more thorough. Option C actually makes the fragmentation worse: three separate, uncoordinated Copilot chat efforts by three different teams still leave no single orchestrated workflow and no automatic handoff between IT, payroll, and facilities — it multiplies isolated assistance rather than creating one connected process. Option D produces a helpful report but is fundamentally a summarisation/reporting capability, not automation — the manager still has to read the report and manually go trigger each onboarding action across each system, which is exactly the bottleneck the HR director wants removed.",
+    "tags": [
+      "process-automation",
+      "copilot-studio",
+      "business-process",
+      "workflow-orchestration"
+    ],
+    "difficulty": "medium"
   }
 ]

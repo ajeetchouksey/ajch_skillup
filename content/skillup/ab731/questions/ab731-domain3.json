@@ -337,5 +337,47 @@
       "governance-structure"
     ],
     "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-017",
+    "scenario": "A 3,000-employee company already holds Microsoft 365 E3 licences for all staff. Leadership wants most employees to be able to ask general AI questions and get web-grounded answers with enterprise data protection, at no additional per-user cost, while a smaller group of 400 power users in finance and sales need Copilot to generate content directly inside Word, Excel, and PowerPoint, run Analyst-style data analysis, and take agentic actions across their daily Microsoft 365 apps.",
+    "question": "Which licensing approach correctly matches each user segment's needs?",
+    "options": [
+      "All 3,000 employees need the paid Microsoft 365 Copilot add-on licence — Copilot capabilities are never included with a standard Microsoft 365 subscription",
+      "The general population can use Microsoft Copilot Chat, which is included with their existing Microsoft 365 E3/E5 subscription at no additional cost and provides enterprise-protected chat; the 400 power users who need in-app content generation and agentic capabilities across Word, Excel, and PowerPoint require the separately purchased Microsoft 365 Copilot add-on licence",
+      "Every user should be moved to pay-as-you-go metered billing, since it is the cheapest licensing model for any organisation regardless of usage pattern",
+      "The 400 power users should use the free consumer Microsoft Copilot app, since it provides the same in-app Word, Excel, and PowerPoint capabilities as the paid add-on licence"
+    ],
+    "correct": 1,
+    "explanation": "Microsoft 365 Copilot licensing spans three distinct models: capabilities included at no extra cost within an existing Microsoft 365 subscription (baseline enterprise-protected Copilot Chat), the paid per-user Microsoft 365 Copilot add-on licence (full in-app generation and agentic features across Word, Excel, PowerPoint, and Teams), and metered pay-as-you-go consumption typically used for variable Azure AI Foundry-style workloads or short pilots rather than standing enterprise chat access. Matching the two segments correctly means the general population's basic-chat needs are already covered by their existing E3/E5 subscription at zero incremental licence cost, while the power users' requirement for deep in-app authoring and agentic actions specifically requires the paid add-on — the two needs are genuinely different products, not different tiers of the same thing. Option A over-licenses the entire organisation by assuming no Copilot capability is ever included with a standard subscription, ignoring the at-no-extra-cost Copilot Chat tier that already meets the general population's stated needs. Option C misapplies pay-as-you-go: that model is designed for variable or unpredictable workloads (like a short pilot or fluctuating Azure AI Foundry token consumption), not for provisioning standing, everyday chat access across an entire 3,000-person workforce, and it isn't inherently cheaper for steady, org-wide usage. Option D confuses the free consumer Microsoft Copilot app with the licensed Microsoft 365 Copilot add-on — the free consumer app lacks Microsoft Graph grounding in the organisation's own data and does not provide the in-app agentic generation capabilities inside Word, Excel, and PowerPoint that the power users specifically require.",
+    "tags": [
+      "licensing",
+      "copilot-licence",
+      "included-in-m365",
+      "license-tiers"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-018",
+    "scenario": "A multinational retailer headquartered in the US is planning to roll out a Copilot-based customer service AI solution across its EU, UK, and APAC operations. The solution will process customer data, including personal data belonging to EU citizens. Before any deployment begins, the AI adoption team must determine where that data will actually be processed and stored, which regulatory regimes apply in each region, and what data-residency or cross-border transfer commitments the organisation needs to document.",
+    "question": "As part of responsible AI adoption planning, what should the team do BEFORE rollout to address the privacy and compliance impact of this multinational deployment?",
+    "options": [
+      "Confirm only that Microsoft does not use customer content to train its foundation models, since that single commitment satisfies all data protection and compliance obligations for a multinational rollout",
+      "Classify the data being processed (including EU citizens' personal data), determine which regulatory regimes apply to each region — such as GDPR-style data-residency and cross-border transfer rules — confirm Microsoft's applicable data-residency commitments for the relevant services, and document the findings as part of a formal compliance review before rollout",
+      "Deploy the solution to all regions simultaneously, since Microsoft's global compliance certifications mean no region-specific review is required",
+      "Restrict the compliance review to the IT security team only, since data residency and regulatory obligations are a purely technical matter rather than a governance and legal one"
+    ],
+    "correct": 1,
+    "explanation": "Understanding the impact of AI adoption on data, security, privacy, and cost requires more than confirming a single narrow commitment — it means classifying what data will actually flow through the solution, identifying every regulatory regime that applies given where the data and the customers sit (for EU personal data, that includes GDPR-style residency and cross-border transfer obligations), confirming what data-residency commitments the specific Microsoft services being used actually provide, and documenting all of this as a formal pre-rollout compliance review involving legal, compliance, and the business, not just engineering. Option A wrongly generalises a specific, narrower Microsoft commitment (that customer content isn't used to train foundation models) into covering the entire compliance question — that commitment addresses model training, not where data is processed and stored, which regional regulations apply, or what residency and transfer obligations the deploying organisation itself carries as a data controller. Option C conflates a vendor's platform-level certifications with an organisation's own regulatory obligations for its specific data flows — certifications describe the platform's controls, but they do not remove the deploying organisation's responsibility to assess data residency, applicable law, and cross-border transfer mechanisms for its own customer data in each region before rollout. Option D wrongly frames data residency and regulatory compliance as a purely technical IT concern; in practice it requires legal and compliance expertise to interpret regulatory regimes correctly and is the kind of cross-functional decision an AI governance body (such as an AI Council) should oversee, not something IT security can assess and sign off on in isolation.",
+    "tags": [
+      "privacy",
+      "compliance",
+      "data-protection",
+      "data-residency"
+    ],
+    "difficulty": "hard"
   }
 ]

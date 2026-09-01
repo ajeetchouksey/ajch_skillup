@@ -431,5 +431,26 @@
       "model-extraction"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-022",
+    "scenario": "A bank deployed a machine learning model 14 months ago to flag potentially fraudulent transactions in real time. At launch, after being trained and validated on a large historical dataset, the model caught over 90% of fraud cases with a low false-positive rate. The model's parameters have not been touched since that initial launch. Over the past two months, fraud patterns have shifted as criminals adopted new tactics, and the fraud team has noticed detection accuracy steadily declining while more fraud cases slip through undetected.",
+    "question": "Which stage of the machine learning solution lifecycle has been neglected, and what is the resulting phenomenon called?",
+    "options": [
+      "Data collection — the original training dataset was too small to capture all fraud patterns, so the model was never accurate to begin with",
+      "Ongoing monitoring and retraining — the model has not been retrained on new transaction data as fraud patterns evolved, a phenomenon known as concept drift",
+      "Model validation — the model was never evaluated against a held-out test set before it was deployed",
+      "Deployment — the model was never properly integrated into the live transaction-processing pipeline"
+    ],
+    "correct": 1,
+    "explanation": "A machine learning solution's lifecycle does not end once a model is deployed — it is a continuous cycle of data collection and preparation, training, validation/evaluation, deployment, and then ongoing monitoring and retraining, because the real-world patterns the model was trained on will keep changing after launch. Here, the model performed well at launch (90% detection, low false positives), which shows data collection and validation were done properly at the time. The decline that emerged months later, coinciding with new fraud tactics, is the signature of concept drift — the statistical relationship between transaction features and 'fraud' has shifted, so a model frozen at its original training point becomes progressively less accurate. The fix is to close the loop: monitor live performance, collect new labelled examples of the new fraud patterns, and retrain/redeploy the model on a recurring cadence. Option A is wrong because the strong launch performance directly contradicts an under-sized or poor original training dataset — the problem only appeared after fraud tactics changed, not from day one. Option C is wrong for the same reason: a model with no validation would likely have shown weak or unpredictable performance at launch, not a period of strong results followed by gradual decline. Option D is wrong because the model is clearly running in production and actively flagging transactions (it just does so with declining accuracy) — deployment integration is not the issue; it is what happens (or fails to happen) after deployment.",
+    "tags": [
+      "machine-learning",
+      "ml-lifecycle",
+      "model-monitoring",
+      "concept-drift"
+    ],
+    "difficulty": "medium"
   }
 ]
