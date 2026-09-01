@@ -190,20 +190,6 @@ The throughline connecting all three is that **guarantees come from structure, n
 
 This is also why the plan/act boundary is the domain's centerpiece rather than just one topic among three: it's the moment where "agent reasoning" (which can be wrong, misled, or overconfident) is separated from "agent action" (which is irreversible the instant it happens). Everything else in this domain — delegation scoping, tool restrictions, bypass-actor configuration, async review — is a variation on protecting that one seam.
 
-### 2. Worked scenario
-
-> **Scenario.** Priya, a platform lead at a mid-size logistics company, is standing up her team's first coding-agent workflow for bug-fix tasks. She has two agents configured: a `planner` custom agent with `tools: ["grep", "glob", "view"]` and an `executor` custom agent with `tools: ["grep", "glob", "view", "edit", "bash"]`.
->
-> An engineer files an issue: *"Fix `test_shipment_status` — it fails because the status enum doesn't include `IN_TRANSIT`. Only touch `shipment/status.py` and its test file. Do not change the public `ShipmentStatus` API surface."* This gives Priya's workflow exactly what it needs: an input (the failing test and the constraint), and an implicit success criterion (the named test passes, no public API change).
->
-> The `planner` agent runs first. Because it only has read-only tools, it can inspect `shipment/status.py`, the enum definition, and the failing test — but it physically cannot edit anything. It produces a structured plan: *"1. Add `IN_TRANSIT` to the `ShipmentStatus` enum in `shipment/status.py`. 2. Update the corresponding test fixture in `test_status.py` to include the new value. No changes to the public `ShipmentStatus` class interface."*
->
-> A reviewer checks the plan against the issue in under a minute: right files (`status.py`, `test_status.py`), no destructive operations, no API-surface change proposed — matches the constraint exactly. The plan is approved, and the workflow hands off to the `executor` agent, which now has edit and bash access. It makes the two changes, runs the test suite in its ephemeral environment (confirms `test_shipment_status` now passes, confirms no other tests broke), and opens a **draft** PR with a summary referencing the original issue.
->
-> A teammate reviews the draft PR asynchronously that afternoon — not in a live session, just PR comments — confirms the diff matches the plan exactly, and marks it ready for review. Because the branch-protection ruleset only lists the agent's own working-branch pushes in the bypass list (not the required-review rule for merges into `main`), the PR still needs a human approval before it can merge. The teammate approves, and the PR merges. The entire audit trail — the plan artifact, the commits, the diff, the PR comments, the session log — is reconstructable from GitHub alone, months later, without anyone needing to remember what happened.
->
-> Nothing about this took a human's continuous attention: two checkpoints (plan review, PR review), each fast because the inputs were well-scoped and the boundary between reasoning and action was enforced by tool capability, not by hoping the agent behaved.
-
 ### 3. Memory aid
 
 **PACE** — the shape of every well-architected agent workflow in this domain:

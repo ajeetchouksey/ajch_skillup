@@ -182,20 +182,6 @@ Evaluation, root-cause analysis, and tuning form a closed loop, and the loop onl
 
 The throughline is that evaluation, diagnosis, and tuning aren't independent skills applied once — they're one repeating cycle, and this domain exists because each stage has a specific, common way to get it wrong. Skipping straight to "add an instruction" without first classifying the root cause — the exam's favorite trap here — treats every category of failure as if it were a reasoning failure, so roughly two-thirds of the time it fixes nothing at all.
 
-### 2. Worked scenario
-
-> **Scenario.** A fintech platform team files an issue: *"Fix `test_rate_limiter_backoff` — it intermittently fails under CI load. Only touch `tests/test_rate_limiter.py`."* A coding-agent session picks it up. The planner (D1) proposes: replace the test's real-time `sleep` calls with a fixed clock/mock so timing no longer depends on CI load. A reviewer approves the plan — it names exactly the one file the issue scoped.
->
-> **Execution diverges from the plan.** The trace shows the executor reads `test_rate_limiter.py`, then also reads `rate_limiter.py` (the production module), and reasons — incorrectly — that the real cause of flakiness is the production backoff calculation being slightly off, not the test's sleep-based timing assumption. It "fixes" the backoff formula in `rate_limiter.py`, then updates the test to match the new production behavior. All tests pass. CI, code scanning, secret scanning, and dependency review all come back clean. A draft PR opens.
->
-> **Evaluation catches it.** A reviewer runs the full signal stack, not just CI status. Outcome achieved? The test passes, yes. Constraint respected? No — the issue said "only touch `tests/test_rate_limiter.py`," and `rate_limiter.py` changed too, a scope violation regardless of green CI. Intent alignment? No — the issue asked for a flaky-*test* fix, not a change to production backoff behavior. The PR fails evaluation on two of four signals despite passing every automated check.
->
-> **Root-cause analysis.** The reviewer pulls the session log and trace and applies the two-question test. Was the needed information available? Yes — the test file itself, which the agent read first, contained the actual cause (a sleep-based timing assumption), fully diagnosable without ever touching production code. Was the tool use correct? Yes — the `read` and `edit` calls used correct parameters and the agent acted on what they returned; nothing was misused mechanically. So this is a **reasoning error**: the agent had the right information and still drew the wrong conclusion, assuming the flakiness lived in production code it hadn't been asked to touch.
->
-> **Tuning, matched to the layer.** Because this is a reasoning error, the fix is instructions and workflow, not memory or tools. The team adds a concrete line to the repository's custom instructions: *"Test-flakiness fixes default to test-side changes (mocking, fixed clocks) unless the issue explicitly requests a production-code change."* They also tighten the plan-review checkpoint to explicitly flag any proposed plan naming files outside the issue's stated scope — this specific failure would have been caught at plan review, before execution ever touched `rate_limiter.py`, if that check had existed. No memory-tier change is made (the information wasn't missing, it was misread) and no tool-access change is made (the tools were used correctly) — tuning stays confined to the layer the evidence actually supports.
->
-> **The next cycle.** A similar flaky-test issue is assigned later that month. The updated instruction and tighter plan-review gate catch the same temptation at the plan stage: the proposed plan names only the test file, review approves in under a minute, and the resulting PR passes the full evaluation stack — including intent alignment — on the first pass.
-
 ### 3. Memory aid
 
 **TRACE** — the loop this domain runs, every time:

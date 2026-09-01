@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-012",
+  "title": "Risk-Tiered Autonomy Across Three Candidate Fixes to a Billing CI Failure",
+  "description": "Tests the ability to classify autonomy level by operational, security, and compliance risk rather than by code complexity, and to correctly distinguish a structurally-blocked action from a low-risk one and a compliance-sensitive one requiring explicit authorization.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 12,
+  "domains": [6],
+  "scenario": {
+    "background": "A coding agent is dispatched to fix a failing CI pipeline for a billing service. Investigating the failure, it identifies three candidate actions: bumping a pinned dependency, rotating an expired API key stored in a secret, and removing a stale feature flag gating a legacy data-export path that two enterprise customers still use under a contractual data-retention term.",
+    "characters": [
+      {
+        "name": "Chidi Okonkwo",
+        "role": "Platform Engineer",
+        "concern": "Wants routine, low-risk fixes to ship with zero added friction, while genuinely risky ones get real scrutiny."
+      },
+      {
+        "name": "Renee Fournier",
+        "role": "Compliance Officer",
+        "concern": "The legacy export path is under a contractual retention term — removing it isn't just a code decision."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-012-q1",
+      "stem": "Bumping the pinned dependency and re-running tests is fully reversible via a single git revert, with no credentials or permissions touched. What autonomy level fits, and why shouldn't a human review gate be added here?",
+      "options": [
+        "Full autonomy — the fix ships and merges through the standard pipeline with no additional approval gate, since low operational, security, and compliance risk across all three dimensions means an added human review step wouldn't catch anything CI doesn't already catch, only adding latency for no risk reduction",
+        "A mandatory human approval gate should be added regardless, since any production change deserves review",
+        "The change should be blocked entirely until a human manually applies it",
+        "Autonomy level should be based on how many lines of code changed, not on risk"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because classification is about risk, not caution for its own sake — a low-risk-across-all-dimensions, fully reversible change gets full autonomy because a human gate here would add latency without reducing any risk CI doesn't already catch, which is exactly the velocity-preservation goal of correctly calibrated autonomy. B misapplies uniform caution regardless of actual risk, diluting human attention exactly where it matters least. C blocks a change that carries essentially no risk. D uses the wrong signal entirely — risk, not diff size, is what should set the autonomy level."
+    },
+    {
+      "id": "gh600-scenario-012-q2",
+      "stem": "The actual root cause is an expired API key in a secret used to call a production billing provider, but the agent's execution context has no read or write access to the secret store at all. What should happen?",
+      "options": [
+        "The agent should escalate its own permissions temporarily to fix the key directly",
+        "The action is blocked outright, structurally, before any question of judgment or approval arises — the agent opens an issue tagging the team that owns the secret, and a human with the correct, separately-scoped permission rotates the key through the actual secret-management workflow",
+        "The agent should ask a human to paste the new key directly into the chat session for the agent to apply",
+        "The agent should work around the missing access by hardcoding a temporary key value in the codebase"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the agent never had the capability to touch the secret store in the first place — this is a structural block, not a judgment call the agent makes and then defers — so the correct path is surfacing the issue to the team that owns the secret and letting a human with the correctly-scoped permission handle it through the real secret-management workflow, entirely outside the agent's execution path. A proposes an agent escalating its own privileges, which defeats the entire purpose of least-privilege scoping. C and D both introduce insecure, ad hoc workarounds for handling a production secret rather than using the legitimate channel."
+    },
+    {
+      "id": "gh600-scenario-012-q3",
+      "stem": "Removing the stale feature flag gating the legacy export path is technically well within the agent's write scope and looks like routine cleanup. Why does it get the highest bar of the three actions?",
+      "options": [
+        "Because it involves the most lines of code changed",
+        "Because the removal is compliance-sensitive and effectively irreversible — reconstructing the export path from scratch would be needed if a customer still relies on it under a contractual retention term — and no amount of code review calibrated for correctness would catch that contractual dimension, so it requires a standalone, explicit authorization decision before removal",
+        "Because it's the most technically complex of the three changes",
+        "Because the agent flagged it as low priority and therefore riskier"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because reversibility and compliance sensitivity — not code complexity — are what set the autonomy bar here: removing the export path is hard to reverse and carries a contractual dimension that ordinary code review isn't designed to catch, so it needs a specific, standalone authorization from someone who can confirm the retention term no longer applies, kept separate from the routine dependency bump. A and C both misapply code-size or complexity as the risk signal, which the scenario explicitly rejects. D invents an unrelated and unsupported claim about priority."
+    },
+    {
+      "id": "gh600-scenario-012-q4",
+      "stem": "What is the overall lesson from how these three actions were handled differently?",
+      "options": [
+        "More human involvement is always safer, so all three actions should have required the same review",
+        "Real accountability means every point of human involvement exists because the classification said it had to, and every point that doesn't need one gets removed — one action ships with zero friction, one never reaches a human's judgment because the capability was structurally absent, and one gets the highest bar precisely because of reversibility and compliance sensitivity, not code complexity",
+        "The agent should always default to the most cautious path regardless of actual risk, to avoid any chance of a mistake",
+        "Autonomy levels should be fixed permanently per agent, not reassessed per action"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because accountability isn't a synonym for caution — diluting human review across every action, including ones that carry no risk, means attention is spread thin exactly where it matters least, while a correctly calibrated system reserves human involvement for where risk classification actually requires it. A treats uniform caution as inherently safer, which the scenario explicitly shows is not true — it just slows down low-risk work without adding protection. C repeats the same overcaution mistake. D ignores that autonomy should be assessed per action based on its actual risk profile, not fixed per agent regardless of what it's doing."
+    }
+  ],
+  "keyLearnings": [
+    "Autonomy level should be classified by operational, security, and compliance risk — not by code complexity, diff size, or generic caution.",
+    "A capability that was never granted (like secret-store access) structurally blocks an action before any judgment call is even needed — this is a stronger guarantee than a policy the agent is merely instructed to follow.",
+    "Reversibility and compliance sensitivity — not how routine a change looks — determine which actions need a standalone, explicit human authorization.",
+    "Adding human review to every action, regardless of risk, doesn't increase accountability — it dilutes attention away from the actions that actually need it."
+  ]
+}

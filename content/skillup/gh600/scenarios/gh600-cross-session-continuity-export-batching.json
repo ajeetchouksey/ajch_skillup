@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-009",
+  "title": "Cross-Session Continuity and Ground Truth for an Export-Batching Fix",
+  "description": "Tests the ability to reason about what should persist across sessions versus what should be freshly re-derived, why GitHub's live state is the ground truth a session must be checked against, and how a resumed follow-up session should behave differently from a brand-new one.",
+  "examId": "gh600",
+  "difficulty": "hard",
+  "estimatedMinutes": 13,
+  "domains": [3],
+  "scenario": {
+    "background": "Maya files an issue: the /export endpoint times out on large datasets, so it should be batched into chunks of 500 rows, touching only export/service.py and its tests. A coding-agent session picks it up, and a second session later needs to add a follow-up fix while an unrelated PR merges a change to a shared dependency in between.",
+    "characters": [
+      {
+        "name": "Maya Torres",
+        "role": "Filing Engineer",
+        "concern": "Wants her follow-up comment addressed without the agent re-deriving a whole new, possibly divergent plan."
+      },
+      {
+        "name": "Jordan Lee",
+        "role": "Platform Reliability Engineer",
+        "concern": "Worried that a long-running session could go stale relative to what actually merges into the base branch."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-009-q1",
+      "stem": "Once session 1 finishes, why is the durable state of the task the Git commits, the PR description, and the plan artifact, rather than anything held in the session's own memory?",
+      "options": [
+        "Because the session's compute environment is discarded when it ends, so anything the session decided is only durable if it was written into Git/GitHub, which then becomes the single source of ground truth for what happened",
+        "Because Git and GitHub are simply required by policy, with no functional reason",
+        "Because the session's own memory is actually more reliable than what's committed to Git",
+        "Because storing state in Git avoids the need for any review of the plan or diff"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because a session's compute environment is discarded once it ends — anything the session decided only persists if it was committed to Git or written into GitHub (the PR, its comments, the plan artifact) — which is exactly why GitHub's live state functions as the ground truth that any later session, or a human, can check against. B dismisses a real functional reason as mere policy. C inverts the actual reliability relationship — durable, committed state outlives an ephemeral session's memory. D confuses durable storage with skipping review, which are unrelated concerns."
+    },
+    {
+      "id": "gh600-scenario-009-q2",
+      "stem": "When Maya leaves a follow-up comment asking for zero-row handling, what should happen instead of triggering a brand-new session with no context?",
+      "options": [
+        "The platform resumes on the same branch — session 2 reads the existing commits and PR thread as its starting point and adds the zero-row handling as one more commit, rather than re-deriving the whole plan from scratch",
+        "A brand-new session should always start fresh regardless of existing context, to avoid any risk of carrying over a stale assumption",
+        "The follow-up should be handled entirely manually by a human, bypassing the agent",
+        "Session 2 should ignore the existing PR and open a second, separate PR for the same fix"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because resuming on the same branch, reading the existing commits and PR thread as context, lets session 2 add the requested change as one more commit instead of re-deriving a whole new plan that could diverge from what's already been reviewed and partially approved — this is what keeps the follow-up focused and consistent with what came before. B discards useful, already-reviewed context for no benefit and risks producing a second, inconsistent implementation. C bypasses the agent for a task well within its scope. D creates duplicate, conflicting work products for what should be one continuous change."
+    },
+    {
+      "id": "gh600-scenario-009-q3",
+      "stem": "Because session 2 gets a freshly-seeded environment (not a reused one from session 1), what does this correctly ensure regarding the unrelated db/connection.py change merged in between sessions?",
+      "options": [
+        "Session 2's test run reflects current reality, picking up the db/connection.py change now merged into the base branch, rather than testing against session 1's now-stale snapshot",
+        "Session 2 ignores the db/connection.py change entirely, since it's unrelated to the export fix",
+        "Session 2 reverts the db/connection.py change to avoid any interference",
+        "Fresh environment seeding has no bearing on which changes a session's test run reflects"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because a fresh environment snapshot at the start of session 2 picks up whatever is currently on the base branch, including the unrelated db/connection.py change — meaning session 2's own test pass reflects current reality rather than a stale view from session 1's earlier snapshot. B is wrong because the change, while unrelated in origin, still affects the same dependency the export service uses, and a correct test run needs to reflect it. C is an unjustified and unrelated action outside the scope of this task. D is wrong — fresh seeding is precisely what determines whether a session's internal test results are trustworthy against the current base branch."
+    },
+    {
+      "id": "gh600-scenario-009-q4",
+      "stem": "Jordan is worried about a hypothetical single very long-running session spanning both changes without a fresh environment seed in between. Why would the real CI run against current main matter more than that session's own internal test result in that case?",
+      "options": [
+        "Because a session's internal test pass, run against a stale snapshot, could stay green even though the code no longer matches what's actually on the base branch — the real CI run against current main is the check that reflects the actual, current state",
+        "The session's internal test result is always more trustworthy than CI, since it runs closer to the code changes",
+        "CI and the session's internal test are functionally identical and either one is sufficient",
+        "This scenario only matters for very large codebases, not for a single-service change like this"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because a long-running session without a fresh environment seed risks its internal test pass staying green against an outdated view of dependencies, even as the real base branch moves on — the actual CI run, executed against current main, is the check that reflects present reality and is therefore the one that matters. B inverts the actual risk — a stale internal session view is exactly the failure mode being described. C incorrectly equates a potentially-stale internal check with an independently-run, current CI check. D understates the risk — staleness relative to a shared dependency can affect any codebase size, not just large ones."
+    }
+  ],
+  "keyLearnings": [
+    "A session's compute environment is discarded when it ends — only what's committed to Git and GitHub persists, which is why GitHub's live state functions as the single ground truth.",
+    "A follow-up request should resume on the same branch and build on existing reviewed context, rather than triggering a brand-new session that could re-derive a divergent plan.",
+    "A freshly-seeded environment for each new session is what ensures its test results reflect current reality, including unrelated changes merged in between sessions.",
+    "A long-running session's own internal test pass can go stale relative to the actual base branch — the real CI run against current main is the check that reflects present reality."
+  ]
+}

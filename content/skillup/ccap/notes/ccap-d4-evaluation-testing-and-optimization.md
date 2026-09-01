@@ -200,17 +200,6 @@ The reason mixed methodology matters (golden + synthetic + adversarial, rule-bas
 
 Optimization and monitoring are the domain's feedback mechanism. A/B testing proves *this specific change* helped; monitoring proves the system *is still* good after many changes accumulate over months; optimization is what keeps "good" within a budget the business can actually sustain. None of the five metric categories (accuracy, latency, cost, safety, security) can be improved in isolation without checking what it costs the other four — which is why the domain insists on measuring all five together rather than optimizing one and hoping the others hold.
 
-### 2. Worked scenario
-
-> **Scenario.** A mid-sized insurer's claims-triage agent, in production for four months, starts generating a rising volume of adjuster complaints: "the agent recommended the wrong coverage tier on several claims this week." The team's pre-launch evaluation had shown 93% accuracy against a 200-example golden dataset. Latency and cost dashboards show nothing unusual. What's the diagnostic path?
->
-> **Reasoning it through:**
-> - *Step 1 — don't guess, pull the trace.* The team pulls logs for five recently misclassified claims and inspects, in order: what context was retrieved, what the system prompt instructed, and what the model actually output.
-> - *Step 2 — check retrieval first.* All five traces show the retrieved policy documents are for the *previous year's* coverage tiers — a source-system migration three weeks earlier changed document IDs, and the RAG index was never re-ingested. This is a **retrieval issue**, not a hallucination and not a prompt failure — the model reasoned faithfully over stale, wrong context. No amount of prompt rewriting or model upgrading would have fixed this, because the input to generation was already wrong.
-> - *Step 3 — why didn't pre-launch eval catch it?* It couldn't have: the golden dataset was built and frozen four months ago, against document IDs that were correct *then*. This is exactly the gap continuous production monitoring is meant to close — a pre-launch eval score is a snapshot, and nothing was sampling live retrieval-hit-rate or citation-grounding in production to catch the drift when the source system changed.
-> - *Step 4 — the fix and the test.* Engineering re-ingests the corrected document set (a retrieval-pipeline fix, per D3's chunking/indexing guidance) and re-runs the same five previously-failing traces to confirm the correct policy documents are now retrieved. Before rolling the reindexed pipeline to 100% of traffic, the team runs a controlled A/B test: 10% of triage traffic on the reindexed retrieval pipeline (challenger) vs. 90% on the stale index (champion, kept temporarily to preserve a clean comparison and a fast rollback path), with pre-registered primary metric = coverage-tier classification accuracy on live traffic, run for one week to reach adequate sample size for the claim volume.
-> - *Step 5 — close the loop.* The A/B test confirms the reindexed pipeline restores accuracy; the team ships to 100% and, critically, adds a new production monitor: an alert on retrieval-hit-rate drift and a scheduled recurring re-ingestion trigger tied to the source system's change log, so the next document-ID migration doesn't require an adjuster complaint to surface it.
-
 ### 3. Memory aid
 
 **DIAGNOSE** the failure before you fix it:

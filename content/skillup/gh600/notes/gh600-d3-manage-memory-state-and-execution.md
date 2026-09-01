@@ -188,18 +188,6 @@ State persistence and drift detection are what happens once you accept that memo
 
 Continuity across tools and environments is the same problem at a wider angle: once more than one tool, more than one MCP server, or more than one environment (an interactive session and the CI run it triggers) are all touching the same task, "memory" isn't just about surviving time, it's about surviving being observed from more than one place at once. The fix is the same principle applied sideways instead of forward: designate one thing as the ground truth (GitHub's live state), and treat every other view — cached, snapshotted, or independently sourced — as something that has to be checked against it, not trusted on its own.
 
-### 2. Worked scenario
-
-> **Scenario.** Maya, an engineer, files an issue: *"The `/export` endpoint times out on large datasets — batch the export into chunks of 500 rows. Only touch `export/service.py` and its tests."* A coding-agent session picks it up.
->
-> **Session 1.** The planner (read-only, D1) produces a structured plan: batch the query, stream chunks, update the corresponding test to cover a >500-row dataset. Maya approves it. The executor session implements the change, runs the test suite in its ephemeral environment (seeded once, at session start, by the repo's `copilot-setup-steps` workflow — this is the environment snapshot the session will trust for the rest of its run), confirms the new test passes, and opens a draft PR. Everything the session decided — the plan, the commit history, the PR description — is now durable state living in Git and GitHub, not in the session's own memory. The session ends; its compute environment is discarded.
->
-> **The gap.** Later that day, a *different*, unrelated PR merges a change to the shared `db/connection.py` module the export service depends on. Nobody involved in the export task knows this happened yet.
->
-> **Follow-up.** Maya reviews the draft PR and leaves a comment: *"Looks right, but also handle the case where the dataset has zero rows."* Rather than triggering a brand-new session with no context, the platform resumes on the *same branch* — session 2 reads the existing commits and the PR thread as its starting point, adds the zero-row handling as one more commit, and does **not** re-derive the whole plan from scratch or produce a second, divergent implementation.
->
-> **Where drift and staleness could still bite.** Session 2's environment is a *new* snapshot, freshly seeded — so it actually does pick up the `db/connection.py` change now merged into the base branch, and its own test run reflects current reality, not the stale state session 1 saw. If session 2 had instead been a single very long-running session spanning both changes without a fresh environment seed in between, its internal test pass could have stayed green against a `db/connection.py` version that no longer matches what's actually on the base branch — exactly why the real CI run that fires on the PR (D2), against current `main`, is the check that actually matters, not the session's own internal one. Maya's review also acts as the drift check: she compares the final diff against the original issue — batching logic, zero-row edge case, nothing else — and confirms nothing has crept beyond the stated scope before approving.
-
 ### 3. Memory aid
 
 **RESET** — what to do with any piece of agent state or context, given that the default is loss:

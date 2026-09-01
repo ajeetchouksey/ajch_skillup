@@ -149,18 +149,6 @@ The guardrail mechanisms are what make that assignment enforceable rather than a
 
 The through-line is that accountability isn't a synonym for caution. A system with too little autonomy isn't more accountable — it's slower, and the humans nominally providing oversight are approving so much low-value traffic that their attention is diluted exactly where it matters least. Real accountability means every point of human involvement in the system is there because the classification said it had to be, and every point that isn't gets removed — which is the same standard this domain applies to guardrails themselves.
 
-### 2. Worked scenario
-
-> **Scenario.** A Copilot coding agent is dispatched to fix a failing CI pipeline for a `billing` service. Investigating the failure, it identifies three candidate actions, each with a different risk profile.
->
-> **Action 1 — bump a pinned dependency and re-run tests.** Operational risk: low (the fix is exactly what CI is designed to catch if wrong). Security risk: none (no credentials or permissions touched). Compliance risk: none. The change is fully reversible with a single `git revert`. Classification lands this in the low-risk tier across all three dimensions, so the assigned autonomy is full: the agent commits the fix, CI re-runs, and the PR merges through the standard pipeline with no additional approval gate. Adding a human review step here wouldn't catch anything CI doesn't already catch — it would only add latency for no risk reduction, exactly the case velocity preservation exists to avoid.
->
-> **Action 2 — the actual root cause is an expired API key in a GitHub Actions secret used to call a production billing provider.** The agent's execution context, correctly scoped to least privilege, doesn't have read or write access to the secret store at all — that's not an instruction it's choosing to follow, it's a capability that was never granted. The action is blocked outright, structurally, before any question of judgment or approval even arises. The agent instead opens an issue describing the failure and tagging the team that owns the secret, and a human with the correct, separately-scoped permission rotates the key through the actual secret-management workflow — a channel outside the agent's execution path entirely.
->
-> **Action 3 — while investigating, the agent notices a stale feature flag gating a legacy data-export path that two enterprise customers still use under a contractual data-retention term.** Removing the dead code looks like routine cleanup, and it's technically well within the agent's write scope. But classification flags it as compliance-sensitive and, in practice, irreversible — removing the export path means reconstructing it from scratch if it turns out a customer still needs it, and no amount of code review calibrated for correctness would catch the contractual dimension. This routes to explicit authorization: a specific, standalone decision from someone who can confirm the retention term no longer applies, made before the removal happens — not folded into the PR that also contains Action 1's dependency bump.
->
-> **The outcome**: one action ships with zero added friction because the classification said it needed none; one action never reaches a human's judgment at all because the capability to attempt it structurally didn't exist; and one action — the one that looked the most like routine cleanup — gets the highest bar in the whole session, because reversibility and compliance sensitivity, not code complexity, are what set the bar.
-
 ### 3. Memory aid
 
 **CRISP** — a guardrail set that's exactly as thick as the risk requires, never padded:

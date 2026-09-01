@@ -164,20 +164,6 @@ These five concepts are really one decision: **how do you get the right behavior
 
 The throughline is that none of these are independent settings — they trade against each other. Choosing Opus for a task that's really a classification problem wastes the "capability" lever. Writing an unstructured, monolithic system prompt makes the "guardrail" lever unreliable. Skipping few-shot examples on a format-sensitive task means the "technique" lever isn't doing its job, so the model's raw capability gets undermined by ambiguity you introduced. And ignoring caching on a high-volume, static-prefix workload means you're paying full price for a lever (prompt reuse) that costs nothing to pull. A mature architecture tunes all five together for a given workload, not one in isolation.
 
-### 2. Worked scenario
-
-> **Scenario.** A support-ticket triage system processes 50,000 tickets/day. Each ticket needs: (1) classification into one of 12 categories, (2) for tickets classified as "billing dispute," a structured JSON summary with a specific schema pulled from a 40-page billing-policy reference document, and (3) escalation to a human for anything touching an account closure or refund over $1,000.
->
-> **Model selection reasoning**: Classification (step 1) is narrow, high-volume, and low-stakes-per-error (retryable) → Haiku-class model, optimizing for cost and latency across 50K calls/day. Step 2 (structured summary against a policy document) needs stronger reasoning to correctly apply policy nuance → Sonnet-class model, invoked only for the subset of tickets classified as billing disputes (a fraction of the 50K, not all of them) — this is the tiered-routing pattern from the model-selection section.
->
-> **Prompting technique reasoning**: Step 1 is zero-shot with a clear category list — no examples needed, the categories are unambiguous. Step 2 needs few-shot examples (2-3 sample tickets with their correct structured JSON output) to lock the exact schema, combined with a light chain-of-thought instruction ("first identify the relevant policy clause, then populate the summary") because getting the policy application *wrong* is worse than getting the format wrong.
->
-> **Context and caching reasoning**: The 40-page billing-policy document and the few-shot examples are identical on every step-2 call — they're placed before a cache breakpoint in the Sonnet prompt. Only the individual ticket text varies and goes after the breakpoint. Given the volume (a meaningful fraction of 50K/day), this converts a large recurring input-token cost into a cache-read cost at a fraction of the price after the first call, and cuts latency on every subsequent call.
->
-> **Guardrail reasoning**: The $1,000/account-closure escalation rule is *not* left to the system prompt alone ("never process refunds over $1,000 without escalation") — it's enforced in code: the structured JSON output from step 2 includes an amount field, and a deterministic check outside the model routes anything over $1,000 or flagged as account-closure to a human queue regardless of what the model's prose suggests. The prompt-level instruction reduces how often the model even suggests auto-processing such a ticket; the code-level check guarantees it never happens silently.
->
-> **Outcome**: 50K Haiku calls/day for cheap, fast triage; a much smaller number of cached, few-shot, CoT-assisted Sonnet calls for the cases that need real reasoning; a code-enforced guardrail that doesn't depend on the model getting it right every single time. This is the tiered, budgeted, reuse-optimized architecture the exam is testing for.
-
 ### 3. Memory aid
 
 **MTGCR** — the order to reason through this domain in:

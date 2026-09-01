@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-009",
+  "title": "Matching Integration Mechanism to Data Shape at a Claims-Adjustment Agent",
+  "description": "Tests the ability to match retrieval strategy, integration protocol, tool scoping, and authorization to the actual shape and stakes of four distinct sub-tasks inside one agent, under a hard latency budget for part of the workflow.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 14,
+  "domains": [3],
+  "scenario": {
+    "background": "A financial services company is building an internal agent for its claims-adjustment team. The agent needs to: (1) look up policy details from a structured claims database by policy number, (2) search a 40,000-document corpus of historical claim adjudication notes and internal guidelines, (3) call an external fraud-scoring API operated by a third-party vendor, and (4) hand off complex disputed claims to a specialized appeals agent that runs its own multi-step investigation workflow. The claims team has a 5-second latency budget for the initial triage response; appeals can run asynchronously over minutes.",
+    "characters": [
+      {
+        "name": "Elena Petrova",
+        "role": "Head of Claims Adjustment",
+        "concern": "The 5-second triage SLA must hold even as the agent gains more capabilities."
+      },
+      {
+        "name": "Marcus Webb",
+        "role": "Security Architect",
+        "concern": "Each adjuster's agent session must only ever retrieve claims the adjuster is personally authorized to see."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-009-q1",
+      "stem": "Which retrieval/integration approach is correct for policy lookup (1) versus historical adjudication-notes search (2)?",
+      "options": [
+        "Use RAG with vector search for both, since both involve retrieving claims-related information",
+        "Use a direct API/database call for the exact-match policy lookup, and RAG with hybrid dense+sparse retrieval, semantic chunking, and metadata filtering (claim category, date, region) for the unstructured notes search",
+        "Use RAG for the policy lookup and a direct database call for the historical notes, since notes are more structured than policy records",
+        "Skip retrieval entirely for both and rely on the model's training knowledge"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because policy lookup is a structured, exact-match query against a system of record — a direct API/database call is faster and more accurate than RAG for a deterministic lookup — while the historical notes are unstructured prose with natural-language queries, which is genuine RAG territory, and hybrid retrieval plus metadata filtering (so recent guidelines outrank a superseded one) matches how adjusters actually search. A misapplies RAG to a task that has one deterministic correct answer per policy number. C reverses the two data shapes. D discards both a system of record and a real retrieval corpus for no reason."
+    },
+    {
+      "id": "ccap-scenario-009-q2",
+      "stem": "Which integration mechanism is correct for the external fraud-scoring API (3) versus the appeals-agent handoff (4)?",
+      "options": [
+        "MCP for the fraud API (for future discoverability) and a direct tool call for the appeals handoff",
+        "A direct API integration for the fraud-scoring call (a fixed, single-purpose, well-known endpoint with no discovery or reuse benefit), and genuine agent-to-agent delegation for the appeals handoff (independent multi-step reasoning owned by a distinct capability domain)",
+        "Agent-to-agent delegation for both, since both involve calling an external capability",
+        "A single shared tool definition that handles both the fraud check and the appeals investigation"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the fraud API is a fixed, single-vendor endpoint called the same way every time — there's no discovery benefit (the endpoint never changes) and no reuse benefit worth MCP's protocol overhead in a latency-sensitive triage path, so a direct integration is simpler and faster; the appeals handoff, by contrast, needs the appeals agent to plan, gather evidence, and reason over its own multi-step investigation independently, which is genuine agent-to-agent delegation, not a tool call. A over-engineers the fraud call. C misapplies agent-to-agent delegation to a simple, fixed API call. D conflates two capabilities with entirely different shapes and risk profiles into one tool."
+    },
+    {
+      "id": "ccap-scenario-009-q3",
+      "stem": "Marcus requires that a junior adjuster's session never retrieve claims data the adjuster isn't personally authorized to see. What authorization design satisfies this?",
+      "options": [
+        "A single shared service credential for the claims database and fraud API, since all adjusters are trusted employees",
+        "Authorize each request against the individual adjuster's own entitlements at the data/service layer, rather than a shared service credential, so a junior adjuster's session cannot retrieve claims above their authorized threshold",
+        "Rely on the system prompt to instruct the agent not to show unauthorized claims to junior adjusters",
+        "Restrict access by IP address of the office network only"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because authorization has to be enforced at the layer that actually controls data access, scoped to the individual adjuster's real entitlements — a shared service credential (A) means every adjuster's session inherits the same broad access regardless of their actual permission level, which is exactly the gap Marcus is worried about. C is a soft, prompt-level instruction that doesn't structurally prevent the retrieval. D authenticates a network location, not an individual's entitlements, and says nothing about which specific claims a given adjuster may see."
+    },
+    {
+      "id": "ccap-scenario-009-q4",
+      "stem": "Given Elena's 5-second triage SLA, which configuration correctly matches latency budget to task depth across the triage path and the appeals workflow?",
+      "options": [
+        "Run full reranking and extended thinking on the historical-notes retrieval during initial triage, and skip it entirely during the appeals investigation",
+        "Use a lighter, reranking-skipped hybrid-search configuration for historical-notes retrieval during the 5-second triage path, and reserve full reranking and extended thinking for the asynchronous appeals workflow, which isn't bound by the same latency budget",
+        "Apply the same retrieval configuration everywhere, since consistency matters more than latency",
+        "Remove the historical-notes retrieval from the triage path entirely to guarantee the 5-second SLA"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the triage path's hard 5-second SLA means the more expensive reranking pass has to be skipped there in favor of a lighter hybrid-search-only configuration, while the appeals workflow — explicitly unconstrained by that budget — can afford the deeper reasoning and reranking that improves accuracy on a harder, asynchronous task. A inverts the actual constraint, applying the expensive step exactly where the latency budget can't absorb it. C ignores that the two paths have fundamentally different latency requirements. D discards a retrieval step the triage response actually needs, rather than right-sizing its depth to the available budget."
+    }
+  ],
+  "keyLearnings": [
+    "Retrieval and integration mechanism should match the actual shape of the data: exact structured lookups get a direct API/database call, unstructured natural-language content gets RAG, fixed single-vendor endpoints get direct API integration, and independent multi-step delegation gets agent-to-agent handoff.",
+    "Authorization for agent tool calls must be scoped to the individual end-user's real entitlements at the data/service layer, never a single shared service credential.",
+    "A hard latency SLA on one path (synchronous triage) versus no SLA on another (asynchronous appeals) justifies using a lighter retrieval configuration on the constrained path and a deeper one on the unconstrained path.",
+    "Least-privilege tool scoping applies at the agent level too — a triage agent doesn't need visibility into how the appeals agent's internal tools work, only that it can delegate to it."
+  ]
+}

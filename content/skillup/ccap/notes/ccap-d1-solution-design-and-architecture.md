@@ -38,15 +38,8 @@ Every production Claude system, regardless of pattern, decomposes into four stag
 
 The feedback loop is what separates a demo from a production system. It closes the gap between "the model got it right in testing" and "we know when the model gets it wrong in production, and we have a mechanism to fix it" — whether that's a human-in-the-loop review queue, an automated eval harness re-scoring live traffic samples, or a retrieval index that gets corrected entries appended.
 
-```mermaid
-graph LR
-  A[Input<br/>ingestion + context assembly] --> B[Processing<br/>model call / tool loop / agent delegation]
-  B --> C[Output<br/>validation + guardrails + formatting]
-  C --> D[Delivery<br/>user / downstream system]
-  C --> E[Feedback Loop<br/>logging, eval, human review]
-  E -.corrections.-> A
-  E -.retraining / prompt updates.-> B
-```
+
+![Feedback Loop](../images/feedbackloop.png)
 
 ### In Practice
 
@@ -74,14 +67,7 @@ Anthropic's own guidance (*Building Effective Agents*) draws a clear line betwee
 
 The professional-tier decision is not "which pattern is more advanced" — it's "which pattern matches the task's need for control versus flexibility." Workflows are more predictable, auditable, and cheaper to run because you can reason about exactly what will execute. Agentic systems trade that predictability for the ability to handle tasks whose steps cannot be fully specified in advance. Anthropic's explicit guidance is to *find the simplest solution possible, and only increase complexity when it demonstrably improves outcomes* — agentic complexity is a cost to be justified, not a default.
 
-```mermaid
-graph TD
-  Q{"Can the steps be<br/>fully specified in advance?"}
-  Q -->|Yes, single step| AL[Augmented LLM]
-  Q -->|Yes, fixed multi-step| WF["Workflow<br/>(chaining / routing / parallel /<br/>orchestrator-workers / evaluator-optimizer)"]
-  Q -->|No, depends on<br/>what's discovered| AG[Agentic System]
-```
-
+![Selecting Architectural Patterns](../images/selectingarchpatterns.png)
 ### In Practice
 
 **What breaks without this**: Deploying an agentic loop for a task that fits a workflow means every run has non-deterministic step count and cost — production runbooks can't set reliable SLAs, and debugging a failure means reconstructing an arbitrary trajectory instead of checking a known sequence of five steps.
@@ -110,18 +96,7 @@ Three orchestration topologies recur in practice:
 
 The orchestration choice has direct cost implications: Anthropic's own data on their multi-agent research system shows multi-agent architectures can consume roughly 15x the tokens of a single-agent chat interaction — a number that must be explicitly weighed against the value of the parallelism and quality gained.
 
-```mermaid
-graph TD
-  U[User Query] --> O[Orchestrator / Lead Agent]
-  O --> S1[Subagent 1<br/>own context + scoped tools]
-  O --> S2[Subagent 2<br/>own context + scoped tools]
-  O --> S3[Subagent 3<br/>own context + scoped tools]
-  S1 --> R[Result Synthesis]
-  S2 --> R
-  S3 --> R
-  R --> O
-  O --> Out[Final Output to User]
-```
+![Three orchestration topologies](../images/three_orch_topologies.png)
 
 ### In Practice
 
@@ -194,20 +169,6 @@ Scenario questions will describe a technically sound architecture and ask "what 
 All six concepts in this domain are really one decision process viewed from different angles. It starts with translation: turning a vague business ask into a concrete problem shape. That shape determines the architectural pattern — augmented LLM for single-step tasks, workflow for fixed multi-step sequences, agentic for genuinely open-ended ones. Whichever pattern you pick, it has to be built out as a full input→processing→output→feedback pipeline, because a pattern without a feedback loop is a demo, not a system. When a single agent's context or tool scope can't carry the whole task, you reach for multi-agent orchestration — but that's a cost you pay for parallelism and isolation, not a default upgrade. Underneath both workflow design and multi-agent design sits decomposition: the discipline of breaking work into independently verifiable units, which is what makes a workflow's fixed steps or an orchestrator's subagent tasks actually gradable. And running through every one of those decisions is the business value pillar test — every added layer of complexity (an extra agent, an extra orchestration hop, an extra decomposition step) has to earn its cost against efficiency, transformation, productivity, cost, or SLA, because complexity that doesn't map to a pillar is just risk with no offsetting return.
 
 The unifying principle Anthropic states directly in its own agent-building guidance is to favor the simplest architecture that satisfies the requirement, and add complexity only when it demonstrably improves outcomes. Every concept in this domain is a tool for either measuring "does this satisfy the requirement" (translation, pillars) or for adding calibrated complexity when needed (workflow patterns, multi-agent orchestration, decomposition) — never complexity for its own sake.
-
-### 2. Worked scenario
-
-> **Scenario.** A mid-size insurance company asks you to "use Claude to speed up claims processing." Today, a claims adjuster manually reads each submitted claim packet (a PDF bundle of forms, photos, and a police report), cross-references policy terms, checks for red flags (mismatched dates, inconsistent damage descriptions), and either approves, denies, or escalates to a senior adjuster. Average handling time: 45 minutes per claim; backlog is 3,000 claims.
->
-> **Translation.** The input is a semi-structured PDF bundle (variable per claim). The output is a decision + supporting rationale. The task has three distinct sub-objectives: extraction (structured data from unstructured docs), verification (cross-reference against policy + fraud heuristics), and judgment (approve/deny/escalate). This is not open-ended research — the *category* of check the adjuster runs is stable, even though the *content* of each claim varies. That points toward a workflow, not a free-roaming agentic system.
->
-> **Pattern selection.** Decompose sequentially: Step 1, an augmented LLM call (with document parsing tools) extracts structured claim data. Step 2, a routing step classifies claim complexity — simple claims (matching policy terms, no red flags) proceed down a fast path; complex claims (conflicting details, high dollar amount) route to a more thorough path. Step 3, an orchestrator-workers step runs three parallel checks on the complex path: policy-terms verification, fraud-heuristic scoring, and prior-claim history lookup — three independent sub-tasks with no shared dependency, well suited to parallelization. Step 4, an evaluator-optimizer loop drafts the recommendation and checks it against a rubric (all required fields cited, confidence threshold met) before finalizing. This is a **workflow**, explicitly *not* a full multi-agent system — the sequence of stages is fixed by the architect; only the routing branch and the parallel-worker fan-out introduce runtime variability, and even those are bounded and predictable.
->
-> **Feedback loop.** Every claim decision — especially escalations and denials — is logged with the extracted data, the check results, and the model's rationale. A sample is reviewed weekly by senior adjusters; overturned decisions feed a correction log that's reviewed monthly to catch systematic extraction errors (e.g., a new state's police-report format the extractor mishandles) and update the extraction prompt/schema accordingly.
->
-> **Business value pillar.** The primary pillar is **efficiency** (45 minutes → an estimated 8 minutes of adjuster review time on simple claims) with a secondary **cost** benefit (backlog of 3,000 claims cleared faster reduces reserve-holding costs). It is explicitly *not* pitched as transformation — the company isn't doing anything it couldn't do before, it's doing the same judgment faster and more consistently, which is the correct, honest framing for the leadership review.
->
-> **Why not multi-agent?** A tempting distractor is "spin up an autonomous agent per claim that decides its own investigation path." Rejected because: claim complexity is boundable and the check types are known in advance (no genuine discovery-dependent branching), and the insurer's compliance team requires an auditable, reproducible sequence of checks per claim — a fixed workflow gives them exactly that; an autonomous agent's variable trajectory would fail an audit requirement, not just add unnecessary cost.
 
 ### 3. Memory aid
 

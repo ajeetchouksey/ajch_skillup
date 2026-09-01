@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-011",
+  "title": "Catching a Contradictory-Output Conflict Across Isolated Parallel Agents",
+  "description": "Tests the ability to distinguish what isolation guarantees from what it doesn't, correctly trace a coordination failure to the decomposition layer rather than either individual agent, and choose human-in-the-loop resolution over a blind rollback-and-retry.",
+  "examId": "gh600",
+  "difficulty": "hard",
+  "estimatedMinutes": 13,
+  "domains": [5],
+  "scenario": {
+    "background": "A platform team migrates an internal service's error-response format to a consistent structured schema, split across payments, notifications, and auth modules. A coordinator decomposes the migration into three parallel subtasks, each dispatched to its own coding-agent session on its own branch, in its own isolated ephemeral environment.",
+    "characters": [
+      {
+        "name": "Wei Zhang",
+        "role": "Reviewing Engineer",
+        "concern": "Runs a parallel-output check in addition to the merge check, and catches something the merge tool alone couldn't."
+      },
+      {
+        "name": "Fatima Al-Rashid",
+        "role": "Platform Team Lead",
+        "concern": "Wants the fix traced to its real cause before anything is rolled back or re-run."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-011-q1",
+      "stem": "The payments and notifications sessions both merge cleanly with no overlapping lines, but standardize the same missing-record error pattern differently — one returns a null/found-false structure, the other throws a NotFoundError. Why didn't the merge-conflict check catch this?",
+      "options": [
+        "Because a merge-conflict check only detects overlapping line-level changes, not whether two independently-produced outputs are semantically compatible with each other",
+        "Because the merge tool was misconfigured for this specific repository",
+        "Because payments and notifications were never actually run in isolation",
+        "Because a merge-conflict check and a parallel-output check are the same thing, so this shouldn't be possible"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because a merge-conflict check only looks for overlapping line-level edits — it has no concept of whether two changes that don't overlap are still logically or semantically incompatible with each other, which is exactly the gap a contradictory-output conflict falls into: clean on every mechanical check, incompatible in practice. B invents an unsupported explanation. C contradicts the scenario, which explicitly describes isolated environments and separate branches. D conflates two genuinely different checks — this scenario is precisely the case that shows they are not the same thing."
+    },
+    {
+      "id": "gh600-scenario-011-q2",
+      "stem": "Where does Fatima's team correctly trace the root cause of the contradictory outputs?",
+      "options": [
+        "To a reasoning error inside the payments session specifically",
+        "To a reasoning error inside the notifications session specifically",
+        "To the coordinator's decomposition: the subtask description told each session *what* to standardize but never specified the *target shape* to standardize to, so each session made a locally reasonable but independently different choice given genuinely incomplete instructions",
+        "To a random, unexplainable divergence with no traceable cause"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because the actual gap is at the decomposition layer — the coordinator never specified a target shape, so each session's choice was locally reasonable given what it was told, not a reasoning failure in either individual session. A and B both misattribute a workflow-level omission to an individual agent that behaved reasonably given its incomplete instructions. D dismisses a fully traceable cause as unexplainable, when the decision record clearly shows the gap."
+    },
+    {
+      "id": "gh600-scenario-011-q3",
+      "stem": "The auth session hasn't finished yet when the conflict is discovered. What is the correct response?",
+      "options": [
+        "Let the auth session finish and lock in its own independent guess before addressing anything",
+        "Pause the auth session before it locks in a third independent guess, have a human resolve the target shape directly, and update the coordinator's subtask template to include that shape explicitly for all three modules",
+        "Immediately terminate all three sessions and start the entire migration over from scratch",
+        "Ignore the auth session entirely and only fix payments and notifications"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because pausing the still-running session prevents a third independently-guessed shape from compounding the same ambiguity, and resolving the target shape with a human decision — then fixing the coordinator's template so the ambiguity doesn't recur — addresses the problem at the layer it actually originated from. A lets a third guess lock in before the ambiguity is even resolved. C is a wasteful overcorrection when only the decomposition instructions need fixing, not the entire migration approach. D leaves the auth module's error-format decision unresolved and eventually facing the same gap."
+    },
+    {
+      "id": "gh600-scenario-011-q4",
+      "stem": "Why is rolling back and simply re-running payments and notifications alone, without changing anything else, not a sufficient fix?",
+      "options": [
+        "Because rollback is never appropriate in a multi-agent system",
+        "Because retried against the same underlying, still-ambiguous coordinator instructions, the same ambiguity would reproduce — the fix has to happen at the decomposition layer before re-running either session makes sense",
+        "Because the unrelated refactoring changes bundled into each session's diff should also be discarded, not preserved",
+        "Because rollback would erase the audit trail needed to reconstruct what happened"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because re-running either session against the same, still-underspecified coordinator instructions would reproduce the exact same kind of independently-reasonable-but-divergent choice — the fix has to happen at the decomposition layer (specifying the target shape) before a re-run can actually resolve the conflict. A is an overgeneralization the scenario doesn't support — rollback is used here, just not in isolation from fixing the actual cause. C is incorrect — the scenario specifically preserves the still-valid, unrelated parts of each session's diff rather than discarding them wholesale. D is unsupported — the audit artifact recording the decision and rollback is explicitly preserved."
+    }
+  ],
+  "keyLearnings": [
+    "Isolation (separate branches, separate environments) prevents sessions from interfering with each other, but it does not guarantee their independently-produced outputs are semantically compatible — that requires a separate parallel-output check.",
+    "A contradictory-output conflict across independently-reasoning agents often traces to an omission at the decomposition layer (an unspecified target shape), not a reasoning error in any individual agent.",
+    "A still-running session should be paused before it locks in its own independent guess once an ambiguity affecting it has been discovered elsewhere.",
+    "Rolling back and re-running against the same underspecified instructions reproduces the same failure — the decomposition-layer fix must happen first, and still-valid unrelated work should be preserved rather than discarded wholesale."
+  ]
+}

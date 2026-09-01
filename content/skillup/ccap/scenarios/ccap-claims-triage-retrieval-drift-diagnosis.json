@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-010",
+  "title": "Diagnosing a Retrieval-Drift Failure Behind a Passing Eval Score",
+  "description": "Tests the ability to follow a disciplined diagnostic path when a passing pre-launch evaluation coexists with a rising rate of production errors, correctly attribute the failure to retrieval rather than hallucination or prompt failure, and close the loop with monitoring and a controlled A/B rollout.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 13,
+  "domains": [4],
+  "scenario": {
+    "background": "A mid-sized insurer's claims-triage agent has been in production for four months. Adjusters are increasingly reporting that the agent recommends the wrong coverage tier on some claims. The team's pre-launch evaluation showed 93% accuracy against a 200-example golden dataset. Latency and cost dashboards show nothing unusual.",
+    "characters": [
+      {
+        "name": "Farah Nasser",
+        "role": "ML Engineering Lead",
+        "concern": "Wants to find the actual root cause fast, without guessing at a fix that doesn't address it."
+      },
+      {
+        "name": "Leo Andrade",
+        "role": "Claims Operations Manager",
+        "concern": "Needs the fix validated before it reaches 100% of live traffic, since a bad rollout affects real coverage decisions."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-010-q1",
+      "stem": "What should Farah's team do first, before forming any hypothesis about the cause?",
+      "options": [
+        "Immediately retrain or upgrade the model, since a rising error rate usually means the model needs to be more capable",
+        "Pull the actual traces for several recently misclassified claims and inspect, in order, what context was retrieved, what the system prompt instructed, and what the model output",
+        "Lower the pass-rate threshold on the golden dataset to reflect the new, lower real-world accuracy",
+        "Assume it's a temporary blip and wait another month to see if it resolves on its own"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because diagnosing a production regression starts with the actual evidence — the retrieved context, the instructions, and the output — rather than guessing at a cause; this is the same discipline that separates a real diagnosis from an assumption. A jumps to a fix before any evidence has been gathered. C hides the regression instead of investigating it. D risks letting a real, ongoing error pattern continue to affect real coverage decisions."
+    },
+    {
+      "id": "ccap-scenario-010-q2",
+      "stem": "All five traces show the retrieved policy documents are for the previous year's coverage tiers, following an unannounced source-system migration three weeks earlier that changed document IDs. What is the correct diagnosis?",
+      "options": [
+        "Hallucination — the model is fabricating coverage-tier details not present in its context",
+        "A prompt failure — the system prompt's instructions are ambiguous about which policy year to apply",
+        "A retrieval issue — the model reasoned faithfully over stale, wrong context because the RAG index was never re-ingested after the migration",
+        "A model mismatch — the task now exceeds the model's reasoning capability"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because the model faithfully reasoned over the context it was given — the context itself was wrong, due to an index that was never re-ingested after the document-ID migration. This is the signature of a retrieval issue, not a generation-side failure. A is wrong because the model didn't fabricate anything beyond its (bad) context — it was faithful to stale input. B is wrong because nothing indicates the instructions themselves are ambiguous; the retrieved documents were simply the wrong ones. D is wrong because the coverage-tier classification task itself hasn't changed in difficulty — the input data changed underneath it."
+    },
+    {
+      "id": "ccap-scenario-010-q3",
+      "stem": "Why didn't the pre-launch evaluation (93% accuracy, 200-example golden dataset) catch this failure?",
+      "options": [
+        "The golden dataset was too small to reach statistical significance",
+        "The golden dataset is a snapshot measured against the world as it existed four months ago, against document IDs that were correct *then* — nothing has been continuously sampling live retrieval-hit-rate or citation-grounding in production to catch drift when the source system changed",
+        "The grading method used rule-based exact match instead of LLM-as-judge",
+        "The eval should have been re-run against the same 200 examples right before launch"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a pre-launch score is inherently a point-in-time measurement — it says nothing about whether the system is still correct after an upstream data change months later, and only continuous production monitoring (sampling live retrieval quality, tracking drift) closes that specific gap. A doesn't address the actual timeline of the failure — a bigger one-time set still wouldn't catch a change that happened months after it was built. C is a grading-method concern, unrelated to the missing continuous-monitoring layer. D re-running against the same fixed examples still wouldn't detect a change in the *live* document index, since the golden set's own reference documents are static."
+    },
+    {
+      "id": "ccap-scenario-010-q4",
+      "stem": "Before rolling the reindexed retrieval pipeline out to 100% of traffic, what should Leo insist on, and why?",
+      "options": [
+        "Skip testing and roll out immediately, since re-ingesting the corrected documents is obviously correct",
+        "A controlled A/B test — a defined percentage of traffic on the reindexed pipeline (challenger) versus the rest on the stale index (champion, kept temporarily for a clean comparison and fast rollback), with a pre-registered primary metric and enough traffic/time to reach adequate sample size",
+        "A single manual spot-check of one claim to confirm the fix works",
+        "Immediately deprecate the champion pipeline entirely so there's no confusion about which one is live"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a controlled A/B test with a pre-registered primary metric (coverage-tier accuracy) and a real sample size validates the fix against live traffic before it fully replaces the champion, while keeping the champion available preserves a fast rollback path if something else is wrong. A skips validation on a change affecting real coverage decisions. C is not enough evidence to certify a fix at scale. D removes the rollback option before the fix has been validated, which is the opposite of what a controlled rollout is for."
+    }
+  ],
+  "keyLearnings": [
+    "Diagnosing a production regression starts with pulling actual traces — retrieved context, instructions, and output — not guessing at a cause.",
+    "A model that reasons faithfully over stale or wrong retrieved context is a retrieval issue, not a hallucination or a prompt failure — the distinction determines where the fix belongs.",
+    "A pre-launch evaluation score is a snapshot; only continuous production monitoring (retrieval-hit-rate drift, citation-grounding checks) catches degradation caused by an upstream change that happens after launch.",
+    "A fix to a production system should be validated via a controlled A/B test with a pre-registered metric before full rollout, keeping the previous version available as a fast rollback path."
+  ]
+}

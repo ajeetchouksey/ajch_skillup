@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-013",
+  "title": "Turning Individual Habits into Shared Claude Code Team Infrastructure",
+  "description": "Tests the ability to diagnose a plateau in developer productivity as a configuration and workflow gap rather than a capability gap, and to fix it with shared team-level configuration, codified workflows, and a debugging discipline.",
+  "examId": "ccap",
+  "difficulty": "medium",
+  "estimatedMinutes": 11,
+  "domains": [7],
+  "scenario": {
+    "background": "A 15-engineer platform team adopted Claude Code for internal tooling development three months ago. Velocity gains have plateaued, and there's been a rise in confused 'Claude isn't working right' support tickets.",
+    "characters": [
+      {
+        "name": "Noah Kessler",
+        "role": "Engineering Manager",
+        "concern": "Wants the plateau explained with evidence, not a vague sense that 'the tool isn't as good as it used to be.'"
+      },
+      {
+        "name": "Sana Iqbal",
+        "role": "Senior Platform Engineer",
+        "concern": "Is tired of hitting confirmation prompts on routine actions while some teammates have blanket shell access."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-013-q1",
+      "stem": "A configuration audit finds every engineer has their own personal settings.json with individually-chosen permission rules, and no committed CLAUDE.md exists. What is the correct fix?",
+      "options": [
+        "Ask each engineer to standardize their own personal settings.json informally, without any shared file",
+        "Introduce a project-level CLAUDE.md and a managed-policy permission baseline (deny destructive commands and force-pushes org-wide; allow read-only operations and the standard test runner without prompting), leaving only genuinely personal preferences at the user level",
+        "Grant every engineer blanket shell access to eliminate confirmation prompts entirely",
+        "Deny all shell access org-wide to eliminate any risk of destructive commands"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a committed project-level CLAUDE.md plus a managed permission baseline gives the whole team consistent, safe defaults (denying genuinely destructive actions, allowing routine safe ones without friction) while still leaving room for real personal preference at the user level — directly fixing both the missing-conventions problem and Sana's friction problem. A leaves the inconsistency and drift in place, just asking people to informally align without any shared source of truth. C removes friction by removing safety, reintroducing exactly the risk a managed baseline is meant to prevent. D removes the friction problem's cause but at the cost of blocking routine, safe actions the team needs daily."
+    },
+    {
+      "id": "ccap-scenario-013-q2",
+      "stem": "Interviews reveal nearly everyone independently re-prompts Claude for the same PR-review checklist and the same test-scaffolding pattern, each with slightly different phrasing and results. What should the architect do?",
+      "options": [
+        "Leave it as-is, since each engineer's phrasing reflects their own working style",
+        "Codify both as shared slash commands checked into .claude/commands/, and add a PostToolUse hook that runs the team's linter automatically after any file edit",
+        "Ban individual engineers from writing their own prompts for these tasks, without providing any shared alternative",
+        "Write a wiki page describing the ideal PR-review prompt phrasing for engineers to copy manually each time"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because codifying a repeated, inconsistent prompt sequence into a shared, version-controlled slash command turns variable phrasing and results into one consistent, reusable invocation, and a PostToolUse hook enforces the linting step deterministically instead of depending on someone remembering to run it. A leaves the inconsistency (and the resulting variable quality) in place. C removes the current (bad) practice without giving engineers a working replacement. D still depends on manual, error-prone copying rather than an enforced, reusable artifact."
+    },
+    {
+      "id": "ccap-scenario-013-q3",
+      "stem": "Reviewing the support-ticket backlog, most 'Claude isn't working' reports turn out to be a permission ask rule firing unexpectedly, an MCP server losing its auth token periodically, and long sessions where context quietly fills with dozens of prior tool-call outputs. What best addresses the third pattern?",
+      "options": [
+        "Increase the model's context window so more tool-call history fits without degrading quality",
+        "Add session-reset guidance to the team's CLAUDE.md and train engineers to delegate long investigative subtasks to a scoped subagent instead of continuing in one saturated session",
+        "Instruct engineers to simply type shorter messages to save context space",
+        "Disable tool use entirely during long sessions to prevent context saturation"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a session saturated with dozens of prior tool-call outputs is exactly the case for delegating investigative sub-tasks to a scoped subagent (which keeps its own context isolated) and for session-reset guidance once a session's context is clearly overloaded — this directly targets why response quality degrades over a long session. A doesn't fix a quality-degradation pattern caused by an overloaded, undifferentiated context; a bigger window just delays the same problem. C addresses the wrong side of the token budget (the human's input, not the accumulated tool-call history). D removes the capability that makes the tool useful in the first place, rather than managing context within long sessions."
+    },
+    {
+      "id": "ccap-scenario-013-q4",
+      "stem": "After all three fixes (shared config, codified workflows, debugging discipline), what should the architect attribute the resulting velocity improvement to?",
+      "options": [
+        "A change in the underlying Claude Code product itself",
+        "Converting individual, inconsistent habits into shared, governed, and diagnosable team infrastructure — nothing about the underlying product changed",
+        "A coincidental drop in ticket volume unrelated to any of the changes made",
+        "The team simply working longer hours to compensate for the plateau"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because every fix applied — CLAUDE.md, managed permissions, shared slash commands, a lint hook, session-reset guidance, subagent delegation — targeted team-level configuration and workflow consistency, not the underlying product, which is exactly why the gains are attributable to converting individual habits into shared infrastructure. A is not supported by anything in the scenario; no product change is described. C ignores that the specific fixes applied map directly to the specific problems diagnosed. D isn't a sustainable or evidenced explanation and contradicts the actual root causes identified in the audit."
+    }
+  ],
+  "keyLearnings": [
+    "A velocity plateau with no underlying product change is often a signal of missing team-level configuration and workflow discipline, not a capability ceiling.",
+    "A committed CLAUDE.md plus a managed permission baseline gives a team consistent, safe defaults while still preserving genuinely personal preferences at the user level.",
+    "Repeated, inconsistent manual prompting for the same task is a signal to codify it as a shared slash command or hook, turning variable results into a reliable, reusable artifact.",
+    "Context saturation from long sessions accumulating tool-call output is addressed by delegating investigative work to scoped subagents and resetting sessions, not by growing the context window."
+  ]
+}

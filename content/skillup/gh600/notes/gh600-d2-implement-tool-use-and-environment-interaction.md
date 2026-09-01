@@ -287,18 +287,6 @@ The reason these four areas share a domain (and the largest weight on the exam) 
 
 The unifying principle underneath all four areas is **least privilege as a default, with explicit, reviewed exceptions** — never the reverse. Tools start from an empty allowlist and get things added because the task needs them, not from a broad default that gets things removed if someone objects. MCP servers require allow-listing before connection, not disconnection after a problem. The firewall defaults to deny, with additions requiring justification. And error handling defaults to "stop and escalate" for anything non-transient, rather than "keep trying and hope."
 
-### 2. Worked scenario
-
-> **Scenario.** Dev, a platform engineer, is configuring a `release-notes` coding agent for his org. Its job: read merged PRs since the last release, summarize them, and open a draft PR updating `CHANGELOG.md`. Nothing about this task requires modifying issues, running deployments, or reaching the public internet.
->
-> Dev starts tool selection from the task: the agent needs to read PR history and diffs, and needs `edit` + `bash` (to run the changelog-formatting script) on its own branch. It does **not** need `actions` or `code_security` toolsets. He configures the GitHub remote MCP server with only the `pull_requests` toolset enabled, in **read-only** mode — the agent summarizes PRs, it never needs to modify one. No other MCP servers are added; a teammate had suggested wiring in a third-party changelog-formatting MCP server found in a public registry, but it isn't on the org's approved MCP allow list, so Dev files a request for platform-security review instead of connecting it directly — registry presence isn't the same as clearance.
->
-> The org's default network firewall already covers this agent's needs (GitHub plus the npm registry for the formatting script's dependencies), so Dev makes no custom allowlist additions — extending it "just in case" isn't justified by anything the task actually requires.
->
-> During a session, the changelog-formatting script fails once with an npm registry timeout. The agent retries with backoff; the second attempt succeeds, and the session continues. Later in the same session, the script hits a genuine bug — a merged PR's title contains characters the formatter can't parse. This isn't transient, so the agent doesn't retry it. It stops, leaves a comment on the tracking issue explaining exactly which PR title broke the formatter and why, and the session ends in a `failed` state, which triggers a lifecycle event routed to the platform team's Slack channel. Because the agent was working on its own branch the entire time, nothing landed on `main` — there's nothing to roll back, only a branch to either fix in a follow-up session or discard.
->
-> The next morning, a teammate sees the Slack alert, reads the session log and the issue comment, manually fixes the one problematic PR title, and re-runs the session — which now completes cleanly and opens a draft PR. Every part of the trail — the MCP configuration, the tool scope, the retry-then-escalate decision, the comment explaining the failure, the eventual commit — is reconstructable from GitHub alone.
-
 ### 3. Memory aid
 
 **LEAST** — the throughline for every configuration decision in this domain:
