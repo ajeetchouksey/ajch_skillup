@@ -12,7 +12,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Model tier should be assigned per task based on the task's actual reasoning complexity and latency tolerance, not applied uniformly across a mixed workload — a single-model policy either overpays for simple tasks or underpowers hard ones.\n\n**Why B is correct**: The 95% classification task is a narrow, low-ambiguity decision well within a faster model's capability, so routing it there minimizes cost and latency at scale. The 5% fraud-reasoning task genuinely needs multi-step inference across transaction history, which is exactly where a more capable model's reasoning depth pays off.\n\n**Why the distractors fail**:\n- A: Paying top-tier latency and cost on 47,500 daily requests that don't need it multiplies infrastructure spend for no accuracy benefit on the easy majority.\n- C: Underpowers the 5% of genuinely hard cases and pushes that complexity onto human reviewers, which doesn't scale and defeats the purpose of using a stronger model where it's actually needed.\n- D: Ignores task complexity entirely, so some fraud cases land on the weaker model and some routine classifications land on the expensive one — worse cost and worse accuracy than a complexity-based split.\n\n**In practice**: Architects segment a workload by reasoning complexity first, then map each segment to the cheapest model tier that reliably meets its accuracy bar — this is the single biggest lever for controlling inference spend at volume.",
-    "tags": ["model-selection", "cost-latency-tradeoff", "workload-segmentation"]
+    "tags": ["model-selection", "cost-latency-tradeoff", "workload-segmentation", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -27,7 +28,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Each workload has its own point on the cost-latency-accuracy curve, and the right model tier is the cheapest one that meets that specific workload's latency ceiling and reasoning-depth floor — not a single tier chosen for organizational convenience.\n\n**Why C is correct**: Moderation is a high-volume, low-latency, relatively narrow classification decision, so a fast, smaller model tier meets the sub-second requirement at sustainable cost. Editorial synthesis is low-volume but reasoning-heavy across many sources, so a more capable model tier is worth its higher per-call cost and latency because accuracy on a complex synthesis task matters more than speed there.\n\n**Why the distractors fail**:\n- A: Running millions of hourly moderation calls on the most expensive tier multiplies cost dramatically for a task that doesn't need that depth of reasoning.\n- B: A fast, smaller model tier applied to deep multi-document synthesis risks shallow or incomplete reasoning on a task where editorial quality is the actual requirement.\n- D: Moderation doesn't need editorial-grade reasoning depth, and running it on a slower, more expensive tier at that message volume is both costly and likely to violate the sub-second latency requirement live chat demands.\n\n**In practice**: When two features of the same product have fundamentally different latency and reasoning requirements, architects assign them different model tiers rather than picking one model for the whole product — uniform model choice is a common source of either runaway cost or missed latency SLAs.",
-    "tags": ["model-selection", "cost-latency-tradeoff", "workload-segmentation"]
+    "tags": ["model-selection", "cost-latency-tradeoff", "workload-segmentation", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -42,7 +44,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Reasoning-mode configuration (whether to enable extended thinking) and model tier should both be set per task based on how much the task benefits from deliberate multi-step reasoning versus how tightly it's constrained by latency expectations.\n\n**Why A is correct**: Clause lookup is a narrow retrieval-style task where users expect an immediate answer, so extended thinking adds latency without meaningfully improving a task that doesn't require deep deliberation. Risk synthesis across 15 documents genuinely benefits from deliberate, multi-step reasoning, and users have already signaled they'll accept the added latency for a more thorough result.\n\n**Why the distractors fail**:\n- B: Enabling extended thinking on the clause-lookup path adds unnecessary latency and cost to a task that doesn't need it, violating the feature's own 'near-instant' expectation.\n- C: Extended thinking on a fast lookup task wastes latency budget for no benefit, while withholding it from the genuinely hard synthesis task removes the deliberate reasoning step that task actually needs — this is backwards from what each task requires.\n- D: A larger context window lets the model see more text, but it doesn't substitute for the deliberate multi-step reasoning process that extended thinking provides on a task requiring synthesis and judgment across many documents.\n\n**In practice**: Extended thinking is a lever for reasoning depth, not context capacity — architects reach for it when a task requires deliberation across multiple steps or sources, and skip it when a task is a fast, well-constrained lookup, regardless of how large the context window is.",
-    "tags": ["model-selection", "extended-thinking", "cost-latency-tradeoff"]
+    "tags": ["model-selection", "extended-thinking", "cost-latency-tradeoff", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 2,
@@ -57,7 +60,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Guardrails work best when they're explicit, structured, and encoded directly in the instructions the model actually receives — a scope boundary the model was never told about, or was told about too vaguely, isn't a guardrail, it's a hope.\n\n**Why D is correct**: Defining the role, the allowed topic set, a concrete refusal pattern, and an explicit instruction not to disclose system-prompt contents gives the model a specific, actionable boundary for each category of misuse the team has already identified, rather than leaving the model to infer intent from a single vague line.\n\n**Why the distractors fail**:\n- A: A one-line, unspecific instruction doesn't cover the range of scenarios (competitor comparisons, off-topic chatter, prompt extraction) and gives the model no concrete refusal behavior to fall back on.\n- B: General safety training addresses broad harms, not this application's specific business boundary of staying on-topic and not disclosing its instructions — those are task-specific guardrails that must be added explicitly.\n- C: Guardrails documented only in customer-facing FAQ pages never reach the model at inference time and have zero effect on what the model actually does.\n\n**In practice**: When architects catalog the specific misuse patterns a deployment is likely to see, they translate each one into an explicit instruction and, where useful, a refusal template in the system prompt — vague or externally-documented boundaries consistently fail in production because the model never sees them.",
-    "tags": ["system-prompt", "guardrails", "prompt-injection"]
+    "tags": ["system-prompt", "guardrails", "prompt-injection", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -72,7 +76,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Untrusted or unpredictable dynamic content should be structurally separated from instructions using clear delimiters, with an explicit instruction telling the model how to treat that delimited block — structure removes ambiguity that a determined or accidental injection could otherwise exploit.\n\n**Why B is correct**: Delimiting the transcript and explicitly stating that its contents are data-only, never instructions, gives the model an unambiguous rule to apply regardless of what text happens to appear inside the tags, which is the core defense against injected instructions riding along in untrusted input.\n\n**Why the distractors fail**:\n- A: Undelimited concatenation gives the model no structural signal for where trusted instructions end and untrusted data begins, making it easier for embedded text to be interpreted as a new instruction.\n- C: Reordering content without adding delimiters or an explicit data-handling instruction doesn't change the fundamental ambiguity — the model still has no structural cue distinguishing instructions from data.\n- D: Assuming general model capability alone will reliably resist injection without any explicit structural safeguard is a bet the architecture shouldn't rely on, especially for clinical content entering a patient's record.\n\n**In practice**: The combination of delimiters plus an explicit 'treat this as data only' instruction is a standard, low-cost defense-in-depth measure for any prompt that injects third-party or user-controlled content — architects apply it by default whenever dynamic content isn't fully trusted.",
-    "tags": ["system-prompt", "prompt-injection", "guardrails", "XML-tags"]
+    "tags": ["system-prompt", "prompt-injection", "guardrails", "XML-tags", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -87,7 +92,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: When multiple deployments share a common core with per-instance variation, a modular template with shared components plus injected variables avoids the maintenance burden and drift risk of maintaining fully duplicated copies.\n\n**Why C is correct**: A shared base template means a change to core instructions (order lookup logic, guardrails) is made once and applies everywhere, while brand-specific sections still let each sub-brand keep its own tone and escalation policy — this directly targets the described drift problem without sacrificing customization.\n\n**Why the distractors fail**:\n- A: This is the current failure mode described in the scenario — it's the practice causing drift, not a fix for it.\n- B: A single undifferentiated prompt solves duplication but eliminates the per-brand tone and policy differences the business actually requires, trading one problem for a different regression.\n- D: Allowing free-form divergent copies with no reconciliation process reproduces the same drift risk as option A, just with an extra step of initially copying from a shared base.\n\n**In practice**: Modular prompt composition — a shared base plus per-instance parameters — is the standard fix whenever the same core logic must be deployed with variation across multiple brands, teams, or environments; it turns a shared-logic update from an N-file manual edit into a single change.",
-    "tags": ["modular-prompts", "system-prompt", "prompt-reuse"]
+    "tags": ["modular-prompts", "system-prompt", "prompt-reuse", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -102,7 +108,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: When a task requires output conforming to a specific, non-obvious schema or vocabulary that the model can't reasonably infer from a description alone, few-shot examples that demonstrate the exact mapping are the most direct fix — they teach the pattern the model needs to reproduce, not just the task's general intent.\n\n**Why A is correct**: Showing concrete ticket-to-category examples using the actual internal labels gives the model a pattern to match against, closing the gap between 'plausible category name' and 'the exact label our system requires.'\n\n**Why the distractors fail**:\n- B: A more capable model is still guessing at an internal, company-specific vocabulary it has no way to know without being shown — capability doesn't substitute for missing information about a proprietary schema.\n- C: Reasoning step-by-step can improve the quality of a category decision, but without examples of the exact label vocabulary, the model still has nothing to anchor its final label choice to, so mismatches persist.\n- D: Raising temperature increases output randomness, which works against consistently reproducing a fixed, exact schema — it's the opposite of what's needed here.\n\n**In practice**: Zero-shot prompting works well for tasks the model can reasonably infer from a description; the moment a task depends on an exact, non-standard schema or vocabulary, architects reach for few-shot examples because that's the only technique that directly teaches the required mapping.",
-    "tags": ["few-shot", "zero-shot", "prompt-engineering"]
+    "tags": ["few-shot", "zero-shot", "prompt-engineering", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 2,
@@ -117,7 +124,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Chain-of-thought prompting — explicitly asking the model to work through intermediate steps before producing a final answer — reduces compounding errors on multi-step tasks by making each step of the calculation explicit and checkable, rather than asking the model to produce a final result in one leap.\n\n**Why D is correct**: Requiring the model to compute and state each sequential adjustment means each step's result is grounded in the previous one and visible in the output, which reduces the chance of an unstated arithmetic slip propagating silently into the final number.\n\n**Why the distractors fail**:\n- A: Prompt length isn't the cause of the errors; removing words doesn't add the missing intermediate reasoning the calculation needs.\n- B: Examples that show only final answers teach the model to produce a final number directly, reinforcing the exact pattern (skipping shown steps) that's causing the errors, rather than fixing it.\n- C: Temperature 0 makes output more deterministic and reproducible, but determinism doesn't make a skipped or miscalculated intermediate step correct — it will just reproduce the same error consistently.\n\n**In practice**: Whenever a task involves multiple dependent calculation or reasoning steps, senior engineers default to asking for explicit intermediate reasoning before the final answer, because unstated reasoning steps are exactly where compounding errors hide.",
-    "tags": ["chain-of-thought", "prompt-engineering", "reasoning"]
+    "tags": ["chain-of-thought", "prompt-engineering", "reasoning", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 2,
@@ -132,7 +140,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Few-shot example count is itself a token-cost decision, and the goal is the minimum number of examples that reliably teach the required pattern — more examples aren't automatically better once diminishing returns on accuracy are outweighed by the recurring cost of sending them on every call.\n\n**Why B is correct**: One or two concise, well-chosen examples that show both the reasoning pattern and the company's specific 'duplicate' definition typically generalize the pattern effectively, at a fraction of the token cost of five full verbose examples repeated on every request.\n\n**Why the distractors fail**:\n- A: Paying the token cost of five full examples on every single call, indefinitely, is rarely justified once one or two examples already convey the pattern — this is over-spending against a cost concern the team explicitly raised.\n- C: The scenario indicates reasoning steps were needed for accuracy; stripping them out to save tokens sacrifices the accuracy the examples existed to provide.\n- D: Extended thinking helps with general reasoning depth, but it doesn't teach the model a company-specific definition of 'duplicate' that it has no way to know without being shown — that requires examples, not just more internal reasoning time.\n\n**In practice**: When few-shot examples are needed but token budget is tight, architects trim to the smallest example set that still demonstrates the pattern reliably, and validate with evaluation data that fewer examples don't measurably hurt accuracy before shipping the leaner prompt.",
-    "tags": ["few-shot", "token-budget", "prompt-engineering", "cost-latency-tradeoff"]
+    "tags": ["few-shot", "token-budget", "prompt-engineering", "cost-latency-tradeoff", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   },
   {
     "domain": 2,
@@ -147,7 +156,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Content positioned far from the model's current point of attention in a very long context — a phenomenon often called 'lost in the middle' — receives proportionally less weight than content near the beginning or, especially, near the end of the context; a single early mention doesn't guarantee persistent influence across dozens of subsequent turns.\n\n**Why C is correct**: Restating the constraint near the most recent turns (or compacting older turns into a summary that re-surfaces the key constraint) keeps it within the model's effective attention span at the point where the next response is actually generated, directly countering the positional decay that's causing the caveat to be ignored.\n\n**Why the distractors fail**:\n- A: A larger context window lets more history fit, but it doesn't change how attention is distributed across that history — it can actually make the caveat proportionally further from the model's focus as more turns accumulate.\n- B: Temperature affects output randomness, not where the model's attention concentrates within a long context; it won't fix a positional attention issue.\n- D: This still relies on a single early mention with no reinforcement, and additionally removes it from the system-level instruction set entirely — it doesn't address the root cause and may weaken enforcement further.\n\n**In practice**: For long-running conversations or documents, architects treat critical instructions as needing periodic reinforcement or compaction into a running summary — assuming a single early statement will hold attention indefinitely across dozens of turns is a common and costly context-engineering mistake in safety-sensitive applications.",
-    "tags": ["context-window", "lost-in-middle", "token-budget"]
+    "tags": ["context-window", "lost-in-middle", "token-budget", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 2,
@@ -162,7 +172,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Context-window optimization for retrieval-augmented workflows starts at the retrieval step — reducing what gets pulled and injected in the first place is more effective than trying to compensate downstream, because every injected token both costs money and dilutes the model's attention with content it must sort through.\n\n**Why A is correct**: Re-ranking and injecting only the handful of chunks actually likely to be relevant cuts token cost roughly in half or more and removes the noisy, irrelevant chunks that were contributing to incorrect citations — it fixes the problem at its source.\n\n**Why the distractors fail**:\n- B: Still pays for and includes all 20 chunks' worth of tokens on every call, and an instruction to 'ignore' irrelevant content doesn't reliably prevent the model from being influenced or distracted by it — the dilution and cost problem remains.\n- C: Doubling chunk size while still injecting all 20 roughly doubles the token bloat this fix is supposed to address, making the underlying problem worse, not better.\n- D: A bigger context window accommodates more tokens but doesn't reduce the actual cost of processing them or address why irrelevant chunks are being cited — it treats the symptom (fitting the content) rather than the cause (retrieving too much irrelevant content).\n\n**In practice**: When a RAG pipeline's context is bloated with low-relevance retrieved content, the fix is almost always to improve retrieval precision (better ranking, tighter top-k) rather than to expand the context window or add downstream instructions asking the model to self-filter noisy input.",
-    "tags": ["context-window", "token-budget", "retrieval-optimization"]
+    "tags": ["context-window", "token-budget", "retrieval-optimization", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 2,
@@ -177,7 +188,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: For long-running conversations, the growth driver is the ever-expanding, mostly non-cacheable verbatim history rather than the static system prompt — the fix is to periodically compact that history into a summary, trading some verbatim detail for a bounded, much smaller token footprint while preserving what matters.\n\n**Why D is correct**: Summarizing older turns keeps the essential clinical details available to the model while replacing dozens of verbatim turns with a compact block, directly reducing the input token count that grows with every additional turn — and it does this without discarding information the model still needs.\n\n**Why the distractors fail**:\n- A: The static system prompt is a separate, unrelated part of the token budget from the growing conversation history — caching still saves cost on that portion regardless of how long the conversation gets, so disabling it removes a benefit without addressing the actual growth driver.\n- B: Dropping the oldest turns entirely risks silently losing clinically relevant details a patient mentioned earlier in the session, which is a correctness and safety risk in a telehealth context.\n- C: max_tokens controls the length of the model's output, not the size of the input conversation history being sent — it does nothing to address growing input token cost.\n\n**In practice**: Prompt caching and history summarization solve different problems — caching reduces cost on a stable, repeated prefix, while summarization bounds the cost of an ever-growing dynamic history; production conversational systems typically need both, applied to the parts of the prompt each one actually addresses.",
-    "tags": ["context-window", "summarization", "token-budget", "prompt-caching"]
+    "tags": ["context-window", "summarization", "token-budget", "prompt-caching", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   },
   {
     "domain": 2,
@@ -192,7 +204,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Prompt caching matches on a shared, identical prefix — anything placed before the cached block, or any change within it, breaks the prefix match and causes a miss, regardless of how long the TTL is set to.\n\n**Why B is correct**: Placing the static, unchanged schema/glossary content first and the varying user query after it ensures the cacheable prefix is truly identical across calls, which is the actual requirement for cache hits — this directly targets the root cause described in the scenario.\n\n**Why the distractors fail**:\n- A: A longer TTL keeps a valid cache entry alive longer, but it does nothing to fix a prefix mismatch caused by ordering — the cache will still miss every time the variable content precedes the static block.\n- C: Shrinking the document reduces token count but doesn't address why the prefix isn't matching; the ordering problem persists at any document size.\n- D: This abandons the optimization entirely rather than fixing the ordering issue that's actually preventing it from working, forfeiting a benefit that's easily recoverable with a simple reorder.\n\n**In practice**: Prompt caching's benefit hinges entirely on prefix stability — architects place static, reusable content (system instructions, reference documents) first and dynamic, per-request content last, precisely so the cacheable portion never shifts or gets pushed later by variable input.",
-    "tags": ["prompt-caching", "context-window", "token-budget"]
+    "tags": ["prompt-caching", "context-window", "token-budget", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 2,
@@ -207,7 +220,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Content that's genuinely shared across many deployments should exist in exactly one place and be composed into each deployment, rather than duplicated — duplication guarantees drift the moment the shared content changes and someone misses an update.\n\n**Why C is correct**: Extracting the shared 70% into one modular component that each client prompt references means a single edit to the shared component updates every client automatically, eliminating the copy-paste maintenance burden the scenario describes while still allowing each client's 30% to remain distinct.\n\n**Why the distractors fail**:\n- A: This is the current failing practice restated with a comment added — it still requires manual, error-prone synchronization across every client file.\n- B: Collapsing all clients into one large conditional prompt makes the file harder to reason about and test, and mixes unrelated clients' policy logic together in ways that increase the risk of one client's changes accidentally affecting another.\n- D: A reactive process — only fixing drift after a client notices — means clients run on outdated shared policy for some period by design, which is a worse outcome than preventing drift in the first place.\n\n**In practice**: The rule of thumb is: if the same instructions appear in more than one prompt and are expected to change together, extract them into a shared, referenced component — this is the prompt-engineering equivalent of avoiding copy-pasted code, and it prevents the exact drift problem described here.",
-    "tags": ["modular-prompts", "prompt-reuse", "system-prompt"]
+    "tags": ["modular-prompts", "prompt-reuse", "system-prompt", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 2,
@@ -222,7 +236,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: When the same discrete capability is needed across multiple independent agents, packaging it once as a reusable, invokable unit (a Skill) — rather than re-authoring it inline in each agent's prompt — gives every agent consistent behavior and a single place to fix or improve the logic.\n\n**Why A is correct**: A shared Skill means the report-generation logic exists once, is invoked identically by all six agents, and any fix or format change is made in one place and takes effect everywhere — directly solving both the duplication and the inconsistency described.\n\n**Why the distractors fail**:\n- B: A vague consistency instruction with no shared underlying artifact still leaves six independently-authored implementations that can drift from each other in exactly the way the scenario describes.\n- C: Routing unrelated workflows through one agent conflates responsibilities that don't belong together, increasing that agent's scope and blast radius well beyond report generation, which isn't what the reuse problem calls for.\n- D: Copying prompt text creates six independent copies again — the moment any one of them needs a fix, the others silently fall out of sync, reproducing the original duplication problem in a new form.\n\n**In practice**: Skills exist for exactly this pattern — a well-defined, reusable capability needed by multiple agents — and the test for 'should this be a Skill' is whether more than one consumer needs the same logic and would otherwise have to reimplement or copy it.",
-    "tags": ["skills", "prompt-reuse", "modular-prompts"]
+    "tags": ["skills", "prompt-reuse", "modular-prompts", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 2,
@@ -237,6 +252,7 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Prompt caching's benefit is proportional to how often an identical prefix is reused across calls, not to prompt size or call volume alone — caching a prefix that's rarely or never repeated provides little to no return, and caching itself carries a write-side cost that only pays off with reuse.\n\n**Why D is correct**: Because the large project-brief portion of each request is unique nearly every time, there's essentially no repeated prefix for a cache to serve on subsequent calls, and the low call volume means even the small fixed closing instruction wouldn't accumulate meaningful savings — caching isn't the right optimization to prioritize here.\n\n**Why the distractors fail**:\n- A: Caching content that's never reused still incurs the cache-write cost with no corresponding reuse benefit, so 'it never hurts' is incorrect — it can add cost without payoff.\n- B: This reflects a real misconception: prompt caching serves exact-prefix matches, not semantic or conceptual similarity between different briefs — Claude does not draw on a previously cached brief's content to answer an unrelated new one just because caching is enabled.\n- C: Token count isn't the deciding factor for whether caching helps — a very large prompt that's reused verbatim benefits enormously from caching, while a small prompt that's never repeated gets no benefit; the determining factor is reuse frequency of an identical prefix, not size.\n\n**In practice**: Before enabling prompt caching, architects check whether there's actually a stable, frequently-repeated prefix in the workload — for one-off, highly variable content at low volume, effort is better spent elsewhere (e.g., trimming the brief itself) than on a caching layer that has nothing meaningful to cache.",
-    "tags": ["prompt-caching", "prompt-reuse", "cost-latency-tradeoff"]
+    "tags": ["prompt-caching", "prompt-reuse", "cost-latency-tradeoff", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   }
 ]

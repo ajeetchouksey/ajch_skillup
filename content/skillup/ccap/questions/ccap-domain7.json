@@ -12,7 +12,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Claude Code's memory hierarchy is designed so instructions can be scoped by audience — project-level files are for shared team conventions that belong in version control, while user-level or gitignored local files are for individual preferences that shouldn't create merge noise for everyone else.\n\n**Why B is correct**: Putting team-wide conventions in the committed CLAUDE.md gives every engineer and every Claude Code session in that repo the same baseline instructions, while a gitignored local override or user-level file lets an individual layer personal preferences (commit message style, shortcuts) on top without touching the shared file — eliminating the conflicts.\n\n**Why the distractors fail**:\n- A: Deleting CLAUDE.md throws away the primary mechanism for giving Claude consistent, codified context, forcing conventions to rely on tribal memory — the opposite of what team enablement requires.\n- C: Private forks that get manually merged reintroduce the exact merge-conflict problem this pattern is designed to solve, and adds manual reconciliation overhead on top.\n- D: Slack messages aren't loaded into Claude's context automatically, so instructions living there don't influence Claude Code's behavior at all — this defeats the purpose of a machine-readable convention file.\n\n**In practice**: Architects standardizing tooling across a team split \"what's shared\" from \"what's personal\" the same way linters split repo-wide config from personal IDE settings — that separation is what keeps a shared file from becoming a conflict magnet.",
-    "tags": ["CLAUDE-md", "team-configuration", "settings-hierarchy"]
+    "tags": ["CLAUDE-md", "team-configuration", "settings-hierarchy", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 7,
@@ -27,7 +28,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Enforceable safety guardrails must live at a layer the individual user cannot override — permission settings that can be turned off by whoever they're supposed to constrain aren't guardrails, they're suggestions. Deny rules in an enterprise-managed policy sit above user and project settings precisely so a destructive action stays blocked even if a local config tries to allow it.\n\n**Why C is correct**: An enterprise-managed settings file that explicitly denies destructive patterns (rm -rf, force-push to protected branches, DROP TABLE) while allow-listing safe routine commands (tests, linters) gives blanket protection against catastrophic mistakes without adding review friction to safe, everyday actions — and because it's managed centrally, no individual engineer's local settings can quietly reopen the destructive paths.\n\n**Why the distractors fail**:\n- A: Forcing manual confirmation on every tool call, including safe reads, creates approval fatigue — fatigued engineers start reflexively approving everything, defeating the safety goal it's trying to achieve.\n- B: Leaving destructive-command protection to each engineer's personal settings means the org's actual protection level is only as strong as its least careful engineer; one misconfigured local settings.json reopens exactly the risk this is meant to close.\n- D: Bypass-permissions mode removes the human-in-the-loop check at the point of action, and catching destructive actions in code review after they've already executed is too late — a dropped table or force-pushed branch isn't undone by a subsequent PR comment.\n\n**In practice**: Security-conscious teams design their permission model the same way they design IAM policies — deny rules for catastrophic actions live in a layer users can't touch, while everyday low-risk actions stay frictionless, because a guardrail engineers can disable under time pressure will eventually get disabled under time pressure.",
-    "tags": ["settings-json", "permissions", "enterprise-managed-policy"]
+    "tags": ["settings-json", "permissions", "enterprise-managed-policy", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 7,
@@ -42,7 +44,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Configuration that needs to be identical across every team member belongs in version control next to the code it supports, not in an individual's local environment or in documentation someone has to remember to follow — checked-in config is enforced by the act of cloning the repo, while documented instructions are only as reliable as everyone's compliance with them.\n\n**Why A is correct**: A project-scoped .mcp.json committed to the repo means MCP server configuration travels with the codebase itself — every engineer, including new hires, gets the exact same Jira and internal-docs connections the moment they clone the repo, with zero manual setup and zero risk of a mistyped connection string.\n\n**Why the distractors fail**:\n- B: A wiki page describes the correct setup but doesn't enforce it — it depends on every new hire reading it carefully and executing it correctly, which is exactly the kind of manual, error-prone step already causing the current inconsistency.\n- C: Sharing a single laptop's configuration doesn't scale past one person at a time and isn't really \"team configuration\" at all — it's a workaround, not a fix for the underlying setup problem.\n- D: Re-entering server details from memory in every session is the most error-prone and highest-friction option of all, guaranteeing exactly the kind of drift and mistakes the team is trying to eliminate.\n\n**In practice**: Architects treat \"does every engineer need this\" as the deciding question for where configuration lives — project-scoped, version-controlled config for anything the whole team shares, user-scoped config for anything that's genuinely personal.",
-    "tags": ["MCP-config", "team-configuration", "onboarding"]
+    "tags": ["MCP-config", "team-configuration", "onboarding", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 7,
@@ -57,7 +60,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Any multi-step workflow that's repeated identically across a team is a candidate for codification into a reusable, version-controlled command rather than something re-typed from memory each time — codifying it removes both the inconsistency of manual phrasing and the risk of skipped steps.\n\n**Why D is correct**: A custom slash command stored in the repo turns a five-step, easy-to-get-wrong sequence into a single, consistent invocation any engineer can run — the ordering and completeness of the steps are guaranteed by the command definition itself, not by whether the person running it happened to remember the breaking-changes check that day.\n\n**Why the distractors fail**:\n- A: Documentation that isn't enforced by tooling still relies on individual memory — the exact failure mode already observed (engineers skipping the breaking-changes step) is what happens when a process lives only in a doc.\n- B: Routing every release through one senior engineer doesn't fix the underlying inconsistency, it just makes that person a bottleneck and a single point of failure for a process that should be repeatable by anyone on the team.\n- C: Free-text phrasing is inherently variable — different engineers describing \"the same\" five steps slightly differently is exactly the inconsistency causing skipped steps today, and there's no guarantee Claude interprets every variant identically or completely.\n\n**In practice**: Whenever an architect notices the same multi-step prompt sequence being retyped by multiple engineers, that's the signal to package it as a slash command — the payoff scales with how often the sequence repeats and how costly a skipped step is.",
-    "tags": ["slash-commands", "developer-workflow", "automation"]
+    "tags": ["slash-commands", "developer-workflow", "automation", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 7,
@@ -72,7 +76,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Unattended automation requires two things at once — a non-interactive execution mode so the pipeline doesn't stall waiting on a human, and a permission scope tight enough that \"unattended\" doesn't also mean \"unconstrained.\" Headless mode without a matching narrow permission set just relocates the risk of an interactive session into an environment where nobody is watching.\n\n**Why A is correct**: Headless/non-interactive mode lets Claude Code run to completion inside a CI step without blocking on an approval prompt, and pairing it with a scoped permission set — read the diff, post a comment, nothing else — means the ephemeral sandbox constrains what could go wrong even without a human in the loop, matching a use case where the blast radius is already limited by the runner's own lack of production access.\n\n**Why the distractors fail**:\n- B: A human approving tool calls remotely defeats the purpose of CI automation — the whole point is a review that runs on every PR without requiring a person to be available and responsive each time, reintroducing the exact bottleneck automation was meant to remove.\n- C: Bypass-permissions mode is unnecessary and reckless here — the sandbox limits some risk, but it doesn't eliminate the risk of Claude taking actions outside the intended review scope (e.g., modifying files or running arbitrary commands) when no permission boundary is defined at all.\n- D: Non-interactive execution is a supported and common pattern for CI integration; avoiding CI entirely means giving up the automated, every-PR coverage this use case needs, for no real safety benefit over a properly scoped headless configuration.\n\n**In practice**: The question a senior architect asks before wiring any agent into CI isn't \"can it run unattended\" but \"what's the narrowest permission set that still lets it do its job\" — headless mode handles the \"unattended\" part, scoped permissions handle the \"safely\" part, and both are needed together.",
-    "tags": ["headless-mode", "CI-CD", "permissions"]
+    "tags": ["headless-mode", "CI-CD", "permissions", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 7,
@@ -87,7 +92,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: When a sub-task produces a lot of output that isn't needed for the ongoing main conversation, delegating it to a subagent with its own isolated context is what keeps the primary session's context budget available for what it actually needs to track — this is a context-management pattern, not just a convenience.\n\n**Why A is correct**: A dedicated subagent runs the test-generation work in its own context, returning just the result (the tests, and maybe a summary) to the main session instead of every intermediate step and line of boilerplate — the main session's context stays focused on the implementation discussion it was already having.\n\n**Why the distractors fail**:\n- B: Manually copy-pasting code into a new chat window is a crude, error-prone manual workaround for the same underlying idea (isolate the test-writing context) — it loses the main session's implementation context entirely and puts the burden of re-establishing it on the engineer every time.\n- C: \"Context window\" isn't a setting an architect tunes up on demand — the model has a fixed context limit, and even if it were adjustable, cramming unrelated boilerplate into the same context doesn't fix the underlying attention/tracking problem this scenario describes.\n- D: Abandoning AI-assisted test generation throws away real productivity gains to solve a context-management problem that has a much more targeted fix (subagent delegation) — it's overcorrecting.\n\n**In practice**: Architects look for sub-tasks that produce a lot of output but don't need to stay in the main conversation's memory — test generation, large-scale search, and bulk file analysis are classic candidates for subagent delegation to protect the primary session's context.",
-    "tags": ["subagents", "context-window", "delegation"]
+    "tags": ["subagents", "context-window", "delegation", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 7,
@@ -102,7 +108,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: An intermittent, production-only failure that can't be reproduced locally is almost always a signal that the actual input or context differs between the failing and succeeding cases in some way the architect hasn't seen yet — the fastest path to root cause is comparing what was actually sent to the model on failure versus success, not guessing at causes from outside the system.\n\n**Why B is correct**: Pulling the real transcripts for failing requests — the exact prompt, retrieved context, and tool call sequence that were sent — and diffing them against successful ones surfaces the actual variable that differs (a particular retrieved document, an edge-case input format, a tool that returned unexpected data). That's the concrete evidence needed to form and test a real hypothesis, rather than a guess.\n\n**Why the distractors fail**:\n- A: Swapping models without evidence treats a symptom as if it were definitely the cause — if the real issue is a specific edge case in retrieved context or a malformed tool result, a different model would very plausibly fail the same way, and the actual bug goes unfixed.\n- C: Local test coverage only helps once the failure mode is understood well enough to write a test that reproduces it — writing more tests blind, before the actual difference between failing and succeeding requests is known, is unlikely to hit the specific case that's actually failing in production.\n- D: Dismissing a low-frequency production issue as not worth investigating ignores that a small failure rate on a high-volume system can still represent a meaningful number of affected users, and the underlying cause could scale up under different conditions.\n\n**In practice**: The operational debugging instinct for \"works locally, fails intermittently in production\" is always the same first move — get the actual transcript of what happened on a specific failing request, because guessing at causes without that evidence wastes time chasing hypotheses the data could have ruled out immediately.",
-    "tags": ["debugging", "observability", "production-incident"]
+    "tags": ["debugging", "observability", "production-incident", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 7,
@@ -117,6 +124,71 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: In a multi-stage agent pipeline, observability has to exist at the granularity of the failure you'll eventually need to diagnose — logging only the final output collapses every intermediate decision into a black box, so when something goes wrong there's no way to localize which stage caused it without first fixing the logging.\n\n**Why D is correct**: Per-stage structured logging with a correlation ID lets the operations team reconstruct exactly what each subagent received and produced for a specific request, and diff that against expectations stage by stage. This converts \"the final answer was wrong somewhere in this pipeline\" into \"stage 3's tool call returned stale data, which stage 4 then summarized incorrectly\" — the level of detail actually needed to fix the root cause rather than the symptom.\n\n**Why the distractors fail**:\n- A: A self-assessment log line asks the model to judge its own output's plausibility, which doesn't provide the intermediate evidence needed to localize which pipeline stage is responsible — and a model that got the answer wrong is not a reliable judge of whether its own answer looks wrong.\n- B: More manual spot-checks might catch more bad outputs, but catching that an output is bad isn't the same problem as diagnosing why the pipeline produced it — without per-stage visibility, each newly caught bad output is exactly as undiagnosable as the one already reported.\n- C: Periodic restarts might mask a transient issue but do nothing to explain or fix a pipeline producing wrong outputs due to a logic or data problem in one of its stages, and they do nothing to help diagnose the incident already reported.\n\n**In practice**: The operational maturity question an architect should ask before a multi-agent pipeline ships to production is \"if this produces a wrong answer next week, can we tell which stage caused it?\" If the answer is no, per-stage tracing is prerequisite infrastructure, not an optional enhancement.",
-    "tags": ["observability", "tracing", "multi-agent", "debugging"]
+    "tags": ["observability", "tracing", "multi-agent", "debugging", "scenario-based", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 7,
+    "id": "ccap-d7-009",
+    "scenario": "A platform team wants every Claude Code session in its monorepo to automatically run the project's linter and auto-formatter on any file Claude edits, without relying on Claude choosing to run them or an engineer remembering to run them after the fact.",
+    "question": "What is the correct mechanism for enforcing this automatically, and why?",
+    "options": [
+      "Add a strongly worded instruction to CLAUDE.md telling Claude to always run the linter and formatter after editing a file",
+      "Configure a PostToolUse hook that runs the linter and formatter automatically after any file-edit tool call completes, so formatting happens deterministically regardless of what Claude decides to do next",
+      "Ask engineers to manually run the linter and formatter themselves after reviewing Claude's changes, since automation risks formatting files Claude didn't intend to change",
+      "Increase the model's temperature so it more reliably remembers to run the linter on its own"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: anything that MUST happen every time belongs in a hook (code that runs deterministically on a defined event), not in a prompt instruction the model might or might not follow that turn \u2014 CLAUDE.md instructions are read as guidance, not enforced as code.\n\n**Why B is correct**: a PostToolUse hook fires automatically whenever a file-edit tool call completes, running the linter/formatter every single time regardless of what Claude does next in its own reasoning \u2014 turning a \"should happen\" hope into a \"does happen\" guarantee.\n\n**Why the distractors fail**:\n- A: a CLAUDE.md instruction is a strong suggestion, not an enforcement mechanism; a distracted or compacted context can cause Claude to skip it on any given turn.\n- C: reintroduces the exact manual-step-that-gets-forgotten problem the team is trying to eliminate, and adds review overhead the automation was meant to remove.\n- D: temperature affects sampling randomness in generated text, not whether a deterministic post-edit action executes \u2014 this doesn't address the actual mechanism needed at all.\n\n**In practice**: the same \"ensure vs. encourage\" distinction that governs safety-critical guardrails applies to routine developer-productivity automation \u2014 if formatting must happen every time, wire it as a hook, not a prompt.",
+    "tags": ["hooks", "developer-workflow", "automation", "scenario-based", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 7,
+    "id": "ccap-d7-010",
+    "scenario": "A 60-engineer organization rolls out Claude Code broadly. Two months in, finance asks the platform team how much is being spent on Claude Code usage per engineering team per month, and nobody can answer \u2014 there's no visibility into per-team or per-project token spend.",
+    "question": "What should the platform team put in place to answer this kind of question going forward?",
+    "options": [
+      "Usage tracking and cost dashboards that attribute token spend to team or project (e.g., via API key/workspace tagging), so spend can be reported and reviewed on an ongoing basis",
+      "Ask each engineer to self-report their estimated usage at the end of each month",
+      "Set a single hard token cap for the entire organization and stop all Claude Code access once it's reached",
+      "Wait until the next invoice arrives and divide the total evenly across all teams regardless of actual usage"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: \"how much are we spending, broken down by team\" is a reporting requirement that only a real usage-tracking and attribution mechanism can answer \u2014 no amount of process discipline after the fact fixes a missing telemetry layer, the same way an accuracy report needs paired before/after logs (a recurring theme across this exam).\n\n**Why A is correct**: tagging usage by team/project/workspace and rolling it into a dashboard is what actually produces the specific, ongoing, per-team breakdown finance is asking for \u2014 and it scales to answering the question again next month without more manual effort.\n\n**Why the distractors fail**:\n- B: self-reported estimates are unreliable and don't scale, and busy engineers will forget or approximate badly.\n- C: a single org-wide hard cap answers \"are we over budget\" at best, not \"which team is spending what\" \u2014 and risks cutting off a legitimate high-value team's access along with everyone else's.\n- D: an even split actively misattributes cost away from actual high-usage teams and onto low-usage ones, producing a number that's actively wrong rather than merely imprecise.\n\n**In practice**: operational enablement at scale means instrumenting cost the same way you'd instrument any other production system \u2014 attribution and dashboards, not after-the-fact guesswork.",
+    "tags": ["cost-monitoring", "operational-enablement", "observability", "scenario-based", "comprehension"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 7,
+    "id": "ccap-d7-011",
+    "scenario": "Six months after rolling out Claude Code, an engineering VP asks for evidence that the rollout actually improved developer productivity. The platform team's dashboard currently shows \"total Claude Code sessions started per week,\" which has been steadily climbing, and the team wants to present this as proof of success.",
+    "question": "What is the strongest critique of using \"total sessions started per week\" as the evidence for a productivity claim, and what should the team measure instead?",
+    "options": [
+      "Sessions-started is a usage/adoption metric, not a productivity metric \u2014 it can climb even if engineers are spending more time correcting bad output or re-prompting after failures; the team should instead track outcome-oriented signals (e.g., cycle time on PRs assisted by Claude Code, defect rates, or engineer-reported time saved on specific task types) alongside usage",
+      "The metric is fine as-is; more sessions started always means more value delivered, so no further measurement is needed",
+      "The team should switch to counting total lines of code generated per week instead, since that more directly reflects developer output",
+      "The team should stop measuring anything at all, since developer productivity can never be quantified"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: a rising usage metric is evidence of adoption, not evidence of the business outcome (productivity) leadership actually asked about \u2014 the same 'what number is leadership actually being measured on' discipline that applies to solution design applies to measuring the solution's own impact after the fact.\n\n**Why A is correct**: it correctly separates adoption (sessions started) from outcome (did work actually get faster or better), and proposes outcome-oriented signals \u2014 cycle time, defect rate, task-specific time-saved \u2014 that can actually support or refute a productivity claim, including the uncomfortable possibility that rising usage is partly rework.\n\n**Why the distractors fail**:\n- B: treats a usage metric as automatically equivalent to a value metric, the exact conflation the VP's question is probing \u2014 more sessions could just as easily mean more struggling.\n- C: lines-of-code is a notoriously gameable proxy that rewards verbosity over quality, and doesn't answer whether the code shipped faster, correctly, or with fewer defects.\n- D: overcorrects into nihilism; productivity impact is measurable via proxies like cycle time and defect rate, even if it's harder to measure than raw usage counts.\n\n**In practice**: whenever a rollout's own success dashboard only shows a usage metric, the right follow-up question is 'what would it look like if usage went up but nothing actually got better' \u2014 if that scenario is possible, the dashboard is missing an outcome metric.",
+    "tags": ["productivity-metrics", "operational-enablement", "evaluation-metrics", "scenario-based", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 7,
+    "id": "ccap-d7-012",
+    "scenario": "A team's shared .mcp.json pins an internal-docs MCP server to a specific version. A platform engineer wants to upgrade that server to a new version that changes several tool schemas, and is planning to roll the new version out to all 40 engineers by merging the version bump directly to the shared, checked-in config.",
+    "question": "What is the biggest operational risk in rolling this out by directly merging the version bump for all engineers at once, and what should the platform engineer do instead?",
+    "options": [
+      "There is no real risk, since MCP server upgrades are always backward-compatible by design",
+      "A schema change could break existing prompts, subagents, or slash commands across the whole team simultaneously the moment it merges, with no way to isolate or roll back the impact to a small group first; the engineer should stage the upgrade \u2014 test it against real workflows in a canary branch or small pilot group before merging the version bump to the shared config everyone picks up",
+      "The engineer should skip testing entirely and rely on engineers reporting problems after the fact, since that's faster",
+      "The engineer should permanently avoid ever upgrading shared MCP servers, since any version change is inherently unsafe"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: a change to shared, checked-in team configuration ships to everyone the moment it merges \u2014 the same blast-radius reasoning that applies to any all-at-once production rollout applies here, and staged/canary rollout is the standard way to catch a breaking change before it hits the whole team at once.\n\n**Why B is correct**: it identifies the real risk \u2014 a tool schema change can silently break anything built against the old schema, and merging straight to the shared config gives every one of the 40 engineers that breakage simultaneously with no isolated blast radius \u2014 and proposes the standard mitigation: validate in a pilot/canary setup first, then merge once confirmed safe.\n\n**Why the distractors fail**:\n- A: falsely assumes backward compatibility is guaranteed; the scenario explicitly states tool schemas are changing, which is exactly the kind of change that can break existing callers.\n- C: relying on after-the-fact reports means the whole team hits the breakage before anyone notices, the opposite of risk mitigation.\n- D: overcorrects into never upgrading at all, which isn't sustainable and isn't what the risk calls for \u2014 the fix is staged rollout, not permanent stagnation.\n\n**In practice**: shared, version-controlled team configuration should be upgraded the same way any shared production dependency is \u2014 validated in a smaller blast radius first, not merged straight to everyone.",
+    "tags": ["MCP-config", "rollout-strategy", "operational-enablement", "scenario-based", "analysis"],
+    "difficulty": "easy"
   }
 ]

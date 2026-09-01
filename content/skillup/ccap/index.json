@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.15",
-  "contentUpdatedAt": "2026-08-31",
+  "contentVersion": "0.1.16",
+  "contentUpdatedAt": "2026-09-01",
   "provider": "Anthropic",
   "palette": {
     "color": "#a78bfa",
@@ -26,15 +26,16 @@
     { "version": "0.1.12", "date": "2026-08-31", "type": "patch", "summary": "Added 17 questions to domain D6 (Stakeholder Communication & Lifecycle Management)" },
     { "version": "0.1.13", "date": "2026-08-31", "type": "patch", "summary": "Domain 7 notes added." },
     { "version": "0.1.14", "date": "2026-08-31", "type": "patch", "summary": "Added 8 questions to domain D7 (Developer Productivity & Operational Enablement)" },
-    { "version": "0.1.15", "date": "2026-08-31", "type": "patch", "summary": "Added 6 scenarios: RAG pipeline design, multi-agent least-privilege, cost/latency optimization, production evaluation & A/B testing, regulated-industry governance rollout, and Claude Code developer enablement" }
+    { "version": "0.1.15", "date": "2026-08-31", "type": "patch", "summary": "Added 6 scenarios: RAG pipeline design, multi-agent least-privilege, cost/latency optimization, production evaluation & A/B testing, regulated-industry governance rollout, and Claude Code developer enablement" },
+    { "version": "0.1.16", "date": "2026-09-01", "type": "minor", "summary": "D7 gap-fill: added 4 questions (ccap-d7-009..012 — hooks, cost/token monitoring, productivity-impact measurement, MCP version rollout risk) closing the domain below the platform's \u226510/domain minimum (8\u219212). Backfilled `difficulty` (easy/medium/hard) on all 124 questions across all 7 domains (previously 0% coverage). Added \u22651 content-type + \u22651 cognitive-level tag from the platform's controlled taxonomy to every question, additive to existing descriptive tags." }
   ],
   "id": "ccap",
   "examCode": "CCAR-P",
-  "title": "Claude Certified Architect – Professional",
+  "title": "Claude Certified Architect \u2013 Professional",
   "shortTitle": "CCA-P",
   "contentLevel": "301",
-  "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions — enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
-  "questions": 120,
+  "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions \u2014 enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
+  "questions": 124,
   "duration": "120 min",
   "passScore": "720/1000",
   "passThreshold": 72,
