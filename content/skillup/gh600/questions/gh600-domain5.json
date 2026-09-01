@@ -1,0 +1,322 @@
+[
+  {
+    "domain": 5,
+    "id": "gh600-d5-001",
+    "scenario": "Cascade Systems has a workflow where Agent A generates a database migration script, Agent B must validate that migration against a staging database before Agent C writes the accompanying documentation. Each step's input is the previous step's verified output.",
+    "question": "Which orchestration pattern is most appropriate for coordinating these three agents?",
+    "options": [
+      "Fully parallel execution — run all three agents concurrently to minimize wall-clock time",
+      "Fan-out orchestration where a coordinator broadcasts the same task to all three agents and picks the best result",
+      "Sequential/pipeline orchestration, where each agent runs only after the prior agent's output has been produced and validated",
+      "Fully autonomous, uncoordinated execution — let each agent poll the repository independently and pick up whatever step looks unstarted"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: the orchestration pattern should match the actual dependency structure of the work — when each step consumes the previous step's verified output, that's a hard data dependency, and coordination has to enforce ordering, not just optimize for speed.\n\n**Why option C is correct**: Agent B literally cannot validate a migration script that doesn't exist yet, and Agent C's documentation is meaningless without a validated migration to describe — a sequential pipeline enforces that each stage only starts once its required input is ready and verified, which is exactly the constraint this workflow has.\n\n**Why the distractors fail**:\n- Option A: running all three concurrently would have Agent B validating a script that may not be finished and Agent C documenting a migration that hasn't been validated — parallelism here doesn't save time, it produces work built on incomplete or invalid inputs.\n- Option B: fan-out/broadcast makes sense when you want several independent attempts at the *same* task to compare results, not when three agents are each doing a *different* task with a dependency chain between them.\n- Option D: uncoordinated polling has no mechanism to guarantee Agent B waits for a validated script before running, or that Agent C waits for a validated result — it turns an ordering requirement into a race condition.\n\n**In practice**: before choosing an orchestration pattern, map the actual data dependencies between steps — if step N genuinely needs step N-1's verified output, parallelism isn't an optimization, it's a correctness bug waiting to happen.",
+    "tags": ["orchestration-patterns", "sequential-execution", "pipeline-pattern", "coordinator-agent"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-002",
+    "scenario": "Thornbury Logistics wants two coding agents to work simultaneously in the same repository: one adding a new API endpoint, one upgrading a logging library. Both agents will produce many intermediate commits before either change is ready for review.",
+    "question": "What is the most effective way to configure isolation for these two agents so they can work in parallel without interfering with each other?",
+    "options": [
+      "Give each agent its own branch (and/or isolated workspace or worktree) scoped to its task, merging only through review, so neither agent's intermediate state affects the other",
+      "Have both agents commit directly to main and rely on the CI pipeline to catch problems after the fact",
+      "Run both agents against the same branch, but instruct them via prompt to avoid touching the other agent's files",
+      "Run the agents sequentially instead of in parallel, since true isolation for parallel agents in the same repo is not achievable"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: parallel execution requires isolation at the level where interference could actually occur — a shared branch or shared working tree is a shared mutable state, and two agents writing to shared mutable state concurrently will eventually stomp on each other regardless of what they're individually instructed to do.\n\n**Why option A is correct**: separate branches (or worktrees/containers) give each agent its own committable state — intermediate, half-finished commits from one agent never appear in the other agent's working copy, and the only point of contact between the two efforts is a deliberate, reviewed merge, which is where conflicts should surface and be handled.\n\n**Why the distractors fail**:\n- Option B: committing directly to main means every intermediate, unfinished commit from either agent is immediately visible to (and buildable by) the other, and CI catching a problem after both agents have already built on a broken shared history is remediation, not isolation.\n- Option C: a prompt instruction is a request, not an enforcement mechanism — it doesn't stop either agent's edits, file locks, or generated artifacts from colliding on a shared branch, and it gives no way to verify compliance.\n- Option D: isolation for parallel agents in the same repository is a solved, common pattern (branches, worktrees, or containerized clones) — abandoning parallelism entirely trades a configuration problem for an unnecessary throughput cost.\n\n**In practice**: the question to ask when parallelizing agents against the same codebase is \"what shared mutable state could two agents both write to?\" — if the answer is \"the same branch,\" you don't have parallel execution yet, you have a race condition with extra steps.",
+    "tags": ["agent-isolation", "parallel-execution", "branch-isolation", "worktree"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-003",
+    "scenario": "Meridian Health's orchestrator notices that two independently triggered agents — one responding to a bug report, one responding to a related feature request — have each opened a PR that modifies the same PatientRecordValidator class, addressing overlapping logic in different ways.",
+    "question": "What should the orchestrator do first upon detecting this overlap?",
+    "options": [
+      "Merge both PRs automatically in the order they were opened, and let a later agent reconcile any conflicts after the fact",
+      "Close both PRs immediately without review, since duplicated work is presumed to be low quality",
+      "Instruct each agent to keep working independently and let the merge queue's automatic conflict resolution decide the outcome",
+      "Flag the overlap, pause one of the two PRs, and route the situation for reconciliation — deciding which change should be kept, combined, or superseded — before either PR proceeds further"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: duplicated effort on the same logic isn't just wasted work — it's a signal that two agents made independent, potentially incompatible decisions about the same piece of behavior, and merging either one without reconciling that overlap risks silently discarding a correct decision or compounding two half-correct ones.\n\n**Why option D is correct**: pausing and flagging the overlap converts a silent risk into a visible decision point — someone (human or a designated reconciling agent) can compare the two approaches, determine whether they're actually compatible, redundant, or contradictory, and decide the outcome deliberately instead of by accident of merge order.\n\n**Why the distractors fail**:\n- Option A: merging in arrival order treats \"which PR was opened first\" as the deciding factor for correctness, which it isn't — the first PR could easily be the worse fix, and asking a later agent to reconcile after both are already in main means untangling a live regression instead of preventing one.\n- Option B: closing both without review discards potentially valid work purely because it was duplicated, throwing away information (two independent diagnoses of the same problem) that's actually useful for making the right call.\n- Option C: a merge queue's automatic conflict resolution operates on textual conflicts in the diff, not on whether two changes represent contradictory logical decisions — code that merges cleanly can still leave the validator behaving inconsistently with either agent's intent.\n\n**In practice**: overlapping changes to the same logic are exactly the case where automation should stop and route to a decision-maker — the cost of a short pause is far lower than the cost of merging two independently-reasoned fixes to the same class and discovering later that neither one is what actually shipped.",
+    "tags": ["conflict-detection", "duplicated-effort", "orchestration-patterns", "reconciliation"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-004",
+    "scenario": "Ashgrove Retail runs two specialized agents against the same service: a performance agent that refactors a function to cache results aggressively, and a correctness agent that removes caching from the same function because it found the cache was returning stale pricing data. Both PRs merge cleanly with no textual conflict, but the resulting behavior contradicts.",
+    "question": "What does this scenario illustrate, and what would have caught it earlier?",
+    "options": [
+      "A Git merge conflict that CI should have flagged automatically — the fix is to enable stricter merge-queue settings",
+      "A semantic/behavioral contradiction between agents that a purely textual merge check cannot detect — catching it requires shared cross-agent context, such as a shared task ledger or objective declaration, so one agent is aware of the other's intent before both changes land",
+      "A flaw in the correctness agent alone — performance agents should always take precedence over correctness agents",
+      "An unavoidable outcome of parallel execution that can only be fixed by never running more than one agent against the same service"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: a clean textual merge only proves that two diffs don't overlap on the same lines — it says nothing about whether the resulting *behavior* of the combined changes is coherent, and semantic contradictions between agents require a coordination mechanism that operates on intent, not on text.\n\n**Why option B is correct**: the two agents each made a locally correct decision (cache more for speed; remove a stale cache for correctness) with no visibility into the other's objective, and because their edits didn't touch the same lines, no diff tool ever flagged them — the only way to have caught this earlier is giving both agents access to a shared record of what the other is working on and why, so a contradiction like \"add caching\" vs. \"remove this exact cache because it's stale\" becomes visible before either merges.\n\n**Why the distractors fail**:\n- Option A: there was no textual merge conflict at all — the diffs are in different parts of the code, or apply cleanly to the same lines in sequence, which is precisely why this class of problem is invisible to merge-queue tooling regardless of strictness settings.\n- Option C: neither agent was wrong given what it could see — the performance agent didn't know the cache was serving stale data, and the correctness agent didn't know a separate effort was aggressively re-adding caching; declaring one agent categorically subordinate to the other doesn't fix the missing coordination, it just picks a winner by fiat.\n- Option D: parallel execution against the same service is common and manageable; the actual failure mode here is missing shared context between agents working on related surface area, which is a solvable coordination gap, not an inherent property of running agents in parallel.\n\n**In practice**: when two changes are individually reasonable but jointly wrong, the root cause is almost always a missing shared context, not a missing merge check — the fix is giving agents visibility into overlapping intent (a shared task ledger, objective declarations, or a coordinator that flags related work), not tightening a tool that only ever looked at text.",
+    "tags": ["conflict-detection", "contradictory-outputs", "semantic-conflict", "shared-context"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-005",
+    "scenario": "Pinehollow Analytics is onboarding a complex customer migration project. A coordinator agent breaks the migration into subtasks — schema conversion, data validation, and rollback planning — assigns each to a specialized subagent, and then integrates their outputs into a single migration plan.",
+    "question": "Which orchestration pattern does this describe?",
+    "options": [
+      "Hierarchical (coordinator/supervisor) orchestration, where a top-level agent decomposes work, delegates to specialized subagents, and integrates their results",
+      "Peer-to-peer orchestration, where agents communicate directly with each other with no central coordination",
+      "Round-robin orchestration, where a single agent cycles through subtasks one at a time on a fixed schedule",
+      "Broadcast orchestration, where the same task is sent to every agent and the majority output wins"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: an orchestration pattern is defined by where decomposition, delegation, and integration authority sit — a hierarchical pattern concentrates that authority in one coordinating agent that breaks work apart and puts it back together, which is a distinct structure from patterns where agents coordinate directly with each other or where the same task is duplicated across agents.\n\n**Why option A is correct**: the coordinator agent performs all three defining actions of hierarchical orchestration — it decomposes the migration into subtasks, delegates each subtask to a subagent specialized for it, and integrates the specialized outputs back into one plan; the subagents never need to coordinate with each other directly because the coordinator owns that responsibility.\n\n**Why the distractors fail**:\n- Option B: peer-to-peer orchestration would have the schema, validation, and rollback agents communicating and negotiating with each other directly, with no central agent owning decomposition or integration — that's not what's described here, since a coordinator explicitly assigns and integrates the work.\n- Option C: round-robin implies one agent working through subtasks serially on its own, not multiple specialized agents each handling a distinct subtask — this scenario has three distinct subagents working on three distinct subtasks, not one agent cycling through a list.\n- Option D: broadcast orchestration sends the *same* task to multiple agents and picks a winning result — here, each subagent gets a *different* subtask (schema conversion is not the same work as rollback planning), so there's no redundant duplication to select among.\n\n**In practice**: recognizing hierarchical orchestration matters because it tells you where to put your review and observability effort — the coordinator's decomposition and integration decisions are the highest-leverage points to audit, since a bad task breakdown or a bad integration step can invalidate correctly-executed subagent work.",
+    "tags": ["orchestration-patterns", "coordinator-subagent", "hierarchical-orchestration", "task-decomposition"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-006",
+    "scenario": "Corvid Aerospace's compliance team will audit a multi-agent workflow six months from now, likely after the original engineers who supervised it have moved to other teams. The workflow involved four agents modifying flight-control simulation code.",
+    "question": "Which artifact best supports that future audit?",
+    "options": [
+      "The final merged code diff only, since the end state is what matters for compliance",
+      "A verbal handoff between the engineers who supervised the agents at the time, to be reconstructed from memory when the audit occurs",
+      "A structured record for each agent's run — what it changed, why (linked to the originating requirement or ticket), what it decided among alternatives, and the outcome — attached to the PR or a decision log",
+      "Agent terminal/console output only, since it captures everything the agent did in raw form"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: an audit six months out has to answer \"why was this decision made\" without access to anyone's memory of the moment — that requirement means the artifact has to capture reasoning and traceability at the time of the decision, not just the resulting state or the raw activity log.\n\n**Why option C is correct**: a structured, per-agent decision record links each change back to the requirement that motivated it, states what alternatives were considered and why one was chosen, and records the outcome — this is exactly the information an auditor needs to reconstruct intent and justification long after the people involved have moved on, and it's queryable rather than dependent on someone recalling details.\n\n**Why the distractors fail**:\n- Option A: a final diff shows *what* changed but nothing about *why* it changed that way rather than some other way, or what alternatives were rejected — for a compliance audit, the reasoning is often the actual point of scrutiny, not just the resulting code.\n- Option B: relying on human memory reconstructed six months later is fragile by design — people forget details, change teams, or leave the company, and an auditability requirement that depends on someone being available to recall events has already failed as a durable artifact strategy.\n- Option D: raw console output is unstructured and voluminous — it technically contains everything, but extracting \"what decision was made and why\" from an unfiltered log transcript is exactly the labor a structured decision record is meant to eliminate.\n\n**In practice**: the test for an audit-ready artifact is whether it still answers \"why\" when nobody involved is reachable — that's why structured, requirement-linked decision records outlive both memory-dependent handoffs and diff-only records.",
+    "tags": ["observability", "audit-trail", "decision-log", "artifact-generation"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-007",
+    "scenario": "Driftwood Media's research agent gathers competitor pricing data and hands its findings to a pricing-strategy agent that produces a recommendation. The pricing-strategy agent's recommendation later turns out to rely on an assumption the research agent silently discarded during its own analysis.",
+    "question": "What should have been captured in the handoff between the two agents to prevent this outcome?",
+    "options": [
+      "Only the final structured data output of the research agent, since intermediate reasoning is implementation detail",
+      "A timestamp of when the handoff occurred, since timing is the primary thing auditors check",
+      "Nothing additional — the pricing-strategy agent should always independently re-derive the raw data itself rather than trust a handoff",
+      "The research agent's final data, along with an explicit record of assumptions made, data excluded, and confidence or caveats — so the downstream agent (or a reviewer) can see what was filtered out and why"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: a handoff between agents transfers more than data — it implicitly transfers everything the upstream agent decided *not* to include, and if those exclusions and assumptions aren't made explicit, the downstream agent inherits a filtered view of reality without knowing it's filtered.\n\n**Why option D is correct**: recording the research agent's assumptions, excluded data, and confidence caveats alongside its final data gives the pricing-strategy agent (or a human reviewer) the ability to see what was left out and judge whether that exclusion still holds for the downstream task — this is precisely the information gap that let a silently discarded assumption become load-bearing for a recommendation without anyone noticing.\n\n**Why the distractors fail**:\n- Option A: treating intermediate reasoning as mere implementation detail is exactly what let this happen — the discarded assumption *was* the intermediate reasoning, and hiding it behind a clean final output is what made it invisible to the downstream agent.\n- Option B: a timestamp tells you when the handoff happened, not what was included or excluded in it — it's useful for sequencing events during an audit, but it does nothing to prevent an undocumented assumption from propagating.\n- Option C: requiring every downstream agent to re-derive raw data independently defeats the entire purpose of a multi-agent pipeline with specialized roles — the fix for a broken handoff is a better handoff, not eliminating handoffs and duplicating work across every agent.\n\n**In practice**: whenever one agent's output becomes another agent's input, ask what got left on the cutting-room floor during the first agent's analysis — that's the part of the handoff most likely to silently break the second agent's conclusions if it isn't written down.",
+    "tags": ["observability", "handoff-documentation", "agent-handoff", "decision-log"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-008",
+    "scenario": "A multi-agent workflow at Larkspur Insurance failed silently overnight — no PR was opened and no alert fired, but three agents apparently ran and consumed compute. A week later, engineers are asked to explain what happened.",
+    "question": "What would have made this post-hoc analysis possible?",
+    "options": [
+      "Relying on the agents' final Git commit history alone, since commits are the only evidence that matters",
+      "Per-agent execution logs (start/end times, tool calls, intermediate outputs, errors) persisted independently of whether the workflow produced a final artifact like a PR, so failures leave a trace even when nothing gets merged",
+      "A single aggregate workflow succeeded/failed boolean stored at the end of the run",
+      "Nothing could have made this analyzable after the fact — silent failures are inherently unrecoverable for analysis"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: post-hoc analysis of a failure is only possible if the system records evidence of activity independently of whether that activity produced a successful final artifact — logging that's conditional on success guarantees you have nothing to look at exactly when you need it most.\n\n**Why option B is correct**: per-agent execution logs that persist regardless of outcome capture the actual sequence of tool calls, intermediate outputs, and errors even when the workflow never reaches a PR — this is what lets engineers reconstruct, a week later, what each agent attempted, where it diverged from expected behavior, and why nothing was ever merged.\n\n**Why the distractors fail**:\n- Option A: if the workflow failed before producing any commits, Git history has nothing to show — commit history is a record of successful output, not a record of attempted execution, so it's silent exactly when a silent failure occurs.\n- Option C: a single aggregate boolean at the end of a run tells you *that* something failed, assuming it even gets written before the failure, but gives no information about *where in the process* it failed or what each of the three agents was doing — it's too coarse to support root-cause analysis.\n- Option D: silent failures are only unrecoverable for analysis if nothing was logged in the first place — the failure to analyze isn't inherent to the failure itself, it's a consequence of a logging strategy that only captures evidence when things go right.\n\n**In practice**: the design question to ask is \"if this workflow fails before producing any output, will I have anything to look at tomorrow?\" — logging that depends on reaching a successful endpoint is the single most common reason multi-agent failures turn out to be unexplainable.",
+    "tags": ["observability", "post-hoc-analysis", "execution-logs", "silent-failure"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-009",
+    "scenario": "Bramblewood Games ships a regression traced to a multi-agent refactor involving four agents over two days. Reviewing the audit trail, an engineer finds each agent's individual log looks correct in isolation, but the regression only appears when Agent 2's change (merged Tuesday morning) interacts with Agent 4's change (merged Wednesday afternoon), which Agent 4 developed without seeing Agent 2's final diff.",
+    "question": "What is the most useful next step to identify why this interaction was missed?",
+    "options": [
+      "Reconstruct a timeline correlating both agents' decision points and the repository state each agent observed at the time it acted, to determine whether Agent 4 was working from a stale view of the codebase that didn't yet include Agent 2's change",
+      "Discard both agents' logs since neither individually shows an error, and treat the regression as unexplainable",
+      "Re-run Agent 4 alone against the current codebase and assume that if it now produces different output, the original run is irrelevant",
+      "Blame Agent 2, since its change merged first and is therefore chronologically responsible for anything that came after"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: when a regression emerges only from the interaction of two individually-correct changes, the root cause almost always lives in the gap between what each agent *actually observed about the codebase* at the moment it acted and what was *true by the time both changes were live* — timeline reconstruction against observed repository state is what surfaces that gap.\n\n**Why option A is correct**: correlating each agent's decision points against the exact repository state it saw when it acted directly tests the most likely hypothesis — that Agent 4 branched from or reasoned about a snapshot of the codebase that predated Agent 2's Tuesday merge, meaning Agent 4's decisions were correct relative to a version of reality that no longer existed by Wednesday afternoon.\n\n**Why the distractors fail**:\n- Option B: discarding logs that individually look correct throws away the exact evidence needed to find an interaction bug — the point of this kind of failure is that no single log shows the problem, so the analysis has to be relational (across logs), not a decision to stop looking.\n- Option C: re-running Agent 4 against the *current* (now-merged) codebase would naturally produce different output regardless of the original root cause, since the codebase itself has changed — a different result under different starting conditions doesn't tell you why the original run went wrong.\n- Option D: assigning blame by merge order is not a diagnosis — Agent 2's change may have been entirely correct on its own; the actual failure is that Agent 4 acted without visibility into it, which is a coordination/context problem, not a chronological-precedence problem.\n\n**In practice**: interaction bugs between agents are rarely visible in any single agent's log — they require reconstructing what each agent *knew* at decision time relative to what was *true* at execution time, which is exactly why timestamped, state-aware logging (not just outcome logging) matters for multi-agent observability.",
+    "tags": ["post-hoc-analysis", "audit-trail", "timeline-reconstruction", "stale-context"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-010",
+    "scenario": "Cobalt Robotics has a workflow where a single customer-reported issue triggers a triage agent, which spawns a diagnosis agent, which in turn spawns a fix agent. Engineers want to trace all activity related to one originating issue across all three agents' logs.",
+    "question": "What observability mechanism best supports this kind of tracing?",
+    "options": [
+      "Requiring each agent to write a free-text summary of its work at the end of its run, with no structured link back to the originating issue",
+      "Relying on approximate timestamp matching across agents' logs to infer which entries are related",
+      "A shared correlation or trace identifier generated at the start of the workflow and propagated through every downstream agent invocation, so all related logs, commits, and artifacts can be joined on that identifier",
+      "Storing each agent's logs in a separate, agent-specific system with no shared schema, since agents operate independently"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: tracing activity across independently-invoked agents requires a stable, explicit key that's propagated through every hop of the workflow — without a shared identifier carried through each invocation, reconstructing \"everything related to this one issue\" degrades into inference and guesswork.\n\n**Why option C is correct**: a correlation or trace ID minted once at the start of the workflow and passed to every downstream agent gives engineers a single, exact key to join logs, commits, and artifacts across the triage, diagnosis, and fix agents — there's no ambiguity about which entries belong to which originating issue, because the identifier is explicit and consistent end to end.\n\n**Why the distractors fail**:\n- Option A: a free-text summary might mention the issue number, or might not, or might phrase it inconsistently — without a structured field guaranteed to be present and consistent, extracting \"which entries relate to issue X\" requires manual reading rather than a reliable query.\n- Option B: timestamp matching only tells you two log entries happened around the same time, not that they're actually related — with multiple issues being processed concurrently, near-simultaneous entries from unrelated workflows would be indistinguishable from related ones.\n- Option D: separate, schema-inconsistent logging systems for each agent make cross-agent tracing effectively manual — even if each agent's own logs are excellent in isolation, there's no reliable way to join them into one picture of a single issue's journey through triage, diagnosis, and fix.\n\n**In practice**: any time one agent's output triggers another agent, propagating a single correlation ID through the entire chain is close to free at build time and is the difference between \"we can query everything about this issue in seconds\" and \"someone has to manually cross-reference three log systems by hand.\"",
+    "tags": ["observability", "correlation-id", "trace-id", "multi-agent"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-011",
+    "scenario": "Hazelmoor Bank assigned a coding agent to a task at 9 AM. By 3 PM, the agent has made no commits, opened no PR, and its last logged tool call was over four hours ago.",
+    "question": "What does this pattern most likely indicate?",
+    "options": [
+      "The agent is engaged in unusually deep extended reasoning and should be left alone indefinitely",
+      "The agent has succeeded silently and simply hasn't reported it yet",
+      "The task was too easy, so the agent finished early and shut down cleanly",
+      "A stalled execution — the agent appears stuck or has stopped making progress, warranting investigation or intervention"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: absence of both output (commits, PRs) and activity (tool calls) over an extended window is the defining signature of a stalled execution — a healthy agent, whether reasoning deeply or nearly finished, still produces observable activity; the combination of no output *and* no recent activity is what distinguishes \"stuck\" from \"working.\"\n\n**Why option D is correct**: four hours with zero tool calls and zero commits is not consistent with an agent that's still actively working — it's consistent with an agent that has hit an error it can't recover from, entered a loop with no observable side effects, or otherwise stopped making forward progress, which is exactly what a stalled-execution detector should flag for investigation.\n\n**Why the distractors fail**:\n- Option A: even an agent doing extended reasoning on a hard problem is expected to produce periodic logged activity (tool calls, intermediate outputs) — four hours of complete silence isn't a signature of deep thinking, it's a signature of the process no longer doing anything observable.\n- Option B: a silent success is a contradiction in terms for an agentic coding task — \"success\" for a coding agent is defined by producing an artifact (a commit, a PR); if nothing has been produced, there is nothing to call a success yet, silent or otherwise.\n- Option C: a task finishing because it was easy would still leave evidence — at minimum a completion signal, commit, or closed status — the absence of any output is inconsistent with \"finished cleanly.\"\n\n**In practice**: stalled-execution detection is usually built on exactly this pair of signals — time since last observable activity, and absence of a completion artifact — because both being true at once is a much stronger signal than either alone, and it's cheap to monitor automatically.",
+    "tags": ["stalled-execution", "failure-detection", "monitoring"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-012",
+    "scenario": "Ironvale Manufacturing notices that a long-running agent, several hours into a multi-step task, has started making edits unrelated to its assigned ticket, referencing files that have nothing to do with the original request.",
+    "question": "What is the most appropriate response to this degraded behavior?",
+    "options": [
+      "Let the agent continue, since a sufficiently capable agent will eventually self-correct back to the original task",
+      "Halt the agent's current run, revert or isolate its unrelated changes, and either reset it with a refreshed, scoped context or hand the task back for human review — rather than letting drifted output continue accumulating",
+      "Immediately grant the agent broader permissions so it can finish exploring whatever it has started",
+      "Delete the agent's entire configuration and treat the drift as unexplainable randomness not worth investigating"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: once an agent's actions are demonstrably diverging from its assigned scope, the priority shifts from letting it continue toward containing the blast radius of further drifted output — recovery, not continued hope of self-correction, is the appropriate response to observed degradation.\n\n**Why option B is correct**: halting the run stops further off-scope edits from accumulating, isolating or reverting the unrelated changes prevents them from contaminating the eventual result, and restarting with a refreshed, tightly scoped context (or escalating to a human) gives the task a clean path back to its actual objective instead of building further on a context that has already drifted.\n\n**Why the distractors fail**:\n- Option A: \"trust that it self-corrects\" has no mechanism behind it — an agent that has already started editing unrelated files isn't showing signs of returning to scope on its own, and every additional hour it runs unmonitored is more drifted output to eventually untangle.\n- Option C: broadening permissions in response to an agent that's already operating outside its intended scope moves in exactly the wrong direction — it increases the potential impact of the drift rather than containing it.\n- Option D: deleting the configuration without investigating discards the diagnostic signal (what caused the drift — a stale context, an ambiguous instruction, a tool misuse) that would prevent the same failure from recurring on the next run.\n\n**In practice**: degraded behavior detection is only useful if it's paired with a recovery action — the moment monitoring confirms an agent is off-task, the response should contain the damage first (halt, isolate) and diagnose second, rather than hoping the agent finds its own way back.",
+    "tags": ["degraded-behavior", "context-drift", "recovery-pattern", "human-in-the-loop"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-013",
+    "scenario": "At Stonebridge Capital, an agent's merged change breaks the main build. A second agent, unaware the build is broken, begins building new work on top of the broken commit.",
+    "question": "What recovery pattern most directly addresses this situation?",
+    "options": [
+      "Roll back the breaking commit — or revert to the last known-good state — before allowing further work to build on top of it, and only then let agents resume from a verified-good baseline",
+      "Instruct the second agent to work around the breakage by patching over symptoms in its own PR",
+      "Leave the broken commit in place and wait for a future agent to eventually notice and fix it organically",
+      "Roll forward with more changes as fast as possible, on the theory that a subsequent large change will overwrite the breakage"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: once a shared baseline is confirmed broken, every unit of work built on top of it inherits the breakage — the recovery pattern that stops the damage from compounding is restoring a known-good baseline before any further work is allowed to build on the broken one, not building around or past the problem.\n\n**Why option A is correct**: rolling back the breaking commit (or reverting to the last known-good state) removes the broken foundation entirely, so any agent — including the second one already mid-task — is working from a baseline that's actually verified to work, which is the only way to guarantee new work isn't quietly inheriting the original defect.\n\n**Why the distractors fail**:\n- Option B: patching over symptoms in an unrelated PR means the second agent's change now depends on a workaround for a bug it didn't cause and doesn't fully understand — this couples two unrelated pieces of work together and leaves the actual root cause (the breaking commit) still in the codebase.\n- Option C: waiting for organic discovery means every agent that touches the codebase in the meantime risks building on the broken state, and the longer the broken baseline persists, the more work eventually has to be untangled from it.\n- Option D: rolling forward faster doesn't remove the broken commit — it adds more surface area on top of a known-bad baseline, which increases (not decreases) the amount of work that will eventually need to be reconciled once the breakage is finally addressed.\n\n**In practice**: a broken shared baseline is one of the few situations where the fastest safe path is backward, not forward — reverting to known-good and only then resuming is what keeps a single failure from becoming everyone's problem.",
+    "tags": ["rollback", "recovery-pattern", "broken-build", "known-good-state"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-014",
+    "scenario": "Fernwood Biotech's orchestrator manages several agents modifying code that touches regulated clinical-trial data pipelines. One agent's proposed change would alter how patient data is filtered before export.",
+    "question": "Which criterion should most strongly trigger a human-in-the-loop pause before this specific change proceeds?",
+    "options": [
+      "The size of the diff, since large diffs are inherently riskier than small ones regardless of subject matter",
+      "The agent's own self-reported confidence score, taken at face value with no independent verification",
+      "The change touches a high-consequence, compliance-sensitive boundary — regulated data handling — where an incorrect autonomous decision has outsized, hard-to-reverse impact; irreversibility and blast radius, not diff size, should drive escalation",
+      "Whether the change compiles successfully, since a compiling change is presumed safe to proceed autonomously"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: human-in-the-loop escalation should be triggered by the consequences of getting a decision wrong — irreversibility and blast radius — not by proxies that happen to correlate with risk sometimes but don't actually measure it, like diff size or whether code compiles.\n\n**Why option C is correct**: a change to how patient data is filtered before export sits directly on a compliance and safety boundary — if the agent's change is wrong, the consequence isn't a bug to fix in the next PR, it's a potential regulated-data exposure that may already have happened by the time anyone notices; that combination of high stakes and difficulty-to-reverse is exactly what should force a pause for human judgment before the change proceeds, independent of how large or small the diff happens to be.\n\n**Why the distractors fail**:\n- Option A: a one-line change to a data-filtering condition can be just as consequential as a five-hundred-line refactor — diff size measures effort, not impact, and a small change to the wrong boundary is exactly the kind of risk that a size-based trigger would miss.\n- Option B: an agent's self-reported confidence reflects what the agent believes about its own output, not an independent assessment of correctness — treating it as sufficient verification for a compliance-sensitive change removes the actual safeguard (independent review) that HITL escalation exists to provide.\n- Option D: compiling successfully only proves the code is syntactically and type-valid — it says nothing about whether the *logic* of the new filtering behavior is compliant with regulatory requirements, which is precisely the property in question.\n\n**In practice**: the question that should drive HITL thresholds is \"if this decision is wrong, how bad is it, and can we undo it easily?\" — regulated-data boundaries, irreversible external actions, and anything with legal or safety exposure should escalate regardless of how confident, small, or syntactically valid the change looks.",
+    "tags": ["human-in-the-loop", "escalation-criteria", "risk-based-review", "blast-radius"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-015",
+    "scenario": "Copperfield Logistics has a workflow where an agent completes 3 of 5 defined subtasks, then crashes due to an infrastructure timeout. The first 3 subtasks produced verified, committed outputs; the last 2 never started.",
+    "question": "What is the most efficient recovery pattern?",
+    "options": [
+      "Restart the entire workflow from subtask 1, discarding the 3 completed and verified subtasks, to guarantee a clean state",
+      "Mark the whole workflow as permanently failed and require a human to perform all 5 subtasks manually",
+      "Have a different agent redo subtask 3 in parallel with a new agent attempting subtask 4, without checking whether subtask 3's original output is still valid",
+      "Resume from a checkpoint after the last verified subtask, re-running only the two incomplete subtasks, using the persisted state from the first three as the starting context"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: recovery from a partial failure should be proportional to what actually failed — when earlier work is independently verified and persisted, discarding it and starting over spends effort re-deriving something already known to be correct, while resuming from a checkpoint spends effort only on the part that's actually incomplete.\n\n**Why option D is correct**: the first three subtasks aren't just \"probably fine\" — they're verified and committed, meaning there's concrete evidence they're correct; resuming from that checkpoint and re-running only subtasks 4 and 5 uses the crash's actual boundary (an infrastructure timeout, not a logic error) to scope the recovery to exactly the work that didn't happen.\n\n**Why the distractors fail**:\n- Option A: discarding three subtasks with verified, committed outputs re-does work that's already known to be correct, purely for the sake of a \"clean\" restart — that's wasted compute and time with no corresponding gain in correctness, since the failure had nothing to do with subtasks 1 through 3.\n- Option B: treating the whole workflow as permanently failed after an infrastructure timeout — a transient, retryable failure category — overreacts to the failure type; it also discards the checkpointed progress that's the whole point of having verified intermediate outputs.\n- Option C: redoing subtask 3 without checking whether its original output is still valid introduces unnecessary duplicated effort and risks producing a second, possibly divergent version of already-verified work — if subtask 3's output is still valid, redoing it is pure waste; if it's not, that should be checked explicitly rather than assumed.\n\n**In practice**: the value of checkpointing is precisely that it turns \"the workflow crashed\" into \"the last two steps need to run\" instead of \"start over\" — recovery patterns should always ask what's independently verified before deciding what needs to be redone.",
+    "tags": ["recovery-pattern", "checkpointing", "partial-failure", "resume-from-checkpoint"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-016",
+    "scenario": "Windmere Telecom's three-agent pipeline — design agent, implementation agent, test agent — is running steadily in production. The team wants to add a fourth security-review agent between implementation and test, without disrupting agents currently mid-task.",
+    "question": "What is the safest way to add this new agent to the live workflow?",
+    "options": [
+      "Immediately reroute all in-flight tasks through the new agent retroactively, even tasks that have already passed the point where it would run",
+      "Introduce the new agent into the pipeline definition so that new tasks entering the workflow route through it, while allowing tasks already in flight to complete under the pipeline definition that was active when they started",
+      "Pause the entire pipeline until every in-flight task completes, since agents cannot be added to a workflow with tasks still in progress",
+      "Add the agent only to a completely separate, unrelated workflow, since existing workflows can never be modified once deployed"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: adding a stage to a live pipeline is safest when it's treated as a versioned change to the pipeline definition — new work adopts the new definition, while work already committed to the previous definition is allowed to finish under the rules it started with, rather than having the definition change out from under it mid-execution.\n\n**Why option B is correct**: routing new tasks through the updated pipeline (including the new security-review agent) achieves the goal going forward, while letting in-flight tasks finish under their original definition avoids the incoherent situation of retroactively inserting a review step into a task that has already moved past the point in the pipeline where that step would occur.\n\n**Why the distractors fail**:\n- Option A: retroactively rerouting tasks that have already passed the implementation-to-test boundary through a security-review step they never went through doesn't make sense operationally — the task's later stages weren't built expecting that review to have happened at that point, and forcing it in after the fact is disruptive without being meaningful.\n- Option C: pausing the entire pipeline until every in-flight task completes is an overcorrection — it treats adding a new stage as if it requires a full stop, when versioning the pipeline definition lets new and in-flight work proceed on different timelines without conflict.\n- Option D: there's no constraint that prevents modifying a live workflow, and confining the new agent to an unrelated workflow doesn't achieve the actual goal, which is inserting security review into *this* pipeline.\n\n**In practice**: treating pipeline changes as versioned — new work gets the new definition, in-flight work finishes under the old one — is the general pattern for onboarding an agent into production without disrupting work that's already committed to a particular sequence of steps.",
+    "tags": ["agent-lifecycle", "agent-onboarding", "workflow-versioning", "in-flight-tasks"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-017",
+    "scenario": "Ashford Systems wants to update the implementation agent's configuration — changing its permitted toolset and system instructions — while several tasks assigned to that agent role are actively in progress.",
+    "question": "What is the recommended approach to reconfigure the agent without disrupting active work?",
+    "options": [
+      "Deploy the updated configuration as a new version, let in-progress tasks finish under the configuration version they started with, and route only newly assigned tasks to the updated version — validating the new version on a small subset before full rollout",
+      "Push the new configuration immediately to the running agent processes mid-task, since configuration changes always apply safely regardless of execution state",
+      "Wait indefinitely and never update the agent's configuration once any task has been assigned to it, since reconfiguration is inherently unsafe",
+      "Delete and recreate the agent under a new identity, discarding all record that the old configuration ever existed"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: reconfiguring an agent that has active, in-progress tasks is safest when treated as a versioned deployment — the running tasks continue under the assumptions (toolset, instructions) they started with, new tasks adopt the updated configuration, and the new configuration is validated at small scale before it becomes the default for everything.\n\n**Why option A is correct**: letting in-progress tasks finish under their original configuration avoids the risk of an agent's permitted tools or instructions changing mid-task in ways the task's earlier decisions didn't anticipate, while routing new tasks to the updated configuration achieves the goal of reconfiguring the agent; staged validation on a subset catches problems with the new configuration before every new task depends on it.\n\n**Why the distractors fail**:\n- Option B: applying a configuration change to a process that's mid-task can invalidate assumptions the agent already made — a toolset change partway through a task can leave the agent referencing tools it no longer has, or behaving inconsistently with instructions it started under.\n- Option C: refusing to ever reconfigure an agent once any task has been assigned to it would make agents effectively unmaintainable in an ongoing production system, where new tasks are continuously being assigned — this overstates the actual risk, which is manageable through versioning rather than a permanent freeze.\n- Option D: deleting and recreating the agent under a new identity discards the historical link between the old configuration and the work it produced, undermining auditability, and it's unnecessary — versioning an existing agent's configuration achieves the update without erasing its history.\n\n**In practice**: the general pattern for any live reconfiguration — agents included — is to let existing work finish under the assumptions it started with, and to stage the new configuration behind a rollout rather than flipping a global switch that every in-progress and future task depends on simultaneously.",
+    "tags": ["agent-lifecycle", "agent-reconfiguration", "versioning", "staged-rollout"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-018",
+    "scenario": "Quillwood Studios' test-generation agent has a high defect-escape rate. The team has built a replacement agent with a better-tuned prompt and toolset, and wants to swap it in for future tasks while several tasks are still assigned to the old agent.",
+    "question": "What is the best way to replace the underperforming agent while preserving continuity?",
+    "options": [
+      "Terminate the old agent's currently assigned tasks mid-execution the moment the replacement is ready, and reassign all of them to the new agent from scratch",
+      "Keep using the old agent indefinitely alongside the new one on a random 50/50 split, with no criteria for when the swap is considered complete",
+      "Route new task assignments to the replacement agent going forward, let the old agent's currently assigned tasks finish (or hand them off cleanly at a checkpoint), and retain the old agent's identity and version in records so past outputs remain attributable",
+      "Replace the agent silently with no record that a substitution occurred, since only the eventual output quality matters"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: replacing an underperforming agent should change which agent handles *new* work without erasing the record of what the *old* agent already produced — continuity means in-progress work isn't abruptly discarded, and auditability means past outputs stay attributable to the agent (and version) that actually generated them.\n\n**Why option C is correct**: routing new assignments to the replacement achieves the actual goal (stop using the underperforming agent going forward), letting existing tasks finish or hand off cleanly at a checkpoint avoids losing partially-completed, potentially valid work, and preserving the old agent's identity and version in historical records means anyone reviewing past test-generation output can still see which agent version produced it — which matters directly for a defect-escape investigation.\n\n**Why the distractors fail**:\n- Option A: terminating in-progress tasks mid-execution the instant a replacement is ready risks discarding partially completed, potentially still-usable work purely for the sake of an abrupt cutover, when a clean handoff at a checkpoint would preserve that value.\n- Option B: a permanent, criteria-free 50/50 split never actually completes the replacement — it leaves the underperforming agent generating tests indefinitely alongside the fix, which doesn't solve the defect-escape problem the replacement was built to address.\n- Option D: a silent substitution with no record breaks the ability to later distinguish which test-generation outputs came from the old (defect-prone) agent versus the new one — that distinction is exactly what's needed to evaluate whether the replacement is actually working better.\n\n**In practice**: agent replacement should look like a staged cutover with a preserved paper trail — new work moves to the better agent, old work finishes cleanly, and the historical record keeps both agents' contributions distinguishable, which is what makes it possible to later prove the replacement actually reduced the defect-escape rate.",
+    "tags": ["agent-lifecycle", "agent-replacement", "continuity", "auditability"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-019",
+    "scenario": "Solaris Energy is retiring a legacy triage agent that has been in production for two years and has contributed to hundreds of past PRs. The team wants to remove it from the active workflow.",
+    "question": "What must be preserved when retiring this agent to maintain auditability and continuity?",
+    "options": [
+      "Nothing needs to be preserved once an agent is retired — historical PRs stand on their own regardless of which agent produced them",
+      "Only the source code of the agent's configuration; its execution logs and past outputs can be deleted to save storage",
+      "The retired agent's identity should be reassigned to whichever agent replaces it, merging both histories into a single record",
+      "The historical record of the agent's identity and version, its past decisions, and the artifacts it produced — logs, PRs, decision rationale — should remain queryable and attributable, even though it no longer participates in new work; retirement removes it from active execution, not from the historical record"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: retiring an agent is a change to what participates in *future* execution — it isn't, and shouldn't be, a change to the *historical* record of what that agent already did; auditability depends on being able to trace a past decision back to the specific agent and version that made it, indefinitely, regardless of whether that agent is still active.\n\n**Why option D is correct**: keeping the retired agent's identity, version, decisions, and artifacts queryable means anyone investigating a past incident, compliance question, or regression two years from now can still determine \"was this the work of the triage agent, and if so, which version, and what was its reasoning\" — retirement stops new work from being assigned to it, but the two years of history it already produced still needs to be attributable.\n\n**Why the distractors fail**:\n- Option A: hundreds of past PRs having \"stood on their own\" doesn't mean the *attribution* of those PRs to a specific agent and version stops mattering — if a future investigation needs to know which decisions came from this triage agent specifically (for example, during an incident review), losing that link removes information that was previously available.\n- Option B: deleting execution logs and outputs while keeping only the configuration source code discards exactly the evidence needed for post-hoc analysis of what the agent actually did — the configuration alone doesn't tell you what decisions it made in any specific case.\n- Option C: reassigning the retired agent's identity to its replacement merges two distinct agents' track records into one, making it impossible to later distinguish which decisions came from the retired agent versus the new one — this actively destroys the attribution that auditability depends on.\n\n**In practice**: retirement should be modeled as \"stop routing new work here\" plus \"freeze and preserve the historical record,\" not as deletion — the two-year audit trail this agent built up is exactly the kind of asset that compliance and incident-review processes rely on long after the agent itself stops running.",
+    "tags": ["agent-lifecycle", "agent-retirement", "auditability", "historical-record"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "gh600-d5-020",
+    "scenario": "Wrenfield Legal decides to retire a clause-extraction agent due to a licensing change, but two tasks are currently mid-execution under that agent, each partially complete with committed intermediate state.",
+    "question": "What is the best way to handle these in-flight tasks during the retirement?",
+    "options": [
+      "Immediately kill the two in-flight tasks with no handoff, since the agent is being retired and its work no longer matters",
+      "Allow the two in-flight tasks to either complete under the retiring agent (if the licensing change permits a short grace period) or be checkpointed and handed off to the replacement agent with their intermediate state and context preserved, before removing the retiring agent from new-task routing",
+      "Restart both tasks from scratch under the replacement agent without transferring any of the retiring agent's intermediate state, since a new agent should never depend on a retiring agent's output",
+      "Block the entire retirement until every future task that could ever be assigned to this agent type is defined, since retirement can only happen when a role has zero possible future demand"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: retiring an agent that has genuinely in-flight, partially-complete work requires an explicit transition plan for that work — either a bounded grace period to finish under the old agent, or a checkpoint-and-handoff to the replacement — rather than either abandoning the work or ignoring the retirement's own constraints (like a licensing deadline).\n\n**Why option B is correct**: this option handles both realistic paths — if the licensing change allows a short grace period, letting the two tasks finish under the agent that already has their full context is the simplest option; if it doesn't, checkpointing the intermediate state and handing it to the replacement preserves the work already done instead of discarding it, and only after one of those paths is chosen does the retiring agent stop receiving new task assignments.\n\n**Why the distractors fail**:\n- Option A: killing in-flight tasks with committed intermediate state discards real, partially-completed work for no reason connected to the actual retirement trigger (a licensing change, not a quality problem with the work itself) — that state was salvageable and didn't need to be thrown away.\n- Option C: restarting both tasks from scratch under the replacement, while ignoring the intermediate state the retiring agent already produced, wastes the work that's already done and is unnecessary if that state can be checkpointed and handed off instead.\n- Option D: requiring every conceivable future task to be predefined before retirement can occur is an impractical, effectively unmeetable bar — it conflates \"handle the tasks that are actually in flight right now\" (a solvable, bounded problem) with \"guarantee zero future demand forever\" (not a real requirement for retiring a role).\n\n**In practice**: the operational question when retiring an agent with active work is narrow and concrete — \"what happens to the tasks that are in flight right now\" — and answering it with a grace period or a state-preserving handoff is what distinguishes a managed retirement from one that quietly loses partially-completed work.",
+    "tags": ["agent-lifecycle", "agent-retirement", "in-flight-tasks", "handoff"],
+    "difficulty": "hard"
+  }
+]

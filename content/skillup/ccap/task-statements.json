@@ -1,0 +1,651 @@
+{
+  "schemaVersion": "1.0",
+  "examCode": "CCAR-P",
+  "source": "Claude Certified Architect – Professional Exam Guide, Version 1.0, effective July 2026",
+  "sourceUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Solution Design & Architecture",
+      "weight": 17,
+      "officialWeight": "17%",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "Translate business problems into Claude-based AI solutions",
+          "knowledge": [
+            "Discovery and requirements framing",
+            "Bottleneck and success-metric identification"
+          ],
+          "skills": [
+            "Quantify the actual bottleneck before selecting an architecture"
+          ],
+          "questionIds": [
+            "ccap-d1-001",
+            "ccap-d1-002",
+            "ccap-d1-003"
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Design end-to-end architectures (input → processing → output → feedback loops)",
+          "knowledge": [
+            "Pipeline stage design",
+            "Feedback-loop mechanisms"
+          ],
+          "skills": [
+            "Design architectures that capture outcomes to improve over time"
+          ],
+          "questionIds": [
+            "ccap-d1-004",
+            "ccap-d1-005",
+            "ccap-d1-006",
+            "ccap-d1-007"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+          "knowledge": [
+            "Workflow vs. agentic vs. augmented-LLM patterns"
+          ],
+          "skills": [
+            "Match pattern complexity to task variability"
+          ],
+          "questionIds": [
+            "ccap-d1-008",
+            "ccap-d1-009",
+            "ccap-d1-010",
+            "ccap-d1-011",
+            "ccap-d1-016"
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Design multi-agent systems and orchestration strategies",
+          "knowledge": [
+            "Coordinator/subagent topologies",
+            "Parallel vs. sequential orchestration"
+          ],
+          "skills": [
+            "Design coordination to prevent duplication and races"
+          ],
+          "questionIds": [
+            "ccap-d1-012",
+            "ccap-d1-013",
+            "ccap-d1-014",
+            "ccap-d1-015"
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Apply decomposition techniques for complex problem solving",
+          "knowledge": [
+            "Task decomposition strategies"
+          ],
+          "skills": [
+            "Break monolithic prompts into auditable sub-steps"
+          ],
+          "questionIds": [
+            "ccap-d1-017",
+            "ccap-d1-018"
+          ]
+        },
+        {
+          "id": "1.6",
+          "title": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+          "knowledge": [
+            "Business value pillar framework"
+          ],
+          "skills": [
+            "Right-size solutions to the actual business metric that matters"
+          ],
+          "questionIds": [
+            "ccap-d1-019",
+            "ccap-d1-020"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Claude Models, Prompting & Context Engineering",
+      "weight": 13,
+      "officialWeight": "13%",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "Select appropriate Claude models based on trade-offs",
+          "knowledge": [
+            "Model tiering and capability/cost/latency trade-offs"
+          ],
+          "skills": [
+            "Route tasks to the right model tier"
+          ],
+          "questionIds": [
+            "ccap-d2-001",
+            "ccap-d2-002",
+            "ccap-d2-003",
+            "ccap-d2-009",
+            "ccap-d2-016"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Design system prompts, templates, and guardrails",
+          "knowledge": [
+            "System prompt design",
+            "Guardrail patterns"
+          ],
+          "skills": [
+            "Write scoped, injection-resistant system prompts"
+          ],
+          "questionIds": [
+            "ccap-d2-004",
+            "ccap-d2-005",
+            "ccap-d2-006",
+            "ccap-d2-014"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
+          "knowledge": [
+            "Zero-shot, few-shot, and chain-of-thought techniques"
+          ],
+          "skills": [
+            "Select the right technique for the reasoning demand"
+          ],
+          "questionIds": [
+            "ccap-d2-007",
+            "ccap-d2-008"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Optimize context windows and manage token usage",
+          "knowledge": [
+            "Context window budgeting",
+            "Lost-in-the-middle effects"
+          ],
+          "skills": [
+            "Manage token usage without sacrificing needed context"
+          ],
+          "questionIds": [
+            "ccap-d2-010",
+            "ccap-d2-011",
+            "ccap-d2-012",
+            "ccap-d2-013"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
+          "knowledge": [
+            "Prompt caching mechanics",
+            "Modular prompts and Skills"
+          ],
+          "skills": [
+            "Structure prompts for cache-hit optimization"
+          ],
+          "questionIds": [
+            "ccap-d2-015"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Integration",
+      "weight": 19,
+      "officialWeight": "19%",
+      "tasks": [
+        {
+          "id": "3.1",
+          "title": "Evaluate tool/agent configuration for capability bloat",
+          "knowledge": [
+            "Least-privilege tool scoping"
+          ],
+          "skills": [
+            "Remove unneeded tool capabilities rather than adding compensating controls"
+          ],
+          "questionIds": [
+            "ccap-d3-001",
+            "ccap-d3-002",
+            "ccap-d3-003"
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Analyze authentication and authorization requirements to identify security gaps",
+          "knowledge": [
+            "AuthN/AuthZ patterns for agent tooling"
+          ],
+          "skills": [
+            "Identify security gaps in tool/agent access design"
+          ],
+          "questionIds": [
+            "ccap-d3-004",
+            "ccap-d3-005",
+            "ccap-d3-006"
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+          "knowledge": [
+            "Accuracy-latency trade-off analysis"
+          ],
+          "skills": [
+            "Justify configuration decisions against measured trade-offs"
+          ],
+          "questionIds": [
+            "ccap-d3-007",
+            "ccap-d3-008",
+            "ccap-d3-009"
+          ]
+        },
+        {
+          "id": "3.4",
+          "title": "Analyze observability challenges and select monitoring strategies at scale",
+          "knowledge": [
+            "Observability at scale",
+            "Distributed tracing"
+          ],
+          "skills": [
+            "Select monitoring strategies appropriate to system scale"
+          ],
+          "questionIds": [
+            "ccap-d3-010",
+            "ccap-d3-011",
+            "ccap-d3-012"
+          ]
+        },
+        {
+          "id": "3.5",
+          "title": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+          "knowledge": [
+            "RAG pipeline design",
+            "Chunking and indexing strategies"
+          ],
+          "skills": [
+            "Design chunking/indexing matched to document structure"
+          ],
+          "questionIds": [
+            "ccap-d3-013",
+            "ccap-d3-014",
+            "ccap-d3-015",
+            "ccap-d3-016",
+            "ccap-d3-017",
+            "ccap-d3-018",
+            "ccap-d3-023"
+          ]
+        },
+        {
+          "id": "3.6",
+          "title": "Apply retrieval strategies matched to data shape and query pattern",
+          "knowledge": [
+            "Retrieval strategy selection"
+          ],
+          "skills": [
+            "Match retrieval approach to data shape and query pattern"
+          ],
+          "questionIds": []
+        },
+        {
+          "id": "3.7",
+          "title": "Evaluate connection protocols and select the appropriate integration mechanism (MCP, API/CLI, agent-to-agent)",
+          "knowledge": [
+            "MCP vs. API/CLI vs. agent-to-agent integration"
+          ],
+          "skills": [
+            "Select the correct integration mechanism per use case"
+          ],
+          "questionIds": [
+            "ccap-d3-019",
+            "ccap-d3-020",
+            "ccap-d3-021",
+            "ccap-d3-022"
+          ]
+        },
+        {
+          "id": "3.8",
+          "title": "Evaluate progressive discovery vs. monolithic context strategy",
+          "knowledge": [
+            "Progressive discovery vs. monolithic context loading"
+          ],
+          "skills": [
+            "Choose context strategy matched to task scope"
+          ],
+          "questionIds": []
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Evaluation, Testing & Optimization",
+      "weight": 16,
+      "officialWeight": "16%",
+      "tasks": [
+        {
+          "id": "4.1",
+          "title": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+          "knowledge": [
+            "Evaluation metric categories"
+          ],
+          "skills": [
+            "Define metrics distinguishing safety from security"
+          ],
+          "questionIds": [
+            "ccap-d4-001",
+            "ccap-d4-002",
+            "ccap-d4-003",
+            "ccap-d4-004",
+            "ccap-d4-005",
+            "ccap-d4-006"
+          ]
+        },
+        {
+          "id": "4.2",
+          "title": "Design evaluation datasets and test frameworks using mixed methodologies",
+          "knowledge": [
+            "Golden-set design",
+            "Mixed-methodology test frameworks"
+          ],
+          "skills": [
+            "Design representative, non-corrupted evaluation datasets"
+          ],
+          "questionIds": []
+        },
+        {
+          "id": "4.3",
+          "title": "Conduct A/B testing and iterative improvements",
+          "knowledge": [
+            "A/B testing methodology",
+            "Novelty effects and selection bias"
+          ],
+          "skills": [
+            "Run valid A/B tests avoiding common experimental pitfalls"
+          ],
+          "questionIds": [
+            "ccap-d4-007",
+            "ccap-d4-008",
+            "ccap-d4-009"
+          ]
+        },
+        {
+          "id": "4.4",
+          "title": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+          "knowledge": [
+            "Failure-mode taxonomy: prompt failure, hallucination, model mismatch, retrieval issue"
+          ],
+          "skills": [
+            "Systematically diagnose root cause from symptoms"
+          ],
+          "questionIds": [
+            "ccap-d4-010",
+            "ccap-d4-011",
+            "ccap-d4-012",
+            "ccap-d4-013"
+          ]
+        },
+        {
+          "id": "4.5",
+          "title": "Optimize token usage, latency, and cost-performance trade-offs",
+          "knowledge": [
+            "Cost-performance optimization techniques"
+          ],
+          "skills": [
+            "Apply caching, routing, and streaming to optimize trade-offs"
+          ],
+          "questionIds": [
+            "ccap-d4-014",
+            "ccap-d4-015",
+            "ccap-d4-016",
+            "ccap-d4-018"
+          ]
+        },
+        {
+          "id": "4.6",
+          "title": "Monitor system performance using logging and observability tools",
+          "knowledge": [
+            "Production monitoring and drift detection"
+          ],
+          "skills": [
+            "Detect performance drift proactively via continuous monitoring"
+          ],
+          "questionIds": [
+            "ccap-d4-017",
+            "ccap-d4-019"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Governance, Safety & Risk Management",
+      "weight": 14,
+      "officialWeight": "14%",
+      "tasks": [
+        {
+          "id": "5.1",
+          "title": "Implement guardrails and safety controls",
+          "knowledge": [
+            "Guardrail layering",
+            "Deterministic vs. soft controls"
+          ],
+          "skills": [
+            "Implement defense-in-depth guardrails"
+          ],
+          "questionIds": [
+            "ccap-d5-001",
+            "ccap-d5-002",
+            "ccap-d5-003",
+            "ccap-d5-004",
+            "ccap-d5-005",
+            "ccap-d5-008"
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Identify risks, limitations, and failure modes of LLM systems",
+          "knowledge": [
+            "LLM risk and failure-mode taxonomy"
+          ],
+          "skills": [
+            "Identify hallucination, drift, and error-propagation risks"
+          ],
+          "questionIds": [
+            "ccap-d5-006",
+            "ccap-d5-007"
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Apply human-in-the-loop validation strategies",
+          "knowledge": [
+            "HITL design patterns",
+            "Risk-tiered review gates"
+          ],
+          "skills": [
+            "Design HITL gates proportional to action risk"
+          ],
+          "questionIds": [
+            "ccap-d5-009",
+            "ccap-d5-010",
+            "ccap-d5-016"
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+          "knowledge": [
+            "GDPR, HIPAA, FedRAMP requirements"
+          ],
+          "skills": [
+            "Map regulatory requirements to architectural controls"
+          ],
+          "questionIds": [
+            "ccap-d5-011",
+            "ccap-d5-012",
+            "ccap-d5-013",
+            "ccap-d5-014"
+          ]
+        },
+        {
+          "id": "5.5",
+          "title": "Address ethical AI considerations (bias, fairness, transparency)",
+          "knowledge": [
+            "Bias, fairness, and transparency principles"
+          ],
+          "skills": [
+            "Audit for proxy-variable bias and design for transparency"
+          ],
+          "questionIds": [
+            "ccap-d5-015",
+            "ccap-d5-017"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Stakeholder Communication & Lifecycle Management",
+      "weight": 14,
+      "officialWeight": "14%",
+      "tasks": [
+        {
+          "id": "6.1",
+          "title": "Conduct structured discovery and requirement gathering",
+          "knowledge": [
+            "Discovery frameworks"
+          ],
+          "skills": [
+            "Run structured discovery avoiding loudest-stakeholder bias"
+          ],
+          "questionIds": [
+            "ccap-d6-001",
+            "ccap-d6-002",
+            "ccap-d6-003",
+            "ccap-d6-004"
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Communicate architectural decisions and trade-offs",
+          "knowledge": [
+            "Decision communication for technical and non-technical audiences"
+          ],
+          "skills": [
+            "Frame trade-offs appropriately per audience"
+          ],
+          "questionIds": [
+            "ccap-d6-005",
+            "ccap-d6-006",
+            "ccap-d6-007"
+          ]
+        },
+        {
+          "id": "6.3",
+          "title": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+          "knowledge": [
+            "SLA design",
+            "Feedback-loop management"
+          ],
+          "skills": [
+            "Set realistic, evidence-backed SLAs"
+          ],
+          "questionIds": [
+            "ccap-d6-008",
+            "ccap-d6-009",
+            "ccap-d6-010",
+            "ccap-d6-011",
+            "ccap-d6-015",
+            "ccap-d6-017"
+          ]
+        },
+        {
+          "id": "6.4",
+          "title": "Document architectures and provide implementation guidance",
+          "knowledge": [
+            "Architecture Decision Records",
+            "Implementation guidance documentation"
+          ],
+          "skills": [
+            "Document decisions and rationale, not just implementation detail"
+          ],
+          "questionIds": [
+            "ccap-d6-012",
+            "ccap-d6-013",
+            "ccap-d6-014"
+          ]
+        },
+        {
+          "id": "6.5",
+          "title": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+          "knowledge": [
+            "Solution lifecycle phase-gates"
+          ],
+          "skills": [
+            "Support handoff and post-launch monitoring ownership"
+          ],
+          "questionIds": [
+            "ccap-d6-016"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Developer Productivity & Operational Enablement",
+      "weight": 7,
+      "officialWeight": "7%",
+      "tasks": [
+        {
+          "id": "7.1",
+          "title": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+          "knowledge": [
+            "Team-wide CLAUDE.md and settings.json configuration"
+          ],
+          "skills": [
+            "Configure shared tooling without engineer-level merge conflicts"
+          ],
+          "questionIds": [
+            "ccap-d7-001",
+            "ccap-d7-002",
+            "ccap-d7-003",
+            "ccap-d7-005"
+          ]
+        },
+        {
+          "id": "7.2",
+          "title": "Improve developer workflows using AI-assisted tooling",
+          "knowledge": [
+            "Slash commands, subagents, CI integration"
+          ],
+          "skills": [
+            "Codify repeated workflows as reusable tooling"
+          ],
+          "questionIds": [
+            "ccap-d7-004",
+            "ccap-d7-006"
+          ]
+        },
+        {
+          "id": "7.3",
+          "title": "Support debugging and operational issue resolution",
+          "knowledge": [
+            "Session-log and trace-based debugging"
+          ],
+          "skills": [
+            "Diagnose intermittent production issues via structured logging"
+          ],
+          "questionIds": [
+            "ccap-d7-007",
+            "ccap-d7-008"
+          ]
+        }
+      ]
+    }
+  ]
+}

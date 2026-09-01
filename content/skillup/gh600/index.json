@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "0.1.10",
+  "contentUpdatedAt": "2026-08-31",
+  "provider": "GitHub",
+  "palette": {
+    "color": "#38bdf8",
+    "bg": "rgba(2,132,199,0.10)",
+    "border": "rgba(2,132,199,0.38)",
+    "glow": "rgba(2,132,199,0.18)",
+    "btn": "linear-gradient(135deg, #0284c7, #0369a1)"
+  },
+  "changelog": [
+    { "version": "0.1.0", "date": "2026-08-31", "type": "major", "summary": "Scaffolded — 6 domains, index.json grounded in the official GH-600 study guide (Microsoft Learn)" },
+    { "version": "0.1.1", "date": "2026-08-31", "type": "patch", "summary": "Domain 1: 22 questions + notes added." },
+    { "version": "0.1.2", "date": "2026-08-31", "type": "patch", "summary": "Domain 2: 28 questions + notes added (tool config, MCP servers, environment integration, error handling)." },
+    { "version": "0.1.3", "date": "2026-08-31", "type": "patch", "summary": "Domain 3 notes added." },
+    { "version": "0.1.4", "date": "2026-08-31", "type": "patch", "summary": "Domain 3: 14 questions added (memory strategies, state persistence & drift, cross-tool continuity)." },
+    { "version": "0.1.5", "date": "2026-08-31", "type": "patch", "summary": "Domain 4 notes added." },
+    { "version": "0.1.6", "date": "2026-08-31", "type": "patch", "summary": "Domain 4: 22 questions added (success criteria & evaluation signals, failure root-cause analysis, tuning agent behavior)." },
+    { "version": "0.1.7", "date": "2026-08-31", "type": "patch", "summary": "Domain 5 notes added." },
+    { "version": "0.1.8", "date": "2026-08-31", "type": "patch", "summary": "Domain 5: 20 questions added (orchestration patterns & isolation, observability & audit trails, failure detection & recovery, agent lifecycle management)." },
+    { "version": "0.1.9", "date": "2026-08-31", "type": "patch", "summary": "Domain 6: 14 questions added (autonomy-level classification, guardrails & human-in-the-loop workflows)." },
+    { "version": "0.1.10", "date": "2026-08-31", "type": "patch", "summary": "6 scenarios added: SDLC-integrated PR review agent, MCP tooling & permission scoping, cross-session memory & context drift, evaluation & tuning pipeline, multi-agent parallel execution, guardrails & human-in-the-loop." }
+  ],
+  "id": "gh600",
+  "examCode": "GH-600",
+  "title": "GitHub Certified: Agentic AI Developer",
+  "shortTitle": "GH-600",
+  "contentLevel": "201",
+  "description": "Validate your expertise operating, integrating, supervising, and governing AI agents inside production SDLC workflows, using GitHub as the control plane.",
+  "questions": 120,
+  "duration": "120 min",
+  "passScore": "700/1000",
+  "passThreshold": 70,
+  "examFee": "$165 USD",
+  "available": true,
+  "accentColor": "#0284c7",
+  "colorScheme": "sky",
+  "domains": [
+    { "id": 1, "title": "Prepare Agent Architecture and SDLC Processes", "weight": 18, "color": "bg-sky-600", "notesFile": "content/skillup/gh600/notes/gh600-d1-prepare-agent-architecture-and-sdlc-processes.md" },
+    { "id": 2, "title": "Implement Tool Use and Environment Interaction", "weight": 23, "color": "bg-violet-600", "notesFile": "content/skillup/gh600/notes/gh600-d2-implement-tool-use-and-environment-interaction.md" },
+    { "id": 3, "title": "Manage Memory, State, and Execution", "weight": 12, "color": "bg-emerald-600", "notesFile": "content/skillup/gh600/notes/gh600-d3-manage-memory-state-and-execution.md" },
+    { "id": 4, "title": "Perform Evaluation, Error Analysis, and Tuning", "weight": 18, "color": "bg-amber-600", "notesFile": "content/skillup/gh600/notes/gh600-d4-perform-evaluation-error-analysis-and-tuning.md" },
+    { "id": 5, "title": "Orchestrate Multi-Agent Coordination", "weight": 17, "color": "bg-rose-600", "notesFile": "content/skillup/gh600/notes/gh600-d5-orchestrate-multi-agent-coordination.md" },
+    { "id": 6, "title": "Implement Guardrails and Accountability", "weight": 12, "color": "bg-gray-600", "notesFile": "content/skillup/gh600/notes/gh600-d6-implement-guardrails-and-accountability.md" }
+  ],
+  "questionFiles": [
+    "content/skillup/gh600/questions/gh600-domain1.json",
+    "content/skillup/gh600/questions/gh600-domain2.json",
+    "content/skillup/gh600/questions/gh600-domain3.json",
+    "content/skillup/gh600/questions/gh600-domain4.json",
+    "content/skillup/gh600/questions/gh600-domain5.json",
+    "content/skillup/gh600/questions/gh600-domain6.json"
+  ],
+  "scenarioFiles": [
+    "content/skillup/gh600/scenarios/gh600-sdlc-integrated-agent-pr-review.json",
+    "content/skillup/gh600/scenarios/gh600-mcp-server-tooling-permission-scoping.json",
+    "content/skillup/gh600/scenarios/gh600-cross-session-memory-context-drift.json",
+    "content/skillup/gh600/scenarios/gh600-automated-evaluation-tuning-pipeline.json",
+    "content/skillup/gh600/scenarios/gh600-multi-agent-parallel-execution.json",
+    "content/skillup/gh600/scenarios/gh600-guardrails-human-in-the-loop.json"
+  ],
+  "resources": [
+    { "label": "Official Certification Page", "url": "https://learn.microsoft.com/en-us/credentials/certifications/agentic-ai-developer/" },
+    { "label": "Official Study Guide", "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/gh-600" },
+    { "label": "GitHub Copilot Docs — Custom Agents", "url": "https://docs.github.com/copilot/how-tos/copilot-sdk/use-copilot-sdk/custom-agents" },
+    { "label": "GitHub Copilot Docs — Agent Memory", "url": "https://docs.github.com/copilot/concepts/agents/copilot-memory" },
+    { "label": "Exam Sandbox", "url": "https://ghcertdemo.starttest.com/" }
+  ],
+  "taskStatementsFile": "content/skillup/gh600/task-statements.json"
+}

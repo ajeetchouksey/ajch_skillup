@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-002",
+  "title": "Scoping Tool Permissions in a Tiered Support Agent System",
+  "description": "Tests the ability to design a multi-agent customer-support architecture where each agent's tool permissions are scoped to least-privilege, and to recognize enforcement mechanisms that hold under prompt injection or model error rather than relying on instructions alone.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [1, 5],
+  "scenario": {
+    "background": "StreamHive, a subscription video-streaming company, is redesigning its customer-support system around Claude. The plan is a tiered agent architecture: an Inquiry Agent handles the majority of contacts (account status, billing questions, subscription details) and a smaller Resolution Agent handles refunds and account changes that the Inquiry Agent escalates to. A prior incident at a partner company — where a support bot with an unused but present 'delete_account' tool was tricked via a crafted customer message into calling it — has made the security team wary of any tool being available 'just in case.'",
+    "characters": [
+      {
+        "name": "Dana Reyes",
+        "role": "Director of Customer Support",
+        "concern": "Wants faster resolution times and fewer contacts requiring human escalation, without customers experiencing incorrect refunds or account actions."
+      },
+      {
+        "name": "Om Patel",
+        "role": "Security Architect",
+        "concern": "Wants every agent's available tools scoped to exactly what its role requires, with server-side enforcement of limits — not instructions the model is merely asked to follow."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-002-q1",
+      "stem": "The Inquiry Agent's job is to read account and subscription data and reply to customers in natural language; it never issues refunds or deletes accounts. Which toolset should it be granted?",
+      "options": [
+        "read_account, read_subscription, and reply — the tools it actually needs — with refund_customer and delete_account left off its toolset entirely",
+        "read_account, read_subscription, reply, refund_customer, and delete_account, with a system-prompt instruction telling it to use refund_customer and delete_account only if the customer insists",
+        "All available support tools, so the agent never has to escalate and Dana's resolution-time metric improves",
+        "read_account and reply only, omitting read_subscription since subscription details can be summarized from account data alone"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because least-privilege means granting exactly the tools a role requires and nothing more — the Inquiry Agent needs to read data and reply, so refund_customer and delete_account should not exist in its toolset at all. B fails because a tool present in the schema is invokable regardless of what the system prompt says; an instruction not to use it is a suggestion the model can be manipulated into ignoring, not a control. C fails because it maximizes attack surface and blast radius for the sake of a resolution-time metric that shouldn't be pursued by removing safety boundaries. D fails because read_subscription is a legitimate need for this role — omitting a required tool isn't least-privilege, it's under-provisioning that will force unnecessary escalations."
+    },
+    {
+      "id": "ccap-scenario-002-q2",
+      "stem": "During a permissions audit, Om finds that the Inquiry Agent's tool schema includes delete_account, described in comments as 'not currently used but may be needed later.' The agent has never invoked it. What is the correct action?",
+      "options": [
+        "Leave it in place since it has never been invoked, and simply monitor logs for any future call to it",
+        "Remove delete_account from the Inquiry Agent's tool schema entirely; if account deletion is needed later, add it to a role that requires it, scoped and reviewed at that time",
+        "Add a stronger system-prompt warning telling the agent never to call delete_account under any circumstances",
+        "Rename the tool to something less obvious, like manage_account_state, so it is harder for a malicious prompt to reference"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a tool the agent's role does not need should not be present in its schema, regardless of whether it has been called yet — the risk is that a crafted or injected input could induce the model to call it, and the only reliable control is that the capability doesn't exist for that agent. A fails because 'no calls yet' is not evidence of safety; it only means no one has successfully triggered it yet, which is exactly the scenario the prior incident illustrates. C fails for the same reason as relying on instructions generally: a system-prompt warning is not enforcement and can be overridden by injected or adversarial input. D fails because obscuring a tool's name is security by obscurity — the tool is still callable, and the mitigation does nothing to change that."
+    },
+    {
+      "id": "ccap-scenario-002-q3",
+      "stem": "The Resolution Agent is being designed to issue refunds up to $50 without human approval, escalating anything larger. Where should the $50 cap be enforced?",
+      "options": [
+        "In the system prompt, instructing the agent to never approve a refund above $50",
+        "In the refund_customer tool/API itself, which validates the requested amount server-side and rejects or requires additional approval for any call above $50, independent of what the agent's reasoning concluded",
+        "In a post-hoc weekly report that flags refunds over $50 for review after they've already been processed",
+        "Nowhere explicit — trust the model's training to avoid issuing large refunds without authorization"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a limit that matters for financial exposure needs to be enforced at the tool/API boundary, where it is checked independent of the model's reasoning — this holds even if the agent is manipulated by an injected instruction or simply reasons incorrectly about the amount. A fails because a system-prompt cap is advisory; if the model is convinced (by a crafted customer message, for instance) that $200 is appropriate, there is nothing stopping it from calling the tool with that value. C fails because post-hoc detection doesn't prevent the unauthorized refund from being issued — the money is already gone by the time the report runs. D fails because relying on the model's general training as a control gives no guarantee and is not an auditable, testable enforcement mechanism."
+    },
+    {
+      "id": "ccap-scenario-002-q4",
+      "stem": "A customer asks the Resolution Agent for a $300 refund and an account deletion, both above what it's authorized to execute unilaterally. Which handoff design correctly routes this to a human?",
+      "options": [
+        "The Resolution Agent asks the customer to confirm the request twice, and if they confirm, executes the refund and deletion directly since repeated confirmation demonstrates intent",
+        "The Resolution Agent generates a structured escalation request (customer ID, requested action, amount, justification) and routes it to a human agent's approval queue; the human independently authenticates the request and executes the action through their own authorized access — the agent never gains the ability to execute it itself",
+        "The Resolution Agent is granted a higher refund limit ($500) so it can handle this case without escalating, reducing the customer's wait time",
+        "The Resolution Agent tells the customer to call back later, with no structured handoff to a human agent"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because escalation should hand off a structured request to a human who independently authenticates and executes the action through their own authorized access — the agent's role stops at proposing, and it never gains the capability to execute above its scope. A fails because repeated confirmation from the same conversation is not an authorization control; it doesn't change who is executing the action or verify it through an independent channel, and it effectively lets the agent self-approve. C fails because raising the agent's limit to avoid escalation defeats the purpose of tiering by risk — it just moves the least-privilege violation to a higher dollar amount instead of fixing the design. D fails because it drops the request without a structured escalation path, creating a poor customer experience and losing the information needed for a human to act efficiently."
+    }
+  ],
+  "keyLearnings": [
+    "Least-privilege tool scoping means a role's toolset contains only what that role needs — a capability an agent doesn't need should not be present in its schema, even if unused.",
+    "Enforcement of limits (dollar caps, permitted actions) belongs at the tool/API boundary, not in system-prompt instructions, because instructions can be bypassed by injected input or model error while server-side checks cannot.",
+    "Escalation from an agent to a human should hand off a structured request for independent human authorization and execution, not let the agent self-approve after extra confirmation from the same conversation.",
+    "A tool present in an agent's schema is always a live attack surface regardless of whether it has ever been called — the safest state for an unneeded tool is not to grant it at all."
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-002",
+  "title": "Scoping MCP Tools and Guardrails for a Supply Agent",
+  "description": "Amberlyn Robotics connects a custom agent to an internal inventory system via MCP and must decide how to scope its tools and permissions. The scenario tests recognizing MCP server configuration shapes, applying least-privilege tool scoping, and distinguishing reversible from irreversible actions when designing guardrails.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [2, 6],
+  "scenario": {
+    "background": "Amberlyn Robotics builds warehouse automation hardware. Its platform team is standing up a custom agent, \"supply-bot,\" that should check stock levels, flag low-inventory parts, and open restock pull requests against a supplier-config repo. supply-bot needs to talk to the company's internal inventory API and to GitHub. Two engineers are configuring the integration before it goes live.",
+    "characters": [
+      {
+        "name": "Elena Vasquez",
+        "role": "Platform Engineer",
+        "concern": "Wiring supply-bot's MCP server connections correctly and scoping its tool grants to exactly what the restock workflow requires."
+      },
+      {
+        "name": "Tomas Reyes",
+        "role": "Compliance Officer",
+        "concern": "Making sure supply-bot cannot take irreversible inventory or procurement actions without explicit human sign-off, and that its credentials follow least privilege."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-002-q1",
+      "stem": "Elena configures the inventory system's integration with: `{\"type\": \"remote\", \"url\": \"https://inventory.amberlyn.internal/mcp\", \"auth\": {\"type\": \"oauth\"}}`. What does this configuration represent?",
+      "options": [
+        "A: A local, stdio-based MCP server that supply-bot's environment launches as a subprocess",
+        "B: A remote MCP server reached over HTTPS using OAuth-based authentication, rather than a subprocess launched by supply-bot's environment",
+        "C: A GitHub Actions workflow step that runs before supply-bot's session begins",
+        "D: A custom agent definition file specifying frontmatter tools"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the presence of a `url` and an `auth` block is exactly how a remote MCP server is identified — supply-bot reaches it over the network rather than spawning it locally. A is wrong because a local/stdio server is identified by `command`/`args` fields to launch a subprocess, which are absent here. C and D misidentify the JSON shape entirely — there is no workflow/job structure (C) and no YAML frontmatter with tools (D); this is specifically an MCP server connection descriptor."
+    },
+    {
+      "id": "gh600-scenario-002-q2",
+      "stem": "Tomas requires that supply-bot can check stock levels and flag low-inventory parts, but must never directly delete or zero-out an inventory record, under any circumstance. What is the most reliable way to enforce this?",
+      "options": [
+        "A: Add an instruction to supply-bot's system prompt telling it never to delete inventory records",
+        "B: Grant supply-bot the inventory MCP server's read and update-quantity tools only, excluding the delete-record tool from its configuration entirely",
+        "C: Grant full inventory API access and rely on the inventory system's own audit log to catch any deletions after the fact",
+        "D: Run supply-bot with an inventory-admin service account, since admin accounts include built-in confirmation prompts for destructive actions"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a constraint that must hold under every circumstance needs to be enforced at the capability layer — if the delete tool is never in supply-bot's configuration, there is no code path by which it can be invoked, regardless of how the agent reasons about a given task. A is a soft instruction the model could deviate from under ambiguous or manipulated input. C grants the exact capability compliance wants withheld and only detects misuse after it already happened. D assumes a behavioral safeguard that broad admin credentials do not reliably provide, and grants more capability than the task requires."
+    },
+    {
+      "id": "gh600-scenario-002-q3",
+      "stem": "supply-bot is allowed to fully autonomously open a restock pull request when stock for a part drops below a threshold — a reversible, easily-reviewed action. Tomas is deciding the autonomy level for a second capability: autonomously cancelling an in-flight purchase order with a supplier once placed. How should this second capability be classified?",
+      "options": [
+        "A: The same autonomy level as opening a restock PR, since both are just inventory-related actions",
+        "B: A higher-risk action requiring human approval before execution, since cancelling a placed purchase order may be difficult or costly to reverse and has direct financial and supplier-relationship consequences",
+        "C: A lower-risk action than opening a restock PR, since cancelling an order reduces spend rather than committing to it",
+        "D: Fully autonomous, as long as the cancellation is logged for later audit"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because autonomy tiers should track blast radius and reversibility, not surface similarity — opening a PR is reviewable and cheaply undone, while cancelling a live purchase order has real-world financial and supplier consequences that may not be reversible at all. A and C both conflate \"inventory-related\" with \"similar risk,\" ignoring that the two actions have very different consequences if wrong. D substitutes after-the-fact logging for the approval gate the action actually needs — an audit trail explains what happened, it doesn't prevent the irreversible action from happening."
+    },
+    {
+      "id": "gh600-scenario-002-q4",
+      "stem": "A developer requests that supply-bot's GitHub App installation be granted org-wide `repo` scope \"just in case it needs to touch another repository later,\" even though its current restock workflow only ever opens PRs against the single supplier-config repo. What should Elena and Tomas do?",
+      "options": [
+        "A: Grant the org-wide scope now to avoid a reconfiguration request later",
+        "B: Scope the installation to only the supplier-config repository that the current workflow actually uses, and expand it later if a concrete new task requires it",
+        "C: Grant org-wide scope but restrict it to read-only, since read access is always considered safe regardless of scope",
+        "D: Deny GitHub access entirely until every future repository supply-bot might ever touch is identified in advance"
+      ],
+      "correct": 1,
+      "explanation": "B is correct and reflects least privilege: grant exactly what the current, concrete task requires, and expand only when a real task demonstrably needs it — not preemptively for a hypothetical future. A is capability creep justified by convenience, the same anti-pattern Tomas is trying to avoid in the inventory system. C is wrong because org-wide read scope still exposes far more repositories than the task requires, and \"read is always safe\" ignores that broad read access itself can leak sensitive data across repos supply-bot has no legitimate reason to see. D is impractical and unnecessary — least privilege means scoping to current needs, not requiring omniscient upfront planning."
+    }
+  ],
+  "keyLearnings": [
+    "MCP server configurations with `command`/`args` describe a local, stdio-launched subprocess; configurations with `url` and an `auth` block describe a remote, network-reached server — recognizing the shape tells you which one you're looking at.",
+    "A hard compliance constraint (\"never do X\") is enforced reliably by excluding the tool that does X from the agent's configuration, not by instructing the agent not to use it.",
+    "Autonomy level should be assigned based on an action's blast radius and reversibility, not its surface similarity to other actions the agent already performs.",
+    "Least privilege applies to credentials and app installation scopes exactly as much as to individual tool grants — scope to what the current task needs, and expand only when a concrete new task requires it."
+  ]
+}

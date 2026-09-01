@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-005",
+  "title": "Three Agents, One Logistics Codebase",
+  "description": "Osprey Cargo Systems runs three coding agents in parallel against a shared logistics codebase. The scenario tests agent isolation for concurrent work, detecting semantic conflicts that don't show up as merge conflicts, keeping shared state consistent across an agent handoff, and resuming a crashed multi-step task from a checkpoint instead of redoing verified work.",
+  "examId": "gh600",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [5, 3],
+  "scenario": {
+    "background": "Osprey Cargo Systems runs three specialized coding agents against its shipment-routing service at the same time: a routing-agent that recalculates delivery routes, a pricing-agent that adjusts freight pricing based on routing changes, and a docs-agent that keeps API documentation current. All three touch overlapping parts of the same repository during a single sprint, and the team is designing how they coordinate without stepping on each other.",
+    "characters": [
+      {
+        "name": "Nadia Kessler",
+        "role": "Orchestration Lead",
+        "concern": "Making sure the three agents can work at the same time without corrupting each other's in-progress changes, and that verified subtasks survive an unexpected crash."
+      },
+      {
+        "name": "Leo Fontaine",
+        "role": "Backend Engineer",
+        "concern": "Catching conflicts between agents' outputs that don't show up as a textual merge conflict but still break correct behavior once both changes are live."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-005-q1",
+      "stem": "Nadia needs routing-agent and pricing-agent to work in the same repository at the same time, each producing many intermediate commits before either change is ready for review. What is the most appropriate isolation mechanism?",
+      "options": [
+        "A: Have both agents work directly on the main branch, since their tasks touch different files most of the time",
+        "B: Give each agent its own branch or worktree, so their intermediate commits don't collide until each is ready to be reviewed and merged independently",
+        "C: Run the agents sequentially instead of in parallel, since true parallel execution in a shared repo is never safe",
+        "D: Let both agents share a single branch but coordinate turn-taking through a shared chat channel"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because branch or worktree isolation is exactly the mechanism designed for this situation — each agent gets its own working copy to commit freely into, and integration only happens at review/merge time, when conflicts (if any) can be handled deliberately. A risks intermediate, unreviewed commits landing on main and colliding unpredictably, since \"touch different files most of the time\" is not a guarantee. C is an overcorrection — parallel execution in a shared repo is a supported pattern precisely because of isolation mechanisms like branches and worktrees; abandoning parallelism trades a real problem for lost throughput. D relies on real-time coordination between agent sessions that isn't a structural guarantee against collision, unlike branch isolation."
+    },
+    {
+      "id": "gh600-scenario-005-q2",
+      "stem": "routing-agent's PR refactors a `RouteOptimizer` function to cache computed routes aggressively for reuse. pricing-agent's PR, opened independently, removes caching from the same function because its own investigation found the cache was serving stale pricing-relevant route data. Both PRs merge cleanly with no textual merge conflict. What has actually happened?",
+      "options": [
+        "A: Nothing to worry about — since there was no merge conflict, both changes are compatible",
+        "B: A semantic conflict — the two agents' changes contradict each other in behavior even though they don't collide as text, and the merged result likely doesn't do what either agent intended",
+        "C: A duplicated-effort conflict, since both agents worked on the same function",
+        "D: A stale-context issue, since one of the agents was working from an outdated snapshot of the repository"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the two changes are logically contradictory (add aggressive caching vs. remove caching entirely) even though they never touched overlapping lines in a way Git's merge algorithm would flag — this is a semantic conflict, and it requires a human or a coordinating process to catch, since no automated merge tool detects contradictions in intent. A is the exact trap the scenario illustrates — a clean textual merge says nothing about behavioral compatibility. C describes two agents doing the same work, not two agents doing contradictory work; here the work is different and conflicting, not duplicated. D isn't supported by the scenario — nothing indicates either agent was working from stale information, only that their conclusions about the same function disagreed."
+    },
+    {
+      "id": "gh600-scenario-005-q3",
+      "stem": "routing-agent finishes its work and hands its findings — the updated set of optimal routes — to pricing-agent via the company's MCP-connected route-tracking server, so pricing-agent can recalculate freight prices. Minutes later, pricing-agent separately queries GitHub directly and finds a routing PR was already reverted by a human due to a data error, but the MCP server's cached view still shows the old routes as current. Which is the correct source pricing-agent should trust?",
+      "options": [
+        "A: The MCP-connected route-tracking server's cached view, since it was the officially designated hand-off channel between the two agents",
+        "B: GitHub's live state, since it reflects the actual current repository state and a human has already intervened to revert the flawed routes — the MCP server's cached data is stale relative to it",
+        "C: Whichever source pricing-agent queried first in this session, to stay consistent",
+        "D: Neither — pricing-agent should proceed using its own last-known internal assumption about the routes"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because when two sources of context disagree, the one reflecting the actual current, authoritative state (here, GitHub's live repository state showing the human-initiated revert) should take precedence over a cached view that hasn't caught up — treating a hand-off channel as authoritative by default ignores that caches can and do go stale. A elevates a designated channel over ground truth simply because it was the intended hand-off path, which is exactly backwards once staleness is detected. C is an arbitrary tie-breaker unrelated to which source is actually correct. D discards a directly verifiable, live signal in favor of an unverified internal assumption, which is worse than either external source."
+    },
+    {
+      "id": "gh600-scenario-005-q4",
+      "stem": "docs-agent is midway through a five-part documentation update (five separate API sections) when its session crashes due to an infrastructure timeout. Three of the five sections were completed, committed, and verified before the crash; the last two never started. When docs-agent's task resumes, what should happen?",
+      "options": [
+        "A: Restart the entire five-part task from scratch, since a crash invalidates all prior progress",
+        "B: Resume only the two unstarted sections, since the three completed sections have verified, committed output that a checkpoint-based resume can build on directly",
+        "C: Assign the remaining work to routing-agent instead, since docs-agent has demonstrated it is unreliable",
+        "D: Leave the task incomplete indefinitely until a human manually finishes the remaining two sections"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the three completed sections produced verified, committed outputs — durable artifacts that survive the crash — so a checkpoint-based resume only needs to pick up the genuinely unfinished work, avoiding wasted redundant effort. A discards real, verified progress unnecessarily; a crash affects the ephemeral session, not artifacts already committed. C conflates an infrastructure timeout with an agent-quality problem, and hands work to an agent (routing-agent) with no demonstrated context for documentation tasks. D abandons automation entirely for a problem that a resume-from-checkpoint pattern is specifically designed to solve."
+    }
+  ],
+  "keyLearnings": [
+    "Branch or worktree isolation lets multiple agents commit freely into their own working copies in a shared repository, deferring conflict resolution to a deliberate review/merge step instead of a real-time collision.",
+    "A clean textual merge does not guarantee behavioral compatibility — semantic conflicts, where two agents' changes contradict each other in intent, require a human or coordinating process to catch, since merge tools only detect line-level collisions.",
+    "When context sources disagree, the one reflecting live, authoritative state should take precedence over a cached hand-off channel that may not have caught up with a recent human intervention.",
+    "Checkpointing verified, committed subtask output lets a crashed multi-step task resume from where it actually left off, rather than repeating work that was already completed and confirmed correct."
+  ]
+}

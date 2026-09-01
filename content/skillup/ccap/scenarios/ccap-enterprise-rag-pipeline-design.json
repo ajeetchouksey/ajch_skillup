@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-001",
+  "title": "Designing a RAG Pipeline Over a Firm's Contract Archive",
+  "description": "Tests the ability to select a chunking and indexing strategy, a retrieval pattern, and an architectural pattern that match the shape of a heterogeneous, citation-critical legal document corpus, and to keep that index synchronized with a live document management system.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [1, 3],
+  "scenario": {
+    "background": "Ashford & Cole, a 400-attorney corporate law firm, wants an internal research assistant that lets attorneys query the firm's 500,000-document contract archive (NDAs, MSAs, amendments, and exhibits stored in iManage, the firm's document management system) and get answers with exact clause-level citations. The archive is a mix of natively digital Word/PDF files and older scanned PDFs, and many contracts have nested clause structures with cross-references to exhibits and prior amendments. Attorneys cannot tolerate an answer that cites the wrong clause or misses a superseding amendment — a wrong citation in a client memo is a malpractice risk, not just an inconvenience.",
+    "characters": [
+      {
+        "name": "Priya Nair",
+        "role": "Head of Legal Operations",
+        "concern": "Attorneys must get precise, verifiable citations back to the exact clause and document version — an unverifiable or stale citation is worse than no answer at all."
+      },
+      {
+        "name": "Marcus Webb",
+        "role": "Platform Engineer",
+        "concern": "The corpus is huge, mixed-format, and constantly edited in iManage; the indexing pipeline has to scale and stay in sync without a full nightly re-index eating the compute budget."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-001-q1",
+      "stem": "Contracts in the archive have nested clauses (e.g., Section 8.2(a)(iii)) that cross-reference exhibits and prior amendments. Which chunking strategy should Marcus use when building the index?",
+      "options": [
+        "Fixed-size token chunks (e.g., 512 tokens with 50-token overlap) applied uniformly across all documents, since this is the simplest strategy to implement at scale",
+        "Structure-aware chunking that preserves clause boundaries and attaches metadata (contract ID, clause number, document version, parent/exhibit references) to each chunk, so retrieval returns complete, citable clause units",
+        "One chunk per entire document, so the model always has full context and never needs to reconcile information across chunks",
+        "Chunk only the table of contents and clause headings, and retrieve full documents on demand when an attorney asks a follow-up question"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because structure-aware chunking that respects clause boundaries and carries metadata (clause number, version, cross-references) is what makes a citation both complete and verifiable — retrieval returns a coherent, addressable unit an attorney can point to. A fails because fixed-size chunks routinely split a clause mid-sentence or merge two unrelated clauses, producing citations that don't map to a real clause boundary. C fails because whole-document chunks blow the retrieval budget and dilute relevance — a 200-page contract as one chunk can't be ranked precisely against a narrow query. D fails because retrieving only headings on the first pass means the system can't answer the actual question without a second round-trip for every query, and it still doesn't solve the citation-precision problem once the full document is pulled in."
+    },
+    {
+      "id": "ccap-scenario-001-q2",
+      "stem": "Attorneys often ask questions that hinge on an exact defined term or statute citation (e.g., \"find every MSA where the defined term 'Confidential Information' excludes independently developed IP\") alongside broader conceptual questions (e.g., \"how do we typically handle limitation-of-liability carve-outs?\"). Which retrieval design fits this mixed query pattern?",
+      "options": [
+        "Pure semantic (dense embedding) retrieval for all queries, since embeddings capture meaning better than exact-match search and legal language is highly contextual",
+        "Pure keyword (lexical/BM25) retrieval for all queries, since legal terms of art must match exactly and semantic drift would return irrelevant clauses",
+        "A hybrid retrieval approach combining lexical search (for exact defined-term and citation matches) with semantic search (for conceptual queries), with results merged and re-ranked before being passed to Claude",
+        "Skip retrieval scoring entirely and pass the top 50 most recently modified documents to Claude on every query, relying on the model's long context window to find the relevant clause"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because the two query types have genuinely different retrieval needs — exact defined-term or citation lookups are precision-sensitive and favor lexical matching, while conceptual questions about how the firm 'typically' handles something benefit from semantic similarity — and a hybrid retriever with re-ranking serves both without forcing one query type to suffer. A fails because pure semantic search can miss an exact defined-term match if the surrounding language varies, which is exactly the failure mode attorneys can't tolerate. B fails because pure lexical search misses the conceptual/pattern-based questions where the relevant clauses don't share exact wording. D fails because 'recently modified' is unrelated to relevance, and dumping unranked documents into a long context window increases cost and latency while making it harder for the model to locate the right clause, not easier."
+    },
+    {
+      "id": "ccap-scenario-001-q3",
+      "stem": "Priya asks the system: \"Has the indemnification cap in our standard MSA template changed across the last three amendments to the Acme Corp master agreement?\" This requires locating the base MSA and each amendment, determining which clauses were superseded, and comparing values across documents. Which architectural pattern should handle this class of question?",
+      "options": [
+        "A single-shot RAG pattern: retrieve the top-k chunks for the query in one pass and let Claude answer directly from whatever was retrieved",
+        "An agentic, multi-step retrieval pattern where Claude decomposes the question into sub-queries (locate base MSA, locate each amendment, extract each indemnification clause, determine supersession order), issues retrieval calls for each, and reasons over the assembled evidence before answering",
+        "A purely extractive pipeline that returns the raw text of every document matching \"Acme Corp\" without any synthesis, leaving the comparison to the attorney",
+        "A fine-tuned classification model that labels each document as \"changed\" or \"unchanged\" without surfacing clause-level detail"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because this is a multi-hop question — it requires finding multiple related documents, understanding which amendment supersedes which, and comparing a specific clause across versions, which single-shot top-k retrieval is not designed to do reliably. An agentic pattern that decomposes the question and retrieves iteratively can assemble the full evidence set before synthesizing an answer. A fails because a single top-k retrieval pass is likely to return chunks from only some of the relevant documents (e.g., the base MSA and one amendment but not all three), producing an incomplete or wrong comparison. C fails because it pushes the actual work — determining supersession order and comparing values — back onto the attorney, defeating the purpose of the assistant for exactly the kind of question it should be best at. D fails because a binary \"changed/unchanged\" label discards the clause-level detail and specific values Priya actually asked for."
+    },
+    {
+      "id": "ccap-scenario-001-q4",
+      "stem": "Marcus needs the index to stay accurate as attorneys check documents in and out of iManage throughout the day, including new amendments and version supersessions. Which synchronization design best fits the citation-accuracy requirement without excessive compute cost?",
+      "options": [
+        "A full nightly re-index of all 500,000 documents, accepting that intra-day edits won't be reflected until the next night's run",
+        "An event-driven sync where an iManage webhook fires on document check-in, triggering re-chunking and re-embedding of only the affected document (and updating supersession metadata for related amendments), so the index reflects changes shortly after they happen",
+        "No automated sync — attorneys manually flag documents for re-indexing when they know a change is significant",
+        "Re-index the entire corpus on every single query to guarantee freshness"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because event-driven, document-scoped re-indexing keeps the index current within minutes of a real edit while only paying the re-embedding cost for the documents that actually changed — this matches both the accuracy requirement (a stale citation on a just-amended clause is a real risk) and the cost constraint. A fails because a nightly batch means any document amended that day is queryable with stale, potentially superseded clause data until the next run — unacceptable when Priya's whole concern is citation accuracy. C fails because it relies on attorneys remembering to flag changes, which is unreliable and defeats the purpose of automated indexing. D fails because re-indexing 500,000 documents per query is computationally infeasible and would make the system unusably slow and expensive."
+    }
+  ],
+  "keyLearnings": [
+    "Chunking strategy should be driven by document structure and citation requirements, not applied as a uniform default — clause-aware chunking with rich metadata is what makes a citation verifiable.",
+    "Retrieval pattern should match the shape of the query mix: hybrid lexical-plus-semantic search serves both exact-term lookups and conceptual questions better than either alone.",
+    "Multi-hop questions that require assembling evidence across several related documents need an agentic, decomposition-and-iterate retrieval pattern, not a single top-k retrieval pass.",
+    "Index freshness for a citation-critical system should be handled with event-driven, document-scoped re-indexing tied to the source system's change events, balancing accuracy against compute cost."
+  ]
+}

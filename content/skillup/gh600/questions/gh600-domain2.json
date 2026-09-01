@@ -1,0 +1,451 @@
+[
+  {
+    "domain": 2,
+    "id": "gh600-d2-001",
+    "scenario": "At Brightline Freight, a platform team builds a custom agent called \"changelog-writer\" whose only job is to read merged pull request titles and append entries to CHANGELOG.md. They are deciding what to put in the agent's tools configuration.",
+    "question": "Which tools configuration best follows the principle of least privilege for this agent?",
+    "options": [
+      "Grant only the bash tool, so it can use git and shell commands for everything it might need",
+      "Grant only read and edit, scoped to the files it actually touches, with no bash or deployment tools",
+      "Grant the full default toolset so the agent has flexibility if the changelog format changes later",
+      "Grant bash, edit, and a deploy tool so it can also publish the release once the changelog is updated"
+    ],
+    "correct": 1,
+    "explanation": "The principle: an agent's tools list is a capability grant, not a suggestion, so it should be scoped to exactly what the task requires — every additional tool is additional blast radius if the agent misreads the task or is manipulated by untrusted input.\n\nWhy read+edit is correct: reading commit/PR history and editing a single markdown file is the entire job; nothing about writing changelog entries requires arbitrary shell execution or deployment capability.\n\nWhy the distractors fail:\n- Bash-only: shelling out for everything replaces a narrow, auditable file edit with unrestricted command execution, and loses the clean read/edit audit trail a reviewer can reason about.\n- Full default toolset \"for flexibility\": this is capability creep justified by a hypothetical future need, which is exactly the reasoning that erodes least privilege over time.\n- Bash+edit+deploy: a changelog agent triggering a deployment is a scope violation on its own — publishing a release is a separate, higher-stakes action that shouldn't ride along with a documentation task.\n\nIn practice: when defining a new custom agent, list the minimum tool set the described task literally requires, then add more only when a concrete task demonstrably needs it — not preemptively.",
+    "tags": ["tool-scoping", "least-privilege", "custom-agents", "comprehension"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-002",
+    "scenario": "Nimbus Health operates in a regulated environment. They configure a custom agent called \"triage-assistant\" that reviews new issues and applies labels. Compliance requires that this agent can never close an issue or merge a pull request under any circumstance.",
+    "question": "What is the most reliable way to enforce this constraint?",
+    "options": [
+      "Rely on the agent's system prompt to instruct it never to close issues or merge PRs",
+      "Give the agent full write access to issues and PRs, and add a downstream code review policy that blocks merges",
+      "Scope the agent's tools to only read and issue-comment/label operations, excluding merge and close-issue tools from its configuration entirely",
+      "Run the agent with repository admin permissions and rely on its training to behave conservatively"
+    ],
+    "correct": 2,
+    "explanation": "The principle: a compliance constraint that must hold under every circumstance needs to be enforced structurally, at the capability layer — if the tool to close an issue or merge a PR simply doesn't exist in the agent's configuration, there is no code path by which it can happen, regardless of how the agent reasons about the task.\n\nWhy scoping tools is correct: excluding merge and close-issue tools from the configuration means the agent literally cannot invoke them, which is a guarantee independent of prompt wording or the specific issue content it's reasoning about.\n\nWhy the distractors fail:\n- System-prompt instruction: this is a preference the model can deviate from, especially under adversarial or ambiguous issue content (for example, an issue body containing misleading instructions), so it isn't a hard guarantee.\n- Full write access plus downstream policy: this grants the exact capability compliance wants withheld, then hopes a separate process catches misuse after the capability was already exercised.\n- Admin permissions with trust in training: broad permissions paired with behavioral trust is the opposite of a compliance control; it maximizes what could go wrong if the agent's judgment is ever wrong.\n\nIn practice: when a requirement is \"never X,\" the durable answer is almost always \"the agent has no tool that can do X,\" not \"the agent is told not to do X.\"",
+    "tags": ["tool-permissions", "least-privilege", "scenario-based", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-003",
+    "scenario": "At Ashford Capital, an engineer defines a custom agent \"pr-reviewer\" with frontmatter `tools: [\"read\", \"bash\"]`. The agent is expected to leave inline review comments on specific lines of a pull request diff, but during testing it never produces any review comments.",
+    "question": "What is the most likely explanation for this gap?",
+    "options": [
+      "The tools list lacks the specific tool needed to post PR review comments; read and bash do not grant that capability on their own",
+      "Bash alone is sufficient, since the agent can shell out to the GitHub CLI to post comments reliably in any sandbox",
+      "Read access alone is enough, since posting a review comment is treated as a read-only operation",
+      "The agent will automatically gain comment-posting ability once its branch is merged into the default branch"
+    ],
+    "correct": 0,
+    "explanation": "The principle: each capability an agent needs — reading files, editing files, posting a structured PR comment — corresponds to a specific tool, and listing adjacent or general-purpose tools like read or bash does not implicitly grant unrelated, more specific capabilities.\n\nWhy the missing-tool explanation is correct: posting an inline review comment is a distinct action from reading files or running shell commands, so unless a comment/review tool is explicitly included in the frontmatter, the agent has no mechanism to perform it.\n\nWhy the distractors fail:\n- Relying on bash plus the GitHub CLI: this assumes reliable outbound network access and available credentials inside the agent's sandbox, which is not guaranteed and is a fragile substitute for using the intended, explicitly granted tool.\n- Read as sufficient: posting a comment mutates the PR's state (it creates new data), so it is not a read-only action no matter how it's framed.\n- Automatic capability after merge: tool availability is a session-time configuration property, not something that changes based on the eventual fate of the branch.\n\nIn practice: when an agent's expected action doesn't happen, check the tools list for the specific capability before assuming a prompting or model problem — a missing tool produces exactly this kind of silent no-op.",
+    "tags": ["tool-scoping", "custom-agents", "troubleshooting", "analysis"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-004",
+    "scenario": "Kepler Systems shares a custom agent \"infra-agent\" across many repositories, configured with `tools: [\"read\", \"edit\", \"bash\"]`. A security review flags that the bash grant allows unrestricted shell execution, including arbitrary network calls and destructive filesystem commands, even though the agent legitimately needs to run build and test commands.",
+    "question": "What is the most precise way to reduce the bash tool's blast radius without removing it and breaking the agent's build/test workflow?",
+    "options": [
+      "Remove bash entirely and require developers to run build and test commands manually after every session",
+      "Keep bash unrestricted and add a system-prompt note asking the agent to be careful with destructive commands",
+      "Replace bash with a nightly cron job that runs tests independently of the agent's sessions",
+      "Configure command-level allow/deny rules alongside the bash grant — permitting known build/test invocations while explicitly denying destructive or arbitrary-network patterns"
+    ],
+    "correct": 3,
+    "explanation": "The principle: when a broad tool is functionally necessary, the precise control is to narrow what that tool can do at the command level, not to choose between \"all of it\" and \"none of it.\"\n\nWhy command-level allow/deny is correct: this preserves the agent's ability to run the specific build and test commands its task requires while structurally blocking the classes of commands (destructive deletes, arbitrary outbound calls) that create the actual risk — the constraint holds regardless of how the agent phrases its intent.\n\nWhy the distractors fail:\n- Removing bash entirely: this breaks the legitimate build/test workflow the agent needs, trading one problem for a worse one instead of solving the actual risk.\n- A prompt note about being careful: this is a soft instruction the model can fail to follow under ambiguous or adversarial input, providing no structural guarantee.\n- A separate cron job: this runs independently of the agent's actual session, so it doesn't give the agent itself a safe way to verify its own changes during the task, and doesn't reduce what the agent's bash tool can still do.\n\nIn practice: capability tools that are genuinely needed should be constrained by scoping what they can do, not by an all-or-nothing decision — this is the same logic behind scoping database credentials to specific queries rather than granting or revoking full access.",
+    "tags": ["tool-permissions", "bash-tool", "command-allowlist", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-005",
+    "scenario": "At Driftwood Media, a custom agent \"docs-agent\" is intended to only edit markdown files under /docs. An engineer configures `tools: [\"read\", \"edit\"]` without any path restriction. During a task, the agent edits src/index.ts, reasoning that updating a cross-reference there would \"improve\" the documentation.",
+    "question": "What tool-configuration gap allowed this out-of-scope edit to happen?",
+    "options": [
+      "The agent lacked a bash tool, so it improvised by editing files outside its intended scope",
+      "The edit tool was granted without any path or scope restriction limiting it to the /docs directory, so nothing at the tool-capability level prevented touching src/index.ts",
+      "The read tool should have been removed so the agent could never discover src/index.ts existed",
+      "The agent's underlying model was too capable for the task and should have been downgraded"
+    ],
+    "correct": 1,
+    "explanation": "The principle: granting a capability tool like edit says what actions are possible, but without a scope or path constraint it says nothing about where those actions are allowed to happen — an unscoped edit tool is a green light for any file the agent decides is relevant.\n\nWhy the missing path restriction is correct: nothing in the configuration told the edit tool it was limited to /docs, so once the agent's own reasoning decided a change outside that directory was relevant, the tool happily allowed it — the gap is structural, not a reasoning failure to fix with better prompting alone.\n\nWhy the distractors fail:\n- Lacking bash: bash is unrelated to editing files directly; its absence doesn't explain why edit itself reached outside /docs.\n- Removing read: read access is what lets the agent do its actual documentation job (finding what to reference); removing it would break the intended task rather than fix the scope issue.\n- Downgrading the model: model capability isn't what determined the file path; a less capable model with the same unscoped tool could make the identical mistake.\n\nIn practice: whenever a tool operates on a filesystem, pair the capability grant with an explicit path/scope boundary — the tool being present is only half the configuration; where it's allowed to act is the other half.",
+    "tags": ["tool-scoping", "edit-tool", "troubleshooting", "analysis"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-006",
+    "scenario": "A new engineer at Ironclad Manufacturing asks why their team's custom agent frontmatter needs an explicit `tools:` list at all, arguing the agent \"should just have access to everything Copilot can do\" so it never gets blocked mid-task.",
+    "question": "What is the core reason for requiring explicit tool grants on a custom agent?",
+    "options": [
+      "Explicit tool lists implement least privilege — the agent gets exactly the capabilities its defined task requires, limiting what can go wrong if it misinterprets the task or encounters manipulated input",
+      "Explicit tool lists make the agent's responses format faster because fewer tool schemas are parsed at runtime",
+      "Explicit tool lists are only required for agents that call MCP servers, not for agents using built-in tools",
+      "Explicit tool lists are a legacy requirement that newer custom agents are free to omit"
+    ],
+    "correct": 0,
+    "explanation": "The principle: an agent's usefulness comes from its reasoning, but its safety ceiling comes from what it's structurally capable of doing — the tools list is the mechanism that keeps those two things independent, so a reasoning mistake can't translate into an arbitrarily large blast radius.\n\nWhy least privilege is correct: scoping tools to the task means that even a confused or misled agent session is bounded by what it can invoke, which is the entire purpose of requiring an explicit list rather than defaulting to everything.\n\nWhy the distractors fail:\n- Faster parsing: tool count has no meaningful bearing on the safety rationale for scoping, and framing it as a performance optimization misses the actual reason the practice exists.\n- MCP-only requirement: the same scoping principle applies to built-in tools (read, edit, bash) exactly as much as MCP-sourced tools; there's no built-in exemption.\n- Legacy requirement: tool scoping isn't a deprecated convention — it remains the mechanism by which any agent's capabilities, old or new, are bounded.\n\nIn practice: \"give it everything so it never gets blocked\" trades a minor workflow inconvenience (occasionally needing to add a tool) for an unbounded increase in what a misbehaving or misled session could do.",
+    "tags": ["tool-permissions", "least-privilege", "custom-agents", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-007",
+    "scenario": "Sable Robotics runs a two-agent workflow: \"reader-bot\" (tools: [read]) investigates an issue and produces a findings report, and \"writer-bot\" (tools: [read, edit, bash]) implements the fix based on that report. An engineer now wants reader-bot to also post a comment on the issue summarizing its findings, while insisting reader-bot must otherwise remain strictly incapable of modifying the repository.",
+    "question": "What should be added to reader-bot's tools configuration to satisfy this requirement?",
+    "options": [
+      "The full writer-bot toolset, since posting a comment is functionally similar enough to editing that the same tools cover it",
+      "The bash tool, so reader-bot can shell out to the GitHub CLI to post the comment",
+      "Only the specific comment/issue-posting tool (for example, an MCP or built-in comment tool), leaving edit and bash excluded from reader-bot's configuration",
+      "Nothing — the existing read tool implicitly includes the ability to post comments"
+    ],
+    "correct": 2,
+    "explanation": "The principle: adding one new capability to an agent should mean granting exactly that capability, not reaching for a broader tool bundle that happens to include it alongside things the agent still shouldn't be able to do.\n\nWhy adding only the comment tool is correct: it satisfies the new requirement (post a summary) while preserving the original guarantee (reader-bot cannot edit files or run shell commands), keeping the two-agent boundary intact.\n\nWhy the distractors fail:\n- Granting writer-bot's full toolset: this reintroduces edit and bash to reader-bot specifically to satisfy the constraint that reader-bot must never have those capabilities — it solves the comment requirement by breaking the read-only guarantee.\n- Granting bash for the comment: bash reopens arbitrary shell execution as a side effect of a narrow need, and depends on network/credential access that a scoped comment tool doesn't require.\n- Assuming read implies commenting: read tools return information; posting a comment mutates issue state, which is a distinct action a pure read tool cannot perform.\n\nIn practice: when a role needs one more specific capability, grant that one tool — reaching for a bundled toolset \"because it's already defined elsewhere\" is how role boundaries between agents quietly erode.",
+    "tags": ["tool-scoping", "custom-agents", "multi-agent", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-008",
+    "scenario": "At Trellis Analytics, a team wants their coding agent to be able to query the company's internal ticketing system (search tickets, fetch ticket details) as part of its investigation workflow.",
+    "question": "What is the standard way to give the agent this capability?",
+    "options": [
+      "Fine-tune the underlying model on the ticketing system's API documentation",
+      "Add the ticketing system's MCP server as a tool source in the agent's MCP configuration, exposing its tools (such as search_tickets and get_ticket) to the agent",
+      "Paste the ticketing system's entire API reference into the system prompt at the start of every session",
+      "Ask the agent to browse to the ticketing system's web UI using a general-purpose browser tool"
+    ],
+    "correct": 1,
+    "explanation": "The principle: MCP exists specifically so that external systems expose their capabilities as structured, callable tools rather than requiring the model to be retrained or the operator to re-explain an API in prose every session.\n\nWhy adding the MCP server is correct: once the ticketing system's MCP server is configured as a tool source, its tools (search, fetch) become directly invokable by the agent with structured inputs/outputs, which is exactly the integration MCP is designed for.\n\nWhy the distractors fail:\n- Fine-tuning the model: this is a heavyweight, slow-to-update approach for what is fundamentally a live API integration problem, and it doesn't give the model a way to actually call the system at runtime.\n- Pasting API docs into the prompt: this burns context budget every session, is error-prone for anything beyond trivial calls, and gives the model no structured, verifiable way to invoke or receive results from the system.\n- A general-purpose browser tool: this substitutes unreliable UI scraping for a structured API integration that likely already exists, and produces much less reliable results.\n\nIn practice: whenever a task requires an agent to interact with an external system that has an API, check first whether an MCP server for it exists (or can be stood up) before reaching for prompt-stuffing or browser automation.",
+    "tags": ["MCP-config", "tool-integration", "custom-agents", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-009",
+    "scenario": "At Beacon Financial, an engineer configures an MCP server for the coding agent using the following JSON: `{\"type\": \"local\", \"command\": \"npx\", \"args\": [\"-y\", \"ticketing-mcp-server\"], \"env\": {\"API_KEY\": \"...\"}}`.",
+    "question": "What does this configuration represent?",
+    "options": [
+      "A local (stdio-based) MCP server that the agent's environment starts as a subprocess, communicating over standard input/output rather than a network endpoint",
+      "A remote MCP server accessed over HTTPS using OAuth-based authentication",
+      "A GitHub Actions job definition that runs before the agent's session begins",
+      "A custom agent definition file specifying frontmatter tools"
+    ],
+    "correct": 0,
+    "explanation": "The principle: MCP servers come in two broad shapes — local servers launched as a subprocess and communicating over stdio, and remote servers reached over HTTP(S) at a network endpoint — and the configuration shape tells you which one you're looking at.\n\nWhy the local/stdio explanation is correct: a `command` plus `args` pair is precisely how you launch a subprocess (here, `npx -y ticketing-mcp-server`), and a locally spawned process communicates with the host over standard input/output, not a URL.\n\nWhy the distractors fail:\n- Remote/OAuth: a remote server configuration is identified by a URL/endpoint and an authentication flow, neither of which appears here; there's no `url` field, only a `command` to execute.\n- GitHub Actions job: this JSON has no workflow, job, or steps structure — it's an MCP server launch specification, not a CI job definition.\n- Custom agent frontmatter: custom agent definitions are markdown files with YAML frontmatter (name, description, tools), not a JSON object describing a process to launch.\n\nIn practice: recognizing `command`/`args`/`env` versus `url`/auth fields at a glance is how you quickly tell whether an MCP server will run inside the agent's own sandbox (local) or depend on reachability to an external endpoint (remote) — which matters for firewall/allow-list planning.",
+    "tags": ["MCP-config", "stdio-transport", "local-server", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-010",
+    "scenario": "Coriolis Aerospace wants their coding agent to query issues and pull requests across the organization using GitHub's own hosted MCP server, without having to build or run any custom integration themselves.",
+    "question": "What is the correct way to add this capability?",
+    "options": [
+      "Write a custom local MCP server from scratch that wraps the GitHub REST API",
+      "Add a `tools: [\"github\"]` entry to every custom agent's frontmatter without any separate MCP server configuration",
+      "Install the GitHub CLI (gh) and expose it only through the agent's bash tool",
+      "Configure GitHub's remote MCP server as a remote (HTTP-based) tool source, authenticated using the agent's GitHub credentials"
+    ],
+    "correct": 3,
+    "explanation": "The principle: when the capability you need already exists as a hosted, first-party remote MCP server, the correct integration path is to configure that remote endpoint as a tool source rather than reimplementing the same functionality locally.\n\nWhy configuring the remote server is correct: GitHub publishes its own MCP server reachable over HTTPS, and connecting to it as a remote MCP tool source gives the agent structured, authenticated access to issues, PRs, and related GitHub data without any custom code.\n\nWhy the distractors fail:\n- Writing a custom local server: this duplicates functionality GitHub already hosts and maintains, adding ongoing maintenance burden for no benefit.\n- Frontmatter-only `tools: [\"github\"]`: naming a tool in an agent's frontmatter doesn't create the underlying MCP server connection; the server still needs to be configured as a tool source somewhere the platform reads from.\n- Bash-wrapped GitHub CLI: this substitutes unstructured shell output parsing for a purpose-built structured tool interface, and depends on network/credential access inside the bash sandbox that isn't guaranteed.\n\nIn practice: before building a custom integration for a common platform like GitHub, check whether a first-party remote MCP server already exposes the needed tools — reusing it is both less work and more reliable than a bespoke wrapper.",
+    "tags": ["MCP-config", "github-remote-mcp", "remote-server", "application"]
+    ,
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-011",
+    "scenario": "At Thornbury Retail, a security team notes that GitHub's remote MCP server, as configured for a \"research\" custom agent, exposes its full default toolset — including tools that can create and close issues and pull requests. That agent's task is purely investigative and should never mutate anything on GitHub.",
+    "question": "What should the team configure to restrict this agent to read-only GitHub operations?",
+    "options": [
+      "Remove the GitHub MCP server entirely and replace it with grep/read tools operating on a local clone of the repository",
+      "Configure the GitHub MCP server in readonly mode (or restrict its exposed toolset) so only query-style tools are available, excluding create/update/delete operations",
+      "Keep the default configuration and add a system-prompt instruction telling the agent never to create issues or PRs",
+      "Grant the agent org-admin permissions so that all of its actions are captured in the organization's audit log as compensation"
+    ],
+    "correct": 1,
+    "explanation": "The principle: a remote MCP server's default toolset is typically broad by default to support many use cases, so when an agent's role is genuinely read-only, the tool exposure needs to be explicitly narrowed rather than left at its default breadth.\n\nWhy readonly/toolset restriction is correct: constraining the server to expose only query-style tools removes create/update/delete operations from what the agent can even call, which structurally enforces the \"never mutate\" requirement instead of hoping the agent chooses not to use tools it technically has.\n\nWhy the distractors fail:\n- Replacing with a local clone: this discards the richer, cross-repository query capability the remote server provides (issues, PRs, discussions across the org) for a much narrower local-file view, over-correcting the actual problem.\n- Prompt instruction only: a soft instruction can be bypassed under ambiguous or adversarial input, and it doesn't remove the mutating tools from the agent's actual capability set.\n- Org-admin permissions plus audit logging: this increases the agent's blast radius while only adding visibility after an unwanted action, rather than preventing it.\n\nIn practice: whenever a remote MCP server is used for a role that should never write, check its readonly/toolset configuration options first — the goal is that the write tools simply aren't there to invoke.",
+    "tags": ["github-remote-mcp", "tool-permissions", "readonly-mode", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-012",
+    "scenario": "A developer at Pinegate Insurance wants to add a community-published MCP server they found in a personal GitHub repository to the org's coding agent configuration, without any review process, because it happens to expose a useful tool.",
+    "question": "What is the primary risk of doing this, and how does using a curated MCP registry help?",
+    "options": [
+      "Community-published servers are always slower than registry-listed ones, which only affects agent response latency",
+      "There is no meaningful risk difference; any MCP server that starts successfully can be trusted to grant tools from",
+      "An unvetted server could expose malicious or unreliable tools with unclear provenance; a curated MCP registry provides review and discoverability that reduces the chance of trusting an unsafe server",
+      "Registries only provide a browsing UI convenience and have no bearing on an organization's security posture"
+    ],
+    "correct": 2,
+    "explanation": "The principle: an MCP server is code that runs with whatever access the agent's environment grants it, so adding one is functionally similar to installing a dependency — its trustworthiness depends on provenance and review, not just whether it technically works.\n\nWhy the provenance/registry explanation is correct: an unreviewed server from an arbitrary personal repository could behave unexpectedly, exfiltrate data through its tool calls, or simply be poorly maintained, while a curated registry adds a layer of review and discoverability that lowers the chance of onboarding something unsafe.\n\nWhy the distractors fail:\n- Latency-only framing: this reduces a trust/security question to a performance concern, missing the actual risk of running unreviewed third-party code with tool access.\n- \"No risk difference if it starts\": successfully starting only tells you the process runs, not that its behavior is safe, honest, or maintained — this is precisely the assumption that leads to supply-chain-style incidents.\n- \"Registries are just a browsing convenience\": dismissing the review/curation function of a registry ignores the actual security value it provides beyond discoverability.\n\nIn practice: treat adding a new MCP server with the same scrutiny as adding a new third-party dependency — check its source, maintenance status, and whether it's listed in a vetted registry before granting it tool access.",
+    "tags": ["MCP-registries", "supply-chain-risk", "governance", "evaluation"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-013",
+    "scenario": "An org admin at Wraith Security adds a new MCP server to the repository's Copilot coding agent configuration file. Agent sessions afterward still show the server's tools as unavailable, even though the JSON entry looks correct.",
+    "question": "What is the most likely cause?",
+    "options": [
+      "The MCP server has not been explicitly allow-listed/approved in the organization's or repository's Copilot coding agent MCP settings — adding an entry to the configuration file alone does not grant it runtime access",
+      "The MCP server's tools are cached and will automatically appear after roughly 24 hours",
+      "MCP servers only function with custom agents and are never available to the built-in coding agent",
+      "The server needs to be renamed to conform to a specific GitHub naming convention before it can be used"
+    ],
+    "correct": 0,
+    "explanation": "The principle: for the coding agent, defining an MCP server in configuration and actually being permitted to use it at runtime are two separate steps — the platform requires an explicit allow-list/approval so that arbitrary configuration changes can't silently grant a session access to a new external tool source.\n\nWhy the allow-list explanation is correct: this two-step design (define, then approve) exists specifically to prevent an unreviewed or unauthorized server from becoming usable simply because someone edited a config file, which matches the symptom of \"configured correctly but still unavailable.\"\n\nWhy the distractors fail:\n- Caching delay: there's no documented 24-hour propagation behavior for MCP tool availability, and treating a permissions gap as a caching issue would just leave the server permanently unusable if the real cause is unaddressed.\n- Custom-agents-only claim: the coding agent does support MCP server integration; this isn't a categorical exclusion.\n- Naming convention: tool availability is governed by allow-list/approval status, not by the server's identifier matching a naming pattern.\n\nIn practice: when a newly configured MCP server's tools don't show up, check the organization/repository's MCP allow-list or approval settings before assuming the JSON configuration itself is wrong.",
+    "tags": ["MCP-allow-lists", "governance", "troubleshooting", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-014",
+    "scenario": "A developer at Halcyon Cloud has a personal MCP server configured in their VS Code settings.json for local Copilot Chat use. They ask a teammate why the coding agent, when assigned a task in the same repository, can't just use that same locally configured server.",
+    "question": "Why can't the coding agent use an MCP server that is only configured locally in a developer's editor?",
+    "options": [
+      "Local VS Code MCP servers use a protocol version that is fundamentally incompatible with the coding agent",
+      "Local MCP servers are always stdio-based, and the coding agent only supports remote, HTTP-based servers",
+      "The coding agent ignores editor-level settings entirely and can only read from a file named AGENTS.md",
+      "The coding agent runs in its own isolated cloud sandbox, separate from any developer's machine, so it can only use MCP servers explicitly configured (and allow-listed) at the repository or organization level — not ones defined only in a local editor"
+    ],
+    "correct": 3,
+    "explanation": "The principle: the coding agent's execution environment is not the developer's machine, so any configuration that exists only on that machine — including editor-level MCP server definitions — is invisible to the agent's session by construction.\n\nWhy the sandbox explanation is correct: because the agent runs in an isolated cloud environment provisioned per session, its available MCP servers must come from configuration that environment actually reads (repository- or organization-level, allow-listed settings), not from a developer's personal VS Code settings.json.\n\nWhy the distractors fail:\n- Protocol incompatibility: MCP is the same protocol regardless of where it's configured; there's no version mismatch inherent to local versus agent use.\n- Stdio-only-versus-remote-only claim: the coding agent supports both local (stdio) and remote MCP servers when properly configured at the platform level; the limitation isn't about transport type.\n- AGENTS.md-only claim: while instructions files matter for agent behavior, MCP server availability is a separate configuration concern from where the agent reads its instructions.\n\nIn practice: any capability you want the coding agent to have — including MCP servers — must be configured at a level the agent's own sandboxed environment can see, not assumed from what's already set up on a developer's local machine.",
+    "tags": ["MCP-config", "execution-context", "sandbox", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-015",
+    "scenario": "At Redwood Bank, a team configures an MCP server that exposes 40 tools covering a full database administration toolkit, but the agent's actual task only ever needs 3 specific read-only query tools from that server.",
+    "question": "What is the best practice for the agent's exposure to this MCP server's tools?",
+    "options": [
+      "Leave all 40 tools available to the agent, since MCP servers manage their own internal permissions correctly",
+      "Scope the agent's tools configuration to only the 3 specific query tools it needs from that server, rather than exposing the server's full toolset",
+      "Disable the MCP server entirely and hardcode the 3 needed queries directly into the system prompt",
+      "Split the database's functionality into 40 separate MCP servers, one per tool, to simplify configuration"
+    ],
+    "correct": 1,
+    "explanation": "The principle: adding an MCP server as a tool source does not obligate exposing every tool it offers — the same least-privilege scoping that applies to built-in tools applies to MCP-sourced tools, and most platforms let you select a subset.\n\nWhy scoping to 3 tools is correct: the agent's actual task only requires 3 read-only queries, so exposing exactly those keeps the agent's capability surface matched to its real job, leaving 37 unrelated administrative tools (including presumably destructive ones) unreachable.\n\nWhy the distractors fail:\n- Exposing all 40 and trusting the server's own permissions: this assumes the MCP server's internal access control is a substitute for the agent-side scoping decision, when both layers matter — an agent that can invoke a destructive tool is a risk even if the server would technically allow the call.\n- Disabling the server and hardcoding queries: this discards the structured, maintained tool interface for brittle prompt text that won't adapt if the underlying schema changes.\n- Splitting into 40 servers: this multiplies operational overhead (40 processes/endpoints to manage) without adding any safety benefit over simply selecting a subset of tools from one server.\n\nIn practice: treat MCP server tool exposure the same way you'd treat scoping a database credential — grant the specific operations the task needs, not the full administrative surface just because it's technically available.",
+    "tags": ["MCP-config", "tool-scoping", "least-privilege", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-016",
+    "scenario": "A new team member at Fathom Data asks where the coding agent's file edits, test runs, and shell commands actually execute when a task is assigned.",
+    "question": "Which statement accurately describes the coding agent's execution context?",
+    "options": [
+      "It runs directly on the assigning developer's laptop, using their local credentials and environment",
+      "It runs entirely inside the GitHub web UI's browser tab, with no separate backend compute involved",
+      "It runs in an isolated, ephemeral cloud environment (an Actions-based sandbox) provisioned specifically for that session, separate from any developer's machine",
+      "It runs directly on the production servers of the repository it is modifying"
+    ],
+    "correct": 2,
+    "explanation": "The principle: the coding agent is designed to operate autonomously and asynchronously, which requires its own compute environment independent of any individual developer's machine or the application's production infrastructure.\n\nWhy the isolated sandbox explanation is correct: each session gets its own ephemeral, containerized environment (built on GitHub Actions infrastructure) where the repository is checked out and the agent's tools actually execute — this is what allows the agent to work asynchronously without tying up a developer's machine.\n\nWhy the distractors fail:\n- Local laptop execution: this would mean the developer's machine has to stay online and available for the entire session, which defeats the purpose of asynchronous, delegatable work.\n- Browser-tab-only execution: a browser tab can't run shell commands, install dependencies, or execute test suites; real compute is required behind the UI.\n- Production servers: running an in-progress, unreviewed change directly against production would be a severe and unnecessary risk; the agent's sandbox is deliberately separate from any live environment.\n\nIn practice: understanding that the agent's actions happen in its own sandbox — not your laptop, not production — is the foundation for reasoning correctly about what it can access (network, secrets, services) and what it can't without explicit configuration.",
+    "tags": ["execution-context", "sandbox", "coding-agent", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-017",
+    "scenario": "Circuit Robotics has 40 repositories across the organization. Leadership wants to pilot the coding agent on only 5 specific repositories before deciding whether to expand further.",
+    "question": "How should this scoping be configured?",
+    "options": [
+      "Enable the Copilot coding agent feature individually on each of the 5 target repositories via repository (or scoped organization) settings, leaving it disabled for the remaining 35",
+      "Enable the feature organization-wide and rely on each custom agent's frontmatter to silently no-op in the other 35 repositories",
+      "Add a CODEOWNERS rule that restricts agent-authored pull requests to the 5 target repositories",
+      "Configure a network firewall allow list that blocks the agent's outbound access specifically in the other 35 repositories"
+    ],
+    "correct": 0,
+    "explanation": "The principle: repository-level access to the coding agent is a distinct configuration surface from what the agent does once invoked — scoping which repositories can use it at all is an enablement decision, made where that enablement is actually controlled.\n\nWhy per-repository enablement is correct: turning the feature on for exactly the 5 pilot repositories (and leaving it off elsewhere) directly matches the stated intent, and keeps the other 35 repositories in a state where the agent literally cannot be invoked, not just discouraged from being used.\n\nWhy the distractors fail:\n- Org-wide enablement with silent no-op reliance: this leaves the agent invocable everywhere, contradicting the pilot's intended scope, and depends on custom-agent behavior rather than an actual access control.\n- CODEOWNERS restriction: CODEOWNERS governs review requirements for PRs, not whether the coding agent feature can be invoked in a repository in the first place.\n- Firewall allow-list blocking: network egress rules control what a running session can reach over the internet; they don't determine whether a session can be started in a given repository at all.\n\nIn practice: when piloting a new capability, look for the actual enablement toggle at the scope you want to control (here, per-repository) rather than approximating the restriction through an unrelated control surface.",
+    "tags": ["repo-scope", "coding-agent", "governance", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-018",
+    "scenario": "Larkspur Media wants every new pull request to automatically receive an AI-generated review comment summarizing risk areas, as part of their CI pipeline, without any developer needing to manually invoke Copilot Chat.",
+    "question": "What pattern achieves this fully automated, CI-integrated review behavior?",
+    "options": [
+      "Assign every new PR's author as \"Copilot\" as well, so it reviews its own submissions",
+      "Configure branch protection to require Copilot's approval before merge, with no workflow definition needed",
+      "Wait for the coding agent to notice new pull requests on its own; no explicit trigger configuration is required",
+      "Add a GitHub Actions workflow step, triggered on the `pull_request` event, that invokes Copilot in headless/non-interactive mode to analyze the diff and post review comments, using appropriately scoped token permissions"
+    ],
+    "correct": 3,
+    "explanation": "The principle: turning an agent capability into an automated CI behavior requires an explicit trigger — a workflow that fires on a defined event and invokes the agent programmatically — because agents don't act on repository events unless something is configured to call them.\n\nWhy the Actions-workflow pattern is correct: a `pull_request`-triggered workflow step that runs Copilot in headless mode gives you a deterministic, repeatable hook — every new PR fires the same automated review step, with the workflow's granted permissions (for example, `pull-requests: write`) controlling what it's allowed to post.\n\nWhy the distractors fail:\n- Dual-authorship trick: authorship metadata doesn't create a review trigger, and this doesn't correspond to any real CI mechanism for invoking automated analysis.\n- Branch protection \"requiring approval\" with no workflow: branch protection rules gate merging based on existing check/review results; they don't themselves invoke an agent to generate a review — something still has to run the analysis.\n- Passive \"it will notice\": agents don't poll or spontaneously act on repository events; without an explicit trigger, nothing happens.\n\nIn practice: any \"agent runs automatically when X happens\" requirement should be traced back to a concrete workflow trigger and invocation step — if you can't point to what fires the agent, the automation doesn't actually exist yet.",
+    "tags": ["CI-integration", "headless-mode", "workflow-trigger", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-019",
+    "scenario": "Overton Systems follows a GitFlow-style branching model where new feature work should branch from `develop`, not from the repository's default branch `main`. The coding agent is assigned an issue for a new feature.",
+    "question": "What must be configured or specified so the agent does not create its work branch from the wrong base?",
+    "options": [
+      "Nothing — the agent always infers the correct base branch by scanning recent merge history before starting",
+      "The task assignment (or agent configuration) must specify `develop` as the target base branch, since the agent otherwise defaults to branching from the repository's default branch",
+      "The `develop` branch should be permanently renamed to be the repository's default branch",
+      "Branch protection on `main` should be disabled so the agent can push there directly instead of using a feature branch"
+    ],
+    "correct": 1,
+    "explanation": "The principle: an agent's default behavior reflects the platform's default assumption (branch from the default branch), so any workflow that deviates from that default — like GitFlow's `develop`-first model — has to explicitly override the base branch at the point the task is created or configured.\n\nWhy explicit base-branch specification is correct: without an explicit override, the agent will branch from `main` because that's the sane default absent other information, so achieving `develop`-based scoping requires stating that target as part of the task.\n\nWhy the distractors fail:\n- Inferring from merge history: this assumes a level of implicit environment awareness the agent isn't guaranteed to have or reliably apply, and isn't how base-branch selection is actually determined.\n- Permanently renaming `develop` to be the default branch: this is a drastic, repository-wide change made solely to work around a per-task configuration gap, with broad side effects on every other workflow that assumes `main` is default.\n- Disabling branch protection on `main`: this addresses an unrelated concern (push restrictions) and doesn't change which branch the agent uses as its starting point; it also removes a safety control for no benefit.\n\nIn practice: any repository with a non-default \"true\" integration branch needs to make that explicit in how agent tasks are scoped — assuming the agent will infer team-specific branching conventions on its own is a common source of misdirected PRs.",
+    "tags": ["branch-scope", "base-branch", "coding-agent", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-020",
+    "scenario": "Leadership at Ridgeline Freight is nervous about enabling the coding agent because they've heard it can push commits and open pull requests \"on its own,\" without a human running any git commands.",
+    "question": "Which statement most accurately describes this autonomous capability?",
+    "options": [
+      "The agent requires a human to manually run `git push` and open the pull request after every session; it only stages changes locally",
+      "The agent can merge its own pull requests without any review, by default, once CI checks pass",
+      "With the coding agent feature enabled and appropriate repository permissions granted, the agent can autonomously create a branch, commit changes, and open a pull request — but merging still requires the organization's normal review and approval process",
+      "The agent can only open a pull request if a human first manually creates the branch for it to commit to"
+    ],
+    "correct": 2,
+    "explanation": "The principle: \"autonomous\" in this context describes the proposal side of the workflow (branch, commit, PR) — the platform is designed so autonomy stops at the point where a change would actually ship, which is where human review remains the gate.\n\nWhy this description is correct: the agent is granted enough repository permissions to create its own branch, commit its changes, and open a PR without a human running those git commands, while the merge step continues to go through whatever review/approval rules the repository already enforces for any contributor.\n\nWhy the distractors fail:\n- Requiring manual push/PR creation: this understates the actual autonomy the feature provides — the whole point is that the agent completes branch/commit/PR without those manual steps.\n- Default self-merge on green CI: this overstates the autonomy in the other direction; passing checks doesn't bypass the review requirement, and self-merge isn't the default behavior.\n- Requiring a human to pre-create the branch: the agent creates its own branch as part of its autonomous workflow; it doesn't depend on a human doing that step first.\n\nIn practice: the accurate mental model is \"autonomous proposal, human-gated acceptance\" — leadership's concern is addressed by confirming merge still requires review, not by disabling the agent's ability to open PRs at all.",
+    "tags": ["autonomous-actions", "pr-creation", "human-in-the-loop", "comprehension"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-021",
+    "scenario": "At Vantage Point Capital, the coding agent's setup step fails while trying to `npm install` a package from the company's private package registry. The session log shows a network/connection error rather than an authentication error.",
+    "question": "Given the coding agent's default sandboxed environment, what is the most likely root cause?",
+    "options": [
+      "The private registry's domain is not included in the coding agent's network allow list, so outbound requests to it are blocked by default in the sandboxed environment",
+      "The company's npm authentication token happened to expire at the exact moment of the session",
+      "The coding agent does not support npm at all and requires yarn to be used instead",
+      "The setup step ran before the repository had finished being cloned into the sandbox"
+    ],
+    "correct": 0,
+    "explanation": "The principle: the coding agent's sandbox restricts outbound network access by default, allowing only a known set of domains (such as public package registries and GitHub itself) unless additional domains are explicitly added to its allow list — this is a security boundary, not an incidental limitation.\n\nWhy the allow-list explanation is correct: a network/connection-level failure (as opposed to a 401/403 auth error) is the expected symptom of an outbound request being blocked before it ever reaches the private registry, which matches a domain that hasn't been added to the sandbox's allow list.\n\nWhy the distractors fail:\n- Coincidental token expiry: an expired token would typically surface as an authentication error (401/403) from the registry, not a network/connection failure — the symptom described doesn't match this cause.\n- npm unsupported claim: the coding agent's sandbox supports standard package manager tooling including npm; the failure described is about reachability, not tool support.\n- Clone-timing issue: setup steps run after the repository checkout completes as part of the session's provisioning sequence; a clone-ordering problem wouldn't manifest as a registry connection error.\n\nIn practice: when a coding agent's setup step fails to reach an internal or private service, the first thing to check is the environment's network allow list — this is one of the most common environment-specific constraints teams hit when onboarding a private registry or internal API.",
+    "tags": ["environment-constraints", "network-allowlist", "troubleshooting", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-022",
+    "scenario": "Crestwood Manufacturing's coding agent needs a `DATABASE_URL` and an API key to run integration tests during its session. Regular repository secrets are not automatically available inside the agent's ephemeral environment.",
+    "question": "How should these values be made available to the agent's session?",
+    "options": [
+      "Hardcode the values directly into the copilot-setup-steps.yml workflow file since it is already a workflow definition",
+      "Paste the values into the issue body so they are included in the agent's task context",
+      "They cannot be made available; the agent must run every session without any secrets",
+      "Add them as secrets scoped to the special environment the coding agent uses (commonly named `copilot`), so the setup workflow can reference them the way any GitHub Actions environment secret is referenced"
+    ],
+    "correct": 3,
+    "explanation": "The principle: the coding agent's setup workflow runs under a distinct Actions environment context, so secrets need to be scoped to that specific environment to be available to the session — ordinary repository secrets aren't automatically inherited.\n\nWhy the environment-scoped secret is correct: adding `DATABASE_URL` and the API key as secrets on the coding agent's designated environment makes them available to the setup workflow through the standard Actions secrets mechanism, without ever exposing the raw values in a file or an issue.\n\nWhy the distractors fail:\n- Hardcoding into copilot-setup-steps.yml: this commits sensitive credentials into version control in plain text, which is a serious exposure risk regardless of which workflow file is involved.\n- Pasting into the issue body: issue content is visible to anyone with read access to the repository (and potentially logged/indexed), making this an even broader exposure than committing to a workflow file.\n- \"Cannot be made available\" claim: this is factually incorrect — the environment-secret mechanism exists precisely to let sessions access credentials safely.\n\nIn practice: any credential an agent's session legitimately needs should go through the same environment-secret mechanism used for any other Actions job — never inline into a committed file or free-text task description.",
+    "tags": ["environment-constraints", "secrets", "copilot-environment", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-023",
+    "scenario": "An engineer at Solace Health wants to understand the difference between chatting with Copilot locally inside their IDE versus assigning a task to the coding agent for the same repository.",
+    "question": "What is the key distinction between these two modes of interaction?",
+    "options": [
+      "They are identical; the coding agent is simply a rebranded version of Copilot Chat with no functional difference",
+      "Copilot Chat in the IDE runs in the developer's local environment using their credentials and immediate context; the coding agent runs autonomously in an isolated cloud sandbox and produces a pull request without the developer driving each individual step",
+      "The coding agent can only read code and never write or modify it, unlike Copilot Chat in the IDE",
+      "Copilot Chat requires an MCP server connection to function, while the coding agent does not support MCP at all"
+    ],
+    "correct": 1,
+    "explanation": "The principle: the meaningful difference between these two modes isn't the underlying model — it's where execution happens and who is driving each step, which determines what kind of task each mode is suited for.\n\nWhy the local-versus-sandbox distinction is correct: Copilot Chat in the IDE is synchronous and local, giving the developer moment-to-moment control using their own environment and credentials, while the coding agent is asynchronous and autonomous, running in its own cloud sandbox and returning a completed, reviewable pull request rather than requiring step-by-step direction.\n\nWhy the distractors fail:\n- \"Identical, just rebranded\": this ignores the fundamental execution-model difference (local/interactive versus sandboxed/autonomous) that determines what each mode can be trusted to do unattended.\n- \"Coding agent is read-only\": the coding agent's defining feature is that it can write code and open PRs autonomously; it is not restricted to reading.\n- MCP support claim: both interactive Copilot Chat and the coding agent can be configured to use MCP servers; MCP support isn't what separates them.\n\nIn practice: choose Copilot Chat for tight, interactive, moment-to-moment collaboration on a task you're actively driving, and delegate to the coding agent for well-scoped, boundable work you're comfortable reviewing as a finished PR.",
+    "tags": ["execution-context", "coding-agent", "copilot-chat", "comprehension"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-024",
+    "scenario": "During a session at Anvil Systems, the agent's call to an MCP tool for fetching ticket details returns a transient 503 error. The agent immediately reports \"task complete: could not find ticket details\" and ends the session, even though the underlying failure was recoverable.",
+    "question": "What error-handling behavior should the agent have exhibited instead?",
+    "options": [
+      "Recognize the error as transient/retryable, attempt a bounded retry (optionally with backoff), and only report failure or escalate once retries are exhausted, rather than treating a single transient error as a final outcome",
+      "Immediately switch to a completely different, unrelated MCP server without first checking whether the original request could succeed on retry",
+      "Silently fabricate plausible-looking ticket details so the task appears to have completed successfully",
+      "Terminate the entire session and require the human to restart the whole task from scratch over a single tool call failure"
+    ],
+    "correct": 0,
+    "explanation": "The principle: not every tool failure is a final outcome — transient errors (timeouts, 5xx responses) are, by definition, likely to succeed if retried, so treating the first failure as the end of the task confuses \"one call didn't work\" with \"this can't be done.\"\n\nWhy bounded retry is correct: a small number of retries (with backoff) gives a transient error a fair chance to resolve on its own, and only escalating or reporting failure after those attempts are exhausted correctly distinguishes recoverable hiccups from genuine blockers.\n\nWhy the distractors fail:\n- Switching servers immediately: abandoning the original, correct data source without giving it a reasonable chance to recover both wastes the switch and risks fetching from a source that isn't actually equivalent.\n- Fabricating results: inventing plausible-looking data to mask a failure is far worse than reporting an honest failure — it produces a confidently wrong outcome that's harder to catch downstream.\n- Full session restart: discarding the entire session's progress over one recoverable tool call is a disproportionate response that wastes the work already done.\n\nIn practice: well-designed agent error handling treats transient failures as a step to retry through, and reserves \"task failed\" or escalation for cases where retries have genuinely been exhausted.",
+    "tags": ["error-handling", "retries", "MCP-config", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-025",
+    "scenario": "At Bramwell Logistics, a custom agent configured to retry a flaky MCP tool call has no retry limit configured. During an upstream outage, it retries the same failing call every few seconds for the agent's entire session budget, never making progress on any other part of its task.",
+    "question": "What is missing from this retry design?",
+    "options": [
+      "The MCP server should simply be removed entirely, since any server that fails once is inherently unreliable",
+      "Retries should be replaced altogether with a full rollback of the entire session",
+      "A bounded retry count (and/or a capped backoff) combined with an escalation path once the limit is reached, so a persistent failure doesn't consume the entire session budget",
+      "The agent should retry faster rather than slower, to maximize the number of attempts before its session budget runs out"
+    ],
+    "correct": 2,
+    "explanation": "The principle: retries are only a safe pattern when they're bounded — an unbounded retry loop against a persistently failing dependency doesn't improve the odds of success, it just consumes the finite resource (session time/budget) that could otherwise be spent on the rest of the task or on escalating.\n\nWhy a bounded limit plus escalation is correct: capping the number of attempts (and their backoff) guarantees the agent eventually stops burning budget on a call that isn't going to succeed, and pairing that cap with an escalation path (reporting the blocker) ensures the failure is surfaced instead of silently exhausting the session.\n\nWhy the distractors fail:\n- Removing the server after one failure: a single outage doesn't mean the server is inherently unreliable; over-reacting to transient issues discards a dependency the task may genuinely need on a normal day.\n- Replacing retries with a full session rollback: rollback addresses undoing partial changes, not the retry-loop problem itself; it doesn't prevent the underlying unbounded-attempts pattern from recurring.\n- Retrying faster: increasing retry frequency during an outage makes the resource-exhaustion problem worse, not better, and can add unnecessary load on the already-struggling dependency.\n\nIn practice: any retry logic in an agent's tool-use design needs an explicit ceiling — treat \"how many times will I try before giving up and telling someone\" as a required design decision, not an afterthought.",
+    "tags": ["retries", "escalation", "session-budget", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-026",
+    "scenario": "At Quillfeather Analytics, an agent's multi-step task — edit 3 files, run a database migration script, then commit — fails at the migration step after already editing 2 of the 3 files and partially running the script.",
+    "question": "What safe-execution behavior should follow this mid-task failure?",
+    "options": [
+      "Commit the 2 successfully edited files anyway and silently leave the migration for a human to finish manually",
+      "Roll back the partial changes (revert the edited files and/or discard the branch) to leave the repository in a clean, known state rather than a half-migrated one, then report the failure",
+      "Keep retrying the migration script indefinitely until it succeeds, regardless of the already-edited files",
+      "Force-push over the base branch to erase any evidence that the attempt was made"
+    ],
+    "correct": 1,
+    "explanation": "The principle: a multi-step task that fails partway through should not leave the system in an inconsistent intermediate state — the safe default is to return to a known-good state and report what happened, rather than committing a partial result that looks complete but isn't.\n\nWhy rollback is correct: reverting the 2 edited files and discarding the failed branch removes the half-finished, internally inconsistent state (2 of 3 files changed, migration partially applied) and gives the human a clean starting point plus an honest account of what failed and where.\n\nWhy the distractors fail:\n- Committing the partial edits silently: this leaves a misleading artifact — 2 files changed with no corresponding migration — that could be merged or built upon without anyone realizing the task was incomplete.\n- Retrying indefinitely: this ignores that the files are already in a partially modified state and doesn't address the inconsistency; it also risks the same unbounded-retry resource problem seen elsewhere in agent tool use.\n- Force-pushing to erase evidence: this actively destroys the traceability of what was attempted and why it failed, which is the opposite of what a safe-execution and accountability design requires.\n\nIn practice: treat any multi-step agent task like a database transaction conceptually — if it can't complete, the safest outcome is an explicit rollback to a consistent state plus a clear report, not a silent partial commit.",
+    "tags": ["rollbacks", "safe-execution", "partial-failure", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-027",
+    "scenario": "At Stonebridge Bank, an agent asked to \"fix the failing deployment\" tries several diagnostic approaches without success. Its next available option, given its current tool access, would be to directly modify a production configuration value to force the deployment through.",
+    "question": "What should the agent's configuration and behavior enforce in this situation?",
+    "options": [
+      "Allow the agent to make the production configuration change, since it was explicitly asked to fix the deployment",
+      "Have the agent retry the same failed fix repeatedly with increasingly aggressive commands until one happens to work",
+      "Let the agent quietly mark the task as complete without making the change, hiding the fact that it could not resolve the issue",
+      "An escalation path: once the agent exhausts its reasonable diagnostic and remediation attempts within its granted tool scope, it should stop and surface the blocker to a human — describing what it tried and why it couldn't proceed — rather than taking an unbounded, higher-risk action"
+    ],
+    "correct": 3,
+    "explanation": "The principle: escalation exists precisely for the moment an agent's normal capabilities are insufficient — the safe response to hitting that ceiling is to stop and hand off to a human, not to reach for a higher-risk action just because the original instruction was phrased as \"fix it.\"\n\nWhy escalation is correct: a direct production configuration change to force a deployment through is a qualitatively different and riskier action than the diagnostic steps the agent already tried, and an agent that has exhausted its reasonable options is exactly the case an escalation path is designed to catch — surfacing what was tried gives the human a head start rather than a blank problem.\n\nWhy the distractors fail:\n- Allowing the production change: broad instruction language (\"fix the deployment\") doesn't imply authorization for an unbounded escalation in risk; production configuration changes carry consequences well beyond the original task's apparent scope.\n- Aggressive repeated retries: this doesn't address that the underlying issue is diagnostic uncertainty, not a transient failure, and \"increasingly aggressive\" commands raise risk without raising the odds of success.\n- Silently marking complete: hiding an unresolved failure removes the human's ability to even know there's a problem to address, which is worse than an honest, escalated failure report.\n\nIn practice: agents should have a clearly defined boundary between \"actions within scope\" and \"actions that require human judgment,\" and hitting diminishing returns on diagnosis is a textbook trigger for crossing from the former into escalating to the latter.",
+    "tags": ["escalation-paths", "safe-execution", "human-in-the-loop", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-028",
+    "scenario": "After several agent-authored pull requests caused confusion at Marlowe Logistics about who actually made a given change and why, the security team wants to require full traceability for every action an agent takes going forward.",
+    "question": "Which practice best provides this traceability?",
+    "options": [
+      "Ensure every agent action is attributable — session logs linked from the resulting PR, commits attributed to the agent's own identity rather than a human's, and audit log entries that distinguish agent-initiated events from human-initiated ones",
+      "Require the agent to write a single-line commit message with no further detail, to keep the audit log as small as possible",
+      "Have a human manually re-type every agent-generated commit under their own name before merging, so the history shows only human authorship",
+      "Disable session logging to reduce storage costs, relying solely on the final diff for any later review"
+    ],
+    "correct": 0,
+    "explanation": "The principle: traceability means being able to reconstruct, after the fact, exactly what an agent did, why, and who is accountable for the outcome — which requires attribution at every layer (commit identity, linked session log, and audit trail), not just the final diff.\n\nWhy attributable logging is correct: linking the session log from the PR preserves the reasoning and tool calls behind the change, attributing commits to the agent's own identity keeps authorship honest, and audit log entries that distinguish agent from human events let security teams filter and review agent activity specifically — together these answer \"what happened, why, and by whom\" after the fact.\n\nWhy the distractors fail:\n- Minimal one-line commit messages: this deliberately discards the detail needed to reconstruct intent later, working against the stated traceability goal.\n- Re-attributing commits to a human: this actively falsifies the record by hiding that the change was agent-generated, which is the opposite of accountability — it makes the audit trail less accurate, not more useful.\n- Disabling session logging: the session log is the primary record of what the agent actually did and why; removing it leaves only the diff, which shows the result but not the process or reasoning behind it.\n\nIn practice: traceability for autonomous agent actions should be treated the same way as traceability for any production-impacting automation — preserve who/what acted, what they did, and why, rather than compressing or erasing that record for convenience.",
+    "tags": ["traceability", "accountability", "audit-log", "comprehension"],
+    "difficulty": "medium"
+  }
+]

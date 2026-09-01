@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-001",
+  "title": "Wiring a Review Agent into the PR Pipeline",
+  "description": "Foxglove Financial integrates a custom coding agent into its pull request review workflow. The scenario tests where plan/approve/act boundaries belong in the SDLC, how tool scope should be configured for a review-only agent, and why branch-protection shortcuts undermine the guarantees the workflow depends on.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [1, 2],
+  "scenario": {
+    "background": "Foxglove Financial is a payments fintech rolling out a custom agent called \"review-bot\" to reduce the load on human reviewers. review-bot is meant to read a pull request's diff, run the existing lint and test suite, and leave inline comments describing issues it finds — nothing more. The team is under pressure to ship the integration quickly before the next sprint, and two engineers are drafting the agent's configuration and its place in the PR pipeline.",
+    "characters": [
+      {
+        "name": "Priya Desai",
+        "role": "Staff Engineer, Developer Experience",
+        "concern": "Designing where in the SDLC the agent should plan, where it should require approval, and where it can act without a human in the loop."
+      },
+      {
+        "name": "Marcus Lin",
+        "role": "Security Lead",
+        "concern": "Ensuring review-bot's tool grants and repository permissions can never let it merge, deploy, or bypass the review it is supposed to be assisting with."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-001-q1",
+      "stem": "Priya is deciding which part of review-bot's workflow should require human approval before proceeding. Which action should remain gated behind human approval rather than being fully autonomous?",
+      "options": [
+        "A: Running the existing lint and test suite against the PR's branch",
+        "B: Merging the pull request once review-bot's own comments have been addressed",
+        "C: Reading the diff and generating a list of candidate issues to comment on",
+        "D: Posting inline comments describing issues review-bot found in the diff"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because merging changes the state of the shared main branch irreversibly for downstream consumers, and review-bot's entire purpose is to assist review, not to decide when review is satisfied — that judgment call belongs to a human reviewer regardless of how confident the agent is in its own comments. A, C, and D are all read-only or additive actions (running checks, analyzing a diff, leaving a comment) that don't change repository state in a way that requires gating; treating them as equally sensitive as a merge would slow the workflow down without adding safety."
+    },
+    {
+      "id": "gh600-scenario-001-q2",
+      "stem": "Marcus is defining review-bot's tools configuration. Which tool set best matches the principle of least privilege for the agent's actual job?",
+      "options": [
+        "A: read and a comment/review-posting tool only, with no edit, bash, or merge tool granted",
+        "B: read, edit, bash, and merge, so review-bot can fix small issues itself and merge once tests pass",
+        "C: The full default toolset, so the team never has to reconfigure it as the pipeline evolves",
+        "D: bash only, since it can invoke git and the test runner for everything it needs"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because review-bot's described job — reading a diff, running existing checks, and leaving comments — requires only read access and a way to post structured feedback; nothing about that job requires modifying files, running arbitrary shell commands, or merging. B grants edit, bash, and merge specifically to let the agent go beyond its intended review-only role, which is scope creep dressed as convenience and removes the human decision point Priya just established in Q1. C is capability creep justified by hypothetical future need rather than the task in front of the team. D substitutes broad shell access for a narrow, auditable comment action, losing the clear audit trail a scoped tool provides."
+    },
+    {
+      "id": "gh600-scenario-001-q3",
+      "stem": "To speed up merges, another engineer proposes adding review-bot as a bypass actor on the main branch ruleset so its own PRs (opened when it proposes larger fixes) skip the required review check, reasoning that review-bot already ran tests and linters before opening them. What is the biggest risk with this proposal?",
+      "options": [
+        "A: It would make review-bot's PRs slower to open, since bypass actors have additional latency",
+        "B: It removes the human review gate for exactly the changes review-bot itself proposed, undermining the guarantee that agent-authored changes get independent human sign-off",
+        "C: Bypass actors are a legacy GitHub feature that no longer functions on protected branches",
+        "D: It would have no meaningful effect, since branch protection only applies to human contributors"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a bypass actor configuration is a structural exemption from the review requirement — once granted, review-bot's own proposed changes merge without the independent human check that the whole point of a review agent is supposed to feed into; \"it already ran its own checks\" describes the agent grading its own work, not an independent review. A and C misstate how bypass actors work. D is false — branch protection rules apply to any actor pushing to or merging into the protected branch, including agents and bots, unless explicitly exempted (which is exactly the risky exemption being proposed here)."
+    },
+    {
+      "id": "gh600-scenario-001-q4",
+      "stem": "Priya notices that when review-bot explains its findings in free-form prose (\"there might be an issue with error handling somewhere in the auth changes\"), reviewers struggle to tell exactly what it flagged before deciding whether to act on it. What should she change to fix this?",
+      "options": [
+        "A: Disable review-bot's comment tool and have it only run tests",
+        "B: Require review-bot's findings to be output as a structured list — specific file, line, and issue description — rather than free-form narration",
+        "C: Instruct review-bot to only comment when it is highly confident, without changing the comment format",
+        "D: Give review-bot merge access so it can fix the issues itself instead of describing them"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the problem is ambiguity in what review-bot found, not whether it found real issues — structured output (specific file, line, description) lets a reviewer verify and act on each finding directly, the same principle that makes a structured implementation plan easier to approve than free-form narration. A eliminates the agent's core function instead of fixing its output format. C doesn't address the format problem and risks silently dropping legitimate findings. D reopens the merge-access risk Marcus and Priya already ruled out in Q1 and Q2."
+    }
+  ],
+  "keyLearnings": [
+    "Plan/approve/act boundaries in an agent-integrated SDLC should gate irreversible, state-changing actions (like merging) behind human approval, even when upstream steps (running tests, generating findings) are fully autonomous.",
+    "Tool grants should match the agent's actual described job exactly — a review-only agent needs read plus a comment tool, not edit, bash, or merge, regardless of how convenient broader access would be.",
+    "Bypass-actor and branch-protection exemptions for an agent's own PRs remove the independent human check that agent-authored changes specifically need, even if the agent already ran its own checks.",
+    "Structured, specific output (file, line, description) is easier for a human to verify and approve than free-form narration, whether that output is a review finding or an implementation plan."
+  ]
+}

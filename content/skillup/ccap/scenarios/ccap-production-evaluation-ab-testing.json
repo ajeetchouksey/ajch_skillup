@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-004",
+  "title": "Evaluating and A/B Testing a New Underwriting Assistant Prompt",
+  "description": "Tests the ability to design a labeled evaluation framework with multiple metrics, structure a statistically sound A/B test, correctly interpret a subgroup regression hidden inside an aggregate result, and communicate the trade-offs to non-technical stakeholders.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [4, 6],
+  "scenario": {
+    "background": "Meridian Lending, a fintech company, uses a Claude-based underwriting copilot that helps loan officers review applications and flags cases likely to be falsely declined. The team has built a new prompt version (v2) that claims to reduce the false-decline rate, and wants to validate it before rolling it out company-wide. The board has asked for a clear before/after business case, and Compliance has flagged that any change to underwriting behavior must be checked for disparate impact across protected classes before it ships broadly.",
+    "characters": [
+      {
+        "name": "Yuki Tanaka",
+        "role": "VP of Engineering",
+        "concern": "Needs a statistically sound basis for the rollout decision, not an anecdotal sense that v2 'seems better' from a handful of examples."
+      },
+      {
+        "name": "Carlos Mendes",
+        "role": "Head of Risk and Compliance",
+        "concern": "Needs to present the trade-offs to the board in plain business terms, and must be able to show regulators the change didn't introduce a disparate impact on any protected subgroup."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-004-q1",
+      "stem": "Before running any A/B test, Yuki wants to build an evaluation framework for comparing v1 and v2. Which framework design correctly serves both her and Carlos's needs?",
+      "options": [
+        "A small set of examples the engineering team reviews informally, judging by 'does the output look reasonable' before moving to a live test",
+        "A fixed, human-labeled golden dataset with known correct decline/approve outcomes, scored on multiple metrics simultaneously: overall accuracy and false-decline rate, plus accuracy broken out by protected-class subgroup to surface any disparate-impact signal",
+        "A single aggregate accuracy metric across the whole labeled dataset, since a single number is easiest to report to the board",
+        "No offline evaluation at all — go straight to a live A/B test with real applicants, since real traffic is the most realistic test"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a labeled golden dataset gives a repeatable, ground-truth-based measurement, and tracking multiple metrics — including subgroup breakdowns — surfaces both the intended improvement (false-decline rate) and the risk Carlos is responsible for (disparate impact) before any real applicant is affected. A fails because an informal 'looks reasonable' review has no ground truth and can't detect a systematic error pattern, especially a subgroup-specific one. C fails because a single aggregate metric can hide a harmful subgroup effect entirely, which is exactly the failure mode Compliance is worried about. D fails because skipping offline evaluation and going straight to live traffic exposes real applicants to an unvalidated change, including the risk of a wrongful decline before any problem is caught."
+    },
+    {
+      "id": "ccap-scenario-004-q2",
+      "stem": "For the live comparison, which A/B test design gives Yuki a valid causal read on whether v2 actually improves the false-decline rate?",
+      "options": [
+        "Run v1 for two weeks, then switch entirely to v2 for the next two weeks, and compare the false-decline rate between the two periods",
+        "Randomly assign incoming applications to v1 or v2 concurrently, with a pre-registered primary success metric and a sample size calculated to give adequate statistical power to detect the expected effect size",
+        "Let loan officers choose whether to use v1 or v2 for each application based on their personal preference, then compare outcomes by officer choice",
+        "Run v2 only on applications the underwriting team suspects might otherwise be falsely declined, and compare those outcomes to the general v1 population"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because random, concurrent assignment with a pre-registered metric and a power-calculated sample size isolates the effect of the prompt change from other variables and gives a statistically valid basis for the rollout decision. A fails because sequential before/after comparison confounds the prompt change with any time-based trend (seasonality, applicant mix shift, market conditions) during the two separate periods. C fails because self-selected assignment introduces selection bias — officers likely to prefer v2 may also handle different types of applications, confounding the comparison. D fails because deliberately routing suspected-false-decline cases to v2 biases the sample toward cases where v2 is more likely to look good, invalidating any comparison to the general v1 population."
+    },
+    {
+      "id": "ccap-scenario-004-q3",
+      "stem": "The A/B test completes. Aggregate results show v2 statistically significantly reduces the overall false-decline rate. However, a subgroup breakdown shows v2 increases the false-decline rate for one specific applicant segment. What should Yuki do next?",
+      "options": [
+        "Ship v2 company-wide immediately, since the aggregate result is statistically significant and positive, and subgroup noise is expected in any large dataset",
+        "Do not ship v2 broadly yet; investigate the subgroup regression to determine whether it's a real effect or noise, and if real, fix the prompt or consider a segment-specific rollout that excludes the affected segment until resolved",
+        "Ship v2 broadly but quietly monitor the affected segment for a few months before deciding whether to address it",
+        "Discard v2 entirely and keep v1 indefinitely, since any subgroup regression means the new prompt is unsafe to use in any form"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because an aggregate improvement can mathematically coexist with a real harm to a subgroup, and given Carlos's disparate-impact obligation, that regression must be investigated and resolved (or the affected segment excluded) before broad rollout — averaging away a harmful subgroup effect is not acceptable in a regulated lending context. A fails because it treats a subgroup regression as noise without verifying that, which is exactly the kind of decision that creates regulatory and reputational risk if the effect is real. C fails because shipping broadly while 'quietly monitoring' still exposes the affected segment to a live regression during the monitoring period, with no interim mitigation. D fails because discarding a prompt that shows genuine overall improvement is an overcorrection when a scoped fix (excluding or specifically addressing the affected segment) may resolve the issue while preserving the aggregate benefit."
+    },
+    {
+      "id": "ccap-scenario-004-q4",
+      "stem": "After the subgroup issue is resolved and v2 is validated for full rollout, Carlos needs to present the results to the board. Which communication approach best fits the audience and the decision they need to make?",
+      "options": [
+        "Present the raw statistical output — p-values, confidence intervals, and the evaluation dashboard exactly as engineering sees it — so the board gets the unfiltered technical detail",
+        "Present business-relevant impact framed in plain language: the estimated reduction in false declines and its dollar/customer impact, the subgroup issue that was found and how it was resolved, and the residual risk or caveats — supported by, but not led with, the underlying statistics",
+        "Present only the headline result ('false-decline rate improved') and omit the subgroup issue, since it was already fixed and doesn't need to be raised",
+        "Skip a formal presentation and send the raw evaluation dataset and A/B test logs to board members to review independently"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because board-level communication needs to translate technical results into business impact and risk framing the board can act on, while still being transparent about material issues (the subgroup regression) that were found and how they were addressed — this builds trust and gives an accurate picture for governance purposes. A fails because raw statistical output is not the right format for a board audience and obscures the business decision behind technical detail they're not equipped to parse quickly. C fails because omitting a materially relevant issue — even one that was resolved — undermines transparency with a governance body that has compliance oversight responsibility, and it may resurface as a bigger trust issue if discovered later. D fails because it abdicates the responsibility to frame and interpret results for a non-technical audience, leaving the board to draw their own conclusions from raw data they aren't positioned to evaluate."
+    }
+  ],
+  "keyLearnings": [
+    "A production evaluation framework should use a labeled ground-truth dataset with multiple tracked metrics, including subgroup breakdowns, rather than a single aggregate metric that can mask harmful effects on specific segments.",
+    "A/B tests need randomized, concurrent assignment with a pre-registered metric and adequate statistical power — sequential before/after comparisons and self-selected or biased assignment all invalidate the causal read.",
+    "An aggregate improvement can hide a real regression in a subgroup; that regression must be investigated and addressed, not averaged away, especially in regulated domains with disparate-impact obligations.",
+    "Communicating results to non-technical stakeholders means translating statistics into business impact and being transparent about issues found and resolved, not hiding technical detail or omitting material findings."
+  ]
+}

@@ -16,6 +16,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+// Pre-split (ajch_platform) layout nested content under public/; ajch_skillup
+// has content/ at the repo root directly — support both.
+const CONTENT_BASE = existsSync(join(ROOT, 'public')) ? join(ROOT, 'public') : ROOT;
 const SKILLUP_DIR = join(ROOT, 'content', 'skillup');
 
 const args = process.argv.slice(2);
@@ -42,7 +45,7 @@ function readJson(absPath) {
 
 /** Resolve a content-relative path (e.g. "content/skillup/...") to absolute. */
 function absContent(relativePath) {
-  if (relativePath.startsWith('content/')) return join(ROOT, 'public', relativePath);
+  if (relativePath.startsWith('content/')) return join(CONTENT_BASE, relativePath);
   return join(ROOT, relativePath);
 }
 

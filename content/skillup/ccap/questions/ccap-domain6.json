@@ -1,0 +1,257 @@
+[
+  {
+    "domain": 6,
+    "id": "ccap-d6-001",
+    "scenario": "A retail chain's business sponsor kicks off a project by saying, \"we want AI that handles all customer emails.\" This is the architect's first structured discovery session with the business team.",
+    "question": "Which is the most effective discovery question to ask first, before proposing any architecture?",
+    "options": [
+      "Ask which LLM model to use — Opus or Sonnet — since the model choice will shape everything else",
+      "Ask how many GPUs the current infrastructure has, since that will determine what's technically feasible",
+      "Ask what a successful resolution looks like for the top email categories today, and what the current escalation triggers are",
+      "Ask what UI framework the team prefers for the chat widget"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: Structured discovery starts by anchoring on the current state and desired outcomes — what \"success\" and \"escalation\" already mean to the business — before any technology or implementation choice enters the conversation; a requirement gathered as an outcome is durable, while a requirement gathered as a technology preference locks in an assumption before it's been tested.\n\n**Why C is correct**: Asking what a successful resolution looks like today, category by category, and what triggers an escalation gives the architect the actual acceptance criteria and edge cases the system must handle — this is the raw material every later design decision (retrieval strategy, guardrails, human-in-the-loop points) will be built from.\n\n**Why the distractors fail**:\n- A: Choosing between models is an architecture decision, not a discovery question — asking it first skips straight past understanding the problem and anchors the conversation on a technology the business has no basis to evaluate yet.\n- B: Claude is consumed via API, so the customer's own GPU inventory is irrelevant to feasibility; this question reveals the architect is thinking about the wrong constraint entirely.\n- D: UI framework preference is an implementation detail several layers downstream of understanding what \"handling an email\" even means for this business — asking it first signals the architect is jumping to solutioning.\n\n**In practice**: Senior architects open discovery with \"what does good look like today, and where does it break down\" — every subsequent technical question should trace back to an answer gathered in that first pass, not the other way around.",
+    "tags": ["discovery", "requirements-gathering", "stakeholder-interviews"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-002",
+    "scenario": "A manufacturing firm holds a discovery workshop for a predictive-maintenance agent with IT, Operations, and Finance stakeholders in the same room. IT wants integration simplicity, Ops wants uptime guarantees, and Finance wants ROI — and the IT lead, who is the most technically fluent, tends to dominate the conversation.",
+    "question": "What is the best structured technique to ensure requirements aren't dominated by the most vocal stakeholder?",
+    "options": [
+      "Conduct separate 1:1 discovery interviews with each stakeholder group before a joint requirements-alignment session, so quieter but critical requirements surface independently",
+      "Let the IT lead run the discovery meeting, since they have the deepest technical knowledge",
+      "Send a generic requirements questionnaire by email and compile the answers without any follow-up",
+      "Skip formal discovery and rely on the RFP document Finance already provided"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: Group discovery sessions are efficient for alignment but poor for elicitation — the loudest or most technically confident voice in the room systematically crowds out requirements from quieter stakeholders, so a structured discovery process separates individual elicitation from group alignment rather than collapsing both into one meeting.\n\n**Why A is correct**: Interviewing IT, Ops, and Finance separately first means Ops's uptime requirement gets surfaced on its own terms, not filtered through whatever the IT lead happened to prioritize in a shared room — the joint session that follows is then used for what it's actually good for: reconciling and prioritizing requirements everyone has already stated, not discovering them for the first time.\n\n**Why the distractors fail**:\n- B: Deferring to the most technically fluent person to run discovery all but guarantees the requirements gathered reflect IT's framing of the problem, leaving Ops's uptime needs and Finance's ROI model as afterthoughts.\n- C: A generic emailed questionnaire with no follow-up captures surface-level answers and misses the clarifying back-and-forth that turns a vague statement into an actionable requirement — it's low-fidelity by design.\n- D: An RFP document represents one party's (Finance's) framing of the problem at a point in time; treating it as sufficient discovery skips independently validating what Ops and IT actually need.\n\n**In practice**: When a project has multiple stakeholder groups with different incentives, architects budget time for individual interviews before any joint session — the question to ask is \"whose requirement would get lost if I only ran this as a group meeting?\"",
+    "tags": ["discovery", "requirements-gathering", "stakeholder-alignment"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-003",
+    "scenario": "During discovery for an insurance claims-automation project, a business stakeholder states the requirement as, \"the system needs to be fast.\" The architect needs to turn this into something the design can actually target.",
+    "question": "What is the best next discovery action?",
+    "options": [
+      "Assume \"fast\" means sub-2-second latency, a common industry default, and proceed to design",
+      "Note it as a nice-to-have and drop it from the requirements document since it isn't quantified",
+      "Immediately propose caching every possible response to guarantee sub-second latency",
+      "Probe further: \"fast compared to what — the current manual process, or a specific target the business is measuring against?\" to convert the vague ask into a measurable, agreed requirement"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: A vague requirement isn't a gap to fill with an assumption — it's a signal that the discovery conversation isn't finished; the job of structured discovery is to keep asking clarifying questions until a statement like \"fast\" becomes a number the business has actually agreed to, because an unstated assumption designed against will surface as a dispute later, at a much more expensive point in the project.\n\n**Why D is correct**: Asking what \"fast\" is being compared to — the current manual process, a competitor benchmark, or a number someone already has in mind — turns an ambiguous adjective into a measurable, stakeholder-validated target that the architecture can actually be designed and evaluated against, and it does so while the cost of clarifying is still just a follow-up question.\n\n**Why the distractors fail**:\n- A: Substituting an \"industry default\" latency figure for the business's actual expectation means the architect is now designing against a number nobody in the room agreed to — if the real expectation was tighter or looser, this surfaces as a mismatch after significant work is already done.\n- B: Dropping an unquantified requirement rather than clarifying it discards a real signal from the business; the fix for vagueness is a follow-up question, not deletion.\n- C: Proposing a specific technical solution (full caching) before the actual latency target is even known is solutioning ahead of requirements — it may be wildly over-engineered or still insufficient depending on what \"fast\" turns out to mean.\n\n**In practice**: Every vague adjective in a requirements conversation — fast, scalable, secure, simple — is a placeholder for a number or a concrete condition; architects treat these as open discovery threads to close with a follow-up question, not gaps to fill with a guess.",
+    "tags": ["discovery", "requirements-gathering", "non-functional-requirements"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-004",
+    "scenario": "A global logistics company is in discovery for a multi-region Claude deployment. The architect has completed stakeholder interviews across three regions and finds two regional VPs give directly contradictory requirements: the EU VP requires that all data processing stay in-region for compliance reasons, while the US VP wants a single unified global deployment for consistency and lower operational cost.",
+    "question": "What is the correct next step before architecture design begins?",
+    "options": [
+      "Design for the EU VP's data-residency requirement globally, since compliance concerns override cost concerns by default",
+      "Escalate the conflicting requirements to a joint stakeholder session (or the executive sponsor) to explicitly resolve the trade-off and document the agreed priority before design begins",
+      "Design two fully independent architectures in parallel and let the business choose after both are implemented",
+      "Proceed with the US VP's requirement, since a single global deployment is generally preferred for application consistency"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: When discovery surfaces a genuine conflict between stakeholders — not a misunderstanding, but two legitimate, opposing priorities — the architect's job is not to privately pick a winner using a rule of thumb; it's to make the conflict explicit to the people with authority to resolve it, and get that resolution documented before it gets baked into a design.\n\n**Why B is correct**: Escalating the conflict to a joint session or an executive sponsor forces an explicit, accountable decision about which priority wins (or how they're reconciled, e.g., regional data residency with a shared orchestration layer) — and documenting that decision means the architecture that follows is built on an agreed foundation, not the architect's private guess about which VP outranks the other.\n\n**Why the distractors fail**:\n- A: Assuming compliance always outranks cost sounds safe, but it's still the architect unilaterally resolving a business trade-off that was never actually put to the stakeholders who own it — the EU requirement might be real, or it might be negotiable with the right waiver; only the stakeholders can say.\n- C: Building two full architectures in parallel to defer the decision is enormously wasteful and doesn't actually resolve the conflict — it just moves the same unresolved discovery gap downstream to a much more expensive point in the project.\n- D: Defaulting to the US VP's preference because global consistency is \"generally preferred\" applies a generic best practice over an actual regulatory constraint that was specifically raised in discovery — it ignores the very conflict the architect was supposed to catch.\n\n**In practice**: Contradictory stakeholder requirements are a discovery output, not a design input — architects surface and force resolution of the conflict explicitly, because a design built on a silently-resolved conflict tends to fail loudly during the phase-gate review that finally asks both VPs the same question.",
+    "tags": ["discovery", "stakeholder-alignment", "requirements-gathering"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-005",
+    "scenario": "A hospital's patient-triage assistant uses a RAG pipeline with a mandatory human-review gate before any triage recommendation reaches a nurse, adding roughly four seconds of latency per request. In a steering committee meeting, the non-technical Chief Medical Officer asks, \"why is this slower than the vendor demo we saw?\"",
+    "question": "What is the most effective way to communicate this trade-off to the CMO?",
+    "options": [
+      "Explain that the added stages — retrieval, classification, and a human-review queue — trade about four seconds of latency for a safety gate that prevents an unreviewed recommendation from reaching a patient, and that the vendor demo didn't include that gate",
+      "Explain that the retrieval step uses cosine similarity search over an embedding index with an HNSW graph, which adds computational overhead",
+      "Reassure the CMO that engineering will optimize the code next sprint to match the vendor demo's speed",
+      "Say that four seconds is within acceptable industry norms and no further discussion is needed"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: Communicating an architectural trade-off to a non-technical executive means translating the technical cause into the business or risk consequence the executive actually weighs decisions against — for a CMO, that consequence is patient safety, not pipeline latency in the abstract.\n\n**Why A is correct**: Framing the four seconds explicitly as \"the price of a safety gate the vendor demo skipped\" gives the CMO the actual trade-off — speed versus an unreviewed recommendation reaching a patient — in terms she can evaluate against her own priorities and defend to her own stakeholders, which is the whole point of the conversation.\n\n**Why the distractors fail**:\n- B: Describing the embedding index and HNSW graph is technically accurate but answers a question the CMO didn't ask — it explains a mechanism without ever stating what the four seconds is buying her, leaving the actual trade-off undiscussed.\n- C: Promising to match the vendor demo's speed next sprint implicitly commits to removing or shrinking the safety gate to hit a number, without ever surfacing that trade-off to the person accountable for patient safety — this is over-promising against a requirement nobody agreed to change.\n- D: Declaring the latency \"within norms\" and closing the discussion dismisses a legitimate stakeholder question instead of using it as an opportunity to align expectations on why the design is the way it is.\n\n**In practice**: When a technical decision reaches an executive review, the architect's job is to restate the technical driver in the currency that executive cares about — risk, cost, time-to-market, patient safety — because a trade-off explained only in engineering terms either gets rejected for the wrong reasons or silently ignored.",
+    "tags": ["trade-off-communication", "executive-communication", "architecture-decisions"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-006",
+    "scenario": "A fintech firm is choosing between two fraud-detection architectures: a fine-tuned smaller model that is cheaper and faster per call but requires quarterly retraining and a six-week initial setup, versus Claude with a few-shot prompting approach that costs more per call at scale but can be deployed in two weeks and updated quickly as fraud patterns shift. The steering committee's CFO is fixated only on per-call cost.",
+    "question": "When presenting this trade-off to the steering committee, what is the most effective architect communication approach?",
+    "options": [
+      "Recommend the fine-tuned model outright since it's cheaper per call, without further discussion, since cost is what the CFO asked about",
+      "Present the decision purely in technical terms — model architecture, fine-tuning pipeline, inference cost per token — and let the CFO extrapolate the business impact",
+      "Reframe the comparison around total cost of ownership and time-to-value — including retraining labor cost, the six-week delay in fraud coverage and its associated fraud-loss exposure, and agility to adapt to new fraud patterns — so the CFO can weigh true cost against speed-to-mitigate-risk, not just per-call price",
+      "Avoid recommending anything and ask the CFO to choose, since the trade-off is subjective"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: A stakeholder fixated on a single visible metric — here, per-call cost — is usually missing the costs that don't show up in that metric; the architect's job in communicating a trade-off is to widen the frame to the full decision (total cost of ownership, time-to-value, risk exposure) rather than either accepting the narrow framing or ignoring it.\n\n**Why C is correct**: Reframing around total cost of ownership surfaces the costs the CFO's narrow per-call lens is hiding — retraining labor, six weeks of unmitigated fraud exposure, and the ongoing agility cost of a model that's slow to adapt to new fraud patterns — which lets the CFO make an informed decision on the actual economics of the choice, not just the number that happened to be visible.\n\n**Why the distractors fail**:\n- A: Recommending the cheaper-per-call option without surfacing the hidden costs accepts the CFO's incomplete framing and risks the committee choosing an option that's actually more expensive once fraud-loss exposure and retraining labor are counted.\n- B: Staying purely technical asks a financial decision-maker to do the business translation themselves — that's the architect's job to do, not the CFO's, and skipping it usually means the trade-off never actually gets weighed correctly.\n- D: Declining to make a recommendation abdicates the architect's advisory responsibility; the trade-off has real technical substance the architect understands better than the committee — presenting it clearly is different from refusing to engage with it.\n\n**In practice**: Whenever a stakeholder anchors on one metric, senior architects ask themselves \"what cost is this number hiding\" and bring that hidden cost into the conversation explicitly — this is what separates a trade-off presentation from a sales pitch for whichever option looks best on the metric already in the room.",
+    "tags": ["trade-off-communication", "executive-communication", "architecture-decisions"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-007",
+    "scenario": "In a review meeting with both engineering and product leads, a stakeholder asks the architect to explain why the team chose a multi-agent orchestration pattern over a single monolithic prompt for a telecom internal-support assistant.",
+    "question": "What should the explanation emphasize to be effective for this mixed technical/product audience?",
+    "options": [
+      "The specific YAML syntax used to define each subagent's configuration",
+      "A comparison of every LLM provider's multi-agent framework, including ones that were never actually evaluated for this project",
+      "A promise that the architecture will never need to change again",
+      "The reasoning behind the decision — why decomposing the task into specialized agents improves reliability and maintainability for this use case, and what trade-off, such as added orchestration complexity, was accepted to get there"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: Communicating an architectural decision means conveying the decision and its rationale — the problem it solves and the trade-off accepted to solve it — not the implementation syntax used to realize it; a mixed audience needs to understand why the choice was made, because that's what lets them evaluate or challenge it, not how it's configured.\n\n**Why D is correct**: Explaining that decomposition improves reliability and maintainability for this specific use case, and naming the orchestration-complexity cost that was accepted in exchange, gives both the product lead (who cares about outcomes) and the engineering lead (who cares about what they're inheriting) exactly the information needed to understand and, if necessary, push back on the decision.\n\n**Why the distractors fail**:\n- A: YAML configuration syntax is an implementation detail several layers below the decision itself — it answers \"how is this built\" when the question asked was \"why was this chosen.\"\n- B: A survey of frameworks that were never evaluated is irrelevant to explaining a decision that was actually made through a different process — it doesn't communicate the real rationale and wastes the audience's time.\n- C: Claiming the architecture will never need to change is an unrealistic overstatement that sets a false expectation and isn't actually part of explaining the trade-off that was made.\n\n**In practice**: When presenting a decision to stakeholders, the useful unit of communication is always \"we chose X over Y because of Z, and it cost us W\" — the rationale and the accepted trade-off, not the code or config that implements the choice.",
+    "tags": ["trade-off-communication", "architecture-decisions", "stakeholder-alignment"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-008",
+    "scenario": "During SLA negotiation for an airline's customer rebooking assistant, the business sponsor asks for \"99.99% uptime and under one second response time for all requests, including complex multi-step rebooking flows.\" The architect knows complex rebooking flows involve multiple tool calls and LLM round-trips.",
+    "question": "What is the most appropriate architect response for setting a realistic SLA?",
+    "options": [
+      "Agree to the SLA as stated to keep the sponsor happy, and address feasibility later during implementation",
+      "Propose differentiated SLA tiers — sub-1-second for simple lookups, and a separate, realistic target such as 3-5 seconds for multi-step rebooking flows — backed by data from a technical spike, and get explicit sign-off on the tiered targets",
+      "Refuse to discuss SLAs until the system is fully built and can be benchmarked",
+      "Set the SLA at 99.99% uptime but leave response time undefined so it can't be violated"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: An SLA is a commitment the architecture has to be able to meet in practice, not a negotiating outcome to placate a stakeholder in the moment — proposing a blanket target that ignores the actual latency profile of different request types sets up a commitment that's certain to be broken, which is worse for trust than negotiating a realistic number up front.\n\n**Why B is correct**: Differentiating SLA tiers by workload — a tight target for simple lookups, a separate and evidence-backed target for multi-step flows that inherently involve several round-trips — gives the sponsor a commitment the architecture can actually meet, and grounding the multi-step number in a technical spike means it's a real measurement, not a guess, before it's signed off.\n\n**Why the distractors fail**:\n- A: Agreeing to an SLA the architect already knows is technically unrealistic defers a known problem to implementation, where it becomes a much more expensive and visible failure — this is over-promising, and the gap surfaces exactly when trust matters most.\n- C: Refusing to discuss SLAs until the system is built leaves the sponsor without any commitment to plan around and misses the chance to align expectations while the design can still be shaped to hit a target.\n- D: Committing to uptime while leaving response time undefined avoids conflict but doesn't actually align expectations — the sponsor still has an unstated expectation of \"under one second,\" and it will resurface as a complaint the first time the system takes five seconds.\n\n**In practice**: The question a senior architect asks before agreeing to any SLA is \"do I have evidence this is achievable for every workload the number covers\" — if the answer is no for some subset, that subset gets its own, separately negotiated target.",
+    "tags": ["sla-management", "expectation-setting", "stakeholder-alignment"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-009",
+    "scenario": "A SaaS HR platform's Claude-based résumé-screening feature has been in production for four months. A quarterly feedback session reveals recruiters are increasingly bypassing the tool's recommendations because they don't trust the reasoning shown for borderline candidates, and usage data confirms declining adoption. Product asks the architect to \"just add more accuracy\" to fix it.",
+    "question": "What is the most appropriate use of this stakeholder feedback loop?",
+    "options": [
+      "Immediately begin re-tuning the classification prompt for higher raw accuracy, since that's what was requested",
+      "Dismiss the feedback, since usage and adoption data isn't a formal metric in the original SLA",
+      "Investigate further with recruiters to distinguish an accuracy problem from a trust or explainability problem — the drop in adoption on borderline cases suggests recruiters may not trust the reasoning shown, not that classifications are wrong — and act on the root cause, such as improving explanation quality",
+      "Add a mandatory pop-up forcing recruiters to accept the tool's recommendation before proceeding"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: A stakeholder feedback loop is only useful if the stated request is treated as a symptom to diagnose, not a work order to execute — \"add more accuracy\" is Product's hypothesis about the fix, but the underlying data (declining adoption specifically on borderline cases) points at a different, unstated root cause that a literal read of the request would miss entirely.\n\n**Why C is correct**: Going back to recruiters to distinguish \"the model is wrong\" from \"I don't trust why the model said what it said\" identifies the actual mechanism behind the adoption drop, and if it's a trust/explainability gap, no amount of raw accuracy improvement fixes it — the correct fix is targeted at the real cause the feedback loop uncovered, not the first hypothesis offered.\n\n**Why the distractors fail**:\n- A: Re-tuning for raw accuracy treats Product's guess as the diagnosis; if the real issue is that recruiters distrust borderline-case reasoning, accuracy gains that don't change the explanation won't move adoption at all — this risks a wasted iteration cycle chasing the wrong metric.\n- B: Usage and adoption data is exactly the kind of operational signal a feedback loop exists to surface, even when it wasn't written into the original SLA — dismissing it because it isn't a formal metric ignores real evidence the tool isn't delivering value in practice.\n- D: Forcing acceptance of recommendations papers over the trust problem with compliance rather than resolving it, and actively damages the relationship with the recruiters whose buy-in the tool depends on.\n\n**In practice**: When feedback surfaces a symptom (declining usage) alongside a stakeholder's proposed fix (more accuracy), the architect's job is to verify the fix actually addresses the mechanism behind the symptom before committing engineering effort — the two aren't always the same thing.",
+    "tags": ["feedback-loops", "stakeholder-alignment", "iteration"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-010",
+    "scenario": "Mid-project on a retail inventory-forecasting assistant, a newly onboarded executive wants to expand scope to include automated supplier negotiation — a capability that wasn't part of the original discovery. The architect is already mid-build on the originally scoped forecasting feature.",
+    "question": "What is the best way to manage this expectation shift?",
+    "options": [
+      "Document the new requirement, assess its impact on timeline, cost, and architecture, and bring it back to stakeholders as an explicit scope-change decision showing the trade-off the expansion requires, before committing to it",
+      "Silently absorb the new scope into the current sprint without renegotiating timeline or budget, to avoid seeming inflexible",
+      "Refuse the new request outright, since it wasn't in the original discovery document",
+      "Build the new feature in parallel using unallocated contingency time without informing the original sponsor"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: Expectation alignment doesn't end at discovery — new stakeholders and shifting priorities introduce new requirements throughout a project's life, and each one needs to go through the same discipline discovery would have applied: understand it, assess its real impact, and get an explicit, informed decision from stakeholders before it's absorbed into the plan.\n\n**Why A is correct**: Treating the new scope as a formal change — assessing what it actually costs in timeline, budget, and architectural rework, then presenting that trade-off back to stakeholders for an explicit decision — keeps expectations aligned on both sides: stakeholders get to decide with real information, and the architect isn't silently absorbing risk on their behalf.\n\n**Why the distractors fail**:\n- B: Silently absorbing new scope avoids an uncomfortable conversation now but sets an expectation that scope changes are free, which erodes the original delivery commitment and surfaces as a missed deadline nobody agreed to.\n- C: Refusing outright because it wasn't in the original discovery document is rigid and treats discovery as a one-time, immutable event rather than a living understanding of requirements — it also damages the relationship with a new, presumably influential stakeholder.\n- D: Building the feature quietly using contingency time without informing the original sponsor is non-transparent — it hides a real scope and resource decision from the person who is accountable for the project's original commitments.\n\n**In practice**: Whenever a new requirement shows up mid-project, the architect's standing move is to make its cost visible and put the trade-off decision back in stakeholders' hands — this is what keeps \"scope creep\" from becoming a silent, unmanaged risk.",
+    "tags": ["expectation-setting", "feedback-loops", "stakeholder-alignment"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-011",
+    "scenario": "At the end of a design review for a media company's content-moderation assistant, a stakeholder asks the architect, \"so once this launches, will we ever need to talk to you again?\"",
+    "question": "What is the most accurate and professional answer for setting expectations about the ongoing relationship?",
+    "options": [
+      "\"No — once it's live, the system is fully autonomous and won't need any further architecture involvement.\"",
+      "\"That depends on whether anything breaks — otherwise there's nothing further to discuss.\"",
+      "\"Only if you want to add new features; performance monitoring isn't really necessary for these systems.\"",
+      "\"Yes — launch is the start of a monitoring and iteration phase; we'll review performance against agreed metrics on a regular cadence and revisit the architecture as usage patterns or requirements evolve.\""
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: The lifecycle of an architecture doesn't end at launch — it moves into monitoring and iteration, where real usage reveals things discovery and design couldn't fully anticipate, and setting that expectation clearly at handoff is part of managing the stakeholder relationship honestly rather than implying the project is \"done.\"\n\n**Why D is correct**: Framing launch as the start of an ongoing monitoring and iteration phase, with a defined cadence for reviewing agreed metrics, tells the stakeholder exactly what continued engagement looks like and why it's necessary — it sets a realistic, accurate expectation instead of implying the architect's involvement ends at go-live.\n\n**Why the distractors fail**:\n- A: Claiming the system is fully autonomous post-launch is inaccurate for any production AI system, which needs ongoing performance monitoring as usage patterns, data distributions, and requirements shift over time — this sets an expectation that will be violated the first time something needs attention.\n- B: Framing further engagement as purely reactive (\"only if it breaks\") understates the proactive monitoring and iteration work that keeps a system performing well — it treats the lifecycle as break-fix rather than an ongoing discipline.\n- C: Dismissing performance monitoring as unnecessary is actively wrong and sets the stakeholder up to be surprised when drift or degraded performance eventually does require attention.\n\n**In practice**: Handoff conversations are the right moment to set the expectation that monitoring and iteration are a normal, planned part of the system's life — stakeholders who understand this upfront are far less likely to treat a later architecture review as a sign something went wrong.",
+    "tags": ["expectation-setting", "lifecycle-management", "monitoring"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-012",
+    "scenario": "An energy utility's architect is preparing a handoff document for the engineering team who will build and maintain a grid-anomaly-detection Claude agent after the design phase concludes.",
+    "question": "What should the architecture document primarily capture to be most useful for the implementation team?",
+    "options": [
+      "A complete line-by-line pseudocode implementation of every function, so engineers don't need to make any decisions",
+      "Key architectural decisions and their rationale and trade-offs, component boundaries and interfaces, and the non-functional requirements they must satisfy — leaving implementation-level choices to the engineering team",
+      "A copy of the original sales pitch deck used to win the project",
+      "Only a diagram of the system, with no accompanying explanation of why decisions were made"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: Architecture documentation exists to transfer decisions and their rationale, not to remove the engineering team's ability to make implementation choices — a good document tells engineers what the system must do and why the boundaries are drawn where they are, and trusts them to figure out how within those bounds.\n\n**Why B is correct**: Capturing the key decisions, the trade-offs behind them, the interfaces between components, and the non-functional requirements those components must satisfy gives engineers everything they need to build correctly and to know when a proposed change would violate an original constraint — while still leaving implementation details, which are the engineering team's domain, to them.\n\n**Why the distractors fail**:\n- A: Line-by-line pseudocode over-specifies implementation, removes engineering autonomy, and becomes stale the moment engineers make any reasonable implementation choice that differs from it — it also doesn't scale to a system of any real complexity.\n- C: A sales pitch deck is written to persuade a buyer, not to inform a builder — it's the wrong artifact entirely for technical handoff.\n- D: A diagram without rationale shows the shape of the system but not why it's shaped that way, which is exactly the information a maintainer needs months later when deciding whether a change is safe.\n\n**In practice**: The test for good handoff documentation is whether an engineer six months from now, facing a proposed change, can tell from the document alone whether that change would violate an original constraint — pseudocode and diagrams alone don't pass that test; rationale does.",
+    "tags": ["architecture-documentation", "handoff", "implementation-guidance"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-013",
+    "scenario": "Six months after handoff of a government agency's multi-agent case-processing system, a newly onboarded engineer needs to modify the escalation logic. She finds the architecture document describes the system's components but never explains why a particular design choice — synchronous versus asynchronous agent handoff — was made, and she can't tell whether changing it would violate an original constraint.",
+    "question": "What documentation gap does this illustrate, and what should have been included to prevent it?",
+    "options": [
+      "Missing an Architecture Decision Record (ADR) or equivalent capturing the \"why\" behind the synchronous/asynchronous choice — including the constraint or trade-off that drove it — so future maintainers can tell whether the constraint still applies before changing it",
+      "Missing sequence diagrams — the fix is to add more UML diagrams of the component interactions",
+      "Missing unit test coverage for the escalation module",
+      "Missing a project timeline showing when the decision was made"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: Documenting what a system does is necessary but not sufficient — without a record of why a specific design choice was made and what constraint or trade-off drove it, a future maintainer has no way to tell whether a proposed change is safe or whether it would silently violate a requirement that motivated the original decision.\n\n**Why A is correct**: An Architecture Decision Record capturing the rationale behind the synchronous/asynchronous choice — for example, a latency constraint, a data-consistency requirement, or a downstream system's limitation — gives the new engineer exactly what she's missing: the ability to check whether that original constraint still holds before she changes the behavior it was designed around.\n\n**Why the distractors fail**:\n- B: More sequence diagrams would show how the components currently interact in more detail, but diagrams describe structure, not the reasoning behind a structural choice — they don't answer \"why was it built this way\" any better than the diagrams she presumably already has.\n- C: Unit test coverage is a code-quality and regression-safety concern; it doesn't help the engineer understand the original design rationale, which is the actual gap described in the scenario.\n- D: A timeline of when the decision was made tells her nothing about the constraint or reasoning that produced it — dates don't substitute for rationale.\n\n**In practice**: The specific failure this scenario illustrates — an engineer unable to tell if a change is safe — is exactly what ADRs exist to prevent; architects treat \"why did we choose this over the alternative\" as documentation on the same level of importance as \"what does this component do.\"",
+    "tags": ["architecture-documentation", "adr", "handoff"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-014",
+    "scenario": "A pharmaceutical company's architect is writing implementation guidance for a development team building a Claude-based clinical-trial document summarization pipeline, under a strict constraint that PHI must never leave a specific VPC.",
+    "question": "Which piece of guidance is most important to include explicitly in the implementation documentation, given the audience is developers who will build the actual integration?",
+    "options": [
+      "A general reminder that \"security is important,\" without further detail",
+      "A history of every alternative vendor considered before Claude was selected",
+      "A specific, testable constraint: which API calls and data flows must stay inside the VPC, how that boundary is enforced — such as private endpoints and no public internet egress for PHI-bearing requests — and how to verify compliance during development",
+      "The org chart of who approved the project"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: Implementation guidance is only actionable when a constraint is stated as something a developer can build against and verify — a compliance requirement expressed as a vague value statement gives engineers nothing concrete to implement or test, while the same requirement expressed as a specific, testable boundary condition can be built, code-reviewed, and validated.\n\n**Why C is correct**: Naming exactly which data flows must remain inside the VPC, how that boundary is technically enforced (private endpoints, no PHI-bearing traffic over the public internet), and how a developer verifies compliance while building gives the team a concrete spec they can implement against and check off — this is what turns a policy requirement into an engineering deliverable.\n\n**Why the distractors fail**:\n- A: \"Security is important\" carries no information a developer can act on — it doesn't tell them which flows are constrained, how the boundary is enforced, or how to know if they've violated it.\n- B: A history of vendor alternatives is background context relevant to the original decision, not guidance for building the integration correctly — it doesn't help the developer implement the VPC boundary.\n- D: An org chart of approvers has no bearing on how the system should be built and doesn't inform any technical decision the development team needs to make.\n\n**In practice**: Good implementation guidance answers \"what specifically must be true, and how do I check that it is\" — a compliance constraint that can't be translated into a testable condition hasn't actually been operationalized yet, no matter how clearly it was stated in a policy document.",
+    "tags": ["implementation-guidance", "architecture-documentation", "handoff"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-015",
+    "scenario": "A banking loan-underwriting project has completed the design phase and is about to move into build. The project manager asks the architect whether a phase-gate review is necessary before development starts.",
+    "question": "What is the most appropriate phase-gate activity between design and build?",
+    "options": [
+      "Skip the gate and start development immediately, since the design document already exists",
+      "Wait until after the build is complete to get stakeholder sign-off, since that's when there's something concrete to review",
+      "Have only the architect informally approve their own design, without further stakeholder involvement",
+      "Hold a design-review checkpoint with key stakeholders — business, security, and engineering — to confirm the architecture meets agreed requirements and constraints, and get explicit sign-off before committing engineering resources to build"
+    ],
+    "correct": 3,
+    "explanation": "**The principle**: A phase gate exists to catch a misaligned or non-compliant design while it's still cheap to fix — on paper, before engineering resources are committed — rather than after implementation has made every correction more expensive; skipping this checkpoint doesn't remove the risk of a flawed design, it just defers discovering it to a more expensive point in the lifecycle.\n\n**Why D is correct**: A design-review checkpoint that brings business, security, and engineering stakeholders together to explicitly confirm the design meets agreed requirements and constraints catches misalignment while a correction is still just a document edit, and the explicit sign-off creates accountable agreement before real engineering investment begins.\n\n**Why the distractors fail**:\n- A: Starting development immediately assumes the design document is correct and fully agreed-upon without ever validating that assumption — any gap between what was documented and what stakeholders actually need surfaces only after build effort has already been spent.\n- B: Deferring stakeholder sign-off until after build is complete means any design flaw or misalignment is now expensive to fix — code, tests, and integration work all have to be reworked, which is exactly the cost a phase gate exists to avoid.\n- C: Self-approval by the architect provides no independent validation and defeats the purpose of a phase gate, which is specifically to get perspectives — especially security and business — that the architect alone doesn't have.\n\n**In practice**: The cost of catching a design flaw roughly follows the project timeline — cheap on paper, expensive in code, very expensive in production — which is exactly why architects insist on an explicit sign-off gate before committing engineering resources, even when it feels like it's slowing things down.",
+    "tags": ["lifecycle-management", "phase-gate", "stakeholder-alignment"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-016",
+    "scenario": "A retail seasonal-demand-forecasting Claude system has been live in production for two quarters. Post-handoff monitoring shows forecast accuracy has degraded during the launch of a new product category that didn't exist in the original training or evaluation data. The original architect is no longer directly staffed on the project, and the operations team lacks the context to know how to respond.",
+    "question": "What lifecycle gap does this scenario most clearly indicate, and what should have been established during handoff to address it?",
+    "options": [
+      "A gap in initial model selection — the fix is to switch to a larger model",
+      "A gap in the iteration and monitoring phase — the handoff should have defined ownership, monitoring metrics and thresholds that trigger review, and a documented escalation path for when performance degrades outside expected bounds, so operations knows when and how to act without the original architect",
+      "A gap in the discovery phase — the fix is to redo discovery from scratch",
+      "A gap in SLA negotiation — the fix is to lower the accuracy SLA to match current performance"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: A system that will encounter data it wasn't originally trained or evaluated on — new product categories, shifting usage patterns — needs a defined monitoring and escalation process established at handoff, so that when performance degrades, the team maintaining the system knows what threshold triggers action and what to do about it, without depending on the original architect's institutional knowledge.\n\n**Why B is correct**: The actual failure here isn't the model or the original discovery — it's that operations doesn't know whether this degradation is expected, who owns responding to it, or what the escalation path is; establishing monitoring metrics, thresholds, and an ownership/escalation plan at handoff is exactly what would let the operations team recognize and act on this situation independently.\n\n**Why the distractors fail**:\n- A: A larger model doesn't inherently solve a data-drift problem caused by an entirely new product category the model has never seen — this misdiagnoses a monitoring and iteration gap as a raw capability gap.\n- C: Redoing discovery from scratch is a massive over-correction for a system that was working correctly on its original scope — the actual gap is in how new, out-of-distribution scenarios get detected and escalated after launch, not in how the original requirements were gathered.\n- D: Lowering the SLA to match degraded performance treats the symptom as acceptable rather than fixing the missing process that would have caught and addressed the degradation in the first place — it also quietly lowers the bar instead of restoring it.\n\n**In practice**: Handoff isn't complete until operations knows what \"healthy\" looks like, what triggers a review, and who to escalate to — without that, a system's owners can only find out something's wrong when a stakeholder complains, which is exactly what happened here.",
+    "tags": ["lifecycle-management", "monitoring", "handoff", "iteration"]
+  },
+  {
+    "domain": 6,
+    "id": "ccap-d6-017",
+    "scenario": "A manufacturing Claude-based quality-inspection copilot has been live for three months. Operations has collected production feedback showing the system performs well on standard defect types but poorly on a newly introduced product line's defect patterns. Leadership asks the architect to describe the appropriate next step in the lifecycle.",
+    "question": "What is the correct lifecycle action?",
+    "options": [
+      "Feed the production feedback into a scoped iteration cycle — updating requirements and evaluation data for the new product line's defect patterns, revalidating the architecture against the updated requirements, and redeploying the updated solution with stakeholders informed of the change",
+      "Ignore the feedback, since three months of data isn't statistically significant enough to act on",
+      "Treat this as a new project and restart the entire discovery-to-handoff lifecycle from scratch",
+      "Have engineering silently patch the model prompts in production without updating requirements documentation or informing stakeholders"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: The iteration phase of the lifecycle exists precisely for cases like this — real production feedback reveals a gap relative to a requirement (accurate detection across product lines) that the original scope didn't fully anticipate, and the correct response is a scoped, documented cycle back through requirements and validation, not a full lifecycle restart or an ad hoc, undocumented patch.\n\n**Why A is correct**: Treating the new defect-pattern gap as a scoped iteration — updating the requirements and eval data to explicitly cover the new product line, revalidating the architecture against that updated bar, and redeploying with stakeholders informed — closes the gap through the same disciplined process the original system was built with, keeping documentation and stakeholder understanding in sync with what's actually running in production.\n\n**Why the distractors fail**:\n- B: Three months of consistent production feedback showing a specific, repeatable weakness on a defined product line is a real operational signal, not statistical noise to be dismissed — ignoring it lets a known gap persist.\n- C: Restarting the entire discovery-to-handoff lifecycle is wildly disproportionate to a scoped gap in one product line's defect coverage — the existing architecture and most of its requirements remain valid; only the new product line's requirements need to be added and validated.\n- D: A silent prompt patch in production that bypasses requirements documentation and stakeholder communication breaks the traceability between what the system does and what it's documented to do, and denies stakeholders visibility into a change to system behavior.\n\n**In practice**: Iteration cycles are meant to be right-sized to the gap that triggered them — the architect's job is to route real production feedback back through a scoped version of the same discipline (updated requirements, revalidation, informed redeployment) rather than either ignoring it or over-reacting to it.",
+    "tags": ["lifecycle-management", "iteration", "feedback-loops"]
+  }
+]

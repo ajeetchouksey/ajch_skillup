@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-003",
+  "title": "Resuming a Multi-Day Migration Without Losing the Thread",
+  "description": "Greywick Systems runs a legacy-monolith migration across multiple coding-agent sessions spanning several days. The scenario tests durable-artifact memory strategy, resuming work across sessions without repeating it, detecting and correcting context drift mid-task, and scoping the work so it fits within session limits in the first place.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [3, 1],
+  "scenario": {
+    "background": "Greywick Systems is splitting a legacy monolith's billing module into a standalone service. The migration is too large for a single agent session, so it will run across several sessions over multiple days, with different engineers reviewing the work between sessions. The team needs the work to survive each session's ephemeral compute environment being discarded, and to be able to tell, at a glance, whether a given session is still on track.",
+    "characters": [
+      {
+        "name": "Sofia Bianchi",
+        "role": "Tech Lead",
+        "concern": "Making sure the migration's plan and progress live somewhere durable so each new session can resume exactly where the last one left off, without re-deciding settled questions."
+      },
+      {
+        "name": "Ravi Patel",
+        "role": "DevOps Engineer",
+        "concern": "Catching context drift — a session quietly wandering outside its assigned scope — early enough to correct it without discarding legitimate completed work."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-003-q1",
+      "stem": "Midway through session 2, the agent reasons — purely within its own context window — that billing records with a null `account_id` should be skipped during the migration, and moves on. That decision is never written into a commit message, the plan artifact, or a PR comment. What is the risk by the time session 4 picks up the work?",
+      "options": [
+        "A: There is no risk — the reasoning will still be available because context windows persist indefinitely across sessions",
+        "B: The decision may be lost once that portion of context is pruned or the session ends, since it exists only in ephemeral short-term memory rather than a durable artifact",
+        "C: The risk only applies to code changes, not to reasoning, so this specific decision is safe regardless of where it's recorded",
+        "D: The decision will automatically be re-derived by any future session working on the same file"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because anything that exists only within a session's own context window is short-term memory — it can be pruned as the context fills up, and it disappears entirely once the ephemeral environment is discarded at session end. A is false; context windows do not persist indefinitely, and each session's environment is discarded when it ends. C is wrong — undocumented reasoning is exactly as vulnerable to loss as undocumented code decisions; neither is safe left only in-context. D is wishful thinking — a future session has no guaranteed way to re-derive a specific business rule unless it was written somewhere durable it can read."
+    },
+    {
+      "id": "gh600-scenario-003-q2",
+      "stem": "Sofia wants session 4 to be able to resume exactly where session 3 left off, including the null-`account_id` decision and everything else settled so far. Which combination of artifacts should she rely on to carry that context forward reliably?",
+      "options": [
+        "A: A verbal handoff between the two engineers supervising each session",
+        "B: The structured plan artifact (updated as decisions are made), incremental commit history, and the PR thread — all durable artifacts that survive past any single session",
+        "C: Re-prompting session 4 with a full transcript of session 3's entire conversation, pasted into the new session's opening message",
+        "D: Trusting the agent's underlying model to recall prior sessions automatically, since it is the same model version"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a plan artifact, commit history, and PR thread are exactly the durable artifacts designed to survive session boundaries — they are written to persistent storage (the repo, the PR) rather than living only in an ephemeral session's memory. A doesn't scale reliably and depends on human availability and memory rather than a written record. C is possible but wasteful and error-prone compared to a maintained plan artifact, and full transcripts often contain noise that obscures the decisions that actually matter. D is false — model sessions do not share memory across invocations just because they use the same underlying model; each session starts with only what's provided to it."
+    },
+    {
+      "id": "gh600-scenario-003-q3",
+      "stem": "Several hours into session 3, Ravi notices the agent's diff has started including changes to an unrelated logging utility that has nothing to do with the billing migration, reasoning in its narration that the change would \"also improve\" that area. He wants to correct course without losing the legitimate migration work session 3 has already produced. What should he do?",
+      "options": [
+        "A: Kill the session immediately and discard all of session 3's work, restarting the migration from session 2's endpoint",
+        "B: Let the session continue, since its narration is confident and coherent throughout",
+        "C: Compare the current diff against the plan artifact's approved scope, revert or split out the out-of-scope logging changes, and redirect the session back to the remaining in-scope work",
+        "D: Grant the agent additional tools so it can complete the logging improvement faster and get back on track sooner"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because the plan artifact is the durable reference for what was actually approved — comparing the live diff against it is how drift gets detected precisely, and reverting or splitting out only the out-of-scope portion preserves the legitimate migration work rather than discarding it. A throws away valid completed work along with the drift, which is unnecessary. B is the anti-pattern the question is illustrating — confident, coherent narration is not evidence of staying in scope, since the agent can be equally confident while drifting. D rewards the drift by expanding capability instead of correcting scope."
+    },
+    {
+      "id": "gh600-scenario-003-q4",
+      "stem": "After session 3 wraps, Sofia reflects that the drift Ravi caught might have been avoidable in the first place. The original migration issue simply said \"migrate the billing module to a standalone service\" with no session-scoped breakdown. What should she change about how future multi-session work is defined?",
+      "options": [
+        "A: Nothing — as long as a plan artifact exists, the original issue's scope doesn't matter",
+        "B: Break the migration into smaller, explicitly scoped sub-tasks sized to fit within a session's practical limits, each with its own stated boundaries, rather than one open-ended multi-day task",
+        "C: Assign the entire migration to a single session and simply extend its time limit until the work is done",
+        "D: Remove the plan artifact requirement, since it didn't prevent the drift this time"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because an open-ended, multi-day task with no session-scoped breakdown gives each session room to interpret \"also improve\" opportunistically — explicitly scoped sub-tasks, sized to what a session can realistically complete, give each session a narrower, more checkable boundary and make drift easier to catch quickly. A ignores that the plan artifact only helps if it reflects a genuinely scoped task in the first place; a vague root issue produces a vague plan. C ignores that sessions have practical time limits by design, and stretching one session indefinitely reintroduces the scope-creep risk rather than solving it. D discards the exact tool (Q3) that let Ravi catch and correct the drift — the plan artifact worked as intended; the root issue was insufficient upfront scoping."
+    }
+  ],
+  "keyLearnings": [
+    "Decisions and rationale that exist only within a session's own context window are short-term memory and can be lost to pruning or session end — anything worth remembering across sessions must be written to a durable artifact.",
+    "Structured plan artifacts, commit history, and PR threads are the durable memory that lets a new session resume prior work reliably, without relying on human recall or full transcript replay.",
+    "Confident, coherent narration from an agent is not evidence it is staying in scope — drift is detected by comparing the live diff against the approved plan artifact, not by how the agent describes its own actions.",
+    "Multi-session tasks drift less when the original task is broken into explicitly scoped sub-tasks sized to a session's practical limits, rather than left as one open-ended, multi-day assignment."
+  ]
+}

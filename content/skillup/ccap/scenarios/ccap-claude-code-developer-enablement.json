@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-006",
+  "title": "Rolling Out Claude Code Across a Fintech Engineering Org",
+  "description": "Tests the ability to design a least-privilege CI integration for an AI coding assistant, structure an enablement and standards rollout across a large engineering team, scope debugging access safely, and choose meaningful adoption metrics.",
+  "examId": "ccap",
+  "difficulty": "medium",
+  "estimatedMinutes": 16,
+  "domains": [1, 7],
+  "scenario": {
+    "background": "Ledgerline, a fintech company with 150 engineers, is rolling out Claude Code across the engineering organization to speed up code review, test generation, and debugging. The plan includes integrating Claude Code into the CI pipeline for automated pull-request review and test-generation suggestions, as well as making it available to engineers for local debugging support. Ledgerline handles customer financial data, so the platform team is deliberate about what the tooling can touch in CI and in production-adjacent environments.",
+    "characters": [
+      {
+        "name": "Wei Zhang",
+        "role": "Engineering Director",
+        "concern": "Wants a measurable productivity gain from the rollout and a CI integration that speeds up review without introducing risk to the deploy pipeline."
+      },
+      {
+        "name": "Sofia Almeida",
+        "role": "DevOps and Platform Lead",
+        "concern": "Worried about secrets exposure and uncontrolled write access if the tooling is given broad permissions inside CI, given a past incident where a build script leaked a credential into logs."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-006-q1",
+      "stem": "How should Claude Code's integration into the CI pipeline for automated PR review and test-generation suggestions be scoped?",
+      "options": [
+        "Grant it direct write access to merge approved changes and trigger production deploys, so the pipeline is fully automated end to end",
+        "Scope it to read-only repository analysis that produces suggested changes as PR comments or draft commits for a human to review and merge, with no access to deployment credentials or the ability to merge or deploy directly, and no secrets exposed in the context it's given",
+        "Give it full CI runner permissions, including access to all environment variables and secrets used by the build, so it can debug pipeline failures on its own",
+        "Run it with production database credentials so test generation can validate against real data patterns"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because least-privilege applies to developer tooling as much as to any other agent — read-only analysis with human-reviewed, human-merged suggested changes captures the productivity benefit while keeping deploy authority and secrets out of the tool's reach, directly addressing Sofia's concern after the prior credential-leak incident. A fails because granting merge and deploy authority to an automated tool removes the human checkpoint before code reaches production, a significant risk for a fintech handling customer financial data. C fails because exposing all environment variables and secrets to the tool's context multiplies the blast radius if that context is ever logged, leaked, or misused — exactly the failure mode of the past incident. D fails because production database credentials should never be handed to a code-assistance tool for test generation; test generation should use synthetic or anonymized data, not live customer financial data."
+    },
+    {
+      "id": "ccap-scenario-006-q2",
+      "stem": "Wei wants all 150 engineers using Claude Code effectively and consistently. Which rollout approach best achieves that?",
+      "options": [
+        "A structured rollout with shared configuration standards (e.g., a common CLAUDE.md convention for project context), training sessions, and a feedback channel, supported by internal champions who help other engineers adopt effective patterns",
+        "Announce the tool is available and let each team configure and adopt it independently, trusting engineers to figure out best practices on their own",
+        "Mandate a specific usage quota (e.g., minimum number of Claude Code sessions per engineer per week) to force adoption regardless of actual task fit",
+        "Restrict the tool to only the most senior engineers initially, and prohibit others from using it until a full company-wide policy is finalized, which may take a year"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because a structured rollout with shared standards, training, and a feedback loop produces consistent, effective usage across a large team and surfaces problems early through champions, rather than leaving 150 engineers to each reinvent conventions independently. B fails because a laissez-faire rollout leads to inconsistent configuration, uneven quality of results, and no shared learning across teams, which undermines the org-wide productivity goal. C fails because a usage quota optimizes for the wrong thing — forcing sessions regardless of task fit encourages hollow or inappropriate use rather than effective use, which won't produce a real productivity gain. D fails because restricting the tool to a small group for an extended period delays the benefit for the vast majority of engineers without a clear reason tied to actual risk, and a year-long policy delay is disproportionate to the actual risks involved in developer tooling."
+    },
+    {
+      "id": "ccap-scenario-006-q3",
+      "stem": "Engineers want Claude Code's help debugging production issues, which sometimes involves examining application logs and database records that may contain customer PII. What access design fits this need?",
+      "options": [
+        "Grant Claude Code direct read access to production databases and unredacted production logs, so it can debug with the most complete information available",
+        "Give Claude Code access to a staging environment and a log pipeline with PII redaction applied, so it can assist with debugging using representative data without exposing real customer PII to the model's context",
+        "Deny any debugging access at all, requiring engineers to manually copy relevant log lines into the chat one at a time without any structured tooling",
+        "Grant temporary, unrestricted production access to Claude Code whenever an engineer requests it, revoked automatically after 24 hours"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because scoped access to a staging environment and redacted logs gives Claude Code the representative data it needs to help debug effectively while keeping real customer PII out of the model's context, matching the same least-privilege principle applied to the CI integration. A fails because direct, unredacted production access exposes customer PII to the tool unnecessarily, creating a data-handling risk disproportionate to the debugging benefit. C fails because manually copying log lines one at a time is not banning access so much as making it inefficient and error-prone, without actually solving the underlying PII exposure question — an engineer could still paste PII manually. D fails because temporary 'unrestricted' access, even time-boxed, still exposes PII during the access window and normalizes broad production access as a routine debugging pattern, which is the risk Sofia is trying to avoid."
+    },
+    {
+      "id": "ccap-scenario-006-q4",
+      "stem": "Six months into the rollout, Wei needs to report on whether the investment in Claude Code is paying off. Which measurement approach gives him a credible answer?",
+      "options": [
+        "Track lines of code generated per engineer per week as the primary success metric, since more output indicates more productive use of the tool",
+        "Track task-level outcome metrics against a pre-rollout baseline — such as PR cycle time, defect/bug-reopen rate, and adoption rate across teams — over a sustained period, rather than relying on raw usage volume or anecdotal sentiment alone",
+        "Rely solely on a single engineer-satisfaction survey question ('Do you like using Claude Code?') as the success metric",
+        "Skip formal measurement since productivity gains from developer tooling are inherently too qualitative to measure"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because outcome metrics tied to actual engineering work — cycle time, defect rates, adoption breadth — measured against a pre-rollout baseline give a credible, gameable-resistant picture of whether the tool is genuinely improving delivery, which is what Wei actually needs to report. A fails because lines of code is a poor proxy for value; it can be trivially inflated without corresponding improvement in quality or speed, and more code is not inherently better. C fails because a single satisfaction question captures sentiment, not outcomes, and doesn't tell Wei whether the tool actually moved delivery metrics. D fails because developer productivity impact is measurable through proxies like cycle time and defect rate even if it isn't perfectly quantifiable — declining to measure at all leaves Wei unable to justify or adjust the investment with any evidence."
+    }
+  ],
+  "keyLearnings": [
+    "Least-privilege applies to developer tooling in CI just as it does to customer-facing agents — read-only analysis with human-reviewed merges keeps productivity gains without exposing deploy authority or secrets.",
+    "A large-scale rollout of an AI coding assistant needs shared configuration standards, training, and a feedback loop, not a laissez-faire per-team adoption that produces inconsistent results.",
+    "Debugging access for an AI assistant should route through redacted or staging data, not direct production credentials, to avoid exposing customer PII unnecessarily.",
+    "Success metrics for developer-tooling rollouts should be outcome-based (cycle time, defect rate, adoption) measured against a baseline, not raw usage volume or lines of code, which can be gamed without reflecting real value."
+  ]
+}

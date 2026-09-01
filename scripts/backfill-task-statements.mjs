@@ -12,6 +12,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+// Pre-split (ajch_platform) layout nested content under public/; ajch_skillup
+// has content/ at the repo root directly — support both.
+const CONTENT_BASE = existsSync(join(ROOT, 'public')) ? join(ROOT, 'public') : ROOT;
 const SKILLUP = join(ROOT, 'content', 'skillup');
 
 const args = process.argv.slice(2);
@@ -24,7 +27,7 @@ function writeJson(p, data) {
   writeFileSync(p, JSON.stringify(data, null, 2) + '\n', 'utf8');
 }
 function absContent(rel) {
-  if (rel.startsWith('content/')) return join(ROOT, 'public', rel);
+  if (rel.startsWith('content/')) return join(CONTENT_BASE, rel);
   return join(ROOT, rel);
 }
 
@@ -274,6 +277,91 @@ function routeAB731(q) {
   return domainFallback[q.domain] ?? '1.1';
 }
 
+// ── CCAP: task-level keyword routing per domain (7 domains, 38 tasks) ─────────
+
+const CCAP_TASK_KEYWORDS = {
+  '1.1': ['business-problem-framing', 'requirements-translation'],
+  '1.2': ['end-to-end-architecture', 'feedback-loop'],
+  '1.3': ['architectural-patterns', 'workflow-pattern', 'agentic-pattern', 'augmented-llm'],
+  '1.4': ['multi-agent', 'coordinator-subagent', 'parallel-execution', 'sequential-execution', 'delegation'],
+  '1.5': ['decomposition'],
+  '1.6': ['business-value', 'performance-sla', 'cost-optimization'],
+  '2.1': ['model-selection', 'cost-latency-tradeoff', 'extended-thinking'],
+  '2.2': ['system-prompt', 'guardrails', 'prompt-injection', 'xml-tags'],
+  '2.3': ['zero-shot', 'few-shot', 'chain-of-thought', 'reasoning', 'prompt-engineering'],
+  '2.4': ['context-window', 'token-budget', 'lost-in-middle', 'summarization', 'workload-segmentation', 'retrieval-optimization'],
+  '2.5': ['prompt-caching', 'modular-prompts', 'skills', 'prompt-reuse'],
+  '3.1': ['capability-bloat', 'tool-permissions', 'least-privilege'],
+  '3.2': ['authn-authz', 'security-gaps', 'tenant-isolation'],
+  '3.3': ['accuracy-latency-tradeoff', 'latency-sla'],
+  '3.4': ['monitoring-at-scale', 'observability', 'tracing', 'structured-logging'],
+  '3.5': ['rag-pipeline', 'chunking', 'indexing', 'metadata-filtering'],
+  '3.6': ['retrieval-strategy', 'semantic-search', 'lexical-search', 'recall', 'structured-query'],
+  '3.7': ['mcp', 'api-integration', 'agent-to-agent', 'integration-protocol', 'tool-discovery'],
+  '3.8': ['progressive-discovery', 'workload-requirements'],
+  '4.1': ['evaluation-metrics', 'safety-metrics', 'security-metrics'],
+  '4.2': ['golden-dataset', 'synthetic-dataset', 'adversarial-testing', 'llm-as-judge'],
+  '4.3': ['ab-testing', 'iterative-improvement'],
+  '4.4': ['diagnosis', 'hallucination', 'prompt-failure', 'model-mismatch', 'retrieval-issue'],
+  '4.5': ['cost-optimization', 'token-optimization', 'latency', 'streaming', 'model-routing'],
+  '4.6': ['monitoring', 'logging', 'observability'],
+  '5.1': ['guardrails', 'content-filtering', 'review-gate'],
+  '5.2': ['failure-modes', 'model-drift', 'error-propagation'],
+  '5.3': ['hitl', 'human-in-the-loop', 'escalation'],
+  '5.4': ['gdpr', 'hipaa', 'fedramp', 'phi', 'pii', 'data-privacy', 'data-residency', 'compliance', 'healthcare-compliance', 'government-compliance', 'financial-services', 'insurance'],
+  '5.5': ['bias-fairness', 'ethical-ai', 'transparency'],
+  '6.1': ['discovery', 'requirements-gathering', 'stakeholder-interviews', 'non-functional-requirements'],
+  '6.2': ['trade-off-communication', 'executive-communication', 'architecture-decisions'],
+  '6.3': ['feedback-loops', 'sla-management', 'stakeholder-alignment', 'expectation-setting'],
+  '6.4': ['adr', 'architecture-documentation', 'implementation-guidance'],
+  '6.5': ['lifecycle-management', 'phase-gate', 'handoff', 'iteration'],
+  '7.1': ['claude-md', 'settings-hierarchy', 'settings-json', 'team-configuration', 'permissions', 'enterprise-managed-policy', 'mcp-config', 'onboarding'],
+  '7.2': ['slash-commands', 'subagents', 'automation', 'ci-cd'],
+  '7.3': ['debugging', 'production-incident'],
+};
+
+function routeCCAP(q) {
+  const tags = (q.tags || []).map(t => t.toLowerCase());
+  const taskIds = Object.keys(CCAP_TASK_KEYWORDS).filter(tid => tid.startsWith(q.domain + '.'));
+  for (const tid of taskIds) {
+    if (CCAP_TASK_KEYWORDS[tid].some(kw => tags.includes(kw))) return tid;
+  }
+  return taskIds[0] ?? null;
+}
+
+// ── GH-600: task-level keyword routing per domain (6 domains, 19 tasks) ───────
+
+const GH600_TASK_KEYWORDS = {
+  '1.1': ['sdlc-delegation', 'task-definition', 'anti-pattern', 'success-criteria'],
+  '1.2': ['planning-phase', 'execution-phase', 'structured-plan', 'plan-validation', 'approval-gate'],
+  '1.3': ['autonomy-guardrails', 'observability', 'session-monitoring', 'audit-trail', 'review-gating'],
+  '2.1': ['tool-scoping', 'tool-permissions', 'tool-integration', 'bash-tool', 'edit-tool', 'command-allowlist'],
+  '2.2': ['mcp-config', 'mcp-allow-lists', 'mcp-registries', 'github-remote-mcp', 'local-server', 'remote-server', 'stdio-transport'],
+  '2.3': ['repo-scope', 'branch-scope', 'base-branch', 'execution-context', 'headless-mode', 'ci-integration', 'autonomous-actions', 'pr-creation', 'workflow-trigger', 'environment-constraints'],
+  '2.4': ['error-handling', 'retries', 'rollbacks', 'escalation', 'escalation-paths', 'traceability', 'safe-execution', 'partial-failure', 'accountability'],
+  '3.1': ['short-term-memory', 'long-term-memory', 'external-memory', 'memory-tiers', 'memory-scoping', 'expiration', 'pruning'],
+  '3.2': ['durable-artifacts', 'context-drift', 'drift-detection', 'drift-correction', 'resuming-work', 'plan-artifact', 'checkpointing'],
+  '3.3': ['shared-state', 'conflicting-context', 'stale-context', 'continuity', 'source-of-truth'],
+  '4.1': ['success-criteria', 'evaluation-signals', 'qualitative-signals', 'quantitative-signals', 'automated-scanning', 'eval-alignment', 'development-intent'],
+  '4.2': ['failure-identification', 'failure-classification', 'root-cause-analysis', 'reasoning-error', 'tool-misuse', 'context-environment-issue', 'log-analysis', 'trace-analysis'],
+  '4.3': ['tuning', 'instruction-tuning', 'memory-refinement', 'tool-access-refinement', 'workflow-revision', 'constraint-tuning'],
+  '5.1': ['orchestration-patterns', 'agent-isolation', 'conflict-detection', 'contradictory-outputs', 'duplicated-effort', 'coordinator-agent', 'coordinator-subagent', 'parallel-execution', 'sequential-execution', 'pipeline-pattern', 'hierarchical-orchestration'],
+  '5.2': ['handoff-documentation', 'post-hoc-analysis', 'decision-log', 'artifact-generation', 'correlation-id', 'historical-record', 'timeline-reconstruction'],
+  '5.3': ['failure-detection', 'stalled-execution', 'degraded-behavior', 'recovery-pattern', 'rollback', 'resume-from-checkpoint', 'known-good-state', 'silent-failure'],
+  '5.4': ['agent-lifecycle', 'agent-onboarding', 'agent-reconfiguration', 'agent-replacement', 'agent-retirement', 'auditability', 'versioning', 'staged-rollout'],
+  '6.1': ['autonomy-levels', 'risk-classification', 'blast-radius'],
+  '6.2': ['guardrails', 'human-in-the-loop', 'blocking-policy', 'permission-scoping', 'least-privilege', 'irreversible-actions', 'execution-velocity', 'over-approval', 'responsible-ai'],
+};
+
+function routeGH600(q) {
+  const tags = (q.tags || []).map(t => t.toLowerCase());
+  const taskIds = Object.keys(GH600_TASK_KEYWORDS).filter(tid => tid.startsWith(q.domain + '.'));
+  for (const tid of taskIds) {
+    if (GH600_TASK_KEYWORDS[tid].some(kw => tags.includes(kw))) return tid;
+  }
+  return taskIds[0] ?? null;
+}
+
 // ── Per-exam backfill runners ─────────────────────────────────────────────────
 
 function backfillExam(examId, routeFn, tsOverride = null) {
@@ -406,6 +494,8 @@ const EXAMS = [
   { id: 'ab100', fix: null,          route: routeAB100 },
   { id: 'ccaf',  fix: null,          route: routeCCAF },
   { id: 'ghc',   fix: fixGHCIndex,   route: routeGHC },  // index fix + map overflow
+  { id: 'ccap',  fix: null,          route: routeCCAP },
+  { id: 'gh600', fix: null,          route: routeGH600 },
 ];
 
 console.log(`\nSkillUp Task-Statements Backfill${DRY_RUN ? ' [DRY RUN]' : ''}\n${'─'.repeat(50)}`);
