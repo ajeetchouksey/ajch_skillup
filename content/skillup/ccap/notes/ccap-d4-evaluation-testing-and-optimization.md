@@ -12,6 +12,8 @@ Evaluation, Testing & Optimization is the domain that turns "it seems to work" i
 
 ### Key Concept
 
+**Report all five metrics together — accuracy, latency, cost, safety, security — never just the one that looks best.**
+
 An evaluation strategy is only as good as the metrics it optimizes for, and a mature architect defines all five categories up front rather than defaulting to the one that's easiest to measure:
 
 - **Accuracy** — task success rate against a ground-truth or rubric-graded standard (exact match, F1, rubric score, or LLM-as-judge score). Accuracy is not one number: a support-triage agent needs *intent classification accuracy*, *tool-selection accuracy*, and *final-answer correctness* tracked separately, because a system can be right about the tool and wrong about the answer, or vice versa.
@@ -20,11 +22,11 @@ An evaluation strategy is only as good as the metrics it optimizes for, and a ma
 - **Safety** — rate of harmful, biased, or policy-violating outputs, typically measured against a red-team or adversarial test set and tracked as a refusal-accuracy pair (correctly refusing unsafe requests *and* correctly not over-refusing safe ones).
 - **Security** — rate of successful prompt injection, jailbreak, or data-exfiltration attempts against the system under adversarial testing, distinct from safety because a system can be perfectly "safe" (never says harmful things) while still being trivially exploitable by an injected instruction in retrieved content.
 
-These five metrics trade off against each other (D3's accuracy-latency frontier is one slice of this), so evaluation design must report them together, not pick the one that looks best.
+These five metrics trade off against each other (D3's accuracy-latency frontier is one slice of this). **Optimizing one and reporting only that one is how a system ships with a hidden cost or safety debt** — evaluation design has to report them together, not pick the one that looks best.
 
 ### In Practice
 
-**What breaks without this**: A team ships a system optimized purely on an accuracy leaderboard and discovers in production that p99 latency triples under real traffic, or that cost-per-resolved-ticket is actually higher than the human baseline once tool-call overhead is counted — because latency and cost were never part of the pre-launch gate, only measured after the fact when it's expensive to fix.
+**What breaks without this**: P99 latency triples under real traffic, or cost-per-resolved-ticket ends up higher than the human baseline once tool-call overhead is counted — this is what happens when a team ships a system optimized purely on an accuracy leaderboard, because latency and cost were never part of the pre-launch gate, only measured after the fact when it's expensive to fix.
 
 **Decision trigger**: Ask — for this use case, which of the five metrics has a hard floor (a compliance-mandated safety bar, a contractual latency SLA, a budget ceiling) versus which one is the optimization target? Define the floors as non-negotiable gates and only then tune the target metric within them — never the reverse.
 
@@ -40,6 +42,8 @@ Common distractor: a question that presents "accuracy improved" as sufficient ev
 
 ### Key Concept
 
+**Coverage should match risk — golden and rule-based for the deterministic core, synthetic and adversarial for the edges.**
+
 A single evaluation dataset or grading method cannot cover both breadth and depth, so production-grade eval frameworks combine methodologies deliberately:
 
 - **Golden datasets** — a curated, human-verified set of representative input/expected-output pairs, used as a stable regression baseline across model or prompt changes. Small, high-trust, expensive to build, and must be refreshed as real usage patterns drift from what it originally captured.
@@ -47,7 +51,7 @@ A single evaluation dataset or grading method cannot cover both breadth and dept
 - **Adversarial / red-team sets** — deliberately hostile or ambiguous inputs designed to probe safety and security failure modes (prompt injection payloads, jailbreak attempts, contradictory instructions), distinct in purpose from accuracy datasets.
 - **Grading methods, mixed**: rule-based checks (exact match, regex, schema validation) for deterministic tasks; **LLM-as-judge** (a separate Claude call scoring output against a rubric) for open-ended quality where no single correct string exists; human review for the highest-stakes or most ambiguous cases, sampled continuously rather than exhaustively at scale.
 
-The core design principle is **coverage matched to risk**: golden + rule-based for the deterministic core, synthetic + LLM-as-judge for breadth on open-ended behavior, adversarial + human review concentrated on the highest-consequence failure modes.
+**A single measurement method will systematically miss whatever it wasn't designed to catch** — golden + rule-based covers the deterministic core, synthetic + LLM-as-judge covers breadth on open-ended behavior, and adversarial + human review concentrates on the highest-consequence failure modes.
 
 ```mermaid
 graph LR
@@ -67,7 +71,7 @@ graph LR
 
 ### In Practice
 
-**What breaks without this**: A team ships evaluation using only a 50-example golden dataset hand-written by the original engineers. It passes at 96% — but the golden set never included the adversarial phrasing a real attacker used, or the edge-case input pattern that appears in 8% of real traffic, so the eval score is confidently wrong about production readiness.
+**What breaks without this**: The eval score is confidently wrong about production readiness when a team ships evaluation using only a 50-example golden dataset hand-written by the original engineers — it passes at 96%, but the golden set never included the adversarial phrasing a real attacker used, or the edge-case input pattern that appears in 8% of real traffic.
 
 **Decision trigger**: Ask — does this dataset cover the *distribution* of real inputs (including adversarial and edge cases), or only the *happy path* the team thought of? If only the happy path, add synthetic expansion for breadth and an adversarial set sized to the system's actual threat model before treating a passing score as a launch signal.
 
@@ -83,17 +87,19 @@ Common distractor: treating "we have an eval dataset" as equivalent to "we have 
 
 ### Key Concept
 
+**Isolate one variable per test — bundled changes make attribution impossible, no matter how significant the result.**
+
 A/B testing (champion/challenger) is the mechanism that converts "this prompt/model/pipeline change feels better" into a statistically defensible decision. The design requirements: a **holdout or control group** running the current (champion) configuration, a **treatment group** running the proposed (challenger) configuration, **randomized and comparable traffic allocation** between them, and a **pre-registered primary metric** (not picking the metric that happened to improve after the fact — that's p-hacking). Statistical significance requires enough sample size to distinguish real effect from noise; for low-traffic systems, this can mean an A/B test needs weeks to reach a trustworthy conclusion, not hours.
 
-Common confounds to control for: the **novelty effect** (users or graders react differently to a change simply because it's new/different, inflating short-term results that regress later), **seasonality/traffic-mix shifts** (comparing a weekday cohort to a weekend cohort), and **selection bias** (routing "easier" traffic to the challenger to make it look better). Iterative improvement is the loop this enables: evaluate → form a hypothesis about the failure mode → make one isolated change → A/B test that single change → adopt or discard → repeat. Changing multiple variables at once (prompt *and* model *and* retrieval depth) breaks attribution — you cannot tell which change caused the result.
+Common confounds to control for: the **novelty effect** (users or graders react differently to a change simply because it's new/different, inflating short-term results that regress later), **seasonality/traffic-mix shifts** (comparing a weekday cohort to a weekend cohort), and **selection bias** (routing "easier" traffic to the challenger to make it look better). **A/B testing without isolation is like changing your diet, your gym routine, and your sleep schedule in the same week and then declaring which one worked** — you can only know that something in the bundle helped. Iterative improvement is the loop this enables: evaluate → form a hypothesis → make one isolated change → A/B test that single change → adopt or discard → repeat.
 
 ### In Practice
 
-**What breaks without this**: A team changes the system prompt and the underlying model in the same release, sees accuracy improve 4%, and attributes it to the prompt rewrite — then spends the next quarter refining prompts with no further gains, because the actual improvement came entirely from the model upgrade. Without isolated, controlled testing, the org draws the wrong lesson and optimizes the wrong lever going forward.
+**What breaks without this**: The org draws the wrong lesson and optimizes the wrong lever going forward when a team changes the system prompt and the underlying model in the same release, sees accuracy improve 4%, and attributes it to the prompt rewrite — then spends the next quarter refining prompts with no further gains, because the actual improvement came entirely from the model upgrade.
 
 **Decision trigger**: Ask — before shipping this change, is it isolated enough that a result can be attributed to it alone, and is the traffic split randomized and large enough to distinguish signal from noise at this volume? If the answer to either is no, don't treat the result as a decision — treat it as a hypothesis needing a cleaner test.
 
-**When you'd choose differently**: For an emergency fix to a safety-critical failure (e.g., the system is actively leaking data), ship the fix immediately to 100% of traffic rather than running a slow, statistically clean A/B test — the cost of continued exposure during the test period outweighs the value of a controlled comparison. Roll out fast, then evaluate the fix's side effects retroactively.
+**When you'd choose differently**: Ship an emergency fix to a safety-critical failure (the system is actively leaking data) immediately to 100% of traffic rather than running a slow, statistically clean A/B test — the cost of continued exposure during the test period outweighs the value of a controlled comparison. Evaluate the fix's side effects retroactively.
 
 ### Exam Trap ⚠️
 
@@ -105,14 +111,16 @@ Common distractor: a scenario where a team bundles several changes into one rele
 
 ### Key Concept
 
-"The agent gave a wrong answer" is a symptom, not a diagnosis — and the exam expects candidates to systematically distinguish between root causes that look identical to an end user but require entirely different fixes:
+**"Wrong answer" is a symptom, not a diagnosis — check the trace before hypothesizing the fix.**
+
+The exam expects candidates to systematically distinguish between root causes that look identical to an end user but require entirely different fixes:
 
 - **Prompt failure**: the instructions were ambiguous, underspecified, contradictory, or missing a needed constraint — the model did what it was plausibly told to do, just not what was intended. Fix: clarify or restructure the prompt (explicit constraints, examples, structured output format).
 - **Hallucination**: the model generated a confident, fluent, but factually ungrounded claim — a fabricated citation, a nonexistent API parameter, a wrong number stated with full confidence. Fix: grounding (RAG with citation requirements), lower temperature for factual tasks, explicit "say you don't know" instructions, and output verification steps.
 - **Model mismatch**: the task's complexity exceeds what the selected model tier can reliably handle (e.g., multi-step quantitative reasoning routed to a fast/small model chosen for cost), or conversely the task is over-served by a large model that adds latency/cost with no accuracy benefit. Fix: route to a different model tier — this is a routing/architecture fix, not a prompt fix.
 - **Retrieval issue** (RAG-backed systems, cross-linking D3): the model reasoned correctly over the context it was given, but the context itself was wrong, incomplete, or stale — a chunking, indexing, or retrieval-ranking failure upstream of generation. Fix: inspect retrieval logs directly; if the wrong or no chunks were retrieved, the fix is in the retrieval pipeline, not the prompt or the model.
 
-The diagnostic discipline is to **inspect the trace before hypothesizing the fix**: look at what context was actually retrieved, what instructions were actually sent, and what the model actually said, in that order — because the same visible symptom (a wrong fact in the final answer) has four different upstream traces depending on the real cause.
+The diagnostic discipline is to inspect the trace in strict order — what context was actually retrieved, what instructions were actually sent, and what the model actually said — because the same visible symptom (a wrong fact in the final answer) has four different upstream traces depending on the real cause.
 
 ```mermaid
 flowchart TD
@@ -129,7 +137,7 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: A team sees a RAG-backed legal assistant cite an incorrect clause and immediately concludes "the model is hallucinating" — then spends weeks trying prompt tweaks and a model upgrade with no improvement, because the actual cause was a chunking failure that split the clause from its governing definition (a retrieval issue, per D3). The fix was never in the model layer, so no model-layer change could have worked.
+**What breaks without this**: The fix was never in the model layer, so no model-layer change could have worked — a team sees a RAG-backed legal assistant cite an incorrect clause, immediately concludes "the model is hallucinating," and spends weeks on prompt tweaks and a model upgrade with no improvement, because the actual cause was a chunking failure that split the clause from its governing definition (a retrieval issue, per D3).
 
 **Decision trigger**: Ask, in strict order, before proposing any fix: (1) What context was actually retrieved and sent to the model — was the right information present? (2) Given that context, did the model's answer stay faithful to it? (3) Were the instructions unambiguous? (4) Is this task within the selected model's reliable capability range? Skipping straight to "let's try a different model" or "let's rewrite the prompt" without checking retrieval first is the single most common wasted diagnostic cycle.
 
@@ -145,7 +153,9 @@ Common distractor: labeling any wrong-fact output as "hallucination" by default,
 
 ### Key Concept
 
-Optimization in production is not a single lever but a set of independent techniques, each addressing a different part of the cost/latency curve, and the architect's job is knowing which lever addresses which symptom:
+**Match the optimization lever to where the token/cost waste actually is — not to whichever lever is easiest to reach for.**
+
+Optimization in production is a set of independent techniques, each addressing a different part of the cost/latency curve:
 
 - **Prompt caching** — caching stable prefix content (system prompts, tool definitions, retrieved reference documents that don't change per-request) cuts both cost and latency on repeated calls sharing that prefix, because cached input tokens are billed and processed at a fraction of the cost of fresh tokens.
 - **Context trimming / compression** — removing stale conversation turns, summarizing long histories, or dropping unused tool definitions from the active context reduces token count directly; this is the token-usage side of the capability-bloat and progressive-discovery principles from D3.
@@ -156,7 +166,7 @@ Optimization in production is not a single lever but a set of independent techni
 
 ### In Practice
 
-**What breaks without this**: A team notices rising API costs and responds by switching every request to a smaller model uniformly, causing accuracy to drop on the subset of genuinely complex requests that needed the larger model — the actual fix (route only simple requests to the smaller model; cache the repeated system prompt and tool schema) would have cut cost without an accuracy hit, but "just downgrade the model" was the wrong lever for a cost problem caused mostly by uncached repeated prefix tokens.
+**What breaks without this**: "Just downgrade the model" was the wrong lever for a cost problem caused mostly by uncached repeated prefix tokens — a team notices rising API costs and responds by switching every request to a smaller model uniformly, causing accuracy to drop on the subset of genuinely complex requests that needed the larger model. The actual fix (route only simple requests to the smaller model; cache the repeated system prompt and tool schema) would have cut cost without an accuracy hit.
 
 **Decision trigger**: Ask, before optimizing: is the pain latency (users waiting) or cost (spend per request), and is the token waste in the *repeated, stable* part of the prompt or the *variable* part? Repeated stable content → prompt caching. Variable bloat (unused tools, stale history) → context trimming. Uniform overpay on simple tasks → model routing. Perceived-but-not-actual latency → streaming, not a smaller model.
 
@@ -172,13 +182,15 @@ Common distractor: presenting "switch to a cheaper model" as the universal answe
 
 ### Key Concept
 
-Production monitoring for agentic systems closes the loop this whole domain builds toward: pre-launch evaluation tells you a system was good *at launch*, on the test set you built; continuous observability tells you whether it's still good *now*, on the traffic it's actually receiving. The required layers (extending D3's observability discussion into a testing/optimization frame): **structured, per-request logging** (inputs, retrieved context, tool calls and their arguments/results, final output, token counts, latency, cost — enough to reconstruct a trace after the fact); **distributed tracing** across multi-step or multi-agent flows so a single slow or failed step is attributable, not buried in an aggregate number; **quality sampling in production** (LLM-as-judge or rule-based grading run continuously on a sampled percentage of live traffic, not just at pre-launch eval time); and **alerting on aggregate drift metrics** (rising tool-error rate, falling retrieval hit rate, rising escalation-to-human rate, rising p99 latency, rising cost-per-resolution) rather than waiting for individual complaints.
+**Continuous observability is what makes "good" an ongoing claim instead of a one-time snapshot.**
 
-The connection back to A/B testing and iteration: production logs and sampled quality scores are the raw material for the *next* hypothesis in the improvement loop — a rising escalation rate on a specific intent category is what tells you where to point the next evaluation dataset and the next A/B test, closing evaluation → monitoring → diagnosis → hypothesis → test back into evaluation.
+Production monitoring closes the loop this whole domain builds toward: pre-launch evaluation tells you a system was good *at launch*, on the test set you built; continuous observability tells you whether it's still good *now*, on the traffic it's actually receiving. The required layers: **structured, per-request logging** (inputs, retrieved context, tool calls and their arguments/results, final output, token counts, latency, cost); **distributed tracing** across multi-step or multi-agent flows so a single slow or failed step is attributable, not buried in an aggregate number; **quality sampling in production** (LLM-as-judge or rule-based grading run continuously on a sampled percentage of live traffic); and **alerting on aggregate drift metrics** (rising tool-error rate, falling retrieval hit rate, rising escalation rate, rising p99 latency, rising cost-per-resolution) rather than waiting for individual complaints.
+
+Production logs and sampled quality scores are the raw material for the *next* hypothesis in the improvement loop — a rising escalation rate on a specific intent category is what tells you where to point the next evaluation dataset and the next A/B test. **A one-time eval score is a photograph of a system that keeps moving** — without continuous sampling, nobody's watching the movie after the photo was taken.
 
 ### In Practice
 
-**What breaks without this**: A team ships a system that passed pre-launch evaluation at 94% accuracy, then never instruments production sampling. Six weeks later, an upstream data source changes format, retrieval quality silently degrades, and accuracy in production has drifted to 78% — but no metric surfaced it, because the only accuracy number anyone ever measured was the one-time pre-launch score, not a continuously sampled production one.
+**What breaks without this**: No metric surfaced it, because the only accuracy number anyone ever measured was the one-time pre-launch score, not a continuously sampled production one — a team ships a system that passed pre-launch evaluation at 94% accuracy, then never instruments production sampling; six weeks later, an upstream data source changes format, retrieval quality silently degrades, and accuracy in production has drifted to 78%.
 
 **Decision trigger**: Ask — if quality degraded gradually in production starting today, what signal would surface it, and within what timeframe? If the honest answer is "a customer complaint, eventually," the system needs continuous sampled grading and drift alerting, not just a pre-launch eval report treated as permanently valid.
 
@@ -199,17 +211,6 @@ Every concept in this domain sits on one timeline: **before launch, you define w
 The reason mixed methodology matters (golden + synthetic + adversarial, rule-based + LLM-as-judge + human) is the same reason diagnosis requires checking the trace in order (retrieval → faithfulness → prompt clarity → model capability): a single measurement method or a single hypothesis about a failure cause will systematically miss whatever it wasn't designed to catch. A golden dataset alone misses distributional edge cases the same way jumping straight to "the model is hallucinating" misses a retrieval failure. The discipline in both cases is the same: broaden your evidence before you commit to a conclusion.
 
 Optimization and monitoring are the domain's feedback mechanism. A/B testing proves *this specific change* helped; monitoring proves the system *is still* good after many changes accumulate over months; optimization is what keeps "good" within a budget the business can actually sustain. None of the five metric categories (accuracy, latency, cost, safety, security) can be improved in isolation without checking what it costs the other four — which is why the domain insists on measuring all five together rather than optimizing one and hoping the others hold.
-
-### 2. Worked scenario
-
-> **Scenario.** A mid-sized insurer's claims-triage agent, in production for four months, starts generating a rising volume of adjuster complaints: "the agent recommended the wrong coverage tier on several claims this week." The team's pre-launch evaluation had shown 93% accuracy against a 200-example golden dataset. Latency and cost dashboards show nothing unusual. What's the diagnostic path?
->
-> **Reasoning it through:**
-> - *Step 1 — don't guess, pull the trace.* The team pulls logs for five recently misclassified claims and inspects, in order: what context was retrieved, what the system prompt instructed, and what the model actually output.
-> - *Step 2 — check retrieval first.* All five traces show the retrieved policy documents are for the *previous year's* coverage tiers — a source-system migration three weeks earlier changed document IDs, and the RAG index was never re-ingested. This is a **retrieval issue**, not a hallucination and not a prompt failure — the model reasoned faithfully over stale, wrong context. No amount of prompt rewriting or model upgrading would have fixed this, because the input to generation was already wrong.
-> - *Step 3 — why didn't pre-launch eval catch it?* It couldn't have: the golden dataset was built and frozen four months ago, against document IDs that were correct *then*. This is exactly the gap continuous production monitoring is meant to close — a pre-launch eval score is a snapshot, and nothing was sampling live retrieval-hit-rate or citation-grounding in production to catch the drift when the source system changed.
-> - *Step 4 — the fix and the test.* Engineering re-ingests the corrected document set (a retrieval-pipeline fix, per D3's chunking/indexing guidance) and re-runs the same five previously-failing traces to confirm the correct policy documents are now retrieved. Before rolling the reindexed pipeline to 100% of traffic, the team runs a controlled A/B test: 10% of triage traffic on the reindexed retrieval pipeline (challenger) vs. 90% on the stale index (champion, kept temporarily to preserve a clean comparison and a fast rollback path), with pre-registered primary metric = coverage-tier classification accuracy on live traffic, run for one week to reach adequate sample size for the claim volume.
-> - *Step 5 — close the loop.* The A/B test confirms the reindexed pipeline restores accuracy; the team ships to 100% and, critically, adds a new production monitor: an alert on retrieval-hit-rate drift and a scheduled recurring re-ingestion trigger tied to the source system's change log, so the next document-ID migration doesn't require an adjuster complaint to surface it.
 
 ### 3. Memory aid
 

@@ -141,6 +141,8 @@ When out-of-the-box Copilot isn't enough, you can extend it:
 
 **Azure AI Foundry** is Microsoft's platform for building, deploying, and managing enterprise AI solutions.
 
+<div class="note-important"><strong>Terminology update:</strong> As of the August 2026 Microsoft Learn documentation revision, Microsoft has rebranded <strong>Azure AI Foundry</strong> to <strong>Microsoft Foundry</strong> (the official docs URL now redirects from <code>/azure/ai-foundry/</code> to <code>/azure/foundry/</code>). <strong>Foundry Tools</strong> remains the umbrella term for the AI services collection (Speech, Vision, Language, Document Intelligence, Content Understanding, Face, etc.) that sits alongside Microsoft Foundry. The AB-731 exam's own study guide resource list still links to this page under the label "Azure AI Foundry documentation" — so both names may appear interchangeably in exam questions and answer options. Don't be thrown by either term: they refer to the same underlying platform capability described in this section.</div>
+
 ### What's in Foundry Tools
 
 | Tool | What it does |

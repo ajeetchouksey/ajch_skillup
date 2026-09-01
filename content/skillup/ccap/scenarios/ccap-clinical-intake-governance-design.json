@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-011",
+  "title": "Governance Design for a Clinical-Intake Assistant",
+  "description": "Tests the ability to sequence a compliance gate before design, name specific risks rather than generic ones, map each risk to a structural control, place a human-in-the-loop gate at the correct point, and build in transparency logging from the start.",
+  "examId": "ccap",
+  "difficulty": "hard",
+  "estimatedMinutes": 13,
+  "domains": [5],
+  "scenario": {
+    "background": "A regional hospital network wants to deploy a Claude-powered clinical-intake assistant: patients describe symptoms in natural language, and the system drafts a structured intake summary plus a preliminary triage-urgency flag for the attending nurse.",
+    "characters": [
+      {
+        "name": "Dr. Priya Ramanathan",
+        "role": "Chief Medical Information Officer",
+        "concern": "A missed urgent case caused by an over-trusted or biased triage flag is a patient-safety incident, not just a quality bug."
+      },
+      {
+        "name": "James Whitfield",
+        "role": "Legal & Compliance Counsel",
+        "concern": "No PHI may be processed by the model provider until a signed BAA is in place — this cannot be a parallel workstream."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-011-q1",
+      "stem": "Where does James's BAA requirement belong in the project timeline?",
+      "options": [
+        "It can proceed in parallel with architecture design, since it doesn't block any technical work",
+        "It's a prerequisite that must be signed before any PHI processing begins, and before design work is finalized — not a parallel workstream",
+        "It only needs to be in place before the system goes live in production, not before design",
+        "It's Legal's responsibility entirely and doesn't need to be tracked by the architect"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the system touches PHI, and a signed BAA with the model provider is a hard prerequisite — no BAA, no PHI processing, full stop — which means it has to be resolved before design work is finalized, not treated as a parallel or later-stage task. A and C both risk finalizing a design (or reaching production) around an assumption that later turns out to be legally unavailable. D ignores that the architect is accountable for sequencing this correctly into the project plan, even though Legal owns executing it."
+    },
+    {
+      "id": "ccap-scenario-011-q2",
+      "stem": "Which pairing of a named risk to its structural control is correct for this system?",
+      "options": [
+        "Bias risk → a generic reminder in the system prompt to 'be fair to all patients'",
+        "Bias risk → disaggregated evaluation of triage-flag accuracy broken out by age, sex, and other relevant subgroups before launch, not just aggregate accuracy",
+        "Data leakage risk → trusting the framework's default session behavior without verifying isolation in testing",
+        "Hallucination risk → a longer system prompt asking the model to 'be careful and accurate'"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a triage-urgency model that systematically under-flags urgency for a demographic subgroup is both an ethical and patient-safety failure, and the only way to catch that pattern is disaggregated evaluation — aggregate accuracy alone can hide it. A is a soft prompt-level nudge, not a structural control, and doesn't measure anything. C explicitly assumes what should be verified — data leakage requires hard per-session isolation confirmed through testing, not an assumption. D is another soft instruction; the actual structural control for hallucination is requiring every symptom claim in the output to be traceable to the patient's actual input text."
+    },
+    {
+      "id": "ccap-scenario-011-q3",
+      "stem": "Given the high consequence severity (a missed urgent case) and a well-defined action space (a nurse reviews before scheduling), where should the human-in-the-loop gate sit, and how should the interface support it?",
+      "options": [
+        "Full autonomy with no human review, since the model is generally reliable",
+        "An approve-before-action gate, with the interface displaying the source symptom text alongside the flag so the nurse's fastest path is reading the evidence, not just clicking a checkmark",
+        "Lightweight post-hoc sampling of a small percentage of intake summaries per week",
+        "A human review step, but with only the final urgency flag shown, to keep the interface simple"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because high consequence severity plus a well-defined action space is squarely the case for an approve-before-action gate, and displaying the source text alongside the flag specifically counters automation bias — a nurse under time pressure needs the evidence visible, not just a label to rubber-stamp. A skips review entirely for a high-severity, patient-safety-relevant decision. C is a detective, after-the-fact control that can't prevent a missed urgent case before it happens. D creates exactly the automation-bias risk the interface design is meant to counter, since the nurse has nothing but the label to click through."
+    },
+    {
+      "id": "ccap-scenario-011-q4",
+      "stem": "What transparency practice should be built in from the start, and why?",
+      "options": [
+        "Log only the final triage-urgency flag, since that's the only output that matters",
+        "Log the source patient text, the specific reasoning that drove the urgency flag, and the nurse's confirm/override decision — so a later-challenged triage decision can be reconstructed",
+        "No logging is needed if the human-in-the-loop gate is already in place",
+        "Log only cases the nurse overrides, since agreed-with cases carry no risk"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because if a triage decision is later challenged — a missed urgent case, a complaint, a regulatory inquiry — the system must be able to reconstruct *why* the flag was set and what the nurse decided, not just what the final flag was. A discards the reasoning and source evidence needed to reconstruct the decision later. C conflates having a review gate with having a durable record of what happened at that gate — they're separate requirements. D wrongly assumes agreed-with cases carry no future risk; a later-discovered systematic bias could affect confirmed cases too, and without logging them there's no way to audit the pattern."
+    }
+  ],
+  "keyLearnings": [
+    "A compliance gate that blocks legally-required work (like a signed BAA before PHI processing) is a prerequisite, not a parallel workstream — it must be resolved before design finalizes.",
+    "Governance risks (hallucination, bias, over-reliance, data leakage) each need a specific, structural control mapped to them — a generic prompt reminder or an unverified assumption is not a control.",
+    "The correct point for a human-in-the-loop gate is set by consequence severity and how well-defined the action space is — high severity plus a clear approval point calls for an approve-before-action gate, with an interface designed to counter automation bias.",
+    "Transparency logging must capture the reasoning behind a decision and the human's response to it, built in from the start, so a later-challenged decision can be reconstructed."
+  ]
+}

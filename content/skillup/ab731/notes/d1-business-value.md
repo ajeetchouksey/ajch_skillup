@@ -2,12 +2,9 @@
 **Exam Weight: 38% — Heaviest Domain (tied)**
 
 ---
-
-## 🧠 The Golden Rule
-
-> **"Generative AI CREATES new content. Other AI CLASSIFIES or PREDICTS existing patterns."**
-
 <div class="note-important"><strong>This distinction drives ~30% of D1 questions.</strong> The exam will give you scenarios and ask which AI type is appropriate. If the task is "generate text / images / code / summaries" → generative AI. If it's "classify fraud / predict churn / detect spam" → traditional ML.</div>
+
+> **🧠 The Golden Rule - "Generative AI CREATES new content. Other AI CLASSIFIES or PREDICTS existing patterns."**
 
 **The mental model:** Think of traditional ML as a **doctor reading an X-ray** — pattern recognition in known data. Generative AI is like a **ghost-writer** — it produces net-new content by learning patterns from training data.
 
@@ -26,7 +23,7 @@
 ---
 
 ## 1.1 Generative AI vs Other AI Types
-
+ 
 | Type | What it does | Example |
 |---|---|---|
 | **Generative AI** | Creates new content (text, images, code, audio) | Drafting a proposal, generating code, creating images |
@@ -37,6 +34,26 @@
 ![Diagram 1](/content/skillup/ab731/images/d1-business-value-01.png)
 
 <mark>Exam shortcut: The word "generate", "draft", "compose", or "create" always points to generative AI.</mark>
+
+---
+
+## 1.1b The Lifecycle of a Machine Learning Solution
+
+Choosing between generative AI and traditional ML (§1.1) is only the first decision. Once you've picked "traditional ML" for a classification or prediction task, that model has to be built, shipped, and kept alive — and that's a repeating cycle, not a one-off project.
+
+| Stage | What happens |
+|---|---|
+| **1. Problem definition** | Define the business question the model must answer (e.g., "is this transaction fraudulent?") and agree the success metric before touching any data |
+| **2. Data collection & preparation** | Gather relevant, representative data; clean, label, and split it into training / validation / test sets |
+| **3. Training** | The algorithm learns patterns from the training data, adjusting its internal parameters to minimise error |
+| **4. Validation & evaluation** | Test the model against data it hasn't seen, using metrics (accuracy, precision, recall) to confirm it generalises rather than memorises |
+| **5. Deployment** | Release the model into production so it can score real, live inputs |
+| **6. Monitoring** | Track live performance — accuracy, drift, latency — because production data shifts over time |
+| **7. Retraining** | Refresh the model with new data when performance degrades, then loop back into training/validation |
+
+<div class="note-trap"><strong>Exam trap:</strong> Candidates assume "deployment" is the finish line. It isn't. Once a model is live, the real world keeps moving — customer behaviour shifts, fraud tactics evolve, market conditions change — and the model's accuracy quietly degrades. This is called <strong>concept drift</strong>. Monitoring and retraining are permanent, ongoing stages of the lifecycle, not optional cleanup. If a scenario describes a model that was "deployed and left alone" while performance declines, the correct answer is the missing monitoring/retraining loop — not a data or deployment problem.</div>
+
+<div class="note-scribble">Think of an ML model like a weather forecaster's model of the atmosphere — trained on historical patterns, but useless if it's never updated with new readings. The lifecycle is a loop, not a line: problem → data → train → validate → deploy → monitor → retrain → back to train.</div>
 
 ---
 
@@ -287,6 +304,7 @@ Not all AI use cases are worth doing first. Prioritise using three dimensions:
 | "Specialised domain vocabulary" | → Fine-tuning (when prompt + RAG can't bridge the gap) |
 | "Copilot vs Agent" | → Copilot = assistive (prompted). Agent = autonomous (acts on goals) |
 | "Pilot success metric" | → KPIs: time saved, adoption rate, error reduction |
+| "Model deployed — is the work done?" | → No. Monitoring + retraining are ongoing lifecycle stages (catch concept drift) |
 | "Generate" vs "classify" (framing nuance) | Gen AI creates; ML classifies. Don't confuse. |
 | Fine-tune vs RAG (which first?) | Try RAG first. Fine-tune only for specialised domain vocabulary. |
 | Hallucination mitigation | RAG + human review, NOT just better prompts |

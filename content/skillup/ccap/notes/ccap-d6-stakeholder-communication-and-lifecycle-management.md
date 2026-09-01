@@ -12,7 +12,9 @@ Stakeholder Communication & Lifecycle Management is the domain that tests whethe
 
 ### Key Concept
 
-Discovery is the phase where an architect converts an ambiguous business request ("we want an AI assistant for customer support") into a scoped, buildable problem statement — and the exam treats skipping or rushing this phase as the single most common root cause of downstream failure, more than any specific technical mistake. A structured discovery pass covers, deliberately and in this rough order:
+**Skipping discovery is the single most common root cause of downstream failure — more than any specific technical mistake.**
+
+Discovery is the phase where an architect converts an ambiguous business request ("we want an AI assistant for customer support") into a scoped, buildable problem statement. A structured discovery pass covers, deliberately and in this rough order:
 
 - **Business objective and success definition** — what specific outcome does this solve, and what metric proves it worked (ticket deflection rate, time-to-resolution, cost per interaction) — not "make support better," which cannot be measured or scoped.
 - **Current-state baseline** — how is the task done today, by whom, with what tools, at what volume and cost; without a baseline, "improvement" is unmeasurable after launch.
@@ -22,7 +24,7 @@ Discovery is the phase where an architect converts an ambiguous business request
 - **Stakeholder map** — who is the business sponsor, who is the technical decision-maker, who are the end users, and critically, who has *veto power* versus who merely has *opinions* — conflating the two is a common real-world (and exam) trap.
 - **Risk tolerance and definition of "good enough"** — what accuracy/quality bar is actually required for this use case, since that bar drives architecture decisions (a customer-facing legal-advice bot and an internal meeting-notes summarizer have wildly different acceptable error rates).
 
-Discovery techniques include structured stakeholder interviews (open-ended first, then targeted), facilitated workshops with multiple stakeholders in the room simultaneously (surfaces disagreement early, when it's cheap to resolve), current-state process shadowing or artifact review (reading real support tickets beats a manager's summary of what support tickets look like), and reviewing existing documentation and system access. The output is a **discovery brief** — a written artifact stakeholders sign off on before design begins, so the design phase has a stable target instead of a moving one.
+Discovery techniques include structured stakeholder interviews (open-ended first, then targeted), facilitated workshops with multiple stakeholders in the room simultaneously (surfaces disagreement early, when it's cheap to resolve), current-state process shadowing or artifact review (reading real support tickets beats a manager's summary of what support tickets look like), and reviewing existing documentation and system access. **The output is a discovery brief** — a written artifact stakeholders sign off on before design begins, so the design phase has a stable target instead of a moving one.
 
 ```mermaid
 flowchart TD
@@ -41,7 +43,7 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: An architect starts designing a Claude-powered ticket-triage system directly from a one-line executive request ("automate our support triage"), skips the data-quality check, and discovers three weeks into build that the "knowledge base" the system is supposed to ground answers on is actually 40% outdated and split across two unlinked wikis nobody had mentioned. The design has to be reworked around a data-remediation effort that discovery would have surfaced in week one.
+**What breaks without this**: The design has to be reworked around a data-remediation effort that discovery would have surfaced in week one — an architect starts designing a Claude-powered ticket-triage system directly from a one-line executive request ("automate our support triage"), skips the data-quality check, and discovers three weeks into build that the "knowledge base" the system is supposed to ground answers on is actually 40% outdated and split across two unlinked wikis nobody had mentioned.
 
 **Decision trigger**: Ask, before any architecture diagram gets drawn — do I have a written, stakeholder-approved discovery brief covering objective, baseline, data quality, integrations, constraints, and success metric? If any of those six is unanswered, the design phase hasn't actually started yet, regardless of how much design work is happening.
 
@@ -57,7 +59,9 @@ Common distractor: a scenario where an architect jumps straight to comparing tec
 
 ### Key Concept
 
-An architectural decision is only as good as a stakeholder's ability to understand *why* it was made — and the exam expects an architect to communicate the same decision differently depending on audience, without changing the underlying facts. The core artifact for capturing a decision is an **Architecture Decision Record (ADR)**: a short, structured document per significant decision, containing the context (what problem prompted this), the options considered, the trade-offs of each, the decision made, and the consequences (including what becomes harder as a result — every decision has a cost, and naming it is what makes an ADR honest rather than a sales pitch).
+**Name the trade-off, not just the conclusion — a decision with no stated downside is a sales pitch, not an ADR.**
+
+The core artifact for capturing a decision is an **Architecture Decision Record (ADR)**: a short, structured document per significant decision, containing the context (what problem prompted this), the options considered, the trade-offs of each, the decision made, and the consequences (including what becomes harder as a result — every decision has a cost, and naming it is what makes an ADR honest rather than a sales pitch).
 
 Communicating trade-offs well means being explicit about the dimension being traded, not just asserting a conclusion:
 
@@ -68,7 +72,7 @@ Communicating trade-offs well means being explicit about the dimension being tra
 
 ### In Practice
 
-**What breaks without this**: An architect chooses a single large model over a cheaper routed multi-model setup and tells the business sponsor only "this is the better option" without naming the cost trade-off. Three months into production, the sponsor is blindsided by a token-cost bill four times their mental estimate, and the resulting trust damage costs the architect influence on every subsequent decision — not because the technical choice was wrong, but because the trade-off was never surfaced as a trade-off.
+**What breaks without this**: Not because the technical choice was wrong, but because the trade-off was never surfaced as a trade-off, the resulting trust damage costs the architect influence on every subsequent decision — an architect chooses a single large model over a cheaper routed multi-model setup and tells the business sponsor only "this is the better option" without naming the cost trade-off, and three months into production the sponsor is blindsided by a token-cost bill four times their mental estimate.
 
 **Decision trigger**: Ask, before presenting any architectural decision — have I named the specific dimension being traded (cost, latency, quality, flexibility, operational burden), and does the audience in front of me actually need the mechanism or the consequence to make their decision? If a stakeholder can only repeat your conclusion but not your reasoning, the trade-off wasn't actually communicated.
 
@@ -84,13 +88,15 @@ Common distractor: a decision presented as objectively "the best option" with no
 
 ### Key Concept
 
-Expectations left implicit become disagreements later — the discipline here is converting vague expectations into **structured feedback cadences and measurable SLAs** before they're needed, not after a stakeholder is already unhappy. Two related but distinct mechanisms:
+**An SLA without a consequence for missing it is a wish, not an agreement.**
+
+Expectations left implicit become disagreements later — the discipline here is converting vague expectations into structured feedback cadences and measurable SLAs before they're needed, not after a stakeholder is already unhappy. Two related but distinct mechanisms:
 
 - **Feedback loops** — a defined, recurring cadence (not ad hoc, reactive check-ins) for stakeholders to see progress and raise concerns while they're still cheap to address: discovery-phase reviews, design-review sign-offs, iterative demo cycles during build, and post-launch review cadences. A feedback loop also needs a **capture mechanism** (a logged feedback register, not verbal-only conversations that evaporate) so feedback is tracked, triaged, and either acted on or explicitly declined with a reason — an untracked verbal comment in a hallway is not a functioning feedback loop, even if it happened.
 - **Expectation alignment on model behavior specifically** — stakeholders coming from deterministic-software backgrounds often expect LLM output to be perfectly consistent and error-free; part of the architect's communication job is setting the expectation, early and explicitly, that probabilistic systems have a non-zero error rate by design, that quality improves iteratively (not in one shot), and that the evaluation methodology (D4) is how "good enough" gets proven rather than asserted.
-- **SLAs (Service Level Agreements)** — the mechanism that converts expectation alignment into an enforceable, measurable commitment. A real SLA for a Claude-based system specifies concrete targets, not aspirations: response latency (e.g., p95 under 3 seconds), availability/uptime (e.g., 99.5% monthly), output quality thresholds tied to the evaluation suite (e.g., ≥90% pass rate on the golden-set eval, re-verified on a defined cadence), support response and incident-escalation times, and — critically — what happens when a target is missed (an escalation path, a remediation window, not just a silent miss). An SLA without a consequence for missing it is a wish, not an agreement.
+- **SLAs (Service Level Agreements)** — the mechanism that converts expectation alignment into an enforceable, measurable commitment. A real SLA for a Claude-based system specifies concrete targets, not aspirations: response latency (e.g., p95 under 3 seconds), availability/uptime (e.g., 99.5% monthly), output quality thresholds tied to the evaluation suite (e.g., ≥90% pass rate on the golden-set eval, re-verified on a defined cadence), support response and incident-escalation times, and — critically — what happens when a target is missed (an escalation path, a remediation window, not just a silent miss).
 
-The unifying principle: a feedback loop without a cadence is reactive firefighting, and a quality commitment without a measurable SLA is a hope that becomes a dispute the first time reality disappoints someone's unstated assumption.
+A feedback loop without a cadence is reactive firefighting, and a quality commitment without a measurable SLA is a hope that becomes a dispute the first time reality disappoints someone's unstated assumption.
 
 ```mermaid
 flowchart LR
@@ -106,7 +112,7 @@ flowchart LR
 
 ### In Practice
 
-**What breaks without this**: A team ships a Claude-powered document-summarization tool with an informal understanding that it should be "pretty accurate." Two months in, a business stakeholder escalates a complaint that the tool "keeps getting things wrong" — but there was never an agreed accuracy threshold, evaluation cadence, or defined acceptable error rate, so there is no way to determine whether the system is underperforming an agreement or simply performing exactly as an LLM-based system was always going to, and every future conversation about the system starts from an argument instead of a data point.
+**What breaks without this**: There is no way to determine whether the system is underperforming an agreement or simply performing exactly as an LLM-based system was always going to — a team ships a Claude-powered document-summarization tool with an informal understanding that it should be "pretty accurate," and two months in, a business stakeholder escalates a complaint that the tool "keeps getting things wrong," but there was never an agreed accuracy threshold, evaluation cadence, or defined acceptable error rate. Every future conversation about the system starts from an argument instead of a data point.
 
 **Decision trigger**: Ask, for every significant stakeholder commitment being made — is this written down as a specific, measurable number (latency, uptime, quality threshold) with a defined consequence if missed, and is there a recurring, logged cadence for surfacing feedback before it becomes an escalation? If the commitment only exists as a verbal impression from a meeting, it isn't an SLA and it isn't a functioning feedback loop.
 
@@ -122,18 +128,20 @@ Common distractor: a scenario where stakeholder satisfaction is assumed because 
 
 ### Key Concept
 
-Documentation is the artifact that lets a system survive its architect's absence — the exam frames this not as a bureaucratic deliverable but as the actual mechanism of knowledge transfer between the person who understands *why* a system is shaped the way it is and the people who must build, operate, or extend it. Good architecture documentation is layered by audience, matching the same principle as decision communication:
+**Documentation is what lets a system survive its architect's absence — specificity a different engineer can act on is the bar.**
+
+Good architecture documentation is layered by audience, matching the same principle as decision communication:
 
 - **Architecture overview** — system diagrams (component, data-flow, sequence), the business context, and top-level decisions with rationale (pointing to the relevant ADRs) — written for someone who needs to understand *what* exists and *why*, not necessarily how to build it.
 - **Implementation guidance** — the detailed technical spec an engineering team actually builds from: API contracts, prompt/system-prompt specifications, tool definitions and permission scopes (cross-linking D3, D5), configuration values, error-handling behavior, and specific acceptance criteria per component. This is where an architect's design intent either survives contact with a different team's implementation or gets silently reinterpreted.
 - **Operational runbooks** — what an on-call engineer or support team needs when something goes wrong in production: known failure modes and their symptoms, monitoring dashboards and alert thresholds, escalation contacts, and remediation steps for common incidents. A runbook written by the architect during handoff is dramatically cheaper than one reconstructed by an operations team during an actual incident.
 - **Traceability to decisions** — implementation and runbook documentation should reference the ADRs that produced them, so a future engineer questioning "why is this built this way" finds the reasoning instead of having to reverse-engineer intent from code and configuration alone.
 
-The documentation discipline that separates a professional-grade handoff from an inadequate one is **specificity a different engineer can act on** — "the system should be reliable" is not implementation guidance; "the summarization tool call must retry twice with exponential backoff and fall back to a cached response after 3 consecutive failures" is.
+"The system should be reliable" is not implementation guidance; "the summarization tool call must retry twice with exponential backoff and fall back to a cached response after 3 consecutive failures" is — **that specificity gap is what separates a professional-grade handoff from an inadequate one**.
 
 ### In Practice
 
-**What breaks without this**: An architect designs and personally builds the first version of a Claude-powered contract-review assistant, then moves to a different project without writing implementation guidance beyond a high-level diagram. Six months later, a new engineer extending the system with a new document type has no record of *why* the original system used a two-pass extraction-then-validation pattern instead of a single call, reimplements it as a single call to "simplify," and silently reintroduces an accuracy problem the original design had specifically solved.
+**What breaks without this**: The engineer reimplements it as a single call to "simplify," and silently reintroduces an accuracy problem the original design had specifically solved — an architect designs and personally builds the first version of a Claude-powered contract-review assistant, then moves to a different project without writing implementation guidance beyond a high-level diagram, and six months later a new engineer extending the system with a new document type has no record of why the original system used a two-pass extraction-then-validation pattern instead of a single call.
 
 **Decision trigger**: Ask, before considering handoff documentation complete — could an engineer who was not in the room for any design conversation implement, operate, or safely extend this system using only what's written down? If the answer relies on "they can just ask me," the documentation isn't done, it's a placeholder for the architect's continued availability.
 
@@ -149,7 +157,9 @@ Common distractor: a system diagram presented as "complete documentation," when 
 
 ### Key Concept
 
-A Claude solution's lifecycle is not a one-time build-and-ship event — it's a recurring cycle with distinct phases, each with its own entry criteria (what must be true to start) and exit criteria (what must be true to move on), and an architect's role and activities differ meaningfully by phase:
+**Doing the wrong activity in the wrong phase is expensive — match the activity to the phase's entry and exit criteria.**
+
+A Claude solution's lifecycle is not a one-time build-and-ship event — it's a recurring cycle with distinct phases, each with its own entry criteria (what must be true to start) and exit criteria (what must be true to move on):
 
 - **Discovery** — entry: a business need is identified. Exit: a stakeholder-approved discovery brief exists (this domain's first topic). The architect's role here is investigative and facilitative, not decisive.
 - **Design** — entry: an approved discovery brief. Exit: architectural decisions are made, documented as ADRs, and signed off by the relevant technical and business stakeholders (this domain's second topic). The architect's role is decisive and communicative — proposing options, naming trade-offs, securing alignment.
@@ -157,7 +167,7 @@ A Claude solution's lifecycle is not a one-time build-and-ship event — it's a 
 - **Monitoring** — entry: the system is live. Exit: this phase doesn't formally exit while the system is in production — it's continuous, tracking the SLA metrics established earlier (quality via the D4 evaluation suite, latency, uptime, cost) and the feedback register against real usage, surfacing drift or degradation before a stakeholder has to.
 - **Iteration** — entry: monitoring data or stakeholder feedback identifies a gap (quality regression, new requirement, scope expansion). Exit: the iteration is scoped and — critically — routed to the *right* re-entry point in the lifecycle: a minor prompt tweak may only need a lightweight design-and-redeploy cycle, while a new use case or a materially different data source needs to loop all the way back to discovery, because the original discovery brief no longer describes the actual problem being solved.
 
-The phase-gate discipline exists because doing the wrong activity in the wrong phase is expensive: designing before discovery produces a solution to the wrong problem (already covered); building before design sign-off produces rework when a late-surfaced stakeholder objection invalidates work already done; treating handoff as a formality produces a system nobody but the original architect can safely operate; and skipping the "return to discovery" step for a materially new requirement produces feature creep bolted onto an architecture that was never scoped for it.
+Designing before discovery produces a solution to the wrong problem; building before design sign-off produces rework when a late-surfaced stakeholder objection invalidates work already done; treating handoff as a formality produces a system nobody but the original architect can safely operate; and skipping the "return to discovery" step for a materially new requirement produces feature creep bolted onto an architecture that was never scoped for it.
 
 ```mermaid
 flowchart LR
@@ -173,7 +183,7 @@ flowchart LR
 
 ### In Practice
 
-**What breaks without this**: A team treats "handoff" as sending a Confluence link and considers the lifecycle complete. Three months later, monitoring shows a steady quality decline (the underlying knowledge base has drifted from the retrieval index), but there's no defined monitoring phase with an owner or an SLA threshold that would have triggered an alert — the degradation is only discovered when a customer complaint escalates, at which point the team realizes the "iteration" that's actually needed (re-scoping the data-freshness architecture) requires a return to discovery, not a quick prompt fix, and nobody had planned for that possibility.
+**What breaks without this**: The degradation is only discovered when a customer complaint escalates, at which point the team realizes the "iteration" that's actually needed (re-scoping the data-freshness architecture) requires a return to discovery, not a quick prompt fix, and nobody had planned for that possibility — a team treats "handoff" as sending a Confluence link and considers the lifecycle complete; three months later, monitoring shows a steady quality decline (the underlying knowledge base has drifted from the retrieval index), but there's no defined monitoring phase with an owner or an SLA threshold that would have triggered an alert.
 
 **Decision trigger**: Ask, for any system currently in production — is there a named owner and an active monitoring cadence checked against the original SLA, and when a gap is found, has anyone deliberately decided whether it's a lightweight iteration or a signal that the original discovery brief no longer matches reality? If monitoring is passive (nobody is actually looking) or every gap gets treated as a quick fix regardless of scope, the lifecycle discipline has broken down.
 
@@ -192,18 +202,6 @@ Common distractor: a scenario presenting every post-launch change request as a s
 Every topic in this domain is really answering the same underlying question from a different point in time: **does everyone who needs to understand this system actually understand it, at the moment they need to?** Discovery answers that question at the start — before design begins, has the architect actually understood the problem well enough that stakeholders agree it's the right problem? Communicating decisions and trade-offs answers it during design — as choices get made, does each relevant stakeholder understand not just *what* was decided but *why*, and what it cost? Feedback loops and SLAs answer it continuously — is there a standing mechanism (not a one-time event) for expectations to be checked against reality, and a consequence when they diverge? Documentation answers it at the moment of transfer — when the architect is no longer in the room, does the knowledge survive without them? And lifecycle-phase discipline answers it structurally — is the *right kind* of understanding-building activity happening at the *right time*, so that discovery-type questions don't get skipped in a rush to build, and handoff-type rigor doesn't get skipped in a rush to move to the next project?
 
 The reason this domain exists separately from the technical domains (D1–D5) is that a technically correct architecture with a communication and lifecycle failure still fails as a *delivered solution* — the exam is testing whether an architect understands that their job doesn't end when the design is sound, it ends when the system is understood, agreed to, operable by someone else, and durable enough to keep being the right system as reality changes around it. Feedback loops and monitoring are the same discipline applied at two different lifecycle points: one keeps a build aligned with intent while it's happening, the other keeps a live system aligned with intent after it's shipped. An SLA is simply expectation alignment made measurable and consequential — the same information a discovery brief or an ADR communicates, but converted into a number someone can check.
-
-### 2. Worked scenario
-
-> **Scenario.** A mid-size insurance company asks an architect to "build something with Claude to help our claims adjusters work faster." Six months later, the system needs to be handed off to the internal platform team, who will own it going forward. Walk the lifecycle.
->
-> **Reasoning it through:**
-> - *Discovery.* The architect runs structured interviews with adjusters (not just their manager) and shadows the current claims-review process, discovering the actual bottleneck isn't drafting claim summaries (what the initial request implied) but cross-referencing policy documents against claim details — a retrieval problem, not a drafting problem. The discovery brief captures this reframed objective, a baseline metric (average adjuster time per claim, currently 22 minutes), a target (a stated goal from the business sponsor of a 30% reduction), the data landscape (policy documents live in three different systems, two of which have API access and one of which is PDF-only with no API), and the stakeholder map (the claims-ops director has sign-off authority; adjusters have strong opinions but not veto power; legal has a hard constraint that no claim-approval decision can be automated). Stakeholders sign off on this brief before design starts.
-> - *Design.* The architect evaluates two options: a RAG system over the two API-accessible sources only (faster to build, incomplete coverage) versus a RAG system with an added document-ingestion pipeline for the PDF-only source (slower to build, complete coverage). The ADR names the trade-off explicitly: option one ships in 6 weeks but only closes an estimated 18% of the time gap because the PDF-only carrier represents a large share of claims; option two ships in 11 weeks but is projected to close closer to the full 30% target. The claims-ops director, given both numbers, chooses option two — a decision the architect could not have made unilaterally, because it trades timeline for outcome in a way only the business sponsor should own.
-> - *Handoff.* Before transferring ownership, the architect produces three documents at three altitudes: an architecture overview (for the platform team's engineering lead, showing the retrieval pipeline, the ingestion pipeline, and pointers to the two ADRs explaining why both exist), implementation guidance (API contracts, the specific chunking and retrieval-ranking configuration, and acceptance criteria per component), and a runbook (what to do if the PDF-ingestion pipeline fails, what the monitoring dashboard's key metrics mean, escalation contact for the original architect during a defined 30-day transition window). The platform team walks through a live incident-response drill using only the runbook before the architect signs off that handoff is complete.
-> - *Monitoring.* The SLA agreed with the claims-ops director specifies: p95 retrieval latency under 4 seconds, a quality bar of ≥88% pass rate on a golden-set eval re-run monthly, and a defined escalation path (platform team on-call, then the original architect) if either threshold is missed for two consecutive weeks. A feedback register, reviewed biweekly with a rotating adjuster representative, logs real usage friction as it happens instead of waiting for a formal complaint.
-> - *Iteration.* Four months in, the feedback register shows adjusters repeatedly requesting the system also flag potential fraud indicators — a capability outside the original discovery brief's scope (and one legal flagged as needing its own compliance review, echoing D5). The architect correctly routes this back to a fresh discovery pass rather than quietly bolting fraud-flagging onto the existing retrieval system, because it's a materially new use case with its own risk profile, not a tweak to the existing one.
-> - *Result.* At every phase, the artifact that mattered wasn't a diagram — it was a decision or a document that let someone *other than the architect* understand, agree to, or act on the system. That's the throughline the whole domain is testing.
 
 ### 3. Memory aid
 

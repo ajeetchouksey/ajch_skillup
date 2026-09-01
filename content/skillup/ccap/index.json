@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.15",
-  "contentUpdatedAt": "2026-08-31",
+  "contentVersion": "0.1.17",
+  "contentUpdatedAt": "2026-09-01",
   "provider": "Anthropic",
   "palette": {
     "color": "#a78bfa",
@@ -26,15 +26,17 @@
     { "version": "0.1.12", "date": "2026-08-31", "type": "patch", "summary": "Added 17 questions to domain D6 (Stakeholder Communication & Lifecycle Management)" },
     { "version": "0.1.13", "date": "2026-08-31", "type": "patch", "summary": "Domain 7 notes added." },
     { "version": "0.1.14", "date": "2026-08-31", "type": "patch", "summary": "Added 8 questions to domain D7 (Developer Productivity & Operational Enablement)" },
-    { "version": "0.1.15", "date": "2026-08-31", "type": "patch", "summary": "Added 6 scenarios: RAG pipeline design, multi-agent least-privilege, cost/latency optimization, production evaluation & A/B testing, regulated-industry governance rollout, and Claude Code developer enablement" }
+    { "version": "0.1.15", "date": "2026-08-31", "type": "patch", "summary": "Added 6 scenarios: RAG pipeline design, multi-agent least-privilege, cost/latency optimization, production evaluation & A/B testing, regulated-industry governance rollout, and Claude Code developer enablement" },
+    { "version": "0.1.16", "date": "2026-09-01", "type": "minor", "summary": "D7 gap-fill: added 4 questions (ccap-d7-009..012 — hooks, cost/token monitoring, productivity-impact measurement, MCP version rollout risk) closing the domain below the platform's ≥10/domain minimum (8→12). Backfilled `difficulty` (easy/medium/hard) on all 124 questions across all 7 domains (previously 0% coverage). Added ≥1 content-type + ≥1 cognitive-level tag from the platform's controlled taxonomy to every question, additive to existing descriptive tags." },
+    { "version": "0.1.17", "date": "2026-09-01", "type": "minor", "summary": "Extracted the embedded 'Worked scenario' prose from all 7 domain notes files into 7 dedicated RichScenario v2.0 files (ccap-scenario-007..013), each with 4 scenario-specific questions and keyLearnings, matching the platform's scenarios/ convention. Notes files now link out to Scenario Practice instead of duplicating the walkthrough inline." }
   ],
   "id": "ccap",
   "examCode": "CCAR-P",
-  "title": "Claude Certified Architect – Professional",
+  "title": "Claude Certified Architect \u2013 Professional",
   "shortTitle": "CCA-P",
   "contentLevel": "301",
-  "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions — enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
-  "questions": 120,
+  "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions \u2014 enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
+  "questions": 124,
   "duration": "120 min",
   "passScore": "720/1000",
   "passThreshold": 72,
@@ -66,7 +68,14 @@
     "content/skillup/ccap/scenarios/ccap-cost-latency-optimization.json",
     "content/skillup/ccap/scenarios/ccap-production-evaluation-ab-testing.json",
     "content/skillup/ccap/scenarios/ccap-regulated-industry-governance-rollout.json",
-    "content/skillup/ccap/scenarios/ccap-claude-code-developer-enablement.json"
+    "content/skillup/ccap/scenarios/ccap-claude-code-developer-enablement.json",
+    "content/skillup/ccap/scenarios/ccap-insurance-claims-triage-workflow-design.json",
+    "content/skillup/ccap/scenarios/ccap-tiered-model-selection-support-triage.json",
+    "content/skillup/ccap/scenarios/ccap-claims-adjustment-agent-integration-design.json",
+    "content/skillup/ccap/scenarios/ccap-claims-triage-retrieval-drift-diagnosis.json",
+    "content/skillup/ccap/scenarios/ccap-clinical-intake-governance-design.json",
+    "content/skillup/ccap/scenarios/ccap-claims-system-lifecycle-handoff.json",
+    "content/skillup/ccap/scenarios/ccap-team-claude-code-operational-enablement.json"
   ],
   "resources": [
     { "label": "Official Exam Page", "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-professional-certification" },

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-008",
+  "title": "Least-Privilege Tool Scoping and MCP Allow-Listing for a Release-Notes Agent",
+  "description": "Tests the ability to scope MCP toolsets, network access, and error-handling behavior to what a task actually requires, and to correctly distinguish a transient failure (retry) from a non-transient one (stop and escalate).",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 11,
+  "domains": [2],
+  "scenario": {
+    "background": "Dev, a platform engineer, is configuring a release-notes coding agent. Its job: read merged PRs since the last release, summarize them, and open a draft PR updating CHANGELOG.md. Nothing about the task requires modifying issues, running deployments, or reaching the public internet.",
+    "characters": [
+      {
+        "name": "Dev Chatterjee",
+        "role": "Platform Engineer",
+        "concern": "Wants the agent to have exactly the access it needs and nothing more, and to fail loudly and specifically rather than silently or destructively."
+      },
+      {
+        "name": "Priyanka Rao",
+        "role": "Teammate",
+        "concern": "Suggested a third-party MCP server for changelog formatting found in a public registry."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-008-q1",
+      "stem": "Which GitHub MCP configuration correctly matches the task's actual needs?",
+      "options": [
+        "Enable the full default GitHub MCP toolset (actions, code_security, pull_requests, issues) so the agent has everything it might need",
+        "Enable only the pull_requests toolset, in read-only mode, since the agent only needs to read PR history and diffs and never needs to modify a PR, run deployments, or touch issues",
+        "Enable the issues toolset only, since CHANGELOG.md updates are issue-adjacent",
+        "Enable the actions toolset, since the agent is part of a CI-like workflow"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the task only requires reading PR history and diffs — it never modifies a PR, runs a deployment, or touches issues — so enabling only pull_requests in read-only mode gives the agent exactly what it needs and nothing it doesn't, which is least privilege applied to MCP tool scoping. A grants unrelated, higher-risk toolsets (actions, code_security, issues) the task never uses. C and D each grant a toolset unrelated to the actual task (reading and summarizing PRs)."
+    },
+    {
+      "id": "gh600-scenario-008-q2",
+      "stem": "Priyanka suggests a third-party changelog-formatting MCP server found in a public registry. What should Dev do?",
+      "options": [
+        "Connect it immediately, since it's already listed in a public MCP registry, which implies it's been vetted",
+        "File a request for platform-security review before connecting it, since registry presence isn't the same as clearance on the org's approved MCP allow list",
+        "Connect it only if Priyanka personally vouches for it",
+        "Refuse to consider any third-party MCP server ever, regardless of review process"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because MCP servers require allow-listing before connection, not disconnection after a problem — registry presence is not equivalent to organizational clearance, so the correct move is routing it through the actual review process before any connection is made. A conflates public discoverability with vetted trust, which are not the same thing. C substitutes informal personal vouching for a real security review process. D is an unnecessary blanket refusal when a legitimate review path exists and should be used."
+    },
+    {
+      "id": "gh600-scenario-008-q3",
+      "stem": "The org's default network firewall already covers GitHub and the npm registry the formatting script depends on. Should Dev add a broader allowlist entry just in case future needs arise?",
+      "options": [
+        "Yes, broaden the allowlist proactively to avoid needing to make changes later",
+        "No — the default firewall already covers what this task actually needs; extending it 'just in case' isn't justified by anything the task requires",
+        "Yes, but only if a teammate requests it informally",
+        "No, and the existing allowlist should also be reduced further, cutting off the npm registry the task actually needs"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because network access, like tool access, should be scoped to what a task actually requires — the default firewall already covers GitHub and npm, which is everything this task needs, so adding broader access without a concrete justification violates least privilege for no benefit. A and C both expand access speculatively rather than on demonstrated need. D incorrectly proposes removing access the task genuinely requires (npm, for the formatting script's dependencies)."
+    },
+    {
+      "id": "gh600-scenario-008-q4",
+      "stem": "During a session, the formatting script fails once with an npm registry timeout, then later fails again because a merged PR's title contains characters the formatter can't parse. How should the agent handle each failure?",
+      "options": [
+        "Retry both failures indefinitely until they succeed",
+        "Retry the timeout with backoff (transient), but stop and escalate on the parsing failure (non-transient) — leaving a comment on the tracking issue explaining exactly what broke, ending the session in a failed state that triggers a lifecycle alert",
+        "Stop and escalate on both failures without attempting any retry",
+        "Silently skip both failed steps and continue as if nothing happened"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because error handling should default to 'stop and escalate' for anything non-transient rather than 'keep trying and hope' — the registry timeout is transient and worth a backoff retry, while the parsing failure is a genuine bug that won't resolve by retrying, so the agent correctly stops, documents exactly what broke, and triggers a lifecycle alert for a human to act on. A wastes time and resources retrying a failure that will never self-resolve. C fails to use a reasonable retry for a genuinely transient issue. D hides a real failure instead of surfacing it, which could let a broken changelog entry slip through unnoticed."
+    }
+  ],
+  "keyLearnings": [
+    "MCP toolsets should be enabled only for what a task actually requires — starting from an empty allowlist and adding only what's justified by the task, not a broad default trimmed down later.",
+    "Registry presence for a third-party MCP server is not the same as organizational clearance — new servers require allow-listing review before connection, never connect-first-review-later.",
+    "Network and tool access should not be broadened speculatively 'just in case' — least privilege applies to firewall rules the same way it applies to tool grants.",
+    "Error handling should distinguish transient failures (retry with backoff) from non-transient ones (stop, document precisely, and escalate) rather than retrying everything or escalating everything uniformly."
+  ]
+}

@@ -11,39 +11,42 @@ This is the largest domain on the exam, and for good reason: it's where an agent
 ## Selecting and Configuring Agent Tools
 
 ### Key Concept
-**Identify required tools from the task, not from what's available**
 
-Tool selection starts from the task, not from the catalog. For a given agent role — a code-review agent, a triage agent, a release-notes agent — you list the concrete actions it must be able to perform (read files, run tests, comment on a PR, query an issue tracker) and map each one to the smallest tool that satisfies it. This is the same discipline as the plan/act boundary from Domain 1, applied one level lower: a tool an agent doesn't need isn't a convenience held in reserve, it's an unused capability that only adds risk and ambiguity. The more tools an agent can see in a given turn, the more chances there are for it to pick the wrong one on an ambiguous instruction — a triage agent that can also merge PRs will occasionally try to, even though "triage" never implied "merge."
+**An unused tool isn't a convenience held in reserve — it's risk and ambiguity with no offsetting benefit.**
+
+Tool selection starts from the task, not from the catalog. For a given agent role — a code-review agent, a triage agent, a release-notes agent — you list the concrete actions it must be able to perform (read files, run tests, comment on a PR, query an issue tracker) and map each one to the smallest tool that satisfies it. This is the same discipline as the plan/act boundary from Domain 1, applied one level lower. The more tools an agent can see in a given turn, the more chances there are for it to pick the wrong one on an ambiguous instruction — a triage agent that can also merge PRs will occasionally try to, even though "triage" never implied "merge." **An unused tool sits there like a spare key nobody remembers cutting** — useless until the day it opens a door it shouldn't.
 
 ### In Practice
 
-**What breaks without this**: an agent configured with a broad, copy-pasted toolset (because it was easier than auditing the task) occasionally invokes a tool that's technically available but never intended for its role — e.g., a documentation agent that also has `bash` access running an arbitrary shell command because a prompt-injected issue body asked it to, when it should have had no code-execution path at all.
+**What breaks without this**: a documentation agent that also has `bash` access runs an arbitrary shell command because a prompt-injected issue body asked it to, when it should have had no code-execution path at all — that's what happens when an agent is configured with a broad, copy-pasted toolset because auditing the task felt like more work than reusing an existing list.
 
 **Decision trigger**: for every tool under consideration, ask "does this agent's task literally require this action to complete, or would the task still fully succeed without it?" If the task succeeds without it, leave it out — you can always add it later with evidence, but you can't un-ring a tool call that already happened.
 
 **When you'd choose differently**: for a general-purpose "assistant" agent meant to handle open-ended, unpredictable requests from developers (not a narrow single-purpose agent), a broader toolset is a legitimate design choice — but it should be paired with tighter permission scoping and human review on anything destructive, since you're trading predictability for flexibility on purpose.
 
 ### Key Concept
-**Configuring tools: `tools`, `excludedTools`, and MCP tool names**
 
-Once required tools are identified, configuration happens through the agent's `tools` property (an explicit allowlist — start from nothing, add only what's needed) or `excludedTools` (a denylist that subtracts specific tools from an inherited default set). Built-in tools like read/edit/bash/grep/glob/view sit alongside MCP-provided tools, which are namespaced to the server that exposes them (e.g., a GitHub MCP server's `issues` tool is distinct from a Slack MCP server's `post_message` tool even if both are loosely "communication" actions) — so an allowlist entry has to reference the specific server-qualified tool name, not a generic capability label.
+**Reference the specific server-qualified tool name — MCP tools are namespaced to the server that exposes them, never a generic capability label.**
+
+Once required tools are identified, configuration happens through the agent's `tools` property (an explicit allowlist — start from nothing, add only what's needed) or `excludedTools` (a denylist that subtracts specific tools from an inherited default set). Built-in tools like read/edit/bash/grep/glob/view sit alongside MCP-provided tools, which are namespaced to the server that exposes them (e.g., a GitHub MCP server's `issues` tool is distinct from a Slack MCP server's `post_message` tool even if both are loosely "communication" actions) — so an allowlist entry has to reference the specific server-qualified tool name, not a generic capability label. **It's like calling two different plumbers "the plumber"** — the label doesn't tell you which one actually shows up.
 
 ### In Practice
 
-**What breaks without this**: teams that reuse one broad `tools` list across every custom agent in the org — because maintaining a separate list per agent feels like overhead — end up with narrow-purpose agents that can silently invoke tools nobody intended for them, and nobody notices until a session log shows an unexpected tool call.
+**What breaks without this**: nobody notices until a session log shows an unexpected tool call — teams that reuse one broad `tools` list across every custom agent in the org, because maintaining a separate list per agent feels like overhead, end up with narrow-purpose agents that can silently invoke tools nobody intended for them.
 
 **Decision trigger**: ask "if I inherit the platform's default toolset, will next month's newly-added default tool automatically become available to this agent too?" If yes and that's not acceptable for a sensitive agent, use an explicit `tools` allowlist instead of relying on `excludedTools` against a moving default.
 
 **When you'd choose differently**: `excludedTools` is the more maintainable choice when you're removing a small, known number of capabilities (e.g., "everything except `bash`") from an otherwise-good default set — rebuilding a full allowlist by hand for a broadly-scoped agent adds maintenance risk of its own if the platform's default toolset changes.
 
 ### Key Concept
-**Tool permission scoping: least privilege as a spectrum, not a switch**
 
-Permission isn't binary "has the tool or doesn't" — most tools (and MCP servers in particular) support finer scoping: read-only vs. read-write modes, per-toolset enablement (e.g., an `issues` toolset without a `pull_requests` toolset), and repository- or org-level constraints on what the underlying credential can reach. A planning-phase or review agent should default to read-only wherever the tool supports it, even if the same tool is also available in write mode elsewhere in the pipeline for the execution phase — matching Domain 1's plan/act split at the tool-configuration layer.
+**Default to read-only wherever a tool supports it — permission is a spectrum, not a has-it-or-doesn't switch.**
+
+Most tools (and MCP servers in particular) support finer scoping: read-only vs. read-write modes, per-toolset enablement (e.g., an `issues` toolset without a `pull_requests` toolset), and repository- or org-level constraints on what the underlying credential can reach. A planning-phase or review agent should default to read-only wherever the tool supports it, even if the same tool is also available in write mode elsewhere in the pipeline for the execution phase — matching Domain 1's plan/act split at the tool-configuration layer. **It's a museum guide badge vs. a curator's master key** — both let you into the building, only one lets you touch the art.
 
 ### In Practice
 
-**What breaks without this**: granting a code-review agent a GitHub tool in full read-write mode because "it's the same tool the execution agent uses anyway" means a subtly wrong prompt or an injected instruction in a PR description could cause the review agent to push a commit or close an issue — actions a reviewer was never supposed to be able to take.
+**What breaks without this**: a subtly wrong prompt or an injected instruction in a PR description could cause a review agent to push a commit or close an issue — actions a reviewer was never supposed to be able to take — when it's granted a GitHub tool in full read-write mode because "it's the same tool the execution agent uses anyway."
 
 **Decision trigger**: before granting a tool, ask "does this agent's job ever require *mutating* state, or does it only need to observe it?" If it only observes, configure the read-only variant even when a write-capable variant is available and would technically also work.
 
@@ -58,9 +61,10 @@ The exam likes to offer "grant the tool, then instruct the agent not to use it d
 ## Configuring MCP Servers
 
 ### Key Concept
-**Adding an MCP server as a tool to an agent**
 
-The Model Context Protocol lets an agent call tools exposed by an external server — local (run as a subprocess, e.g., a Docker-packaged server started with a command and args) or remote (an HTTP endpoint the agent connects to directly). Configuration for GitHub Copilot's coding agent happens through an `mcpServers` block: each entry names the server, its `type` (`local` or `http`), how to reach it (`command`/`args` for local, `url` for remote), any required authentication, and — critically — which of the server's tools are actually exposed to the agent. A server that offers thirty tools doesn't mean an agent should receive all thirty; the same least-privilege discipline from tool selection applies again at the MCP layer.
+**A server offering thirty tools doesn't mean an agent should receive all thirty — least privilege applies at the MCP layer too.**
+
+The Model Context Protocol lets an agent call tools exposed by an external server — local (run as a subprocess, e.g., a Docker-packaged server started with a command and args) or remote (an HTTP endpoint the agent connects to directly). Configuration for GitHub Copilot's coding agent happens through an `mcpServers` block: each entry names the server, its `type` (`local` or `http`), how to reach it (`command`/`args` for local, `url` for remote), any required authentication, and — critically — which of the server's tools are actually exposed to the agent. **It's a rented office suite where you only get keys cut for the rooms your team actually uses, not the whole floor.**
 
 ```mermaid
 flowchart TD
@@ -79,46 +83,49 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: adding an MCP server with its full default toolset exposed — because scoping individual tool names felt like unnecessary setup — hands the agent tools nobody scoped or reviewed, some of which may be destructive (delete, force-push, send-message) and were never part of the task the agent was configured for.
+**What breaks without this**: the agent ends up with tools nobody scoped or reviewed, some of which may be destructive (delete, force-push, send-message) and were never part of its task — that's the result of adding an MCP server with its full default toolset exposed because scoping individual tool names felt like unnecessary setup.
 
 **Decision trigger**: when adding any MCP server, ask "which specific tools does this agent's task require from this server?" and enumerate them explicitly, rather than accepting the server's full default exposure.
 
 **When you'd choose differently**: for an internal, fully-trusted server built in-house specifically to back one narrow agent (nothing else will ever consume it), exposing its complete toolset can be reasonable — the server's entire surface area was already designed around exactly that agent's needs, so there's nothing extra to trim.
 
 ### Key Concept
-**Configuring the GitHub remote MCP server**
 
-GitHub hosts its own remote MCP server (reachable at `https://api.githubcopilot.com/mcp/`) that exposes GitHub platform capabilities — issues, pull requests, repositories, Actions, code security — as MCP tools, authenticated via a bearer token (OAuth or PAT) sent with the request. Two configuration levers matter most: **toolsets**, which group related tools (e.g., `issues`, `pull_requests`, `actions`) so you can enable only the groups a given agent needs instead of the entire surface; and a **read-only mode**, which restricts the server to non-mutating operations only — the same read/write scoping principle as any other tool, applied to GitHub's own API surface.
+**Scope by toolset and read-only mode — the same read/write discipline applied to GitHub's own API surface.**
+
+GitHub hosts its own remote MCP server (reachable at `https://api.githubcopilot.com/mcp/`) that exposes GitHub platform capabilities — issues, pull requests, repositories, Actions, code security — as MCP tools, authenticated via a bearer token (OAuth or PAT) sent with the request. Two configuration levers matter most: **toolsets**, which group related tools (e.g., `issues`, `pull_requests`, `actions`) so you can enable only the groups a given agent needs instead of the entire surface; and a **read-only mode**, which restricts the server to non-mutating operations only. **It's a security badge that opens the mailroom but not the server room.**
 
 ### In Practice
 
-**What breaks without this**: enabling every toolset on the GitHub remote MCP server for an agent that only needs to read issue context turns a narrow research task into one with a much larger blast radius — the agent now technically has a code path to modify Actions workflows or push commits, even if the task never called for it.
+**What breaks without this**: the agent now technically has a code path to modify Actions workflows or push commits, even if the task never called for it — enabling every toolset on the GitHub remote MCP server for an agent that only needs to read issue context turns a narrow research task into one with a much larger blast radius.
 
 **Decision trigger**: ask "does this agent's task require any GitHub mutation at all?" If not, enable read-only mode and only the toolsets the task actually touches (e.g., `issues` and `pull_requests`, not `actions` or `code_security`), rather than defaulting to the full authenticated surface.
 
 **When you'd choose differently**: an execution-phase coding agent that needs to push commits and open PRs genuinely needs a write-capable configuration — the goal isn't "always read-only," it's matching the server's mode to the phase the agent is actually operating in.
 
 ### Key Concept
-**MCP registries: discovery is not the same as trust**
 
-An MCP registry is a catalog — a place to discover servers that expose a given capability — not an approval mechanism. A server appearing in a registry tells you it exists and roughly what it does; it says nothing about whether your organization has vetted its data handling, its authentication model, or the blast radius of the tools it exposes. Treating "it's in the registry" as equivalent to "it's safe to connect" skips the actual review step organizations need before granting any external server access to agent context (which may include repository contents, issue text, or credentials).
+**Registry presence answers "does it exist," not "should we trust it."**
+
+An MCP registry is a catalog — a place to discover servers that expose a given capability — not an approval mechanism. A server appearing in a registry tells you it exists and roughly what it does; it says nothing about whether your organization has vetted its data handling, its authentication model, or the blast radius of the tools it exposes. Treating "it's in the registry" as equivalent to "it's safe to connect" skips the actual review step organizations need before granting any external server access to agent context (which may include repository contents, issue text, or credentials). **A business listed in the phone book hasn't been vetted by anyone — it's just findable.**
 
 ### In Practice
 
-**What breaks without this**: a developer discovers a convenient third-party MCP server in a registry and wires it directly into a production agent workflow without review — if that server logs request payloads or has an overly broad tool surface, repository contents or issue text an agent passed through it are now outside the org's control, with no one having evaluated that trade-off.
+**What breaks without this**: repository contents or issue text an agent passed through it are now outside the org's control, with no one having evaluated that trade-off — a developer discovers a convenient third-party MCP server in a registry and wires it directly into a production agent workflow without review, and if that server logs request payloads or has an overly broad tool surface, the exposure is silent.
 
 **Decision trigger**: before connecting any newly-discovered MCP server, ask "has this specific server been vetted by someone with authority to approve it for this org, independent of it being listed in a registry?" Registry presence answers "does it exist," not "should we trust it."
 
 **When you'd choose differently**: for a low-stakes local experiment in a sandbox with no real repository data or credentials in play, a developer trying out a registry-listed server for evaluation purposes doesn't need the same review bar as a production rollout — the distinction is what's actually exposed to the server, not the server's popularity.
 
 ### Key Concept
-**MCP allow lists: policy enforced at the org, not the individual agent config**
 
-Because any contributor could otherwise wire an arbitrary MCP server into an agent workflow, org owners can configure an **MCP server allow list** policy that restricts which MCP servers are permitted for use with Copilot's coding agent across the organization — only servers on the approved list can be connected, regardless of what an individual repository's configuration requests. This moves the trust decision from "did this repo's maintainer make a good call" to "did the org's security/platform team approve this specific server," which matters because a compromised or malicious MCP server has a direct path to whatever context and credentials the agent session holds.
+**An org-level MCP allow list moves the trust decision from "did this repo's maintainer make a good call" to "did security actually approve this server."**
+
+Because any contributor could otherwise wire an arbitrary MCP server into an agent workflow, org owners can configure an **MCP server allow list** policy that restricts which MCP servers are permitted for use with Copilot's coding agent across the organization — only servers on the approved list can be connected, regardless of what an individual repository's configuration requests. This matters because a compromised or malicious MCP server has a direct path to whatever context and credentials the agent session holds. **It's a corporate vendor-approval list, not a suggestion box.**
 
 ### In Practice
 
-**What breaks without this**: without an org-level allow list, the practical security posture of every coding-agent session in the org is only as strong as the least-careful repository maintainer's MCP configuration — one repo wiring in an unreviewed server creates an exfiltration path that has nothing to do with that repo's own code quality.
+**What breaks without this**: one repo wiring in an unreviewed server creates an exfiltration path that has nothing to do with that repo's own code quality — without an org-level allow list, the practical security posture of every coding-agent session in the org is only as strong as the least-careful repository maintainer's MCP configuration.
 
 **Decision trigger**: ask "if any contributor in the org could add an MCP server config to any repo today, would that be an acceptable security posture?" If not, the allow list needs to be enabled and enforced centrally rather than relying on repo-by-repo review discipline.
 
@@ -133,9 +140,10 @@ Watch for questions that treat "the MCP server is listed in a registry" as suffi
 ## Integrating Agents into Development Environments
 
 ### Key Concept
-**Execution context: ephemeral, sandboxed, and configurable before the session starts**
 
-Coding agent sessions run inside an isolated, ephemeral compute environment rather than on a developer's machine or a shared long-lived box — each session starts clean and is discarded afterward. Teams can customize what that environment looks like before the agent's first tool call using a dedicated setup workflow (a `copilot-setup-steps` job) that installs dependencies, sets up language toolchains, or seeds any state the agent's later work will assume is already present — the same way a CI job's setup phase prepares an environment before the actual build/test steps run.
+**Prepare the environment before the agent's first tool call — don't burn session budget on setup the agent has to redo itself.**
+
+Coding agent sessions run inside an isolated, ephemeral compute environment rather than on a developer's machine or a shared long-lived box — each session starts clean and is discarded afterward. Teams can customize what that environment looks like before the agent's first tool call using a dedicated setup workflow (a `copilot-setup-steps` job) that installs dependencies, sets up language toolchains, or seeds any state the agent's later work will assume is already present — the same way a CI job's setup phase prepares an environment before the actual build/test steps run. **It's arriving at a hotel room that's already made up, not one where you have to bring your own furniture.**
 
 ### In Practice
 
@@ -146,48 +154,52 @@ Coding agent sessions run inside an isolated, ephemeral compute environment rath
 **When you'd choose differently**: a repository with no build step and no dependencies beyond what's already in the base image (e.g., a docs-only repo) doesn't need a custom setup workflow at all — the ephemeral default environment is already sufficient, and adding one would just be unnecessary maintenance.
 
 ### Key Concept
-**Repository and branch scope**
 
-A coding agent session is scoped to a single repository and operates on its own branch — it cannot push directly to a protected branch, and it cannot span multiple repositories within one session (the same constraint Domain 1 covers for task decomposition, expressed here as an environment-level fact rather than a planning choice). This scoping is what makes the session's diff reviewable as a single coherent unit: everything the session touched is confined to one branch in one repo, so a reviewer never has to reason about partial, cross-repository side effects from a single session.
+**One session, one repository, one branch — that's what makes a session's diff reviewable as a single coherent unit.**
+
+A coding agent session is scoped to a single repository and operates on its own branch — it cannot push directly to a protected branch, and it cannot span multiple repositories within one session (the same constraint Domain 1 covers for task decomposition, expressed here as an environment-level fact rather than a planning choice). Everything the session touched is confined to one branch in one repo, so a reviewer never has to reason about partial, cross-repository side effects from a single session. **It's one contractor, one job site, one set of blueprints — not five sites managed off memory.**
 
 ### In Practice
 
-**What breaks without this**: assuming a single session can coordinate changes across a library repo and its downstream consumers produces a task that silently only completes the portion scoped to whichever repo the session was actually attached to — the requester may not notice the other repos were never touched until something downstream breaks.
+**What breaks without this**: the requester may not notice the other repos were never touched until something downstream breaks — assuming a single session can coordinate changes across a library repo and its downstream consumers produces a task that silently only completes the portion scoped to whichever repo the session was actually attached to.
 
 **Decision trigger**: before assigning any task, ask "does this change require edits in more than one repository?" If yes, decompose it into one session per repository up front, rather than discovering the scope limit mid-task.
 
 **When you'd choose differently**: there's no legitimate exception here within a single session — cross-repo work always needs decomposition into separate sessions; the only design choice is how those sessions coordinate (e.g., a tracking issue linking the per-repo PRs), not whether the single-repo constraint can be worked around.
 
 ### Key Concept
-**CI invocation for agent-authored changes**
 
-An agent-opened PR triggers the repository's CI the same way a human-opened PR would, but with one important gate: workflows on agent-authored PRs commonly require the same approval step used for first-time external contributors before Actions workflows run automatically — a maintainer has to approve the workflow run rather than it firing unattended. This exists because a PR whose diff came from an autonomous process is exactly the scenario where you don't want CI (which can have write-capable secrets and deploy permissions) executing unreviewed instructions with no human checkpoint at all.
+**An agent-authored PR is exactly the diff you don't want CI executing unreviewed — the same approval gate as a first-time external contributor applies.**
+
+An agent-opened PR triggers the repository's CI the same way a human-opened PR would, but with one important gate: workflows on agent-authored PRs commonly require the same approval step used for first-time external contributors before Actions workflows run automatically — a maintainer has to approve the workflow run rather than it firing unattended. This exists because a PR whose diff came from an autonomous process is exactly the scenario where you don't want CI (which can have write-capable secrets and deploy permissions) executing unreviewed instructions with no human checkpoint at all. **It's the same background check you'd run on a first-day contractor, not a return visitor.**
 
 ### In Practice
 
-**What breaks without this**: auto-approving Actions runs on every agent-opened PR (to "keep things fast") removes the one CI-level checkpoint that exists specifically to catch a scenario where the diff itself is untrusted until a human has looked at it — a malicious or injected change could reach a workflow with real secrets before anyone reviewed the code.
+**What breaks without this**: a malicious or injected change could reach a workflow with real secrets before anyone reviewed the code — auto-approving Actions runs on every agent-opened PR (to "keep things fast") removes the one CI-level checkpoint that exists specifically to catch a scenario where the diff itself is untrusted.
 
 **Decision trigger**: ask "would I auto-approve CI runs on a PR from a first-time external contributor without looking at the diff first?" If not, don't configure agent PRs to skip that same gate just because the author is a trusted agent product rather than an unknown human.
 
 **When you'd choose differently**: a narrowly-scoped, low-privilege workflow (e.g., a lint-only check with no secrets and no deploy capability) can reasonably be exempted from the approval gate for agent PRs specifically because a compromised run of *that* workflow has no meaningful blast radius — the exemption should be scoped to the workflow's actual capability, not granted broadly.
 
 ### Key Concept
-**Autonomous branch and PR creation**
 
-Once execution is unlocked, the agent creates its own working branch off the base branch, commits incrementally, and opens a pull request — by default as a **draft**, signaling it isn't yet ready for merge consideration even though the code changes are complete. This mirrors Domain 1's plan/act/review boundary at the Git level: draft status is itself a checkpoint, distinguishing "the agent finished its work" from "a human has looked at it and agreed it's ready."
+**Draft status is itself a checkpoint — it separates "the agent finished" from "a human agreed it's ready."**
+
+Once execution is unlocked, the agent creates its own working branch off the base branch, commits incrementally, and opens a pull request — by default as a **draft**, signaling it isn't yet ready for merge consideration even though the code changes are complete. This mirrors Domain 1's plan/act/review boundary at the Git level. **It's a draft manuscript, not a published book** — the label alone tells the reader not to cite it yet.
 
 ### In Practice
 
-**What breaks without this**: treating an agent-opened PR as ready-for-review the instant it appears (skipping the draft-to-ready transition) collapses the signal that was supposed to tell reviewers "this hasn't been triaged yet" — reviewers either waste time on PRs the requester hasn't even glanced at, or a rushed merge happens before anyone confirms the PR matches intent.
+**What breaks without this**: reviewers either waste time on PRs the requester hasn't even glanced at, or a rushed merge happens before anyone confirms the PR matches intent — that's what happens when an agent-opened PR is treated as ready-for-review the instant it appears, skipping the draft-to-ready transition.
 
 **Decision trigger**: ask "has a human confirmed this PR is what was actually asked for, or only that the agent believes it finished?" If only the latter, the PR should stay in draft until someone makes that call explicitly.
 
 **When you'd choose differently**: for a task class with a very tight, mechanically verifiable acceptance criterion (a single dependency version bump with no API changes, validated automatically), a team might configure automatic draft-to-ready transition once CI passes — a deliberate, narrow exception, not a default assumption that CI-green implies ready-for-merge.
 
 ### Key Concept
-**Environment-specific constraints: network firewall and secrets scoping**
 
-The agent's execution environment sits behind a network firewall that, by default, allows access only to a curated set of domains needed for common development work (source hosting, common package registries) and blocks everything else — this exists specifically to reduce the blast radius of a prompt-injection attack that tries to get the agent to exfiltrate data to an arbitrary external endpoint. Administrators can extend this allowlist with additional domains a given repository's build genuinely needs. Secrets available to the agent are scoped through a dedicated environment (conceptually similar to a GitHub Actions deployment environment) rather than being broadly injected — so a credential the agent's task doesn't need isn't sitting in its environment where a misbehaving tool call could reach it.
+**Default-deny network egress is what makes a successful prompt injection a contained failure instead of a leaked-secret incident.**
+
+The agent's execution environment sits behind a network firewall that, by default, allows access only to a curated set of domains needed for common development work (source hosting, common package registries) and blocks everything else — this exists specifically to reduce the blast radius of a prompt-injection attack that tries to get the agent to exfiltrate data to an arbitrary external endpoint. Administrators can extend this allowlist with additional domains a given repository's build genuinely needs. Secrets available to the agent are scoped through a dedicated environment (conceptually similar to a GitHub Actions deployment environment) rather than being broadly injected — so a credential the agent's task doesn't need isn't sitting in its environment where a misbehaving tool call could reach it. **It's a building's card-access system that only opens the doors a badge is scoped for, not every door because it's simpler to configure.**
 
 ### In Practice
 
@@ -206,9 +218,10 @@ A frequent distractor pairs "the agent's session log shows tests passing" with "
 ## Operating Agents with Safe Execution Paths and Robust Error Handling
 
 ### Key Concept
-**Error handling and bounded retries**
 
-Not every failure means the same thing, so a robust agent doesn't respond to every failure identically. Transient failures — a network timeout, a rate limit, a flaky test — are reasonable to retry a bounded number of times with backoff, because the underlying action is likely to succeed on a later attempt with no change in approach. Failures that reflect a logic error, a missing permission, or a genuinely failing test are not retry candidates — retrying the same failing action without changing anything just burns the session's execution budget and delays the point where a human actually needs to get involved.
+**Retry only what's transient — retrying a deterministic failure just burns the session budget and delays the human it actually needs.**
+
+Not every failure means the same thing, so a robust agent doesn't respond to every failure identically. Transient failures — a network timeout, a rate limit, a flaky test — are reasonable to retry a bounded number of times with backoff, because the underlying action is likely to succeed on a later attempt with no change in approach. Failures that reflect a logic error, a missing permission, or a genuinely failing test are not retry candidates — retrying the same failing action without changing anything just burns the session's execution budget and delays the point where a human actually needs to get involved. **It's banging on a stuck door harder instead of checking whether it's locked from the other side.**
 
 ```mermaid
 flowchart TD
@@ -226,46 +239,49 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: an agent configured to retry indiscriminately on any failure — including a genuinely failing test it cannot fix by trying again — burns its bounded execution window retrying the same unproductive action, and the session eventually stops for running out of time rather than for the actual, diagnosable reason, making the resulting log far less useful to whoever investigates it.
+**What breaks without this**: the session eventually stops for running out of time rather than for the actual, diagnosable reason, making the resulting log far less useful to whoever investigates it — an agent configured to retry indiscriminately on any failure, including a genuinely failing test it cannot fix by trying again, burns its bounded execution window on the same unproductive action.
 
 **Decision trigger**: for any failure type the agent might hit, ask "would retrying this exact action with no change in approach plausibly succeed?" If the failure is environmental and likely to resolve on its own (timeout, rate limit), retry is appropriate; if the failure is deterministic given the current state (a test the code doesn't satisfy), escalate instead of retrying.
 
 **When you'd choose differently**: for a deterministic failure the agent has tool access to actually fix (a lint error with an auto-fixable rule), the right response isn't "retry the same action" or "escalate immediately" — it's applying a different, corrective action and then re-attempting, which is a distinct pattern from blind retry.
 
 ### Key Concept
-**Rollbacks: isolation makes "rollback" cheap by construction**
 
-Because execution happens on the agent's own branch rather than directly on a protected branch, a "rollback" from a failed or unwanted session is rarely a destructive undo operation — it's simply not merging. Closing the PR, deleting the branch, or leaving it as an inspectable record of what was attempted costs nothing to the target branch's history, because nothing ever landed there. This is the direct payoff of the repository/branch scoping covered earlier in this domain: the environment-level constraint (agent works on its own branch, can't push to protected branches) is what makes rollback safe-by-default rather than something that has to be engineered separately after the fact.
+**Because nothing ever landed on the protected branch, "rollback" is just not merging — not a destructive undo.**
+
+Because execution happens on the agent's own branch rather than directly on a protected branch, a "rollback" from a failed or unwanted session is rarely a destructive undo operation — it's simply not merging. Closing the PR, deleting the branch, or leaving it as an inspectable record of what was attempted costs nothing to the target branch's history, because nothing ever landed there. This is the direct payoff of the repository/branch scoping covered earlier in this domain. **It's a sketch on a whiteboard, not a signed contract** — erasing it costs nothing.
 
 ### In Practice
 
-**What breaks without this**: a workflow that applies agent-generated changes directly to a protected branch (bypassing the branch-and-PR flow to save time) turns every failed or wrong session into an actual revert operation against production history, instead of a PR that was simply never merged — the cost of a mistake goes from "close a tab" to "coordinate an emergency revert."
+**What breaks without this**: the cost of a mistake goes from "close a tab" to "coordinate an emergency revert" — a workflow that applies agent-generated changes directly to a protected branch, bypassing the branch-and-PR flow to save time, turns every failed or wrong session into an actual revert operation against production history.
 
 **Decision trigger**: ask "if this session's output turns out to be wrong, what does undoing it require?" If the answer is more than closing a PR or deleting a branch, the execution path isn't isolated enough yet.
 
 **When you'd choose differently**: there's no good reason to skip branch isolation for agent-authored changes — the closest exception is a fully separate, already-audited automation pipeline (e.g., a config value flip recorded in its own system of record) that isn't really "agent code changes" in the same sense at all.
 
 ### Key Concept
-**Escalation paths that reach a human without stalling everything else**
 
-When an agent hits a failure it can't resolve through retry or self-correction, the productive move is to stop cleanly and leave a legible trail for a human — a comment on the issue or PR explaining what blocked it (a firewall-blocked domain, a failing test it couldn't diagnose, a permission it doesn't have), plus a session-failed lifecycle event that a monitoring integration can route to a dashboard or chat channel. This is the same asynchronous, checkpoint-based oversight model from Domain 1 applied to the failure case specifically: escalation shouldn't require a human to have been watching the session live, only that the failure is discoverable the next time someone checks in.
+**Escalation doesn't require a human watching live — only that the failure is discoverable the next time someone checks in.**
+
+When an agent hits a failure it can't resolve through retry or self-correction, the productive move is to stop cleanly and leave a legible trail for a human — a comment on the issue or PR explaining what blocked it (a firewall-blocked domain, a failing test it couldn't diagnose, a permission it doesn't have), plus a session-failed lifecycle event that a monitoring integration can route to a dashboard or chat channel. This is the same asynchronous, checkpoint-based oversight model from Domain 1 applied to the failure case specifically. **It's a voicemail, not a phone that has to be answered live.**
 
 ### In Practice
 
-**What breaks without this**: an agent that fails silently — stopping without a clear comment explaining why, and without emitting a lifecycle event anyone is subscribed to — leaves a stalled task that looks indistinguishable from "still in progress" until someone manually checks the session, which can take hours or days in a team not actively watching every session.
+**What breaks without this**: a stalled task looks indistinguishable from "still in progress" until someone manually checks the session — which can take hours or days in a team not actively watching every session — when an agent fails silently, stopping without a clear comment explaining why and without emitting a lifecycle event anyone is subscribed to.
 
 **Decision trigger**: ask "if this session fails at 2 a.m., how does the right person find out before it matters?" If the answer relies on someone happening to check, wire the lifecycle event to an actual notification channel rather than treating the session log as sufficient on its own.
 
 **When you'd choose differently**: for a low-priority, non-time-sensitive background task (e.g., a periodic documentation-freshness sweep), routing failures to a low-urgency digest rather than an immediate alert is a reasonable calibration — the principle is matching escalation urgency to actual task stakes, not that every failure needs a page.
 
 ### Key Concept
-**Traceability and accountability**
 
-Every action an agent takes should be reconstructable after the fact: session logs capturing what the agent reasoned and which tools it called, commits attributed to the agent's identity (distinguishing agent-authored work from human-authored work in the repository's history), and organization-level audit log entries recording session starts, tool invocations against sensitive resources, and outcomes. This is what turns "an agent did something" into "we can determine exactly what it did, when, and why" — the difference between an incident being investigable and being a shrug.
+**Traceability is what turns "an agent did something" into "we can determine exactly what it did, when, and why."**
+
+Every action an agent takes should be reconstructable after the fact: session logs capturing what the agent reasoned and which tools it called, commits attributed to the agent's identity (distinguishing agent-authored work from human-authored work in the repository's history), and organization-level audit log entries recording session starts, tool invocations against sensitive resources, and outcomes. **It's a flight recorder, not a shrug** — the difference between an incident being investigable and being a mystery.
 
 ### In Practice
 
-**What breaks without this**: without clear commit attribution and session-log retention, a problem discovered weeks later (a subtly wrong config change, an unexpected API call) can't be traced back to which session caused it, what the agent's reasoning was at the time, or which tools it had access to — the investigation has nothing concrete to work from, the same failure mode as bypassing the PR flow entirely in Domain 1.
+**What breaks without this**: the investigation has nothing concrete to work from — the same failure mode as bypassing the PR flow entirely in Domain 1 — when, without clear commit attribution and session-log retention, a problem discovered weeks later (a subtly wrong config change, an unexpected API call) can't be traced back to which session caused it, what the agent's reasoning was at the time, or which tools it had access to.
 
 **Decision trigger**: ask "if this specific change turns out to be wrong six months from now, can someone reconstruct exactly what the agent did and why, using only what the platform already records?" If not, traceability is a gap to close now, not after an incident forces the question.
 
@@ -286,18 +302,6 @@ Every sub-topic in this domain is the same question asked at a different layer: 
 The reason these four areas share a domain (and the largest weight on the exam) is that they compose into a single blast-radius calculation. A tool that's over-granted, connected to an under-vetted MCP server, running with unrestricted network egress, with no escalation path when something goes wrong, is a worst-case stack — each layer's looseness compounds the others. Conversely, a narrowly-scoped tool list, a reviewed and allow-listed MCP server in read-only mode, an isolated branch behind a default-deny firewall, and a clean escalation-and-audit trail is a best-case stack where even a bad outcome at any single layer is caught, contained, and traceable rather than becoming an incident.
 
 The unifying principle underneath all four areas is **least privilege as a default, with explicit, reviewed exceptions** — never the reverse. Tools start from an empty allowlist and get things added because the task needs them, not from a broad default that gets things removed if someone objects. MCP servers require allow-listing before connection, not disconnection after a problem. The firewall defaults to deny, with additions requiring justification. And error handling defaults to "stop and escalate" for anything non-transient, rather than "keep trying and hope."
-
-### 2. Worked scenario
-
-> **Scenario.** Dev, a platform engineer, is configuring a `release-notes` coding agent for his org. Its job: read merged PRs since the last release, summarize them, and open a draft PR updating `CHANGELOG.md`. Nothing about this task requires modifying issues, running deployments, or reaching the public internet.
->
-> Dev starts tool selection from the task: the agent needs to read PR history and diffs, and needs `edit` + `bash` (to run the changelog-formatting script) on its own branch. It does **not** need `actions` or `code_security` toolsets. He configures the GitHub remote MCP server with only the `pull_requests` toolset enabled, in **read-only** mode — the agent summarizes PRs, it never needs to modify one. No other MCP servers are added; a teammate had suggested wiring in a third-party changelog-formatting MCP server found in a public registry, but it isn't on the org's approved MCP allow list, so Dev files a request for platform-security review instead of connecting it directly — registry presence isn't the same as clearance.
->
-> The org's default network firewall already covers this agent's needs (GitHub plus the npm registry for the formatting script's dependencies), so Dev makes no custom allowlist additions — extending it "just in case" isn't justified by anything the task actually requires.
->
-> During a session, the changelog-formatting script fails once with an npm registry timeout. The agent retries with backoff; the second attempt succeeds, and the session continues. Later in the same session, the script hits a genuine bug — a merged PR's title contains characters the formatter can't parse. This isn't transient, so the agent doesn't retry it. It stops, leaves a comment on the tracking issue explaining exactly which PR title broke the formatter and why, and the session ends in a `failed` state, which triggers a lifecycle event routed to the platform team's Slack channel. Because the agent was working on its own branch the entire time, nothing landed on `main` — there's nothing to roll back, only a branch to either fix in a follow-up session or discard.
->
-> The next morning, a teammate sees the Slack alert, reads the session log and the issue comment, manually fixes the one problematic PR title, and re-runs the session — which now completes cleanly and opens a draft PR. Every part of the trail — the MCP configuration, the tool scope, the retry-then-escalate decision, the comment explaining the failure, the eventual commit — is reconstructable from GitHub alone.
 
 ### 3. Memory aid
 

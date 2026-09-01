@@ -12,7 +12,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Translating a business problem into a Claude-based solution starts with quantifying the actual bottleneck and defining measurable success criteria — architecture, model, and pattern choices should be derived from that target, not assumed upfront.\n\n**Why B is correct**: Without a baseline (6 hours/file, unknown accuracy) and a target (e.g., 95% extraction accuracy in 30 minutes), you can't evaluate whether any architecture actually solves the business problem, and stakeholders can't agree on 'done.'\n\n**Why the distractors fail**:\n- A: Assumes the solution is a conversational RAG Q&A pattern before confirming the workflow need is structured extraction into covenant fields, which may call for a different pattern (e.g., an extraction workflow with schema-validated output) — premature pattern lock-in.\n- C: Skips human review entirely for a regulated lending decision, introducing compliance and financial risk the business never asked to accept.\n- D: Treats model selection as a proxy for requirements definition; a stronger model doesn't fix an undefined success metric and may be needlessly expensive for a task simpler models could handle once scoped.\n\n**In practice**: Senior architects run a discovery pass — bottleneck, current cost/time, target metric, risk tier — before touching an architecture diagram; skipping it is the single most common root cause of AI projects that ship but don't move the metric leadership cared about.",
-    "tags": ["requirements-translation", "business-problem-framing", "solution-design"]
+    "tags": ["requirements-translation", "business-problem-framing", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -27,7 +28,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Decomposing a business problem by risk and tooling profile (read-only vs. write access, deterministic lookup vs. judgment-based action) yields an architecture where each component's permissions match its actual task — this is a core input to pattern selection.\n\n**Why C is correct**: Separating low-risk read-only lookups from write-capable exception handling lets you apply least-privilege and different architectural patterns (simple augmented LLM vs. tool-using agent) matched to each risk tier.\n\n**Why the distractors fail**:\n- A: Mixes risk tiers under one broad instruction set, making the system harder to secure and evaluate, and over-permissioning the low-risk 65% of traffic.\n- B: Ignores the 65% of contact volume that's cheap to automate with a simpler, lower-risk pattern, leaving easy wins on the table and underestimating total business value.\n- D: Grants full write access to every agent regardless of task, violating least-privilege for the 65% of traffic that never needs it and multiplying blast radius if any one agent misbehaves.\n\n**In practice**: An architect segments the workload by risk/tooling first, then assigns pattern and permission scope per segment, rather than picking one architecture for an entire heterogeneous workload.",
-    "tags": ["requirements-translation", "decomposition", "solution-design"]
+    "tags": ["requirements-translation", "decomposition", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -42,7 +44,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: For clinical and other regulated workflows, the input source and mandatory human checkpoint are determined by where in the real-world workflow the AI intervenes — that decision must precede any architecture or vendor comparison because it changes what data you ingest and what output requires sign-off.\n\n**Why A is correct**: Ambient drafting needs live audio input and a physician-review checkpoint before the note enters the legal record; dictation summarization needs a different, post-hoc input; autonomous chart completion changes the human-in-the-loop model entirely — you cannot compare the three options meaningfully until you know the intervention point and required sign-off.\n\n**Why the distractors fail**:\n- B: Optimizes cost before requirements are fixed, risking an underpowered pattern that fails the actual review requirement.\n- C: Context-window sizing is a downstream engineering detail, irrelevant until the input format is chosen.\n- D: Vendor integration is a real constraint but is an integration detail, not the requirement that defines what the solution must do — feasibility follows requirements, not the reverse.\n\n**In practice**: In regulated domains (healthcare, finance, legal) architects anchor on 'what must a human review before this becomes an official record' before anything else, because that decision drives input design, output format, and audit-trail requirements.",
-    "tags": ["requirements-translation", "human-in-the-loop", "solution-design"]
+    "tags": ["requirements-translation", "human-in-the-loop", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -57,7 +60,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: An end-to-end architecture only improves over time if there's an explicit feedback loop that captures the delta between AI output and human-corrected ground truth, and a process that feeds that delta back into the system — without it, the system is static no matter how good the initial design is.\n\n**Why D is correct**: Capturing adjuster corrections as structured data creates the raw material for identifying systematic error patterns (e.g., consistently underestimating water damage) and closing the loop by updating the prompt, examples, or logic.\n\n**Why the distractors fail**:\n- A: A bigger context window just gives the model more static reference data per call — it doesn't capture what went wrong or feed anything back.\n- B: A faster model speeds up throughput but doesn't affect whether the system learns from mistakes.\n- C: A second-pass reviewer improves accuracy per call but is a validation step, not a feedback loop across calls over time — it doesn't accumulate learning from adjuster behavior.\n\n**In practice**: Architects distinguish 'accuracy at time of call' (validation, review) from 'accuracy improving over time' (feedback loop) — the latter requires deliberately instrumenting and storing the human-correction delta, which many teams omit and then wonder why quality plateaus.",
-    "tags": ["feedback-loop", "end-to-end-architecture", "solution-design"]
+    "tags": ["feedback-loop", "end-to-end-architecture", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -72,7 +76,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Heterogeneous input sources should be normalized into a common schema before the reasoning/processing step, so downstream logic operates on consistent structured data rather than re-deriving meaning from each raw format every time.\n\n**Why B is correct**: Normalizing EDI, email, and photo inputs into one exception schema means the processing step has one contract to reason over, making the system easier to test, extend to new input sources, and less prone to format-specific reasoning errors.\n\n**Why the distractors fail**:\n- A: Treats structurally different inputs (structured EDI, prose email, image) as equivalent raw text, forcing ad hoc parsing inline every call — fragile and doesn't scale to new input types.\n- C: Grants independent write access per source without coordination, risking conflicting or duplicate TMS updates when multiple sources report the same exception.\n- D: Reintroduces a human bottleneck for every single exception, defeating the purpose of automating triage.\n\n**In practice**: 'Normalize inputs to a common schema, then reason once' is a recurring pattern for multi-source ingestion — it's also what makes adding a fourth input source later a schema-mapping change rather than a redesign.",
-    "tags": ["end-to-end-architecture", "multimodal", "solution-design"]
+    "tags": ["end-to-end-architecture", "multimodal", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -87,7 +92,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Any 'accuracy' reporting requires storing both the AI's original output and the ground-truth (human-approved) outcome for the same item, so they can be diffed — without that paired log, there's no data source for the metric, regardless of how good the model or prompt is.\n\n**Why C is correct**: Logging Claude's original triage next to the engineer's final decision is the only option that actually produces the comparable pair of records leadership's accuracy report depends on.\n\n**Why the distractors fail**:\n- A: Caching is a cost optimization unrelated to measuring accuracy, and caching stale results could even hide drift.\n- B: Better prompting may improve accuracy going forward but produces no historical record to report on.\n- D: A second re-triage creates a second opinion, not a ground-truth signal tied to what a human actually decided — comparing two model outputs to each other isn't the same as measuring real-world accuracy.\n\n**In practice**: 'Can we measure this' is a question architects must answer during design, not after launch — if the observability layer doesn't capture the specific paired data a stakeholder's report needs, the report is undeliverable no matter how the rest of the system performs.",
-    "tags": ["feedback-loop", "end-to-end-architecture", "solution-design"]
+    "tags": ["feedback-loop", "end-to-end-architecture", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -102,7 +108,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: The human checkpoint in an end-to-end architecture belongs immediately before any action with real-world, potentially disruptive side effects — the AI can reason and propose freely up to that point, but execution of risky actions requires explicit approval.\n\n**Why A is correct**: It lets Claude do the high-value reasoning work (correlation, root-cause hypothesis) at machine speed while gating only the disruptive action (restart) behind human approval, matching risk to review effort.\n\n**Why the distractors fail**:\n- B: Executes a potentially service-impacting action before review, turning human oversight into a post-hoc audit that can't prevent the outage it was meant to prevent.\n- C: Withholds Claude's reasoning entirely, forcing the engineer to redo root-cause analysis manually and forfeiting the main value of the system out of excess caution not justified by where the actual risk lies.\n- D: Reviews the low-risk input (raw alerts) instead of the high-risk output (remediation action), gating the wrong step and leaving the actually dangerous action unchecked.\n\n**In practice**: Architects place HITL gates at the point of irreversible or costly action, not uniformly at the start or end of the pipeline — gating everything is as much a design failure as gating nothing.",
-    "tags": ["human-in-the-loop", "end-to-end-architecture", "solution-design"]
+    "tags": ["human-in-the-loop", "end-to-end-architecture", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -117,7 +124,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Workflow patterns (fixed, predictable step sequences) fit tasks whose steps and order don't change call-to-call; agentic patterns are reserved for tasks with genuine open-ended branching — choosing agentic for a fixed sequence adds cost, latency, and non-determinism without benefit.\n\n**Why D is correct**: The task has an identical, unvarying sequence every day (fetch data, draft in style, human review), which is exactly what a workflow pattern is designed for — deterministic, auditable, and cheaper than letting the model decide each step.\n\n**Why the distractors fail**:\n- A: Grants autonomy to decide data sources and iteration count for a task that has neither ambiguity — unpredictable behavior and higher token cost for a problem that doesn't need discretion.\n- B: Adds coordination overhead for a task with no parallelizable subtasks or independent domains of expertise — pure overhead.\n- C: Ignores that the task explicitly requires pulling current, structured market data — relying on training knowledge would produce stale or fabricated figures, a factual-accuracy failure for a data journalism use case.\n\n**In practice**: 'Does the sequence of steps ever need to change based on what's discovered mid-task' is the deciding question between workflow and agentic — if the answer is no, a workflow is simpler, cheaper, and more predictable to operate.",
-    "tags": ["architectural-patterns", "workflow-pattern", "solution-design"]
+    "tags": ["architectural-patterns", "workflow-pattern", "solution-design", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 1,
@@ -132,7 +140,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Agentic patterns are the right fit when the task requires the model to decide, case by case, which actions to take, in what order, and when to stop — i.e., genuine open-ended investigation, as opposed to a task where the same fixed steps always apply.\n\n**Why B is correct**: The scenario explicitly says the right sequence of checks varies case by case and the outcome branches based on what's discovered, which is the definition of a task needing autonomous tool selection and stopping-condition judgment — an agentic loop.\n\n**Why the distractors fail**:\n- A: Forces every anomaly through the same rigid order even when it's obviously a pricing error needing no cost lookup, wasting calls and failing to match the variable-investigation nature of the task.\n- C: Can't verify anything against live competitor, inventory, or cost data, so its 'decision' about a real-time pricing anomaly would be an unverified guess.\n- D: Massively over-provisions the architecture — spinning up a distinct agent per SKU adds orchestration cost with no benefit, since the investigation logic is identical across SKUs.\n\n**In practice**: 'Does the model need to decide what to check next based on what it just found' is the litmus test for agentic vs. workflow — pricing and fraud investigation tasks are a classic case where the branching is inherent to the problem, not a design choice.",
-    "tags": ["architectural-patterns", "agentic-pattern", "solution-design"]
+    "tags": ["architectural-patterns", "agentic-pattern", "solution-design", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 1,
@@ -147,7 +156,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: An augmented LLM pattern — a single well-scoped call, optionally with tools, but without agentic looping or multi-step orchestration — fits tasks that are single-shot judgment applied against fixed, known context, with no external data lookup or multi-step planning required.\n\n**Why C is correct**: The checklist is fixed and the input (contract text) is fully available upfront — 'compare this document against this rubric' is fully covered by one well-designed prompt with structured output, without the overhead of agentic loops or multi-agent coordination.\n\n**Why the distractors fail**:\n- A: Calls this 'agentic' on the basis of 'requires judgment,' but judgment within a single call is exactly what an augmented LLM already does — agentic implies autonomous multi-step tool use and branching, which this task doesn't need.\n- B: Introduces coordination and result-merging overhead for a task better handled as one pass over one document, since the 12 clauses aren't independent enough to justify separate agents.\n- D: Invents a branching step the scenario never asked for — the checklist and process are explicitly the same for every NDA, so type-based routing adds complexity without a corresponding requirement.\n\n**In practice**: Not every task that 'requires thinking' needs agentic tooling — architects reserve workflow, agentic, or multi-agent complexity for when the process genuinely branches or spans multiple steps/data sources; otherwise a well-scoped augmented LLM call is simpler, cheaper, and easier to evaluate.",
-    "tags": ["architectural-patterns", "augmented-llm", "structured-output"]
+    "tags": ["architectural-patterns", "augmented-llm", "structured-output", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 1,
@@ -162,7 +172,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: When all necessary information is available in a single request and no external action or lookup is required, the simplest pattern — an augmented LLM, single call, structured output — is the correct architectural choice; added complexity should be justified by an actual requirement, not added by default.\n\n**Why A is correct**: The scenario explicitly states all needed information (photo plus spec) is provided in one request and no external lookups or actions are needed, which is precisely the case an augmented LLM handles without additional orchestration.\n\n**Why the distractors fail**:\n- B: Introduces a tool call (production history lookup) the scenario never asked for — adding latency and cost and risking irrelevant history being treated as decision-relevant.\n- C: Splits a single-image classification task across two coordinating agents for no stated reason — coordination overhead outweighs any parallelism benefit for a single photo.\n- D: Inserts a human-review checkpoint before every call regardless of outcome, defeating the purpose of automating a high-volume, low-risk classification task and bottlenecking a manufacturing line without a justified risk basis.\n\n**In practice**: Architects default to the simplest pattern that satisfies the requirement and only add tools, agentic autonomy, or multi-agent coordination when the task genuinely needs external data, multi-step branching, or clearly separable subdomains of expertise.",
-    "tags": ["architectural-patterns", "augmented-llm", "multimodal"]
+    "tags": ["architectural-patterns", "augmented-llm", "multimodal", "scenario-based", "comprehension"],
+    "difficulty": "easy"
   },
   {
     "domain": 1,
@@ -177,7 +188,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: In multi-agent systems, orchestration strategy must be derived from the real dependency and approval constraints of the task — agents that must not act independently of each other's output or of a human gate need a coordinator enforcing that sequence, not an architecture that lets them race or skip steps.\n\n**Why D is correct**: It directly implements the stated constraint — containment only happens after enrichment completes and only with human approval — by routing everything through a coordinator that enforces both the sequencing dependency and the HITL gate before the risky action executes.\n\n**Why the distractors fail**:\n- A: Directly violates the requirement that containment never happens without enrichment plus approval — a race condition where containment fires before enrichment finishes is exactly the failure mode being guarded against.\n- B: Removes the multi-agent structure entirely and has no natural point to insert a human approval gate between enrichment and containment within one prompt.\n- C: Lets triage bypass threat-intel for 'high-confidence' alerts, directly violating the stated business rule that enrichment must occur before containment regardless of triage confidence.\n\n**In practice**: Multi-agent orchestration design starts from the hard constraints ('X must never happen without Y') and works backward to a topology that makes violating the constraint structurally difficult, rather than relying on each agent's judgment to honor it.",
-    "tags": ["multi-agent", "coordinator-subagent", "human-in-the-loop"]
+    "tags": ["multi-agent", "coordinator-subagent", "human-in-the-loop", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 1,
@@ -192,7 +204,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: A key driver for decomposing a single agent into multiple subagents is permission scoping — when different parts of a task require access to different, especially sensitive, resources, splitting by permission boundary limits what any single compromised or misbehaving component can reach.\n\n**Why B is correct**: It identifies the actual architectural reason grounded in the scenario — literature review needs public API access and cross-referencing needs restricted internal database access, and keeping those tool grants separate means a prompt injection or bug in one subagent can't reach the other's resources.\n\n**Why the distractors fail**:\n- A: Asserts a general accuracy benefit that isn't guaranteed and isn't the reason given in the scenario — decomposition should be justified by specific requirements, not a blanket claim.\n- C: Factually wrong — Claude agents are not limited to one tool type each; this isn't a technical constraint driving the design.\n- D: Claims a cost benefit that doesn't necessarily follow — model tier choice depends on each subagent's task complexity, not simply the fact that the work was split.\n\n**In practice**: When justifying multi-agent decomposition in a design review, 'what access does each piece need, and what's exposed if this piece is compromised' is a stronger and more defensible answer than general appeals to accuracy or cost — least-privilege is often the real driver behind subagent boundaries.",
-    "tags": ["multi-agent", "delegation", "solution-design"]
+    "tags": ["multi-agent", "delegation", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -207,7 +220,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: Coordinator-mediated delegation — a coordinator that owns the shared unit of work and assigns subtasks to specialized subagents according to their real dependencies — is the standard way to prevent duplicate work and races in multi-agent systems, because it centralizes the state that would otherwise be independently and inconsistently acted on.\n\n**Why C is correct**: It creates one authoritative record per disruption event and sequences dependent subtasks correctly (notification needs the new itinerary from rebooking), directly addressing both duplication and race-condition risks.\n\n**Why the distractors fail**:\n- A: Treats duplication as an acceptable side effect to be cleaned up after the fact — unique constraints can stop a duplicate rebooking write, but can't stop duplicate notification messages being sent to a passenger.\n- B: Discards the benefit of specialized subagents with scoped tools/permissions (e.g., compensation logic separate from rebooking logic) and creates a monolith that's harder to reason about.\n- D: Ignores actual task dependencies — forcing notification to 'take its turn' before rebooking has finished means passengers could be notified with no new itinerary yet.\n\n**In practice**: 'Who owns the shared state, and what are the real dependencies between subtasks' are the two questions a coordinator design must answer — orchestration strategies that ignore either one produce duplicated work or out-of-order actions in production.",
-    "tags": ["multi-agent", "coordinator-subagent", "parallel-execution"]
+    "tags": ["multi-agent", "coordinator-subagent", "parallel-execution", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 1,
@@ -222,7 +236,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Orchestration should parallelize subtasks that have no dependency on each other while respecting subtasks that do have a dependency — sequencing everything by default wastes time on independent work, and parallelizing everything by default risks running steps before their prerequisites are met.\n\n**Why A is correct**: Intake validation is a genuine prerequisite, but zoning and fee calculation have no dependency on each other, so running them in parallel after intake reduces total latency versus running all three sequentially, without violating the one real dependency.\n\n**Why the distractors fail**:\n- B: Is safe but unnecessarily slow — it forces fee calculation to wait on the slow zoning-compliance step even though there's no dependency between them.\n- C: Runs zoning and fee checks before intake validation, meaning the system may spend the expensive multi-call zoning check on an application that turns out to be incomplete and gets rejected at intake.\n- D: Removes fee calculation from the automated flow entirely for a task described as fast and independent, reintroducing a manual step with no stated reason to gate it.\n\n**In practice**: Identifying true dependencies versus independent subtasks is the core analysis behind sequential-vs-parallel orchestration decisions — architects map the dependency graph first, then decide what can run concurrently.",
-    "tags": ["multi-agent", "parallel-execution", "sequential-execution"]
+    "tags": ["multi-agent", "parallel-execution", "sequential-execution", "scenario-based", "analysis"],
+    "difficulty": "hard"
   },
   {
     "domain": 1,
@@ -237,7 +252,8 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Complex, multi-factor optimization problems become inconsistent and unauditable when handled as one undifferentiated reasoning step — decomposing into sub-steps with well-defined, individually checkable outputs makes each stage's logic inspectable and its errors localizable, which a single monolithic prompt cannot offer.\n\n**Why D is correct**: Breaking the problem into risk-scoring, ranking, and constrained allocation gives each step a defined, checkable output, so if the final schedule looks wrong, you can identify which stage produced the error.\n\n**Why the distractors fail**:\n- A: Is the same failed approach with more input volume — it adds no structure or intermediate checkpoints, so opacity and inconsistency are likely to persist or worsen.\n- B: Discards a relevant input to the actual business problem (outage risk) rather than fixing the decomposition, trading away solution quality instead of solving the auditability issue.\n- C: Removes structure rather than adding it, the opposite of the fix needed, since the whole reason for the inconsistency was a lack of a defined reasoning process.\n\n**In practice**: When a single prompt produces inconsistent, hard-to-audit output for a multi-factor problem, the fix is almost always to decompose the reasoning into named intermediate steps with checkable outputs, not to add more raw data or remove structure — the same principle behind chain-of-thought and multi-step workflows generally.",
-    "tags": ["decomposition", "workflow-pattern", "solution-design"]
+    "tags": ["decomposition", "workflow-pattern", "solution-design", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -252,7 +268,8 @@
     ],
     "correct": 1,
     "explanation": "**The principle**: Decomposition should separate sub-tasks that have fundamentally different logic and auditability requirements — an objective eligibility check is a different kind of judgment than relative ranking among an already-qualified pool, and conflating them into one call makes it hard to guarantee the hard criteria were applied consistently.\n\n**Why B is correct**: It identifies the real architectural problem — mixing a criteria-matching step with a relative-ranking step in one call means you can't cleanly audit or guarantee consistent application of eligibility rules, and can't isolate whether a low outcome was due to failing eligibility or losing on ranking, which matters for compliance in hiring contexts.\n\n**Why the distractors fail**:\n- A: Makes a blanket cost claim without engaging with the actual design problem in the scenario — cost is a separate concern from the architectural flaw being tested here.\n- C: Factually wrong — Claude can process a job requisition and a resume together in one prompt; that's not the limitation causing the design problem.\n- D: Proposes a disproportionate architecture for what's fundamentally a two-step decomposition problem (filter, then rank), and 'ensuring fairness' isn't achieved merely by adding more agents.\n\n**In practice**: In screening and eligibility contexts (hiring, lending, benefits), decomposing 'does this meet the hard requirements' from 'how does this compare to peers' is often a compliance necessity, not just a design nicety — regulators frequently want to see the eligibility decision made and logged independently of ranking logic.",
-    "tags": ["decomposition", "structured-output", "solution-design"]
+    "tags": ["decomposition", "structured-output", "solution-design", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   },
   {
     "domain": 1,
@@ -267,7 +284,8 @@
     ],
     "correct": 2,
     "explanation": "**The principle**: When a single-pass estimate anchors on whichever input the model encounters first, decomposing into independent per-source estimates followed by an explicit, separately-reasoned synthesis step forces the model to actually consider each source's signal on its own terms before combining them, rather than letting positional order implicitly dominate.\n\n**Why C is correct**: Computing each source's contribution as its own sub-estimate first, then requiring an explicit weighting/synthesis step, directly counters positional anchoring because no single source is silently privileged just by appearing earlier — the combination step becomes an inspectable reasoning artifact.\n\n**Why the distractors fail**:\n- A: Might reduce systematic bias toward one source across many calls in aggregate, but doesn't fix any individual valuation and doesn't create the auditable weighting the business likely also wants.\n- B: Discards real signal relevant to valuation accuracy to sidestep the harder-to-reason-about source, rather than fixing the architecture that mishandles it.\n- D: Removes the very transparency needed to catch and correct anchoring — a bare number gives no visibility into which source dominated the estimate.\n\n**In practice**: 'Produce and expose intermediate reasoning per input before combining them' is a common decomposition technique for problems where a single combined pass shows position or recency bias — it converts an implicit weighting decision into an explicit, checkable one.",
-    "tags": ["decomposition", "structured-output", "solution-design"]
+    "tags": ["decomposition", "structured-output", "solution-design", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   },
   {
     "domain": 1,
@@ -282,7 +300,8 @@
     ],
     "correct": 0,
     "explanation": "**The principle**: Aligning a solution to business value pillars means treating stated constraints (cost per call, latency SLA) as first-class design requirements, not secondary concerns to optimize around after the fact — the best architecture is the one that meets the actual business constraints, not the one that maximizes a single dimension like output quality in isolation.\n\n**Why A is correct**: It correctly diagnoses that maximizing model capability and context size directly trades against the two explicit constraints finance set, and proposes right-sizing to the minimum architecture that clears the accuracy bar within budget — the definition of aligning to the stated cost/performance-SLA pillars rather than an unstated 'maximize quality' goal.\n\n**Why the distractors fail**:\n- B: Treats cost as someone else's problem to fix later, inverting the correct process — architects are responsible for designing within stated business constraints.\n- C: Overcorrects by abandoning the AI solution entirely rather than adjusting the architecture to fit the constraints, throwing away the productivity value the assistant could still deliver if right-sized.\n- D: Proposes changing the business requirement (technician wait time) to fit the architecture, rather than changing the architecture to fit the business requirement.\n\n**In practice**: When a stated cost or latency SLA conflicts with a 'maximize quality' instinct, senior architects ask 'what's the minimum capability that clears the required bar within the constraint,' since exceeding a quality bar the business didn't ask for while blowing through a cost/latency target it did ask for is a value misalignment, not a strength.",
-    "tags": ["business-value", "cost-optimization", "performance-sla"]
+    "tags": ["business-value", "cost-optimization", "performance-sla", "scenario-based", "application"],
+    "difficulty": "medium"
   },
   {
     "domain": 1,
@@ -297,6 +316,7 @@
     ],
     "correct": 3,
     "explanation": "**The principle**: Solution design must align to the metric that actually matters to the business, which can diverge from an informal, well-intentioned framing of the problem — architects should design around the real success metric, since optimizing the wrong metric can look like progress while missing the actual business goal.\n\n**Why D is correct**: It directly targets time-to-action on severe violations by prioritizing real-time triage and escalation of the specific category the KPI is about, even at the cost of not moving the overall backlog number as fast — the correct tradeoff because the board KPI is about severe-violation response time, not total ticket count.\n\n**Why the distractors fail**:\n- A: Leaves prioritization entirely to manual human judgment with no change to how quickly severe cases are surfaced, likely leaving time-to-action on severe violations largely unchanged.\n- B: Improves the general backlog number the informal framing cared about but does nothing to specifically prioritize severe violations — an old low-severity message could get cleared before a five-minute-old harassment threat.\n- C: Optimizes to shrink the visible ticket count fastest, which looks good on a dashboard but deprioritizes exactly the severe, low-volume cases the KPI is about.\n\n**In practice**: 'What number is leadership actually being measured on' is a question architects must ask explicitly, because the team's colloquial description of a problem and the metric reported to the board can diverge — designing for the wrong one produces a system that looks successful internally while missing the business value it was funded to deliver.",
-    "tags": ["business-value", "performance-sla", "solution-design"]
+    "tags": ["business-value", "performance-sla", "solution-design", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   }
 ]

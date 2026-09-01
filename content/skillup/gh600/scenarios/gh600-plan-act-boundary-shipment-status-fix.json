@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-007",
+  "title": "Protecting the Plan/Act Boundary in a Bug-Fix Coding Agent Workflow",
+  "description": "Tests the ability to design a coding-agent workflow that separates reasoning (which can be wrong) from action (which is irreversible), scope each agent's tools to its role, place review checkpoints correctly, and preserve a reconstructable audit trail.",
+  "examId": "gh600",
+  "difficulty": "medium",
+  "estimatedMinutes": 12,
+  "domains": [1],
+  "scenario": {
+    "background": "Priya, a platform lead at a mid-size logistics company, is standing up her team's first coding-agent workflow for bug-fix tasks. She configures a planner custom agent with read-only tools (grep, glob, view) and an executor custom agent with edit and bash access in addition. An engineer files an issue asking to fix a failing shipment-status test by adding a missing enum value, explicitly scoping the change to one file and its test, and explicitly prohibiting any change to the public API surface.",
+    "characters": [
+      {
+        "name": "Priya Malhotra",
+        "role": "Platform Lead",
+        "concern": "Wants fast, low-friction bug fixes without giving up an auditable, reconstructable trail of what the agent actually did and why."
+      },
+      {
+        "name": "Alex Kim",
+        "role": "Reviewing Teammate",
+        "concern": "Needs to be able to check a proposed plan or diff quickly, without needing to have watched the session live."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-007-q1",
+      "stem": "Why does the planner agent only having read-only tools (grep, glob, view) matter for this workflow's safety?",
+      "options": [
+        "It doesn't matter — the planner's tool access is irrelevant since it never takes real actions anyway",
+        "It structurally guarantees the planning phase cannot make any edit, regardless of what the agent reasons its way into wanting to do — the boundary between reasoning and action is enforced by tool capability, not by hoping the agent behaves",
+        "It's only there to make the planner run faster, since fewer tools means less overhead",
+        "It exists purely to reduce token costs during planning, with no safety implication"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a planner restricted to read-only tools physically cannot edit anything no matter what its plan concludes — this is the core mechanism that separates agent reasoning (which can be wrong or overconfident) from agent action (which is irreversible), enforced structurally rather than through instruction alone. A dismisses a real safety design choice as irrelevant. C and D both miss that the tool restriction is a deliberate safety boundary, not a performance or cost optimization."
+    },
+    {
+      "id": "gh600-scenario-007-q2",
+      "stem": "Alex reviews the planner's proposed plan in under a minute before it's approved. What makes this review fast and effective?",
+      "options": [
+        "Alex has to re-read the entire codebase from scratch to verify the plan",
+        "The plan is checked against the issue's explicit constraints (right files touched, no destructive operations, no public API change) — a well-scoped input and an implicit success criterion make the check fast because there's a small, specific thing to verify",
+        "Alex trusts the plan automatically since the planner agent is read-only",
+        "The review is fast because Alex skips checking whether the plan matches the issue's stated constraints"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the issue gave the workflow a well-scoped input and an implicit success criterion (the named test passes, no public API change), which means the plan review has a small, specific, checkable target — right files, no destructive operations, no API-surface change — rather than an open-ended judgment call. A describes an unnecessarily slow, unscoped review. C substitutes blind trust in the tool restriction for actually checking the plan's content, which isn't what the scenario describes happening. D describes skipping the review's actual purpose entirely."
+    },
+    {
+      "id": "gh600-scenario-007-q3",
+      "stem": "After the executor implements the change and opens a draft PR, a teammate reviews it asynchronously and marks it ready. Why does the PR still need a human approval before merging, even though the plan was already approved?",
+      "options": [
+        "Because the branch-protection ruleset only lists the agent's own working-branch pushes in the bypass list, not the required-review rule for merges into main — plan approval and merge approval are two separate checkpoints",
+        "It doesn't need another approval — plan approval should be sufficient to also authorize the merge",
+        "Because the executor agent is inherently untrustworthy regardless of any configuration",
+        "Because GitHub requires two approvals for every PR by default, unrelated to this workflow's design"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because the workflow deliberately keeps plan approval and merge approval as two separate checkpoints — the branch-protection ruleset's bypass list only covers the agent's own branch pushes, not the required review for merging into main, so a human still has to approve before the change reaches the protected branch. B collapses two intentionally separate checkpoints into one, weakening the safeguard. C mischaracterizes a deliberate two-checkpoint design as blanket distrust. D invents a generic GitHub default rather than describing this workflow's actual, deliberately configured ruleset."
+    },
+    {
+      "id": "gh600-scenario-007-q4",
+      "stem": "What makes the entire sequence — plan, execution, PR, review, merge — reconstructable months later without anyone needing to remember what happened?",
+      "options": [
+        "The plan artifact, commits, diff, PR comments, and session log are all durable records living in Git and GitHub, not in anyone's memory or the session's own transient state",
+        "Nothing is reconstructable after the session ends — this workflow relies on institutional memory",
+        "Only the final merged diff matters; the plan and intermediate comments are discarded once the PR merges",
+        "A separate audit database outside GitHub tracks the full history"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because every artifact that mattered — the plan, the commits, the PR thread, the session log — is durable state stored directly in Git and GitHub rather than living only in a session's transient memory or a person's recollection, which is exactly what makes the sequence reconstructable long after the fact. B contradicts what the scenario describes. C discards the plan and review context that explain *why* the diff looks the way it does, which is needed for a full reconstruction. D invents infrastructure not described in the scenario — the actual audit trail lives in GitHub itself."
+    }
+  ],
+  "keyLearnings": [
+    "Separating a read-only planning phase from an edit-capable execution phase enforces the reasoning/action boundary structurally, via tool capability, not via instructions the agent might not follow.",
+    "A well-scoped issue with explicit constraints turns plan review into a small, fast, specific check instead of an open-ended judgment call.",
+    "Plan approval and merge approval are two separate checkpoints for a reason — branch-protection rules should not let an agent's own working-branch bypass extend to bypassing required review on the protected branch.",
+    "A reconstructable audit trail comes from every artifact (plan, commits, diff, comments, session log) living as durable state in Git and GitHub, not in anyone's memory."
+  ]
+}

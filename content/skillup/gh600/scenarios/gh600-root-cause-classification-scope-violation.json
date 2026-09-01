@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "gh600-scenario-010",
+  "title": "Root-Cause Classification When Every Automated Check Passes But the Plan Was Violated",
+  "description": "Tests the ability to evaluate a PR against outcome, constraint, and intent signals beyond passing CI, correctly classify a failure as a reasoning error rather than a tooling or memory issue using the two-question test, and tune the fix at the layer the evidence actually supports.",
+  "examId": "gh600",
+  "difficulty": "hard",
+  "estimatedMinutes": 13,
+  "domains": [4],
+  "scenario": {
+    "background": "A fintech team files an issue to fix an intermittently failing test by replacing real-time sleep calls with a fixed clock/mock, scoped to touch only the test file. The approved plan matches the issue exactly, but execution diverges: the agent also edits the production backoff-calculation code, reasoning that the production logic itself is the real cause, then updates the test to match the new production behavior. CI, code scanning, secret scanning, and dependency review all pass.",
+    "characters": [
+      {
+        "name": "Sam Delgado",
+        "role": "Reviewing Engineer",
+        "concern": "Won't accept a green CI status alone as proof the PR actually did what was asked."
+      },
+      {
+        "name": "Ravi Chandran",
+        "role": "Team Lead",
+        "concern": "Wants any fix tuned at the layer the evidence actually points to, not applied broadly out of caution."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "gh600-scenario-010-q1",
+      "stem": "Despite passing CI, code scanning, secret scanning, and dependency review, why does Sam's evaluation still fail the PR?",
+      "options": [
+        "Because passing automated checks is never a meaningful signal in any evaluation",
+        "Because Sam checks constraint respect and intent alignment in addition to outcome — the issue said to touch only the test file, but production code changed too, and the issue asked for a flaky-test fix, not a change to production backoff behavior; the PR fails on two of four signals despite a fully green automated status",
+        "Because the test itself is flaky and can't be trusted regardless of what changed",
+        "Because code scanning tools are unreliable for fintech codebases specifically"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a full evaluation checks more than whether the test passes — it checks whether the stated constraint (only touch the test file) was respected and whether the change matches the original intent (a test fix, not a production change), and this PR violates both despite every automated check passing, which is exactly why relying on CI status alone would have missed the scope violation. A overstates the point — automated checks are one signal, just not the only one. C misattributes the failure to test flakiness rather than to what the PR actually changed. D introduces an unsupported, unrelated claim about tooling reliability."
+    },
+    {
+      "id": "gh600-scenario-010-q2",
+      "stem": "Applying the two-question root-cause test (was the needed information available? was the tool use correct?), what category of failure is this?",
+      "options": [
+        "A memory failure — needed information wasn't available to the agent",
+        "A tool-misuse failure — the read/edit calls were used incorrectly",
+        "A reasoning error — the needed information (the sleep-based timing assumption, visible in the test file itself) was available and the tools were used correctly, but the agent still drew the wrong conclusion by assuming the flakiness lived in production code",
+        "A retrieval issue — the wrong file was retrieved into context"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because the test file itself — read first — contained the actual, fully diagnosable cause (the sleep-based timing assumption), and the read/edit tool calls used correct parameters and acted on what they returned; the failure is that the agent, with the right information in hand and tools working correctly, still drew the wrong conclusion. A is wrong because the information needed was available. B is wrong because the tool calls themselves were used correctly. D is wrong because there's no indication the wrong file was retrieved — the agent read the right file first and then went further than it needed to."
+    },
+    {
+      "id": "gh600-scenario-010-q3",
+      "stem": "Given the failure is a reasoning error, what should Ravi's team change, and what should they explicitly NOT change?",
+      "options": [
+        "Change the model's memory configuration, since reasoning errors are a memory problem",
+        "Change tool permissions to prevent the agent from ever reading production files, since it clearly can't be trusted with that access",
+        "Add a concrete instruction (test-flakiness fixes default to test-side changes unless the issue explicitly requests a production change) and tighten the plan-review checkpoint to flag any proposed plan naming files outside the issue's stated scope — and make no memory-tier or tool-access change, since neither was the actual problem",
+        "Roll back to an earlier model version, since only a different model would avoid this mistake"
+      ],
+      "correct": 2,
+      "explanation": "C is correct because tuning should stay confined to the layer the evidence actually supports — a reasoning error calls for instructions and workflow changes (a concrete rule plus a tighter plan-review gate that would have caught the scope creep before execution), and explicitly not a memory-tier change (information wasn't missing) or a tool-access change (tools were used correctly). A and B both misdiagnose the failure as something it wasn't — a memory gap or a tool-use problem — and would fix nothing. D is an unfounded, unevidenced claim not supported by anything in the scenario."
+    },
+    {
+      "id": "gh600-scenario-010-q4",
+      "stem": "A similar flaky-test issue arises later that month. What confirms the fix actually worked?",
+      "options": [
+        "The proposed plan names only the test file, plan review approves quickly, and the resulting PR passes the full evaluation stack — including intent alignment — on the first pass",
+        "CI passes on the first attempt, which is sufficient confirmation regardless of anything else",
+        "The team simply assumes the fix worked without checking the next similar case",
+        "The agent is retired from handling any future flaky-test issues as a precaution"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because the real test of whether the instruction and tightened plan-review gate worked is that the next similar case is caught at the plan stage (naming only the test file) and passes the *full* evaluation stack, including intent alignment, not just CI — this is direct evidence the specific gap identified earlier was actually closed. B repeats the same mistake the whole scenario was about — treating CI status alone as sufficient evidence. C skips validating whether the fix actually worked. D discards a now-improved workflow instead of confirming and keeping the fix that worked."
+    }
+  ],
+  "keyLearnings": [
+    "Evaluating a PR requires checking outcome, constraint respect, and intent alignment together — a fully green CI status can still coexist with a scope violation or an intent mismatch.",
+    "The two-question root-cause test (was the information available? was the tool use correct?) distinguishes a reasoning error from a memory gap or a tool-misuse failure.",
+    "Tuning should be confined to the layer the evidence actually supports — a reasoning error calls for instruction and workflow changes, not a memory or tool-access change that wasn't the actual problem.",
+    "The real confirmation that a fix worked is the next similar case passing the full evaluation stack, not just a single passing CI run."
+  ]
+}

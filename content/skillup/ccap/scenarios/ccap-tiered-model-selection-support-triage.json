@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-008",
+  "title": "Tiered Model Selection for a High-Volume Ticket Triage System",
+  "description": "Tests the ability to tune model tier, prompting technique, context/caching strategy, and guardrail enforcement together for a mixed-workload system, rather than optimizing any one lever in isolation.",
+  "examId": "ccap",
+  "difficulty": "medium",
+  "estimatedMinutes": 12,
+  "domains": [2],
+  "scenario": {
+    "background": "A support-ticket triage system processes 50,000 tickets per day. Each ticket needs: (1) classification into one of 12 categories, (2) for tickets classified as \"billing dispute,\" a structured JSON summary against a specific schema pulled from a 40-page billing-policy reference document, and (3) escalation to a human for anything touching an account closure or a refund over $1,000.",
+    "characters": [
+      {
+        "name": "Tomas Vidal",
+        "role": "Head of Support Engineering",
+        "concern": "Wants inference cost under control at 50K tickets/day, without sacrificing accuracy on the cases that actually carry financial risk."
+      },
+      {
+        "name": "Aisha Bello",
+        "role": "Risk & Compliance Manager",
+        "concern": "The $1,000/account-closure escalation rule must never depend on the model choosing to follow a prompt correctly."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-008-q1",
+      "stem": "Which model-tiering strategy correctly matches Tomas's cost concern to the actual shape of the workload?",
+      "options": [
+        "Use the most capable model tier for all 50,000 tickets/day to guarantee consistent quality",
+        "Use a fast, cheap model tier for the narrow, high-volume classification step (1), and route only the subset classified as billing disputes to a stronger model tier for the policy-nuanced structured summary (step 2)",
+        "Use the cheapest model tier for every step, including billing-dispute summaries, since cost is the primary concern",
+        "Alternate randomly between tiers across all three steps to average out cost and quality"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because classification is narrow, high-volume, and low-stakes-per-error, which is exactly where a cheap, fast tier optimizes cost without hurting outcomes, while the billing-dispute summary genuinely needs stronger reasoning to apply policy nuance correctly — tiered routing sends only that smaller subset to the stronger tier. A wastes budget on the 88% of tickets that don't need deep reasoning. C risks getting the policy-nuanced summary wrong, which is the step where an error is most costly. D applies no reasoning about which step needs which capability at all."
+    },
+    {
+      "id": "ccap-scenario-008-q2",
+      "stem": "Which prompting-technique choice best fits step 2 (structured JSON summary against a specific schema, pulled from a 40-page policy document)?",
+      "options": [
+        "Zero-shot with just a description of the desired schema, since the model can infer standard JSON structure",
+        "Few-shot examples (2-3 sample tickets with correct structured JSON output) combined with a light chain-of-thought instruction to first identify the relevant policy clause, then populate the summary",
+        "Chain-of-thought alone, with no examples, since reasoning step-by-step is sufficient for any structured-output task",
+        "Increase sampling temperature to generate more varied possible summaries and pick the best one"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a specific, non-obvious schema needs few-shot examples to lock the exact structure, and getting the *policy application* wrong is worse than getting the format wrong — the light CoT instruction (identify the clause first) targets that specific risk. A fails because a zero-shot description alone won't reliably reproduce an exact, non-standard schema. C fails because reasoning without examples doesn't teach the model the exact JSON shape it needs to reproduce. D fails because raising temperature increases output variability, which works against reliably reproducing a fixed schema."
+    },
+    {
+      "id": "ccap-scenario-008-q3",
+      "stem": "The 40-page billing-policy document and the few-shot examples are identical on every step-2 call, while only the individual ticket text varies. What context/caching strategy best fits this pattern?",
+      "options": [
+        "Place the policy document and few-shot examples before a cache breakpoint, with the varying ticket text placed after it, so the stable prefix is cached and only the per-call ticket text is processed fresh",
+        "Skip caching entirely, since the policy document changes too rarely to matter",
+        "Cache the ticket text instead, since that's the part sent most frequently",
+        "Regenerate the policy document summary fresh on every call to keep it maximally accurate"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because prompt caching benefits an identical, reused prefix — placing the stable policy document and examples first (and unchanged) before the varying ticket text means the large, repeated portion is served from cache at a fraction of the cost on every call after the first, cutting both cost and latency. B forfeits real, ongoing savings on a stable, frequently-reused prefix. C is backwards — the ticket text is exactly the part that's *not* reused across calls, so caching it provides no benefit. D adds no value since the document doesn't need to be regenerated, only reused."
+    },
+    {
+      "id": "ccap-scenario-008-q4",
+      "stem": "How should the $1,000/account-closure escalation rule be enforced to satisfy Aisha's requirement that it never depend on the model following a prompt correctly?",
+      "options": [
+        "State the rule clearly in the system prompt (\"never process refunds over $1,000 without escalation\") and trust the model to comply",
+        "Have the structured JSON output from step 2 include an amount field, and enforce a deterministic, code-level check outside the model that routes anything over $1,000 or flagged as account-closure to a human queue regardless of what the model's prose suggests",
+        "Ask the model to double-check its own output for compliance with the escalation rule before finalizing",
+        "Rely on the human queue reviewing every single ticket regardless of amount, making the automated classification irrelevant"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because a hard compliance rule needs a deterministic, code-level gate outside the model's judgment — the prompt-level instruction can reduce how often the model even suggests auto-processing such a case, but only a structural check guarantees it never happens silently, which is exactly what Aisha requires. A is a soft control that can be missed or degraded by later prompt changes, which is the failure mode Aisha is trying to prevent. C still relies on the model's own judgment, which is the same weakness as A. D defeats the purpose of the whole triage system by routing everything to humans regardless of risk."
+    }
+  ],
+  "keyLearnings": [
+    "Model tier, prompting technique, context/caching strategy, and guardrails trade against each other — tuning one in isolation (e.g., picking a cheap model without adjusting the prompting technique) undermines the others.",
+    "Tiered routing sends the minority of high-stakes, nuanced work to a stronger model while keeping high-volume, low-stakes work on a cheap, fast tier.",
+    "Few-shot examples are the direct fix when a task requires an exact, non-obvious output schema that a model can't reliably infer from a description alone.",
+    "A hard compliance rule (like a dollar-amount escalation threshold) must be enforced as a deterministic, code-level check outside the model — a system-prompt instruction alone is not a guarantee."
+  ]
+}

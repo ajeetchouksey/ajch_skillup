@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.10",
-  "contentUpdatedAt": "2026-08-31",
+  "contentVersion": "0.1.11",
+  "contentUpdatedAt": "2026-09-01",
   "provider": "GitHub",
   "palette": {
     "color": "#38bdf8",
@@ -21,7 +21,8 @@
     { "version": "0.1.7", "date": "2026-08-31", "type": "patch", "summary": "Domain 5 notes added." },
     { "version": "0.1.8", "date": "2026-08-31", "type": "patch", "summary": "Domain 5: 20 questions added (orchestration patterns & isolation, observability & audit trails, failure detection & recovery, agent lifecycle management)." },
     { "version": "0.1.9", "date": "2026-08-31", "type": "patch", "summary": "Domain 6: 14 questions added (autonomy-level classification, guardrails & human-in-the-loop workflows)." },
-    { "version": "0.1.10", "date": "2026-08-31", "type": "patch", "summary": "6 scenarios added: SDLC-integrated PR review agent, MCP tooling & permission scoping, cross-session memory & context drift, evaluation & tuning pipeline, multi-agent parallel execution, guardrails & human-in-the-loop." }
+    { "version": "0.1.10", "date": "2026-08-31", "type": "patch", "summary": "6 scenarios added: SDLC-integrated PR review agent, MCP tooling & permission scoping, cross-session memory & context drift, evaluation & tuning pipeline, multi-agent parallel execution, guardrails & human-in-the-loop." },
+    { "version": "0.1.11", "date": "2026-09-01", "type": "minor", "summary": "Extracted the embedded 'Worked scenario' prose from all 6 domain notes files into 6 dedicated RichScenario v2.0 files (gh600-scenario-007..012), each with 4 scenario-specific questions and keyLearnings, matching the platform's scenarios/ convention. Notes files now link out to Scenario Practice instead of duplicating the walkthrough inline." }
   ],
   "id": "gh600",
   "examCode": "GH-600",
@@ -59,7 +60,13 @@
     "content/skillup/gh600/scenarios/gh600-cross-session-memory-context-drift.json",
     "content/skillup/gh600/scenarios/gh600-automated-evaluation-tuning-pipeline.json",
     "content/skillup/gh600/scenarios/gh600-multi-agent-parallel-execution.json",
-    "content/skillup/gh600/scenarios/gh600-guardrails-human-in-the-loop.json"
+    "content/skillup/gh600/scenarios/gh600-guardrails-human-in-the-loop.json",
+    "content/skillup/gh600/scenarios/gh600-plan-act-boundary-shipment-status-fix.json",
+    "content/skillup/gh600/scenarios/gh600-mcp-tool-scoping-release-notes-agent.json",
+    "content/skillup/gh600/scenarios/gh600-cross-session-continuity-export-batching.json",
+    "content/skillup/gh600/scenarios/gh600-root-cause-classification-scope-violation.json",
+    "content/skillup/gh600/scenarios/gh600-parallel-migration-contradictory-output-conflict.json",
+    "content/skillup/gh600/scenarios/gh600-risk-tiered-autonomy-billing-ci-fix.json"
   ],
   "resources": [
     { "label": "Official Certification Page", "url": "https://learn.microsoft.com/en-us/credentials/certifications/agentic-ai-developer/" },

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-007",
+  "title": "Designing a Claims-Triage Workflow, Not an Agent",
+  "description": "Tests the ability to translate a vague business ask into a concrete problem shape, choose a workflow over an agentic pattern for a bounded task, place parallelization correctly, and close the loop with a feedback mechanism and a named business value pillar.",
+  "examId": "ccap",
+  "difficulty": "medium",
+  "estimatedMinutes": 12,
+  "domains": [1],
+  "scenario": {
+    "background": "Meridian Mutual, a mid-size insurer, asks an architect to \"use Claude to speed up claims processing.\" Today, an adjuster manually reads each submitted claim packet (a PDF bundle of forms, photos, and a police report), cross-references policy terms, checks for red flags (mismatched dates, inconsistent damage descriptions), and either approves, denies, or escalates to a senior adjuster. Average handling time is 45 minutes per claim, with a backlog of 3,000 claims. The check types an adjuster runs are stable across claims even though the content of each claim varies.",
+    "characters": [
+      {
+        "name": "Dana Okafor",
+        "role": "VP of Claims Operations",
+        "concern": "Wants the backlog cleared fast, but the leadership review must state the honest, specific business justification, not the most impressive-sounding one."
+      },
+      {
+        "name": "Ravi Subramaniam",
+        "role": "Compliance Lead",
+        "concern": "Every check the system runs per claim must be auditable and reproducible after the fact, especially for escalations and denials."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-007-q1",
+      "stem": "Given that the category of check an adjuster runs is stable across claims even though each claim's content varies, and Ravi requires an auditable, reproducible sequence of checks, which architectural pattern should the system use?",
+      "options": [
+        "A fully autonomous agentic system that decides its own investigation path per claim, since claims vary in content",
+        "A fixed workflow: a defined sequence of extraction, routing, parallel verification, and a final recommendation step, with only the routing branch and parallel fan-out introducing bounded runtime variability",
+        "A single augmented LLM call that reads the whole claim packet and outputs a decision directly, with no intermediate steps",
+        "A multi-agent system with one independent, autonomously-directed agent per claim to maximize parallelism"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the check *categories* are stable and bounded even though claim *content* varies — that's the definition of a task suited to a fixed workflow, and a workflow's fixed, auditable sequence is exactly what Ravi's compliance requirement needs. A fails because an autonomous agent's variable trajectory would fail an audit requirement, not just add unnecessary cost — the compliance team needs a reproducible sequence, not a discovered one. C fails because it skips the extraction, routing, and verification stages the task actually decomposes into, losing the ability to route complex claims down a more thorough path. D fails because it grants per-claim autonomy the task never asked for and multiplies both cost and audit difficulty for no benefit, since the checks are already known in advance."
+    },
+    {
+      "id": "ccap-scenario-007-q2",
+      "stem": "For the complex-claim path, three checks are needed: policy-terms verification, fraud-heuristic scoring, and prior-claim history lookup. How should these three checks be sequenced?",
+      "options": [
+        "Strictly sequentially in a fixed order, since a workflow requires every step to run one after another",
+        "As an orchestrator-workers fan-out: the three checks run in parallel, since each is an independent sub-task with no shared dependency on the others' output",
+        "Skip two of the three checks for complex claims to keep latency low, since the fast path already handles simple claims",
+        "Route all three checks to a single agent that decides at runtime which ones to actually run"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the three checks have no shared dependency — none needs another's output to run — which is exactly the condition that justifies an orchestrator-workers parallel fan-out inside an otherwise-fixed workflow; a workflow can still contain a parallelizable stage. A is incorrect because forcing independent checks through a strict sequence adds latency with no correctness benefit. C is incorrect because complex claims are specifically the ones that need all three checks — that's why they were routed to the thorough path in the first place. D is incorrect because deciding at runtime which checks to run reintroduces agentic unpredictability into a step whose three checks are already fully known in advance."
+    },
+    {
+      "id": "ccap-scenario-007-q3",
+      "stem": "What feedback-loop design would most directly satisfy Ravi's audit requirement while also catching systematic extraction errors over time?",
+      "options": [
+        "Log every claim decision — the extracted data, check results, and rationale — with a weekly senior-adjuster sample review and a monthly correction log to catch recurring extraction errors",
+        "Trust the model to self-correct over time without any logging, since Claude improves its own reasoning across calls",
+        "Log only denied claims, since approvals carry no compliance risk",
+        "Skip logging entirely and rely on adjuster complaints to surface any systematic errors"
+      ],
+      "correct": 0,
+      "explanation": "A is correct because it gives Ravi exactly what an audit needs — the extracted data, check results, and rationale per claim — while the weekly/monthly review cadence is what actually catches a recurring extraction error (like a new state's police-report format) before it silently compounds. B is wrong because a model does not retain or improve from past calls on its own; without an explicit feedback mechanism nothing changes. C is wrong because approvals carry real compliance risk too (e.g., a systematically wrong extraction that happens to auto-approve), and Ravi's requirement covers escalations *and* denials, not denials alone. D is wrong because it makes detection depend on someone noticing and complaining, which is slower and less complete than a structured sampled review."
+    },
+    {
+      "id": "ccap-scenario-007-q4",
+      "stem": "In the leadership review, which business value pillar framing is the most honest and defensible given the actual numbers (45 minutes reduced to an estimated 8 minutes of adjuster review time on simple claims, backlog of 3,000 claims)?",
+      "options": [
+        "Transformation — the company is fundamentally reinventing how claims are handled",
+        "Efficiency as the primary pillar, with cost as a secondary benefit from clearing the backlog faster and reducing reserve-holding costs",
+        "Performance SLA, since the only relevant number is a strict latency guarantee",
+        "Productivity, framed as enabling adjusters to take on entirely new responsibilities"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because the actual numbers point directly at efficiency (a large per-claim time reduction) with a secondary, quantifiable cost benefit (backlog clearing reduces reserve-holding costs) — this is the honest framing the stated metrics support. A is the classic trap: it sounds more impressive, but the company isn't doing anything it couldn't do before, it's doing the same judgment faster and more consistently, which is efficiency, not transformation. C is wrong because no latency SLA was stated in the scenario; the numbers given are about adjuster time, not response-time guarantees. D is wrong because nothing in the scenario describes adjusters taking on new responsibilities — they're doing the same review faster, which is efficiency, not an expanded productivity mandate."
+    }
+  ],
+  "keyLearnings": [
+    "A stable set of check *categories* across varying claim *content* is the signature of a workflow-shaped task, not an agentic one — audit and reproducibility requirements reinforce that choice.",
+    "Independent sub-tasks with no shared dependency (like three parallel verification checks) can be parallelized inside an otherwise-fixed workflow via an orchestrator-workers stage.",
+    "A feedback loop needs both the raw data (extracted fields, check results, rationale) and a review cadence (weekly sample, monthly correction log) to actually catch systematic errors, not just individual mistakes.",
+    "Business value framing should map to the metric actually stated in the scenario — the most impressive-sounding pillar (transformation) is a trap when the numbers point to efficiency or cost instead."
+  ]
+}

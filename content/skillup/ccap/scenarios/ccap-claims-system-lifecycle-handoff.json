@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccap-scenario-012",
+  "title": "Walking the Full Lifecycle of a Claims-Adjuster Assistant",
+  "description": "Tests the ability to reframe a vague business ask through discovery, present a trade-off for a business sponsor to decide rather than deciding it unilaterally, produce layered handoff documentation, set a measurable SLA, and correctly route a new capability request back through discovery instead of silently expanding scope.",
+  "examId": "ccap",
+  "difficulty": "medium",
+  "estimatedMinutes": 14,
+  "domains": [6],
+  "scenario": {
+    "background": "A mid-size insurance company asks an architect to build something with Claude to help claims adjusters work faster. Six months later, the system needs to be handed off to the internal platform team, who will own it going forward.",
+    "characters": [
+      {
+        "name": "Grace Owusu",
+        "role": "Claims-Ops Director",
+        "concern": "Owns sign-off authority and needs to see real trade-offs, not just a technical recommendation, before committing timeline and budget."
+      },
+      {
+        "name": "Tobi Ilesanmi",
+        "role": "Platform Team Engineering Lead",
+        "concern": "Needs documentation at the right altitude to operate the system independently after handoff, not a code dump or a diagram with no rationale."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccap-scenario-012-q1",
+      "stem": "During discovery, adjuster interviews and process shadowing reveal the actual bottleneck is cross-referencing policy documents against claim details, not drafting claim summaries as the initial request implied. What should the architect do with this finding?",
+      "options": [
+        "Proceed with the original request (drafting summaries) since that's what was asked for",
+        "Capture the reframed objective in the discovery brief — along with a baseline metric, a target, the data landscape, and the stakeholder map — and get sign-off before design starts",
+        "Quietly redesign around the real bottleneck without updating the discovery brief, to save time",
+        "Escalate immediately to build both capabilities in parallel without validating either"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because discovery exists to catch exactly this kind of gap between the initial framing and the real bottleneck, and the reframed objective — along with the baseline, target, data landscape, and stakeholder map — needs explicit stakeholder sign-off before design starts so everyone is aligned on what's actually being built. A ships the wrong solution because it never revisits the original, incorrect framing. C skips the accountability step of getting stakeholders to agree to the new framing, risking a design built on an assumption nobody validated. D commits to building two things before either has been scoped or validated."
+    },
+    {
+      "id": "ccap-scenario-012-q2",
+      "stem": "Two design options exist: a RAG system over two API-accessible policy sources only (6 weeks, closes ~18% of the time gap) versus adding a document-ingestion pipeline for a third, PDF-only source (11 weeks, closes closer to the full 30% target). Who should decide, and how should the architect present it?",
+      "options": [
+        "The architect should decide unilaterally and pick whichever option is technically cleaner",
+        "The architect should present both options with their trade-off explicitly named — timeline versus outcome — in an ADR, and let Grace, who owns sign-off authority, make the call since it trades resources for outcome",
+        "The architect should build the faster option first and add the PDF pipeline later if anyone complains",
+        "The architect should ask engineering to vote on which option to build"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because this is a business trade-off — timeline versus how much of the target gap actually closes — that only the business sponsor should own, and an ADR naming the trade-off explicitly is what lets Grace make an informed decision with real numbers. A takes a decision away from the person accountable for weighing timeline against outcome. C silently commits to an incomplete solution without ever surfacing the trade-off to the person who should decide. D routes a business decision through engineering preference rather than the stakeholder with actual sign-off authority."
+    },
+    {
+      "id": "ccap-scenario-012-q3",
+      "stem": "What should the architect produce for Tobi's platform team at handoff, and why?",
+      "options": [
+        "A single, exhaustive line-by-line pseudocode document, so the platform team never has to make an implementation decision",
+        "Three documents at three altitudes: an architecture overview with rationale and links to the ADRs, implementation guidance (contracts, configuration, acceptance criteria), and a runbook (failure playbooks, monitoring metrics, escalation contacts) — validated with a live incident-response drill before sign-off",
+        "Just a system diagram, since Tobi's team is technical and can infer the rest",
+        "The original sales pitch deck, since it explains why the project was approved"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because good handoff documentation captures decisions and their rationale at multiple altitudes — architecture-level, implementation-level, and operational-level — and validating it with a live drill confirms the platform team can actually operate the system using only the documents, not tribal knowledge from the original architect. A over-specifies implementation and removes the platform team's ability to make reasonable engineering choices. C omits the rationale needed to know whether a future change would violate an original constraint. D is written to persuade a buyer, not to inform a builder, and is the wrong artifact for a technical handoff."
+    },
+    {
+      "id": "ccap-scenario-012-q4",
+      "stem": "Four months post-handoff, adjusters repeatedly request the system also flag potential fraud indicators — a capability outside the original discovery brief's scope, and one that legal has flagged as needing its own compliance review. What should happen with this request?",
+      "options": [
+        "Quietly bolt fraud-flagging onto the existing retrieval system, since it's a small addition to what's already built",
+        "Route it back to a fresh discovery pass, since it's a materially new use case with its own risk profile, not a tweak to the existing system",
+        "Reject it outright, since it wasn't part of the original scope",
+        "Approve it immediately without legal review, since the platform team already has engineering capacity"
+      ],
+      "correct": 1,
+      "explanation": "B is correct because fraud-flagging is a materially different capability with its own risk profile (as legal has already flagged), and treating new capabilities with genuinely new risk as requiring their own discovery and design pass — rather than quietly extending an existing system's scope — is exactly the discipline this lifecycle stage exists to apply. A skips the compliance review legal has already said is needed and expands scope without re-validating requirements. C is overly rigid and ignores that scope legitimately evolves as real usage reveals new needs — the fix is a proper process, not a blanket refusal. D skips the compliance review a stakeholder has explicitly required."
+    }
+  ],
+  "keyLearnings": [
+    "Discovery findings that reframe the original business ask (e.g., the real bottleneck differs from what was requested) must be captured and signed off in the discovery brief before design proceeds.",
+    "A design trade-off that trades resources (timeline) for outcome (coverage of the target) belongs to the business sponsor with sign-off authority, not to the architect alone.",
+    "Handoff documentation should capture decisions and rationale at three altitudes — architecture, implementation, operations — and should be validated with a live exercise before sign-off, not just handed over.",
+    "A new capability request with its own risk profile should be routed back through a fresh discovery and compliance pass, not silently folded into the existing system's scope."
+  ]
+}

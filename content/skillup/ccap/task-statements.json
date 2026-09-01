@@ -614,7 +614,9 @@
             "ccap-d7-001",
             "ccap-d7-002",
             "ccap-d7-003",
-            "ccap-d7-005"
+            "ccap-d7-005",
+            "ccap-d7-009",
+            "ccap-d7-012"
           ]
         },
         {
@@ -643,6 +645,21 @@
           "questionIds": [
             "ccap-d7-007",
             "ccap-d7-008"
+          ]
+        },
+        {
+          "id": "7.4",
+          "title": "Monitor cost and measure the productivity impact of AI-assisted tooling rollouts",
+          "knowledge": [
+            "Usage/cost attribution and dashboards",
+            "Adoption metrics vs. outcome metrics"
+          ],
+          "skills": [
+            "Distinguish usage/adoption signals from real productivity outcomes"
+          ],
+          "questionIds": [
+            "ccap-d7-010",
+            "ccap-d7-011"
           ]
         }
       ]
