@@ -12,7 +12,9 @@ Developer Productivity & Operational Enablement is the smallest domain on the ex
 
 ### Key Concept
 
-Individual developers can configure Claude Code however they like on their own machine, but a *team* configuration has to be consistent, governed, and checked into version control the same way any other shared engineering asset is — otherwise every engineer's Claude behaves slightly differently, and "it works on my Claude" becomes a real support burden. Team-level configuration operates at layered scopes, and an architect needs to know which layer a given setting belongs in:
+**A `CLAUDE.md` documents conventions; only the permissions layer actually enforces them.**
+
+Team-level configuration operates at layered scopes, and an architect needs to know which layer a given setting belongs in:
 
 - **`CLAUDE.md` (project memory)** — a file checked into the repository root (and optionally nested in subdirectories for module-specific context) that documents project conventions: coding standards, build/test commands, architecture notes, and things Claude should always or never do in this codebase. Because it's committed to version control, it's reviewed in pull requests the same as code — the team's shared understanding of "how we work here" becomes a living document instead of tribal knowledge held by whoever's been on the team longest.
 - **Settings hierarchy** — Claude Code resolves configuration from multiple `settings.json` locations with a defined precedence: enterprise-managed policy settings (deployed by IT/platform teams, not overridable by individual developers) sit above project-level settings (checked into the repo, shared by the team), which sit above user-level settings (personal preferences on a single machine). An architect designing team enablement decides *which settings belong at which layer* — a security-relevant permission belongs in managed policy, a personal keybinding preference belongs at the user level.
@@ -33,7 +35,7 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: A team lets each developer configure their own Claude Code permissions individually. One developer, trying to move fast, grants blanket shell-command approval to skip confirmation prompts. A routine refactor session runs a destructive cleanup command against a directory that still contained uncommitted work from a teammate's shared branch checkout, and there's no team-wide `deny` rule that would have blocked it — because the safety net existed only as an individual habit, not as configuration.
+**What breaks without this**: The safety net existed only as an individual habit, not as configuration — a team lets each developer configure their own Claude Code permissions individually, one developer grants blanket shell-command approval to skip confirmation prompts, and a routine refactor session runs a destructive cleanup command against a directory that still contained uncommitted work from a teammate's shared branch checkout, with no team-wide `deny` rule that would have blocked it.
 
 **Decision trigger**: Ask, when adding a new team convention or permission — does this need to be true for *every* developer on every machine (managed policy or project settings, committed to the repo), or is it a personal preference that shouldn't constrain teammates (user-level settings)? If a security or destructive-action boundary is left to individual discretion, it isn't actually enforced.
 
@@ -49,18 +51,18 @@ Common distractor: a scenario framing a well-written `CLAUDE.md` file alone as s
 
 ### Key Concept
 
-Beyond individual configuration, the productivity gain a team gets from Claude Code compounds when common, repeatable engineering tasks are turned into reusable, shareable tooling rather than re-prompted from scratch by every developer every time. The core mechanisms:
+**The highest-leverage productivity gain is turning a repeated workflow into a shared, versioned team asset — not writing a smarter individual prompt.**
+
+The core mechanisms:
 
 - **Custom slash commands** — team-defined, reusable prompts (stored as markdown files in the repo, e.g., `.claude/commands/review.md`) that codify a specific repeatable workflow — a PR-review checklist, a test-scaffolding routine, a release-notes generator. Because they're checked into the repo, the whole team invokes the same well-tuned workflow instead of everyone reinventing (and inconsistently tuning) their own prompt for the same task.
 - **Subagents for delegated, specialized work** — a subagent scoped to a narrow task (a code-review subagent with read-only tool access, a test-writing subagent with access only to the test directory) lets a developer delegate a bounded piece of work without the primary session's context getting cluttered by that work's intermediate steps (cross-linking D1's orchestration patterns and D4's context-window discipline — the same reasons a production multi-agent system isolates subtask context apply to a developer's own working session).
 - **Hooks for workflow automation** — deterministic scripts triggered at defined points in a Claude Code session (e.g., a `PostToolUse` hook that runs a linter or formatter automatically after any file edit, a pre-commit hook that blocks a commit if tests fail) enforce standards mechanically rather than relying on Claude — or the developer — to remember to do it every time.
 - **CI/CD integration via headless mode** — Claude Code can run non-interactively in automated pipelines (`claude -p "<prompt>" --output-format json`), enabling automated PR summarization, changelog generation, or first-pass code review as part of a CI job rather than a manual developer step — turning an interactive productivity tool into an automated pipeline stage.
 
-The unifying principle: the highest-leverage productivity gain isn't a smarter individual prompt, it's turning a workflow that used to be re-invented per developer, per task, into a shared, versioned, and where possible automated team asset.
-
 ### In Practice
 
-**What breaks without this**: A five-person team each independently asks Claude Code to "review this PR for issues" with their own informal prompt, producing five different review depths and styles depending on how each developer happened to phrase the request that day. A critical issue gets caught in one developer's ad hoc review style but missed in another's, and there's no way to audit which review "version" was actually applied to a given PR, because none of it was a versioned, repeatable asset.
+**What breaks without this**: There's no way to audit which review "version" was actually applied to a given PR, because none of it was a versioned, repeatable asset — a five-person team each independently asks Claude Code to "review this PR for issues" with their own informal prompt, producing five different review depths and styles, and a critical issue gets caught in one developer's ad hoc review style but missed in another's.
 
 **Decision trigger**: Ask, when a task gets asked of Claude more than a couple of times across the team — is this worth codifying as a shared slash command, subagent, or hook so everyone gets the same tuned behavior, or is it genuinely one-off and not worth the maintenance overhead of a shared asset?
 
@@ -76,7 +78,9 @@ Common distractor: presenting a hook and a slash command as interchangeable ways
 
 ### Key Concept
 
-When an AI-assisted workflow misbehaves in production or in day-to-day development, the diagnostic discipline is the same one used for any complex system: reproduce, isolate, and trace — but applied to a set of failure modes specific to Claude-based tooling. The recurring categories an architect needs to recognize:
+**Check the transcript and the configuration layer first — most "Claude did something wrong" reports are a permission, connectivity, or context problem, not a model failure.**
+
+The recurring categories an architect needs to recognize:
 
 - **Permission and configuration failures** — a tool call is silently blocked or requires unexpected confirmation because a `deny` or `ask` rule (correctly or incorrectly) fired; the fix starts with checking the resolved permissions configuration (which settings layer actually applied) before assuming the model itself made a bad decision.
 - **Tool and MCP connectivity failures** — an MCP server is unreachable, misconfigured, or returning malformed responses, which surfaces to the developer as Claude "refusing" or "failing" to use a tool it should have access to; the fix is checking the MCP server's own logs and connection status, not re-prompting Claude repeatedly with the same request.
@@ -84,7 +88,7 @@ When an AI-assisted workflow misbehaves in production or in day-to-day developme
 - **Rate limits, token budgets, and cost anomalies** — unexpected throttling or an unusual spike in token spend is diagnosed through usage and cost telemetry (via the Claude Console or exported OpenTelemetry metrics), not guesswork; this is where operational monitoring (cross-linking D4's evaluation-and-monitoring practices) becomes a debugging tool, not just a reporting dashboard.
 - **Transcript and audit-log tracing** — the session transcript (what tools were called, with what inputs, in what order, with what results) is the primary evidence for diagnosing *why* Claude took a given action; for governed or regulated environments, audit logs (cross-linking D5) serve the same purpose after the fact, for incidents that need to be reconstructed rather than watched live.
 
-The operational habit that separates fast resolution from prolonged confusion is checking the transcript and the configuration layer *first*, before assuming the model reasoned incorrectly — a large share of "Claude did something wrong" reports turn out to be a permission rule, a disconnected tool, or a saturated context window, not a model failure.
+A large share of "Claude did something wrong" reports turn out to be a permission rule, a disconnected tool, or a saturated context window, not a model failure — checking the transcript and the configuration layer first is what separates fast resolution from prolonged confusion.
 
 ```mermaid
 flowchart TD
@@ -106,7 +110,7 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: An on-call engineer gets paged because a Claude-powered internal tool "stopped working correctly," and spends an hour re-prompting the model with rephrased instructions, assuming it's a reasoning problem. The actual cause is an MCP server that silently lost its database connection two hours earlier — visible immediately in the server's own logs, invisible from the Claude session transcript alone, and never found because the engineer skipped straight to prompt-tuning instead of checking the tool layer first.
+**What breaks without this**: Visible immediately in the server's own logs, invisible from the Claude session transcript alone, and never found because the engineer skipped straight to prompt-tuning instead of checking the tool layer first — an on-call engineer gets paged because a Claude-powered internal tool "stopped working correctly," spends an hour re-prompting the model with rephrased instructions assuming it's a reasoning problem, when the actual cause is an MCP server that silently lost its database connection two hours earlier.
 
 **Decision trigger**: Ask, when an AI-assisted workflow misbehaves — have I checked the resolved permissions, the tool/MCP connectivity, and the session transcript *before* concluding the model reasoned incorrectly? Most "the AI is wrong" reports are actually a configuration, connectivity, or context problem wearing a reasoning-failure costume.
 

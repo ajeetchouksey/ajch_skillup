@@ -12,17 +12,19 @@ This domain covers the decisions an architect makes *before* a single line of or
 
 ### Key Concept
 
+**Model selection is a portfolio decision, not a search for the single smartest model.**
+
 Claude ships as a family of models along a capability–cost–latency spectrum rather than a single model with settings. At a given point in time the family typically spans three tiers:
 
 - **Opus-class** — the most capable reasoning tier. Best for open-ended agentic tasks, multi-step planning, ambiguous instructions, and work where a wrong answer is expensive (legal analysis, complex code refactors, multi-agent orchestration/lead-agent roles). Highest cost per token and highest latency.
 - **Sonnet-class** — the balanced production workhorse. Strong reasoning at meaningfully lower cost and latency than Opus; the default choice for most customer-facing and production agentic workloads. Supports extended context (up to 1M tokens on some Sonnet versions via a beta header) and extended thinking.
 - **Haiku-class** — optimized for speed and cost at high volume. Best for classification, routing/triage, extraction, moderation, and other narrow, well-specified tasks where the acceptable error tolerance is symmetric with the cost savings.
 
-Selection is rarely "pick the smartest model" — it's a portfolio decision. A production architecture commonly mixes tiers: Haiku for a routing/classification pass, Sonnet for the primary task, Opus reserved for escalation paths or a lead/orchestrator agent that spawns cheaper subagents. Extended thinking (visible step-by-step reasoning before the final answer) is available on capable models and trades latency and token spend for higher accuracy on multi-step reasoning — it is a *setting* to reach for on hard problems, not a default for every call.
+A production architecture commonly mixes tiers: Haiku for routing, Sonnet for the primary task, Opus reserved for escalation paths or a lead/orchestrator role that spawns cheaper subagents. **Extended thinking is a lever to pull on hard problems, not a default setting** — it trades latency and token spend for accuracy on multi-step reasoning, so save it for the calls that are actually struggling.
 
 ### In Practice
 
-**What breaks without this**: Defaulting every call to the top-tier model inflates cost and latency without a proportional accuracy gain on simple tasks — a classification step that Haiku handles in 300ms at a fraction of the cost gets routed through Opus at 3-5x the latency and 10x+ the cost, and at scale (millions of calls) this is the single biggest line item in a Claude bill. Conversely, defaulting to the cheapest tier for ambiguous, high-stakes reasoning produces silently wrong answers that pass a smoke test but fail in production edge cases.
+**What breaks without this**: The single biggest line item in a Claude bill is often a classification step routed through Opus instead of Haiku — defaulting every call to the top-tier model inflates cost and latency without a proportional accuracy gain, and at millions of calls the 10x+ cost multiplier compounds fast. The opposite mistake is just as real: defaulting to the cheapest tier for ambiguous, high-stakes reasoning produces silently wrong answers that pass a smoke test but fail in production edge cases.
 
 **Decision trigger**: Ask three questions per call site: (1) Is the task narrow and well-specified, or open-ended and ambiguous? (2) What is the cost of a wrong answer here — retry-able, or does it reach a customer/compliance boundary? (3) Is this call on a latency-sensitive path (user-facing, synchronous) or a batch/async path? Narrow + cheap-to-retry + latency-sensitive → Haiku. Ambiguous + high-stakes + can tolerate seconds of latency → Opus. Everything in the broad middle → Sonnet as the default, with extended thinking enabled only when a specific reasoning chain is failing.
 
@@ -38,13 +40,15 @@ Common distractor: "always use the most capable model to maximize accuracy." The
 
 ### Key Concept
 
-The system prompt is where role, scope, tone, constraints, and output format are fixed *before* any user input arrives — it is the architectural control surface for behavior, distinct from the conversational turns that follow. A well-designed system prompt is layered: role/persona definition, task scope (what the model should and should not do), output format contract (schema, structure, length), and explicit guardrails (refusal conditions, escalation triggers, prohibited actions). Templating separates the stable structure from the variable payload — a production system typically renders a system prompt from a template with slots for tenant-specific policy, tool availability, or retrieved context, rather than hand-writing a new prompt per use case.
+**Treat the system prompt as a strong preference, not a guarantee.**
 
-Guardrails operate at two levels: prompt-level (instructions that shape what the model attempts) and system-level (validation, moderation, or business logic outside the model that catches what the prompt didn't prevent). A robust design treats the system prompt as a *strong preference*, not a guarantee — critical constraints (PII handling, financial transaction limits, irreversible actions) belong in code-enforced guardrails around the model call, not solely in prompt text.
+The system prompt fixes role, scope, tone, constraints, and output format before any user input arrives — the architectural control surface for behavior, distinct from the turns that follow. A well-designed one is layered: role/persona, task scope, output format contract, and explicit guardrails (refusal conditions, escalation triggers, prohibited actions). Templating separates stable structure from variable payload, rendering a prompt from slots (tenant policy, tool availability, retrieved context) instead of hand-writing one per use case.
+
+Guardrails operate at two levels: prompt-level (shapes what the model attempts) and system-level (validation or business logic outside the model that catches what the prompt didn't prevent). Critical constraints — PII handling, transaction limits, irreversible actions — belong in code-enforced guardrails, never prompt text alone. **A prompt-only guardrail is a suggestion the model can be talked out of** — the code-level check is what still holds when the suggestion fails.
 
 ### In Practice
 
-**What breaks without this**: A system prompt that mixes persona, task instructions, and formatting rules in unstructured prose degrades as it grows — later instructions get deprioritized or contradict earlier ones, and the model's adherence to format constraints (e.g., "always return valid JSON") becomes inconsistent under load. Relying on the system prompt alone as the only guardrail against a high-stakes action (e.g., "never approve a refund over $500") means a single successful jailbreak or an edge-case phrasing bypasses the only line of defense.
+**What breaks without this**: Later instructions get deprioritized or silently contradict earlier ones once a system prompt mixes persona, task instructions, and formatting rules in unstructured prose — format adherence (e.g., "always return valid JSON") gets inconsistent under load. Relying on the prompt alone as the only guardrail against a high-stakes action ("never approve a refund over $500") means one successful jailbreak or edge-case phrasing bypasses the only line of defense.
 
 **Decision trigger**: Ask: "If this instruction is violated, what is the blast radius?" If the answer is reputational or low-stakes (wrong tone, minor format drift), a prompt-level guardrail is sufficient. If the answer touches money, data exposure, or irreversible external side effects, the constraint needs a code-level check (validation, allow-list, human approval step) in addition to the prompt instruction — the prompt reduces how often the check fires, the code guarantees it fires when needed.
 
@@ -60,21 +64,23 @@ Common distractor: treating the system prompt as sufficient for safety-critical 
 
 ### Key Concept
 
+**Match the technique to what the task is actually testing — format, reasoning, or neither.**
+
 Three core techniques cover most production prompting decisions, and they are not mutually exclusive escalation tiers — they're tools matched to task shape:
 
 - **Zero-shot** — the model performs the task from instructions alone, no examples. Works well when the task is common, well-represented in training data, and the desired output format is simple or can be fully specified in words (e.g., "summarize in three bullet points").
 - **Few-shot** — the prompt includes 2-5+ input/output examples before the real task. This is the highest-leverage technique for *format precision and edge-case calibration* — when the desired output has a specific structure, tone, or handles ambiguous edge cases in a particular way, showing beats describing. Few-shot examples consume context window and, if long, are strong candidates for prompt caching (see below).
 - **Chain-of-thought (CoT)** — the model is instructed to reason step by step before producing a final answer ("think through this before answering"), or explicit extended thinking is enabled. This materially improves accuracy on multi-step reasoning, math, and tasks with several dependent sub-decisions, at the cost of additional output tokens and latency.
 
-These compose: a production prompt commonly combines a small number of few-shot examples (to lock the output schema) with a chain-of-thought instruction (to get correct reasoning before that schema is populated). The selection question is not "which technique is best" but "what is the task actually testing" — format fidelity points to few-shot, reasoning correctness points to CoT, and simple well-defined tasks don't need either.
+These compose: a production prompt commonly combines a small number of few-shot examples (to lock the output schema) with a chain-of-thought instruction (to get correct reasoning before that schema is populated). **The question is never "which technique is best"** — it's what the task is testing: format fidelity points to few-shot, reasoning correctness points to CoT, and a simple well-defined task needs neither.
 
 ### In Practice
 
-**What breaks without this**: Using zero-shot prompting for a task with a strict, non-obvious output schema (e.g., a specific JSON shape with conditional fields) produces plausible-looking but inconsistent output — the model has to infer structure it was never shown, and inference drifts across runs. Using CoT on every call, including simple classification, adds output tokens and latency for no accuracy benefit and can even hurt performance on tasks that don't require multi-step reasoning by encouraging over-thinking.
+**What breaks without this**: Output drifts across runs when zero-shot is used for a task with a strict, non-obvious schema (a specific JSON shape with conditional fields) — the model has to infer structure it was never shown. The opposite mistake costs just as much: CoT on every call, including simple classification, adds tokens and latency for no accuracy benefit and can even hurt performance by encouraging over-thinking.
 
 **Decision trigger**: Ask: "Is the model getting the *content* right but the *format* wrong?" → add few-shot examples showing the exact target format. Ask: "Is the model jumping to a plausible-sounding wrong answer on a multi-step problem?" → add a chain-of-thought instruction or enable extended thinking. If neither symptom is present, zero-shot with a clear instruction is the cheaper, faster, equally accurate choice.
 
-**When you'd choose differently**: For latency-critical, simple, high-volume classification (e.g., spam/not-spam on a support queue), skip CoT entirely even if it would nudge accuracy up marginally — the latency and token cost multiplied across volume outweighs the gain. Reach for CoT/extended thinking selectively on the subset of calls that are actually hard.
+**When you'd choose differently**: Skip CoT entirely for latency-critical, simple, high-volume classification (spam/not-spam on a support queue) even if it would nudge accuracy up marginally — the latency and token cost multiplied across volume outweighs the gain. Reach for CoT/extended thinking selectively, only on the calls that are actually hard.
 
 ### Exam Trap ⚠️
 
@@ -86,33 +92,21 @@ Common distractor: framing chain-of-thought as strictly superior to zero-shot, s
 
 ### Key Concept
 
-The context window is a finite, shared budget across system prompt, conversation history, tool definitions, retrieved documents (RAG), few-shot examples, and the model's own output — every token spent in one category is unavailable to another, and quality degrades as the window fills (models attend less reliably to information buried in the middle of a very long context, sometimes called the "lost in the middle" effect). Claude models commonly support a 200K-token standard context window, with some Sonnet versions supporting up to 1M tokens via a beta context header for workloads that genuinely require it (e.g., whole-codebase or large-document analysis) — but a larger window is a ceiling, not a target; unnecessary context still costs money and can dilute relevance.
+**A bigger context window is a ceiling, not a target — unused capacity still costs and can dilute relevance.**
 
-Optimization techniques include: summarizing or compacting older conversation turns instead of retaining full history, retrieving only the relevant document chunks instead of stuffing entire corpora into context (RAG over "put everything in the prompt"), pruning tool definitions to only what's needed for the current task, and placing the most important instructions/content near the start or end of the prompt (edges of context are attended to more reliably than the middle). Token usage is monitored via the `usage` object returned on every API response (input tokens, output tokens, and cache-related token counts), which is the primary signal for cost and budget tracking in production.
+The context window is a finite, shared budget across system prompt, conversation history, tool definitions, retrieved documents (RAG), few-shot examples, and the model's own output — every token spent in one category is unavailable to another, and quality degrades as the window fills (models attend less reliably to information buried in the middle of a very long context, sometimes called the "lost in the middle" effect). Claude models commonly support a 200K-token standard context window, with some Sonnet versions supporting up to 1M tokens via a beta context header for workloads that genuinely require it.
 
-```mermaid
-graph TD
-  A["Context Window Budget (e.g. 200K tokens)"] --> B["System Prompt + Guardrails"]
-  A --> C["Tool/Function Definitions"]
-  A --> D["Few-Shot Examples"]
-  A --> E["Retrieved Context (RAG chunks)"]
-  A --> F["Conversation History"]
-  A --> G["Reserved: Model Output"]
-  F --> H{"History growing too large?"}
-  H -->|Yes| I["Summarize/compact older turns"]
-  H -->|No| J["Keep as-is"]
-  E --> K{"Full corpus or relevant chunks?"}
-  K -->|Full corpus| L["Wasteful — dilutes relevance, costs tokens"]
-  K -->|Relevant chunks only| M["Efficient — precise + cheaper"]
-```
+Optimization techniques include summarizing or compacting older conversation turns instead of retaining full history, retrieving only relevant document chunks instead of stuffing entire corpora into context, pruning tool definitions to only what's needed for the current task, and placing important instructions near the start or end of the prompt (edges are attended to more reliably than the middle). **A wider highway doesn't fix a traffic jam caused by badly placed signs** — window size and context quality are separate problems, and upgrading capacity only solves one of them. Token usage is tracked via the `usage` object on every API response, the primary signal for cost and budget tracking in production.
+
+![Context Window](../images/ContextWindow.png)
 
 ### In Practice
 
-**What breaks without this**: An agent that appends full conversation history turn after turn without summarization eventually fills the context window, forcing truncation that silently drops early instructions or critical earlier decisions — the model then contradicts itself or "forgets" constraints stated at session start. Stuffing an entire knowledge base into context instead of retrieving relevant chunks both costs far more per call and measurably reduces answer quality because relevant facts get diluted among irrelevant ones.
+**What breaks without this**: The model contradicts itself or "forgets" constraints stated at session start once truncation silently drops early instructions — this is what happens when an agent appends full conversation history turn after turn with no summarization. Stuffing an entire knowledge base into context instead of retrieving relevant chunks costs far more per call and measurably reduces answer quality, diluting relevant facts among irrelevant ones.
 
 **Decision trigger**: Ask: "Does the model need this information for *this* turn, or is it historical context I'm carrying out of habit?" If a fact was relevant three turns ago but isn't load-bearing now, it's a summarization candidate. Ask: "Am I retrieving because the model needs it, or including it because it might be relevant?" — RAG retrieval should be a precision operation, not a hedge.
 
-**When you'd choose differently**: For short-lived, single-turn tasks (a one-shot extraction or classification call) context optimization is largely moot — there's no history to compact and no benefit to engineering a retrieval pipeline for a prompt that's already small. Optimization effort should scale with session length and document volume, not be applied uniformly.
+**When you'd choose differently**: Context optimization is largely moot for short-lived, single-turn tasks (a one-shot extraction or classification call) — there's no history to compact and no benefit to engineering a retrieval pipeline for a prompt that's already small. Optimization effort should scale with session length and document volume, not be applied uniformly.
 
 ### Exam Trap ⚠️
 
@@ -124,28 +118,20 @@ Common distractor: "a bigger context window solves context management" — the e
 
 ### Key Concept
 
+**Structure prompts with static content first, variable content last — caching only pays off for the shared prefix.**
+
 Three complementary mechanisms let architects avoid re-sending and re-processing the same content on every call:
 
-- **Prompt caching** — marking a stable prefix of the prompt (system prompt, tool definitions, few-shot examples, a large reference document) with a cache breakpoint so Claude reuses the already-processed representation on subsequent calls instead of reprocessing it from scratch. Cache reads are billed at a fraction of the base input token price and return with materially lower latency; cache writes carry a modest premium over standard input pricing. Caches expire on a short default TTL (minutes) with an extended-TTL option available for longer-lived sessions. The architectural implication: **structure prompts with static content first, variable content last** — caching only pays off for the shared prefix, so anything that changes per-request (the actual user query) belongs after the cache breakpoint, not mixed into it.
+- **Prompt caching** — marking a stable prefix of the prompt (system prompt, tool definitions, few-shot examples, a large reference document) with a cache breakpoint so Claude reuses the already-processed representation on subsequent calls instead of reprocessing it from scratch. Cache reads are billed at a fraction of the base input token price and return with materially lower latency; cache writes carry a modest premium over standard input pricing. Caches expire on a short default TTL (minutes) with an extended-TTL option available for longer-lived sessions. The architectural implication: anything that changes per-request (the actual user query) belongs after the cache breakpoint, not mixed into it.
 - **Modular prompts** — decomposing a prompt into reusable components (a persona block, a task-instruction block, a formatting-rules block, an examples block) assembled per use case rather than duplicating near-identical prompt text across many call sites. This is a maintainability and consistency strategy as much as a token strategy: a policy change updates one module instead of every prompt that used it.
 - **Skills** — packaged, reusable capability bundles (instructions, optionally scripts and reference resources) that Claude loads *progressively* — only a short name/description is in context by default, with the full instructions and resources loaded on demand when the task actually needs that capability. This keeps a large library of specialized capabilities available to an agent without permanently consuming context budget for capabilities that aren't relevant to the current task.
 
-```mermaid
-sequenceDiagram
-  participant Client
-  participant API as Claude API
-  Note over Client,API: Static prefix (system prompt, tool defs, examples) — cache_control breakpoint
-  Client->>API: Request 1: [Static Prefix] + [User Query A]
-  API-->>Client: Response (cache MISS on prefix — full processing, cache write)
-  Client->>API: Request 2: [Static Prefix] + [User Query B]
-  API-->>Client: Response (cache HIT on prefix — reused, cheap + fast)
-  Client->>API: Request 3: [Static Prefix] + [User Query C]
-  API-->>Client: Response (cache HIT — prefix reused again within TTL)
-```
+![Prompt Reuse Strategies](../images/PromptReuseStrategies.png)
 
 ### In Practice
 
-**What breaks without this**: Sending an identical, lengthy system prompt and tool-definition block on every call in a high-volume agent without caching means every request pays full input-token price to reprocess content that hasn't changed — at scale this is a direct, avoidable cost multiplier and adds latency the cache would have eliminated. Duplicating prompt text across a dozen use-case-specific prompts (instead of modular components) means a single guardrail update requires hunting down and editing every copy, and inevitably some copies drift out of sync.
+**What breaks without this**: Every request pays full input-token price to reprocess content that hasn't changed when a high-volume agent sends an identical, lengthy system prompt and tool block without caching — at scale this is a direct, avoidable cost multiplier that also adds latency the cache would have eliminated. Duplicating prompt text across a dozen use-case-specific prompts instead of modular components means a single guardrail update requires hunting down every copy, and some inevitably drift out of sync.
+
 **Decision trigger**: Ask: "Is a meaningful chunk of this prompt identical across many calls (system prompt, tool schema, a reference document, few-shot set)?" → put it before a cache breakpoint, with variable content after it. Ask: "Am I about to copy-paste a prompt block into a new use case?" → extract it into a shared module instead. Ask: "Does this agent need a capability only occasionally, and would loading its full instructions permanently crowd the context window?" → package it as a Skill loaded on demand rather than inlining it into the base system prompt.
 
 **When you'd choose differently**: For low-volume or single-shot use cases (an internal script run a handful of times), the engineering overhead of setting up cache breakpoints or a modular prompt library exceeds the savings — plain, self-contained prompts are the right call until volume or reuse actually materializes.

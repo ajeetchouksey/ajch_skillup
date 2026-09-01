@@ -12,9 +12,13 @@ Integration is the domain where architecture meets the messy reality of producti
 
 ### Key Concept
 
-Capability bloat is the accumulation of tools, permissions, or sub-agents beyond what any single task actually requires. It happens gradually — a team adds "just one more tool" to solve a narrow problem, and eighteen months later an agent has forty tool definitions, most unused on any given turn. The cost is not just token overhead in the system prompt; it is a measurable degradation in tool-selection accuracy. As the number of semantically similar tool descriptions grows, the model's ability to pick the *correct* one drops, because ambiguity between look-alike tools (`update_ticket` vs `update_ticket_status` vs `patch_ticket`) rises faster than the model's discriminative signal.
+**More tools doesn't mean a more capable agent — past a point, it means a less accurate one.**
 
-The architectural response is **least-privilege tool scoping**: give each agent or sub-agent only the tools it needs for its role, and use routing/orchestration (a coordinator agent, or MCP server segmentation) to keep any single context window's tool list small and semantically distinct. This is the same principle as least-privilege IAM, applied to capability surfaces instead of permissions.
+Capability bloat is the slow accumulation of tools, permissions, or sub-agents beyond what any single task needs. It never arrives as one decision — a team adds "just one more tool" to solve a narrow problem, and eighteen months later an agent carries forty tool definitions, most unused on any given turn.
+
+The real cost isn't token overhead. It's that tool-selection accuracy quietly degrades as look-alike tools pile up (`update_ticket` vs `update_ticket_status` vs `patch_ticket`) — ambiguity grows faster than the model's ability to tell them apart. **Think of it like a junk drawer**: the more things you cram in, the longer it takes to find the one you actually need, even though everything in it is technically useful.
+
+The architectural response is **least-privilege tool scoping**: give each agent or sub-agent only the tools it needs for its role, and use routing/orchestration (a coordinator agent, or MCP server segmentation) to keep any single context window's tool list small and semantically distinct — the same principle as least-privilege IAM, applied to capability surfaces instead of permissions.
 
 ### In Practice
 
@@ -22,7 +26,7 @@ The architectural response is **least-privilege tool scoping**: give each agent 
 
 **Decision trigger**: Ask — do any two tools in this agent's active set act on the same object type, or do more than ~15 tools need to be visible in a single turn? If yes, split by domain (billing agent, ticketing agent, inventory agent) and route between them with a coordinator, or use MCP server-level segmentation so only the relevant tool subset loads into context at a time.
 
-**When you'd choose differently**: For a narrow, single-purpose agent (e.g., a dedicated "refund processor" that only ever calls 3 tools), consolidating everything into one flat tool list is correct — introducing a coordinator layer for 3 tools adds latency and failure surface for no accuracy benefit. Scoping is a response to breadth, not a default posture.
+**When you'd choose differently**: Scoping is a response to breadth, not a default posture — for a narrow, single-purpose agent (a dedicated "refund processor" that only ever calls 3 tools), consolidating everything into one flat tool list is correct, since introducing a coordinator layer for 3 tools adds latency and failure surface for no accuracy benefit.
 
 ### Exam Trap ⚠️
 
@@ -34,13 +38,15 @@ Common distractor: "more tools = more capable agent." The exam will present a sc
 
 ### Key Concept
 
-Agentic systems introduce a class of security gap that traditional application security doesn't fully anticipate: the *agent* is a caller with its own credential, but the *user* behind the agent has their own identity and entitlements too. Analyzing auth requirements means distinguishing **authentication** (is this agent/tool call cryptographically who it claims to be — API keys, OAuth tokens, mTLS) from **authorization** (given that identity, is this specific action on this specific resource permitted — RBAC/ABAC scoped per tool, per data source, per user session).
+**Authentication proves who's calling; authorization decides what that identity may do — and only one of them usually gets checked.**
 
-The common gap: a tool is authenticated with a single service-level credential (e.g., one API key for the whole MCP server) but the agent is expected to act on behalf of many different end users with different entitlements. If authorization isn't re-checked per-call against the *acting user's* permissions — not the service credential's broad permissions — the agent becomes a confused-deputy: it has more access than any individual user should, and it will use that access if asked (including via prompt injection from untrusted tool output).
+Agentic systems introduce a security gap traditional application security doesn't fully anticipate: the *agent* is a caller with its own credential, but the *user* behind the agent has their own identity and entitlements too. Authentication asks whether this agent/tool call is cryptographically who it claims to be (API keys, OAuth tokens, mTLS); authorization asks whether, given that identity, this specific action on this specific resource is permitted.
+
+The common gap: a tool authenticates with one service-level credential (one API key for the whole MCP server) while the agent is expected to act on behalf of many end users with different entitlements. **An agent with one shared admin credential is a confused deputy** — it has more access than any individual user should, and it will use that access the moment it's asked, including by an instruction smuggled in through a retrieved document.
 
 ### In Practice
 
-**What breaks without this**: An agent connected to an internal MCP server with a single admin-scoped service token will, when asked (including by a malicious instruction embedded in a document it retrieved), read or modify records the requesting human user was never authorized to touch. This is the confused-deputy problem, and it is the single most common security gap found in enterprise agent audits — not a broken auth *system*, but a missing per-call authorization *check*.
+**What breaks without this**: This is the confused-deputy problem, and it's the single most common security gap found in enterprise agent audits — not a broken auth *system*, but a missing per-call authorization *check*. An agent connected to an internal MCP server with a single admin-scoped service token will read or modify records the requesting user was never authorized to touch, the moment it's asked, including by a malicious instruction embedded in a document it retrieved.
 
 **Decision trigger**: Ask — does this tool call cross a trust boundary (different user, different data sensitivity tier, external system)? If yes, verify that authorization is evaluated per-call against the acting user's actual entitlements, not just validated once at session start against a broad service credential.
 
@@ -56,13 +62,15 @@ Common distractor: questions conflate "we use OAuth" (authentication is solved) 
 
 ### Key Concept
 
-Every integration decision — model choice, RAG retrieval depth, number of tool calls in a chain, extended thinking budget, prompt caching strategy — sits on an accuracy/latency/cost frontier, and there is no configuration that maximizes all three simultaneously. Architects are expected to **justify** a chosen point on that frontier against the actual SLA and failure cost of the use case, not default to "most accurate" or "fastest" as a universal answer.
+**Justify your position on the accuracy/latency/cost frontier against the real SLA — don't default to "most accurate" or "fastest."**
 
-Concretely: retrieving 20 chunks and reranking them is more accurate than retrieving 5 and skipping reranking, but costs an extra round trip and reranking latency. A multi-step agentic tool chain (search → fetch → verify → summarize) is more accurate than a single-shot answer but multiplies latency roughly by the number of sequential steps. Extended thinking improves reasoning-heavy accuracy but adds token cost and time that a synchronous chat UI may not tolerate.
+Every integration decision — model choice, RAG retrieval depth, number of tool calls in a chain, extended thinking budget, prompt caching strategy — sits on an accuracy/latency/cost frontier, and no configuration maximizes all three simultaneously. Architects are expected to justify a chosen point on that frontier against the actual SLA and failure cost of the use case.
+
+Retrieving 20 chunks and reranking them is more accurate than retrieving 5 and skipping reranking, but costs an extra round trip. A multi-step agentic tool chain (search → fetch → verify → summarize) is more accurate than a single-shot answer but multiplies latency roughly by the number of sequential steps. **There's no free lunch on this frontier** — every accuracy gain is paid for somewhere in latency, cost, or both, and the job is picking where the use case actually needs to sit.
 
 ### In Practice
 
-**What breaks without this**: Teams that default to "maximum accuracy configuration" for a synchronous, user-facing chat surface (e.g., a support widget with a 3-second user-patience budget) ship a pipeline that takes 12 seconds end-to-end and gets abandoned by users before the accurate answer ever renders. Conversely, teams that default to "fastest" for a compliance-adjacent use case (e.g., contract clause extraction) ship an unreviewed single-pass answer that fails audit because no verification step existed.
+**What breaks without this**: A pipeline that takes 12 seconds end-to-end gets abandoned by users before the accurate answer ever renders — this is what happens when teams default to a "maximum accuracy configuration" for a synchronous, user-facing chat surface with a 3-second patience budget. The opposite mistake costs just as much: defaulting to "fastest" for a compliance-adjacent use case (contract clause extraction) ships an unreviewed single-pass answer that fails audit because no verification step existed.
 
 **Decision trigger**: Ask two questions in order — (1) what is the cost of a wrong answer here (a bad support macro suggestion vs. a bad contract clause), and (2) what is the user's actual latency tolerance (synchronous chat vs. an async batch job)? The intersection of those two answers — not a fixed preference — determines whether you add reranking, multi-step verification, and extended thinking, or strip them out.
 
@@ -78,17 +86,19 @@ Common distractor: the exam will present a scenario with a stated SLA (e.g., "su
 
 ### Key Concept
 
-Agentic systems fail in ways traditional application monitoring doesn't catch: a tool call can succeed (200 OK) while returning semantically wrong data; a multi-step agent can loop or silently drop a step; a RAG pipeline can retrieve confidently-wrong chunks with no error signal at all. Observability for agentic integrations therefore needs **three layers beyond standard infra metrics**: (1) trace-level visibility into each tool call and its inputs/outputs (not just "did the API call succeed"), (2) output-quality signals (grounding checks, citation validation, confidence/uncertainty scoring) sampled or run continuously in production, and (3) drift detection — is retrieval quality, tool-selection accuracy, or task success rate degrading over time as data or usage patterns shift.
+**Agentic failures are silent and semantic — a tool call can return 200 OK while being completely wrong.**
 
-At scale, full human review of every trace is infeasible, so the strategy shifts to **statistical sampling plus automated grading** (LLM-as-judge or rule-based checks on a subset of traffic) combined with alerting on aggregate metrics (tool error rate, retrieval hit rate, escalation/fallback rate) rather than per-transaction inspection.
+Agentic systems fail in ways traditional application monitoring doesn't catch: a tool call can succeed (200 OK) while returning semantically wrong data; a multi-step agent can loop or silently drop a step; a RAG pipeline can retrieve confidently-wrong chunks with no error signal at all. Observability for agentic integrations needs three layers beyond standard infra metrics: trace-level visibility into each tool call's inputs/outputs, output-quality signals (grounding checks, citation validation, confidence scoring) sampled or run continuously in production, and drift detection on retrieval quality, tool-selection accuracy, or task success rate over time.
+
+At scale, full human review of every trace is infeasible, so the strategy shifts to statistical sampling plus automated grading (LLM-as-judge or rule-based checks on a subset of traffic) combined with alerting on aggregate metrics, rather than per-transaction inspection. **A green dashboard tells you the plumbing works, not that the water is clean** — infra metrics confirm the call succeeded; only output-quality sampling and drift detection confirm the answer was actually right.
 
 ### In Practice
 
-**What breaks without this**: A RAG-backed support agent silently starts retrieving stale documentation after a source system migration changes document IDs — every tool call returns 200 OK, so infra dashboards stay green, while answer quality degrades for weeks before a human notices via customer complaints. Standard APM (application performance monitoring) has no signal for this because nothing "errored."
+**What breaks without this**: Answer quality can degrade for weeks before a human notices, via customer complaints, while every tool call keeps returning 200 OK and infra dashboards stay green — this is exactly what happens when a RAG-backed support agent silently starts retrieving stale documentation after a source-system migration changes document IDs. Standard APM has no signal for this because nothing "errored."
 
 **Decision trigger**: Ask — if this component silently returned plausible-but-wrong output instead of failing loudly, how would we know, and how long would it take? If the honest answer is "we wouldn't, until a user complains," you need an output-quality or drift-detection layer, not just uptime monitoring.
 
-**When you'd choose differently**: For low-stakes, low-volume internal tools (an experimental prototype used by five people), full automated grading infrastructure is disproportionate — spot-check sampling and a feedback button are sufficient until the system reaches production scale or stakes.
+**When you'd choose differently**: Full automated grading infrastructure is disproportionate for low-stakes, low-volume internal tools (an experimental prototype used by five people) — spot-check sampling and a feedback button are sufficient until the system reaches production scale or stakes.
 
 ### Exam Trap ⚠️
 
@@ -99,6 +109,8 @@ Common distractor: equating "monitoring" with "the API returned 200." Agentic fa
 ## Design a RAG Pipeline: Chunking and Indexing
 
 ### Key Concept
+
+**Chunking and indexing strategy should match the shape of the source data, not a fixed default.**
 
 A RAG pipeline is a sequence of decisions, each of which trades off recall, precision, and cost, and each of which must match the shape of the source data:
 
@@ -120,7 +132,7 @@ graph LR
 
 ### In Practice
 
-**What breaks without this**: Fixed-size chunking applied to a legal contract splits a defined term from its definition across two chunks; the retriever finds the usage but not the definition, and the model confidently generates an answer using the wrong meaning of the term — with no error surfaced anywhere in the pipeline. This is a chunking-strategy failure, not a model failure, and it looks identical to a hallucination from the outside.
+**What breaks without this**: This is a chunking-strategy failure, not a model failure, and it looks identical to a hallucination from the outside — fixed-size chunking applied to a legal contract splits a defined term from its definition across two chunks, so the retriever finds the usage but not the definition, and the model confidently generates an answer using the wrong meaning, with no error surfaced anywhere in the pipeline.
 
 **Decision trigger**: Ask — does this content have a real internal structure (headings, clauses, functions, table rows) that a naive fixed-size split would ignore? If yes, chunk along that structure. Ask separately — will users search with exact terms (SKUs, error codes, statute numbers) as often as with natural language? If yes, hybrid indexing is not optional.
 
@@ -136,7 +148,9 @@ Common distractor: "always use the smallest chunk size for precision" or "always
 
 ### Key Concept
 
-Retrieval strategy is not one-size-fits-all; it must match both the **shape of the data** and the **pattern of the queries**:
+**Retrieval is not synonymous with vector search — match the strategy to the data shape and query pattern.**
+
+Retrieval strategy must match both the shape of the data and the pattern of the queries:
 
 | Data shape | Query pattern | Matched strategy |
 |---|---|---|
@@ -146,11 +160,11 @@ Retrieval strategy is not one-size-fits-all; it must match both the **shape of t
 | Highly interconnected (org charts, dependency graphs, codebases) | "What depends on X" / relationship questions | Graph-based retrieval (traverse relationships, not just similarity) |
 | Long single documents (contracts, manuals) | "Find the clause about X" | Hierarchical retrieval: retrieve section/summary first, then drill into chunk |
 
-The core architectural insight tested here is that **retrieval is not synonymous with vector search**. When data is structured and the query is a lookup ("what is the current price of SKU-4471"), the correct "retrieval" is a direct database or API query — using a vector index for this is slower, less accurate, and more expensive than the obvious alternative.
+When data is structured and the query is a lookup ("what is the current price of SKU-4471"), the correct answer is a direct database or API query, not an embedding search. **A vector index turns an exact question into an approximate one** — slower, less accurate, and more expensive than the obvious alternative.
 
 ### In Practice
 
-**What breaks without this**: Routing every query type through a single vector-similarity retriever means an exact-match query ("order #48213 status") gets converted to embedding space, compared against thousands of semantically similar-but-wrong orders, and returns approximately-right instead of exactly-right results — for data that had an exact, deterministic answer available via a direct database call the whole time.
+**What breaks without this**: An exact-match query ("order #48213 status") returns approximately-right instead of exactly-right results when every query type is routed through a single vector-similarity retriever — it gets converted to embedding space, compared against thousands of semantically similar-but-wrong orders, for data that had an exact, deterministic answer available via a direct database call the whole time.
 
 **Decision trigger**: Ask — does this query have a deterministic, structured answer available from a system of record (a database row, an API response)? If yes, route there directly and skip the vector index entirely. Only fall back to semantic retrieval when the query is genuinely open-ended or the answer is embedded in unstructured prose.
 
@@ -165,6 +179,8 @@ Common distractor: a scenario describing clearly structured, lookup-pattern data
 ## Connection Protocols: MCP vs. API/CLI vs. Agent-to-Agent
 
 ### Key Concept
+
+**MCP, direct API, and agent-to-agent solve different problems — picking the more sophisticated one by default is over-engineering.**
 
 Choosing how a Claude-based system connects to external capability is itself an architecture decision with real trade-offs, not a stylistic preference:
 
@@ -187,7 +203,7 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: Building a bespoke direct-API integration for every new data source an agent might need — instead of an MCP server — means each new connector requires custom client code, and every client application (chat UI, batch pipeline, internal CLI) that wants the same capability has to reimplement it. Conversely, wrapping a single, fixed, high-frequency internal API call in a full MCP server adds discovery and protocol overhead to a call pattern that was never going to change or need reuse — pure latency cost for no benefit.
+**What breaks without this**: Every client application that wants the same capability has to reimplement it when a bespoke direct-API integration is built for every new data source instead of an MCP server — each new connector needs custom client code with no reuse. The opposite mistake wraps a single, fixed, high-frequency internal API call in a full MCP server, adding discovery and protocol overhead to a call pattern that was never going to change or need reuse — pure latency cost for no benefit.
 
 **Decision trigger**: Ask three questions in order: (1) Will more than one client/agent need this capability over time? (2) Does the set of available tools/resources need to be discoverable/changeable without redeploying the client? (3) Does the sub-task require independent multi-step reasoning, or is it a single well-defined function call? Reusable + discoverable → MCP. Fixed + single-purpose → direct API/CLI. Independent reasoning required → agent-to-agent delegation.
 
@@ -203,13 +219,15 @@ Common distractor: treating MCP as strictly "more advanced" and therefore always
 
 ### Key Concept
 
+**Monolithic context guarantees visibility; progressive discovery guarantees relevance — pick based on how sparse the capability set actually is.**
+
 When an agent has access to a large body of tools, documents, or capabilities, there are two ways to expose them: **monolithic context** (load everything — every tool description, every document, every instruction — into the context window up front) or **progressive discovery** (expose a minimal entry point, and let the agent request more detail, list available tools, or fetch specific resources only as needed, layer by layer).
 
-Monolithic context is simpler to reason about and guarantees the model always "sees" every option, but it consumes context budget whether or not any given item is relevant to the current turn, degrades tool-selection and retrieval accuracy as volume grows (see capability bloat), and increases per-request cost and latency. Progressive discovery (e.g., an MCP server exposing a `list_tools`-then-`describe_tool`-then-`call_tool` pattern, or a document index the agent searches before loading full text) keeps the active context lean, scales to far larger capability/document sets, but adds round trips (latency) and risks the agent failing to discover something relevant if the discovery layer itself is poorly designed (e.g., ambiguous top-level categories).
+Monolithic context is simpler to reason about and guarantees the model always "sees" every option, but it consumes context budget whether or not any given item is relevant, and degrades tool-selection and retrieval accuracy as volume grows (see capability bloat). **A capability catalog nobody browses is still costing you shelf space** — progressive discovery (e.g., an MCP server exposing a `list_tools`-then-`describe_tool`-then-`call_tool` pattern, or a document index the agent searches before loading full text) keeps the active context lean and scales to far larger sets, at the cost of extra round trips and the risk of failing to discover something relevant if the discovery layer itself is poorly designed.
 
 ### In Practice
 
-**What breaks without this**: A monolithic system prompt that inlines full descriptions for 60 tools and 40 policy documents "just in case" consumes tens of thousands of tokens before the user's actual question is even read, inflating cost and latency on every single turn — including the 95% of turns that only need 2 of those 60 tools. As the tool/doc count grows, this isn't a one-time cost, it's a permanent tax on every request.
+**What breaks without this**: This isn't a one-time cost, it's a permanent tax on every request — a monolithic system prompt that inlines full descriptions for 60 tools and 40 policy documents "just in case" consumes tens of thousands of tokens before the user's actual question is even read, inflating cost and latency on every single turn, including the 95% of turns that only need 2 of those 60 tools.
 
 **Decision trigger**: Ask — does the total candidate set of tools/documents/instructions exceed what's relevant to a typical single turn by a wide margin (e.g., 60 tools available, ~3 typically used)? If yes, progressive discovery (list → describe → invoke, or search → fetch) pays for itself in reduced per-turn cost and improved selection accuracy, despite the added round-trip latency.
 

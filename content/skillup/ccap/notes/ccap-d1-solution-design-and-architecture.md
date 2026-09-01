@@ -12,17 +12,19 @@ This domain tests whether you can turn an ambiguous business problem into a defe
 
 ### Key Concept
 
-Business stakeholders describe outcomes ("reduce support ticket backlog," "speed up contract review"), not architectures. The architect's first job is translating that outcome into a *problem shape*: is this classification, extraction, generation, multi-step reasoning, or open-ended research? The shape determines whether Claude is even the right tool, and if so, which pattern applies. A recurring professional-tier trap is skipping straight to "let's build an agent" before establishing whether the task is deterministic enough that a traditional rules engine or a single well-crafted prompt would outperform an agent on cost and reliability.
+**Translate the business outcome into a problem shape before reaching for an architecture.**
 
-A disciplined translation process asks, in order: (1) What is the input, and how variable is it? (2) What does "correct output" look like, and can it be evaluated programmatically? (3) Does the task require external state or tools mid-reasoning, or is it a single input→output transformation? (4) What is the acceptable latency and error-cost budget? Only after answering these should you reach for a pattern.
+Business stakeholders describe outcomes — "reduce support ticket backlog," "speed up contract review" — not architectures. The architect's first job is translating that outcome into a *problem shape*: classification, extraction, generation, multi-step reasoning, or open-ended research. That shape determines whether Claude is even the right tool, and if so, which pattern applies.
+
+A disciplined translation asks four questions in order: how variable is the input, can "correct output" be evaluated programmatically, does the task need external state or tools mid-reasoning, and what's the acceptable latency and error-cost budget. **Skipping straight to "let's build an agent" is like prescribing surgery before taking a patient history** — the professional-tier trap is reaching for the most capable-sounding tool before confirming a simpler one wouldn't outperform it on cost and reliability.
 
 ### In Practice
 
-**What breaks without this**: Teams that jump straight to "build an agent" for a task that is actually a stable, well-defined transformation (e.g., "extract these five fields from an invoice") end up with a system that is slower, more expensive, and *less* reliable than a single structured-output prompt — because every extra agentic hop introduces a new place for the model to wander off-task.
+**What breaks without this**: Every extra agentic hop is one more place for the model to wander off-task. Teams that jump straight to "build an agent" for a stable, well-defined transformation (e.g., extracting five fields from an invoice) end up with a system that's slower, pricier, and *less* reliable than a single structured-output prompt.
 
 **Decision trigger**: Ask "if I wrote this as a flowchart today, would a human follow the same fixed sequence of steps every time, or would the sequence itself depend on what they discover along the way?" Fixed sequence → workflow. Discovery-dependent sequence → agentic.
 
-**When you'd choose differently**: If the business genuinely needs open-ended investigation (e.g., "find out why this account is at risk of churn" with no predefined data sources), forcing it into a rigid workflow will under-deliver — the problem shape itself demands agentic flexibility, even though it costs more per run.
+**When you'd choose differently**: Forcing genuine open-ended investigation into a rigid workflow under-delivers — a task like "find out why this account is at risk of churn," with no predefined data sources, has a problem shape that demands agentic flexibility even though it costs more per run.
 
 ### Exam Trap ⚠️
 
@@ -34,20 +36,22 @@ The exam will describe a task that *sounds* complex ("multi-department approval 
 
 ### Key Concept
 
-Every production Claude system, regardless of pattern, decomposes into four stages: **Input** (ingestion, normalization, context assembly — retrieval, tool schemas, conversation history), **Processing** (the model call(s), including any tool-use loop or multi-agent delegation), **Output** (parsing, validation, formatting, guardrail checks before the result reaches the user or downstream system), and **Feedback loops** (logging, human review, evaluation signals, and — critically — a path for corrections to flow back into prompts, retrieval indexes, or fine-tuning data). Architects who design only the "happy path" processing stage and treat feedback as an afterthought build systems that degrade silently in production because there's no mechanism to detect drift or recurring failure modes.
+**A feedback loop is what separates a demo from a production system.**
 
-The feedback loop is what separates a demo from a production system. It closes the gap between "the model got it right in testing" and "we know when the model gets it wrong in production, and we have a mechanism to fix it" — whether that's a human-in-the-loop review queue, an automated eval harness re-scoring live traffic samples, or a retrieval index that gets corrected entries appended.
+Every production Claude system decomposes into four stages: **Input** (ingestion, normalization, context assembly), **Processing** (the model call, including any tool-use loop or delegation), **Output** (parsing, validation, guardrail checks), and **Feedback loops** (logging, review, corrections flowing back into prompts or retrieval indexes). Architects who design only the happy-path processing stage and treat feedback as an afterthought build systems that degrade silently, because nothing is watching for drift or recurring failure modes.
+
+The loop closes the gap between "the model got it right in testing" and "we know when it's wrong in production, and can fix it" — whether that's a human review queue, an automated eval harness re-scoring live traffic, or a corrected retrieval index. **A system with no feedback loop is a car with no rearview mirror**: it drives fine on a straight road, with no way to know something's wrong until after it's already crashed.
 
 
 ![Feedback Loop](../images/feedbackloop.png)
 
 ### In Practice
 
-**What breaks without this**: Systems with no feedback loop can pass every pre-launch eval and still fail in production within weeks, because real-world input distribution shifts (new document formats, new user phrasing) and nobody is watching for it. The team finds out via a customer complaint, not a dashboard.
+**What breaks without this**: A system can pass every pre-launch eval and still fail in production within weeks — real-world input drifts (new document formats, new phrasing) with nobody watching, so the team finds out via a customer complaint, not a dashboard.
 
 **Decision trigger**: Ask "when this system is wrong, how would we know — and how would that knowledge get back into the system?" If the honest answer is "someone would eventually notice and file a ticket," the feedback loop is missing, not just informal.
 
-**When you'd choose differently**: For low-stakes, low-volume internal tools (a one-off migration script using Claude to reformat 200 files), a full feedback/eval loop is over-engineering — spot-checking manually is proportionate to the risk.
+**When you'd choose differently**: A full feedback/eval loop is over-engineering for low-stakes, low-volume internal tools — a one-off migration script reformatting 200 files just needs a manual spot-check, proportionate to the actual risk.
 
 ### Exam Trap ⚠️
 
@@ -59,13 +63,15 @@ Scenario questions often present an architecture diagram missing the feedback lo
 
 ### Key Concept
 
+**Match the pattern to how much control a task needs, not to how advanced the pattern sounds.**
+
 Anthropic's own guidance (*Building Effective Agents*) draws a clear line between three tiers of system:
 
 - **Augmented LLM**: a single Claude call enhanced with retrieval, tools, and memory — no autonomous multi-step control flow. This is the baseline building block for everything else.
 - **Workflows**: predefined code paths that orchestrate LLM calls in a fixed structure — prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer. The *sequence of steps is fixed by the developer*, even though the content of each step is generated by the model.
 - **Agentic systems**: Claude dynamically directs its own process and tool use, maintaining control over how it accomplishes a task. The *sequence itself* is decided by the model at runtime, typically in a loop of plan → act → observe → repeat until a stopping condition is met.
 
-The professional-tier decision is not "which pattern is more advanced" — it's "which pattern matches the task's need for control versus flexibility." Workflows are more predictable, auditable, and cheaper to run because you can reason about exactly what will execute. Agentic systems trade that predictability for the ability to handle tasks whose steps cannot be fully specified in advance. Anthropic's explicit guidance is to *find the simplest solution possible, and only increase complexity when it demonstrably improves outcomes* — agentic complexity is a cost to be justified, not a default.
+Workflows are predictable, auditable, and cheaper because you can reason about exactly what will execute; agentic systems trade that predictability for handling tasks whose steps can't be fully specified in advance. **Anthropic's own guidance is blunt**: find the simplest solution possible, and add complexity only when it demonstrably improves outcomes — agentic complexity is a cost to justify, not a default.
 
 ![Selecting Architectural Patterns](../images/selectingarchpatterns.png)
 ### In Practice
@@ -74,7 +80,7 @@ The professional-tier decision is not "which pattern is more advanced" — it's 
 
 **Decision trigger**: Ask "can I write down, today, the exact sequence of LLM calls this task requires, regardless of the input?" Yes → workflow (pick the sub-pattern: chaining for sequential dependent steps, routing for input-type branching, parallelization for independent sub-tasks, orchestrator-workers for dynamic task breakdown with a fixed control layer, evaluator-optimizer for iterative refinement against a quality bar). No → agentic.
 
-**When you'd choose differently**: A coding agent that needs to read a codebase, decide what to change, run tests, and react to failures cannot be pre-scripted as a fixed workflow — the *number* and *order* of steps genuinely depends on what the agent discovers, which is exactly when agentic control is justified despite its higher variance and cost.
+**When you'd choose differently**: Agentic control is justified exactly when the number and order of steps can't be pre-scripted — a coding agent that reads a codebase, decides what to change, runs tests, and reacts to failures can't be forced into a fixed workflow, despite the higher variance and cost that comes with it.
 
 ### Exam Trap ⚠️
 
@@ -86,7 +92,9 @@ The exam frequently uses "agentic" and "agent" loosely in a scenario stem, then 
 
 ### Key Concept
 
-Multi-agent systems become the right answer when a task's breadth exceeds what a single context window or a single agent's tool set can handle coherently — for example, research tasks that require parallel exploration of independent sub-questions, or systems where different agents need different tool permissions for security isolation. Anthropic's published multi-agent research system uses an **orchestrator (lead agent) + subagents** topology: the lead agent decomposes the user's query into parallelizable sub-tasks, spins up subagents with narrow, well-defined objectives and their own context windows, and synthesizes their results. This works because subagents operate with clean, focused context rather than one agent's context becoming polluted with every intermediate research step.
+**Multi-agent systems earn their cost only when breadth exceeds what one context window can hold coherently.**
+
+Multi-agent systems become the right answer when a task's breadth exceeds what a single context window or a single agent's tool set can handle — parallel research over independent sub-questions, or systems needing different tool permissions per agent for security isolation. Anthropic's published multi-agent research system uses an **orchestrator (lead agent) + subagents** topology: the lead agent decomposes the query into parallelizable sub-tasks, spins up subagents with narrow objectives and their own context windows, and synthesizes the results — this works because subagents reason with clean, focused context instead of one agent's context filling up with every intermediate step.
 
 Three orchestration topologies recur in practice:
 
@@ -94,17 +102,17 @@ Three orchestration topologies recur in practice:
 - **Supervisor/orchestrator-worker**: a lead agent dynamically assigns and collects work from subagents it spins up, in parallel or sequence, and owns the synthesis step. Good for breadth-first tasks (research, multi-source data gathering) where subtasks are independent enough to parallelize.
 - **Swarm/peer-to-peer**: agents communicate with each other directly with no single controller — rare in production because it's the hardest to debug, audit, and bound; usually a workflow or supervisor pattern achieves the same outcome with far less operational risk.
 
-The orchestration choice has direct cost implications: Anthropic's own data on their multi-agent research system shows multi-agent architectures can consume roughly 15x the tokens of a single-agent chat interaction — a number that must be explicitly weighed against the value of the parallelism and quality gained.
+The orchestration choice has a direct cost: Anthropic's own data shows multi-agent architectures can consume roughly 15x the tokens of a single-agent chat interaction. **Think of it like hiring a project team instead of one generalist** — you get parallelism and specialization, but you're paying for coordination overhead on every task, whether or not that task actually needed it.
 
 ![Three orchestration topologies](../images/three_orch_topologies.png)
 
 ### In Practice
 
-**What breaks without this**: Giving every subagent the full tool set (including write/delete-capable tools) "for flexibility" collapses the security and cost benefits of decomposition — a compromised or misfiring subagent now has blast radius equal to the whole system, and you've paid the multi-agent token tax without the isolation benefit it was supposed to buy.
+**What breaks without this**: Giving every subagent the full tool set "for flexibility" collapses both the security and cost benefits of decomposition — a compromised or misfiring subagent now has blast radius equal to the whole system, and you've paid the 15x multi-agent token tax without the isolation it was supposed to buy.
 
 **Decision trigger**: Ask "do these subtasks have independent, non-overlapping objectives that don't need to see each other's intermediate reasoning?" If yes, parallel subagents under an orchestrator are worth the token cost. If subtasks are tightly sequential and each needs the full context of the last, a pipeline (or a single agent with a longer context) is cheaper and easier to debug than fanning out.
 
-**When you'd choose differently**: For a task with a hard, tight latency SLA (e.g., a customer-facing chat response needing sub-2-second turnaround), spinning up an orchestrator and multiple subagents adds coordination latency that a single augmented LLM call cannot match — multi-agent orchestration is a throughput/quality optimization, not a latency optimization.
+**When you'd choose differently**: Multi-agent orchestration is a throughput/quality optimization, not a latency one — a task with a hard, tight SLA (a customer-facing chat response needing sub-2-second turnaround) can't absorb the coordination latency of spinning up an orchestrator and multiple subagents; a single augmented LLM call wins there.
 
 ### Exam Trap ⚠️
 
@@ -116,17 +124,19 @@ Distractor answers love to conflate "using multiple tools" with "multi-agent sys
 
 ### Key Concept
 
-Decomposition is the discipline of breaking a problem too large or too ambiguous for one prompt/agent into smaller units that are independently solvable, verifiable, and (ideally) parallelizable. Three decomposition strategies map directly onto the workflow patterns above: **sequential decomposition** (each step depends on the prior step's output — use prompt chaining), **parallel decomposition** (subtasks are independent and can run concurrently — use parallelization or orchestrator-workers), and **hierarchical decomposition** (a top-level goal breaks into sub-goals that themselves break into tasks — use nested orchestrator-worker layers or a planning agent).
+**Good decomposition produces sub-tasks that are each independently verifiable — not just smaller.**
 
-The quality bar for good decomposition is that each resulting sub-unit has a clear, independently verifiable success criterion. A decomposition that produces sub-tasks nobody can evaluate in isolation just relocates the ambiguity rather than resolving it — you've made the system more complex without making it more testable.
+Decomposition breaks a problem too large or ambiguous for one prompt/agent into smaller units that are independently solvable, verifiable, and ideally parallelizable. Three strategies map onto the workflow patterns above: **sequential** (each step depends on the last — prompt chaining), **parallel** (independent subtasks running concurrently — parallelization or orchestrator-workers), and **hierarchical** (a top-level goal splits into sub-goals that split further — nested orchestrator layers or a planning agent).
+
+The quality bar is that each resulting sub-unit has a clear, independently verifiable success criterion. **A decomposition nobody can grade in isolation hasn't actually decomposed anything** — it's just relabeled complexity, still one tangled problem underneath.
 
 ### In Practice
 
-**What breaks without this**: A single sprawling prompt asking Claude to "analyze this 200-page contract, flag risks, summarize obligations, and draft a response" produces inconsistent quality across the sub-tasks because the model is juggling four different objectives with four different "good answer" criteria in one pass — accuracy on each individual sub-task drops compared to decomposing into four focused calls.
+**What breaks without this**: Accuracy on each sub-task drops when a model juggles multiple different "good answer" criteria in one pass — a single sprawling prompt asking Claude to analyze a 200-page contract, flag risks, summarize obligations, and draft a response produces inconsistent quality across all four, compared to four focused calls.
 
 **Decision trigger**: Ask "can I write a single, unambiguous grading rubric for what a good response to this whole prompt looks like?" If the rubric has to say "and also" more than once, decompose along those "and also" boundaries.
 
-**When you'd choose differently**: Over-decomposing a genuinely simple, tightly-coupled task (e.g., splitting "translate this paragraph" into "identify tone" + "translate" + "verify tone preserved" as three separate calls) adds latency and cost without improving quality — decomposition should track genuine independent sub-problems, not be applied reflexively to every task.
+**When you'd choose differently**: Decomposition should track genuine independent sub-problems, not get applied reflexively — splitting "translate this paragraph" into "identify tone" + "translate" + "verify tone preserved" as three separate calls just adds latency and cost to a task that was simple and tightly coupled to begin with.
 
 ### Exam Trap ⚠️
 
@@ -138,6 +148,8 @@ The exam sometimes presents a decomposition that looks reasonable but creates su
 
 ### Key Concept
 
+**Name which business value pillar a design serves — and which one it knowingly sacrifices.**
+
 Every architectural decision in this domain should be traceable to one or more of five business value pillars, because a professional architect is accountable for value delivered, not elegance achieved:
 
 - **Efficiency** — doing the same work with fewer resources (time, headcount, steps).
@@ -146,11 +158,11 @@ Every architectural decision in this domain should be traceable to one or more o
 - **Cost** — direct reduction in operating expense, including model spend, infra, and human review overhead.
 - **Performance SLAs** — meeting explicit, contracted thresholds for latency, accuracy, or availability that the business has committed to (internally or to customers).
 
-These pillars often trade off against each other, and the architecture is the mechanism that encodes the trade-off the business actually wants. An agentic multi-agent research system might score high on transformation and productivity but poorly on cost and latency SLA; a narrow single-prompt classifier might score high on cost and SLA but deliver no transformation. Naming which pillar(s) a design decision optimizes for — and which it knowingly sacrifices — is what separates a professional-level architectural justification from an enthusiast's tech-stack preference.
+These pillars often trade off against each other, and the architecture is the mechanism that encodes which trade-off the business actually wants. An agentic multi-agent research system might score high on transformation and productivity but poorly on cost and latency SLA; a narrow single-prompt classifier might score high on cost and SLA but deliver no transformation. **Naming the pillar is what separates a professional justification from a tech-stack preference** — an architect accountable for value delivered always has an answer to "which pillar, and what did we give up."
 
 ### In Practice
 
-**What breaks without this**: Teams that build the "best" architecture on technical merit without pillar alignment frequently get their project cancelled at the business review — not because the system doesn't work, but because nobody can answer "what did this save or unlock, in terms leadership tracks" (dollars, hours, SLA compliance, new revenue). Technical excellence without a named business pillar is invisible to the people who fund the next phase.
+**What breaks without this**: Technical excellence without a named business pillar is invisible to the people who fund the next phase — teams that build the "best" architecture on merit alone frequently get their project cancelled at the business review, not because the system doesn't work, but because nobody can answer what it actually saved or unlocked.
 
 **Decision trigger**: Before finalizing an architecture, ask "if I had to put one number in front of a VP, which pillar would it be, and does my design choice actually move that number?" If the answer is vague ("it'll be smarter"), the design isn't yet aligned to a pillar.
 
