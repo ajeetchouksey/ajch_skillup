@@ -11,11 +11,12 @@ This domain covers the judgment layer that sits above any specific tool or confi
 ## Integrating Agents into the SDLC
 
 ### Key Concept
-**Good delegation candidates vs. steps that stay human-owned**
+
+**Delegate what's reversible and reviewable; keep merge approval, security changes, and architecture decisions human-owned.**
 
 An agent session works best on tasks that have a clear start state, a clear end state, and a verifiable definition of "done." Repository research, drafting an implementation plan, making code changes on a branch, running tests and linters in an ephemeral environment, and opening a pull request all fit that shape — the agent can be evaluated purely on whether its output matches the acceptance criteria.
 
-Some steps must stay human-owned regardless of how capable the agent is, because completing them isn't just execution — it's a judgment call the organization has to be accountable for. Merge approval is the clearest example: it's the moment a proposed change becomes an accepted one. Security-sensitive changes (credential rotation, access-control changes, anything with production blast radius and no easy rollback) and architecture decisions (adopting a new framework, choosing REST vs. GraphQL) require weighing trade-offs and organizational context that isn't the agent's to own.
+Some steps must stay human-owned regardless of how capable the agent is, because completing them isn't just execution — it's a judgment call the organization has to be accountable for. Merge approval is the clearest example: it's **the moment a proposed change becomes an accepted one, like signing a contract instead of drafting it**. Security-sensitive changes (credential rotation, access-control changes, anything with production blast radius and no easy rollback) and architecture decisions (adopting a new framework, choosing REST vs. GraphQL) require weighing trade-offs and organizational context that isn't the agent's to own.
 
 ```mermaid
 graph LR
@@ -34,18 +35,19 @@ graph LR
 
 ### In Practice
 
-**What breaks without this**: teams that delegate merge approval, credential rotation, or architecture direction to an agent lose the checkpoint where a human is accountable for what actually ships — a plausible-but-wrong change or a subtly incorrect security config can go live with nobody having evaluated intent, only correctness-of-syntax.
+**What breaks without this**: a plausible-but-wrong change or a subtly incorrect security config can go live with nobody having evaluated intent, only correctness-of-syntax — teams that delegate merge approval, credential rotation, or architecture direction to an agent lose the checkpoint where a human is accountable for what actually ships.
 
 **Decision trigger**: ask "does completing this step also commit the organization to it, or is it still reversible and reviewable before it matters?" If the step is reversible and lands in the normal review pipeline (a PR, a draft plan), it's a good delegation candidate. If completing it *is* the commitment, keep it human-owned.
 
 **When you'd choose differently**: a well-scoped, low-risk config change (bumping a pinned dependency version with no API surface change) can sometimes be pre-approved for auto-merge under strict conditions — but that's a deliberate, narrow policy decision made by a human in advance, not a default assumption that agent PRs are trustworthy.
 
 ### Key Concept
-**Anti-patterns that sabotage delegation**
+
+**A vague issue, not a weak agent, is the most common reason delegation goes wrong.**
 
 The most common failure isn't a broken agent — it's a broken task definition. A vague issue like "improve the checkout flow" gives the agent no boundary, so it fills the gap with its own inference of scope, often touching far more than intended (including services it shouldn't, like a payment gateway). Granting an agent bypass-actor status on branch protection without a compensating review control lets CI-green PRs merge with nobody evaluating whether the change matches intent — automated checks confirm the code behaves as written, not that it's the right thing to build.
 
-Two structural anti-patterns are easy to miss because they look like convenience: assigning cross-repository work to a single agent session, and ignoring session/execution time limits. Coding agent sessions are scoped to **one repository** — a task spanning an auth library and three downstream consumers cannot be captured as one atomic session or one PR; it must be decomposed into separate per-repo tasks. And every session runs inside a bounded execution ceiling: a task that exceeds it doesn't fail loudly, it stops wherever it got to. Tests passing on a partial diff only proves the completed portion is internally consistent — not that the task is done. Finally, treating any agent-authored PR as pre-approved because "the agent already checked its own work" collapses the review gate that exists specifically to catch mismatches CI can't detect.
+Two structural anti-patterns are easy to miss because they look like convenience: assigning cross-repository work to a single agent session, and ignoring session/execution time limits. Coding agent sessions are scoped to **one repository** — a task spanning an auth library and three downstream consumers cannot be captured as one atomic session or one PR; it must be decomposed into separate per-repo tasks. And every session runs inside a bounded execution ceiling: a task that exceeds it doesn't fail loudly, it stops wherever it got to. Tests passing on a partial diff only proves the completed portion is internally consistent — not that the task is done. Finally, treating any agent-authored PR as pre-approved because "the agent already checked its own work" collapses the review gate that exists specifically to catch mismatches CI can't detect. **A task without acceptance criteria is a contractor without a blueprint** — they'll build something, just not necessarily what you needed.
 
 ### In Practice
 
@@ -62,13 +64,14 @@ Scenario questions often reward the "obviously fast" answer — add the agent as
 </div>
 
 ### Key Concept
-**Defining inputs, outputs, and success criteria before delegating**
 
-A well-formed agent task specifies three things before any work starts: **inputs** the agent needs (the issue description, relevant custom instructions, explicit acceptance criteria — e.g., "must not change the public API," "the fix should make test `test_order_totals` pass"), **outputs** the agent will produce (a branch, a sequence of commits, a pull request, and a session log as the record of what happened), and **success criteria** a reviewer will check the output against (tests pass, lints pass, the stated acceptance criteria are met). This is the same discipline a well-written ticket requires for a human contributor, made explicit because the agent has no other source of shared context to draw on.
+**Specify inputs, outputs, and success criteria up front — a reviewer should be able to checklist the PR in under two minutes.**
+
+A well-formed agent task specifies three things before any work starts: **inputs** the agent needs (the issue description, relevant custom instructions, explicit acceptance criteria — e.g., "must not change the public API," "the fix should make test `test_order_totals` pass"), **outputs** the agent will produce (a branch, a sequence of commits, a pull request, and a session log as the record of what happened), and **success criteria** a reviewer will check the output against (tests pass, lints pass, the stated acceptance criteria are met). This is the same discipline a well-written ticket requires for a human contributor, made explicit because the agent has no other source of shared context to draw on. **A reviewer without a checklist is grading blind.**
 
 ### In Practice
 
-**What breaks without this**: without stated inputs, the agent guesses at conventions and constraints; without stated outputs, a requester doesn't know whether to expect one PR or four; without stated success criteria, a reviewer has no fast way to check the PR against intent and ends up re-deriving the requirements from the diff itself.
+**What breaks without this**: a reviewer ends up re-deriving the requirements from the diff itself because there's no fast way to check the PR against intent — that's what happens without stated success criteria, just as missing inputs leave the agent guessing at conventions and constraints, and missing outputs leave a requester unsure whether to expect one PR or four.
 
 **Decision trigger**: before assigning a task, ask "could a reviewer check this PR off against a checklist in under two minutes?" If the acceptance criteria aren't specific enough to produce that checklist, tighten the issue before delegating — not after the PR shows up.
 
@@ -83,9 +86,10 @@ Watch for questions that frame the "/tests directory" or a file path as the sign
 ## Defining Boundaries Between Planning, Reasoning, and Action
 
 ### Key Concept
-**Planning as a distinct, reviewable phase before any code-modifying tool runs**
 
-Separating "decide what to do" from "do it" creates a checkpoint where a reviewable artifact exists before anything irreversible — a file edit, a commit, a shell command — happens. This is the same reason engineering teams write design docs before implementation: catching a wrong direction on paper is cheap; catching it in a merged diff is expensive. Configuring this well means two things: the plan step must run *before* execution, and its output must be a structured artifact — a task list naming specific files and actions — rather than free-form narration like "I'll look at the auth module and probably update a few files." Structured output is what makes a plan checkable: a reviewer can mentally diff a task list against the issue's acceptance criteria; vague prose can't be validated or falsified either way.
+**Separate "decide what to do" from "do it" — catching a wrong plan on paper is cheap; catching it in a merged diff is expensive.**
+
+A reviewable artifact exists before anything irreversible — a file edit, a commit, a shell command — happens once you separate deciding from doing. This is the same reason engineering teams write design docs before implementation. Configuring this well means two things: the plan step must run *before* execution, and its output must be a structured artifact — a task list naming specific files and actions — rather than free-form narration like "I'll look at the auth module and probably update a few files." Structured output is what makes a plan checkable: a reviewer can mentally diff a task list against the issue's acceptance criteria; vague prose can't be validated or falsified either way.
 
 The plan-then-act boundary is the core conceptual model of this domain — the diagram below is the one worth memorizing cold.
 
@@ -106,22 +110,23 @@ flowchart TD
 
 ### In Practice
 
-**What breaks without this**: without a plan-review checkpoint, scope drift or an unintended destructive step only surfaces once the PR already exists — at which point the agent may have already touched files, run commands, or drifted past the issue's intent, all more expensive to unwind than a plan revision would have been. "I'll review the diff at the end instead" sounds equivalent to plan review but isn't: the first point of human contact has moved from *before any change* to *after everything already happened*.
+**What breaks without this**: the first point of human contact has moved from before any change to after everything already happened — without a plan-review checkpoint, scope drift or an unintended destructive step only surfaces once the PR already exists, at which point the agent may have already touched files, run commands, or drifted past the issue's intent, all more expensive to unwind than a plan revision would have been. "I'll review the diff at the end instead" sounds equivalent to plan review but isn't.
 
 **Decision trigger**: ask "if this plan is wrong, what does it cost to find out?" If the answer is "a re-read of a task list" the checkpoint is working; if the answer is "an unwind of committed changes," the checkpoint arrived too late.
 
 **When you'd choose differently**: for genuinely trivial, single-line, previously-validated task classes (a version bump the team has run this exact pattern on dozens of times), a team might collapse plan review into a lighter-weight automated scope check rather than a full human read — but that's a calibrated exception for a known-low-risk pattern, not the default for novel work.
 
 ### Key Concept
-**Enforcing the boundary through tool capability, not instructions**
 
-A plan/act boundary is only a real safety boundary if it's enforced structurally — otherwise "planning phase" is just a label, and the same agent could act on its own plan if it happened to have the tools to do so. The durable mechanism is scoping the **`tools`** property of a planning-phase (sub)agent to read-only tools only (grep, glob, view) and withholding any edit- or bash-capable tools, so there is no code path by which the planner can modify the repository — the constraint holds even if its reasoning goes sideways or it's fed a misleading issue body. Only the execution-phase agent is granted edit/bash-capable tools, once a plan has been approved.
+**A plan/act boundary is only real if it's enforced by missing tools, not by an instruction the model could talk itself past.**
 
-For an orchestrator agent that inherits a broad default toolset but should stay planning-only (reason, decide, delegate — never edit or run bash directly), the precise tool is **`excludedTools`**: it subtracts the specific edit/bash tools from the inherited defaults without requiring you to reconstruct and maintain a full allowlist by hand. A system-prompt instruction telling the model "don't make edits" is a soft guideline the model can deviate from under ambiguous or adversarial input; tool-availability scoping is a capability guarantee that holds regardless of what the model reasons its way into. Draft-PR gates and explicit approval requirements extend the same principle past the plan stage: they keep the *merge* decision human-owned even after execution has produced a diff.
+The durable mechanism is scoping the **`tools`** property of a planning-phase (sub)agent to read-only tools only (grep, glob, view) and withholding any edit- or bash-capable tools, so there is no code path by which the planner can modify the repository — the constraint holds even if its reasoning goes sideways or it's fed a misleading issue body. Only the execution-phase agent is granted edit/bash-capable tools, once a plan has been approved. For an orchestrator agent that inherits a broad default toolset but should stay planning-only (reason, decide, delegate — never edit or run bash directly), the precise tool is **`excludedTools`**: it subtracts the specific edit/bash tools from the inherited defaults without requiring you to reconstruct and maintain a full allowlist by hand.
+
+A system-prompt instruction telling the model "don't make edits" is a soft guideline the model can deviate from under ambiguous or adversarial input; tool-availability scoping is a capability guarantee that holds regardless of what the model reasons its way into — **the difference between removing the key from the ignition and just asking the driver not to start the car**. Draft-PR gates and explicit approval requirements extend the same principle past the plan stage: they keep the *merge* decision human-owned even after execution has produced a diff.
 
 ### In Practice
 
-**What breaks without this**: an instruction-only boundary ("please don't edit files during planning") can be bypassed by prompt injection embedded in a malicious or malformed issue body, or simply by model reasoning that decides an edit is warranted — the plan/act split becomes a label with no enforcement behind it.
+**What breaks without this**: the plan/act split becomes a label with no enforcement behind it — an instruction-only boundary ("please don't edit files during planning") can be bypassed by prompt injection embedded in a malicious or malformed issue body, or simply by model reasoning that decides an edit is warranted.
 
 **Decision trigger**: whenever an agent's role is "propose, don't act," ask "is this boundary enforced by what the agent *can* invoke, or only by what it's *told* not to invoke?" If it's the latter, tighten the `tools`/`excludedTools` configuration rather than the prompt wording.
 
@@ -136,39 +141,42 @@ The exam frequently offers "instruct the agent not to do X in its system prompt"
 ## Configuring Observability and Control for Autonomous Agents
 
 ### Key Concept
-**Guardrails that match the granularity of the actual risk**
 
-Autonomy guardrails work best when their scope matches the scope of the actual concern rather than defaulting to an all-or-nothing switch. Org-level enablement paired with a per-repository opt-out lets an organization default to productivity while still respecting a specific repository's compliance or risk profile — disabling the feature org-wide because one repository has a concern discards the benefit for every team that doesn't share it. The same discipline applies to branch-protection ruleset bypass-actor configuration: bypass should be scoped **per rule**, not per actor wholesale. An agent can reasonably bypass rules meant to stop humans pushing straight to main (since the agent works on its own branches), while the rule requiring approving reviews before merge into main stays fully intact for every PR, including the agent's. Adding an agent as a bypass actor on the *review-requirement* rule specifically is the configuration mistake that removes the human checkpoint teams actually want to keep.
+**Scope guardrails to the specific rule causing friction, not to the actor wholesale.**
+
+Autonomy guardrails work best when their scope matches the scope of the actual concern rather than defaulting to an all-or-nothing switch. Org-level enablement paired with a per-repository opt-out lets an organization default to productivity while still respecting a specific repository's compliance or risk profile — disabling the feature org-wide because one repository has a concern discards the benefit for every team that doesn't share it. The same discipline applies to branch-protection ruleset bypass-actor configuration: bypass should be scoped **per rule**, not per actor wholesale. An agent can reasonably bypass rules meant to stop humans pushing straight to main (since the agent works on its own branches), while the rule requiring approving reviews before merge into main stays fully intact for every PR, including the agent's. Adding an agent as a bypass actor on the *review-requirement* rule specifically is **the configuration mistake that removes the human checkpoint teams actually want to keep — the difference between adjusting one thermostat and shutting off heat to the whole building**.
 
 ### In Practice
 
-**What breaks without this**: a coarse org-wide enable/disable switch forces every team into the same policy regardless of their actual risk profile, and a coarse "add the agent as a bypass actor" (without specifying which rule) accidentally exempts the agent from required review, not just from friction that didn't apply to it in the first place.
+**What breaks without this**: a coarse "add the agent as a bypass actor" (without specifying which rule) accidentally exempts the agent from required review, not just from friction that didn't apply to it in the first place — and a coarse org-wide enable/disable switch forces every team into the same policy regardless of their actual risk profile.
 
 **Decision trigger**: when configuring a guardrail, ask "does this bypass apply to the rule causing friction, or does it apply to the actor generally?" Scope to the rule, not the actor, whenever the actor should still be subject to some rules and not others.
 
 **When you'd choose differently**: for a genuinely low-risk internal tooling repository with no compliance obligations, a team might reasonably decide the org default (agent enabled, standard review required) needs no repo-level override at all — the point isn't that every repo needs a custom policy, it's that the mechanism exists at the right granularity when one does.
 
 ### Key Concept
-**Inspectable artifacts as the durable audit trail**
 
-Observability for autonomous agents depends on the work being visible through the same tooling humans already use to review changes. An agent that commits incrementally to a branch, where each step is a viewable diff and the PR serves as the aggregated, durable record, produces an audit trail a human (or a future investigator) can reconstruct end-to-end — what changed, in what order, and why. A workflow that instead applies a single bulk change directly to a target branch through a side-channel automation pipeline, bypassing the PR flow, has no equivalent trail of intermediate reasoning or steps, no matter how fast it runs.
+**Observability depends on the work landing as ordinary Git artifacts — commits, diffs, a PR — not an opaque side-channel.**
+
+An agent that commits incrementally to a branch, where each step is a viewable diff and the PR serves as the aggregated, durable record, produces an audit trail a human (or a future investigator) can reconstruct end-to-end — what changed, in what order, and why. A workflow that instead applies a single bulk change directly to a target branch through a side-channel automation pipeline, bypassing the PR flow, has no equivalent trail of intermediate reasoning or steps, no matter how fast it runs. **No black box, no post-incident reconstruction.**
 
 ### In Practice
 
-**What breaks without this**: when something goes wrong three weeks after a bulk, PR-bypassing change, there's no commit history to bisect, no diff sequence to review, and no PR thread documenting intent — the investigation has nothing to work from.
+**What breaks without this**: there's no commit history to bisect, no diff sequence to review, and no PR thread documenting intent — when something goes wrong three weeks after a bulk, PR-bypassing change, the investigation has nothing to work from.
 
 **Decision trigger**: for any new agent tooling integration, ask "does this land as standard Git/GitHub artifacts (commits, diffs, a PR) or as an opaque side-channel?" The former is auditable and reversible by construction; the latter usually isn't, regardless of how convenient it looks.
 
 **When you'd choose differently**: a fully automated, human-supervised pipeline that applies a config change (e.g., a feature flag toggle recorded in a separate, already-audited system of record) may reasonably skip the PR flow — but only when that alternate system already provides an equivalent durable, reviewable trail.
 
 ### Key Concept
-**Human intervention that doesn't slow delivery**
 
-Human-in-the-loop controls don't have to be synchronous to be effective. Requiring a reviewer to approve every individual tool call, or to stay present in a live session for an agent's full runtime, turns the reviewer into a bottleneck that doesn't scale past one task at a time and defeats much of the purpose of delegating the work. The scalable pattern moves the checkpoint into artifacts a reviewer can engage with whenever they're available: PR comments, and a draft-to-ready-for-review transition, rather than a blocking live conversation. Session lifecycle events — started, completed, failed — give the same asynchronous model to monitoring: a team subscribes to these events and routes them to chat or a dashboard, so a human intervenes at a meaningful checkpoint (a failed session, a plan awaiting approval, a PR awaiting review) without polling or watching every step in between.
+**Oversight scales through async checkpoints — PR comments, draft-to-ready transitions, lifecycle events — not a reviewer watching every step live.**
+
+Requiring a reviewer to approve every individual tool call, or to stay present in a live session for an agent's full runtime, turns the reviewer into a bottleneck that doesn't scale past one task at a time and defeats much of the purpose of delegating the work. The scalable pattern moves the checkpoint into artifacts a reviewer can engage with whenever they're available: PR comments, and a draft-to-ready-for-review transition, rather than a blocking live conversation. Session lifecycle events — started, completed, failed — give the same asynchronous model to monitoring: a team subscribes to these events and routes them to chat or a dashboard, so a human intervenes at a meaningful checkpoint (a failed session, a plan awaiting approval, a PR awaiting review) without polling or watching every step in between. **It's an on-call pager, not a doctor sitting in the room for a patient's entire stay.**
 
 ### In Practice
 
-**What breaks without this**: synchronous, blocking approval collapses as soon as an organization runs more than one agent task concurrently — either delivery stalls waiting for a reviewer's real-time availability, or teams quietly stop enforcing the gate because it's too slow to keep up with.
+**What breaks without this**: either delivery stalls waiting for a reviewer's real-time availability, or teams quietly stop enforcing the gate because it's too slow to keep up with — synchronous, blocking approval collapses as soon as an organization runs more than one agent task concurrently.
 
 **Decision trigger**: ask "does this oversight model require a human to be present in real time, or can it be satisfied whenever a human next checks in?" If real-time presence is required, look for the async equivalent (draft PR, comment-based approval, lifecycle event) before accepting the throughput cost.
 
