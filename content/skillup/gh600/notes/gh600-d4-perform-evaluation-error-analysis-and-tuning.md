@@ -20,7 +20,7 @@ Before evaluating an agent's output, evaluation needs an explicit target — not
 flowchart LR
     Issue["Issue + acceptance criteria<br/>(outcomes + constraints)"] --> Plan["Approved plan artifact (D1)"]
     Plan --> Exec["Execution: diff, commits, PR"]
-    Exec --> Quant["Quantitative signals:<br/>tests, coverage, lint, diff size, CI status"]
+    Exec --> Quant["Quantitative signals:<br/>tests, coverage, lint, CI status"]
     Exec --> Scan["Automated scanning:<br/>code scanning, secret scanning,<br/>dependency review"]
     Exec --> Qual["Qualitative signals:<br/>reviewer reads diff for<br/>readability, convention fit"]
     Quant --> Verdict{"All signals + intent-alignment<br/>check out?"}
@@ -29,6 +29,7 @@ flowchart LR
     Verdict -->|"Yes"| Pass["Evaluated as successful —<br/>ready for merge"]
     Verdict -->|"No"| Fail["Evaluated as a failure —<br/>proceed to root-cause analysis"]
 ```
+*Outcomes and constraints both have to check out to pass.*
 
 ### In Practice
 
@@ -112,12 +113,13 @@ The diagnostic question that separates the three stays consistent even in a mess
 
 ```mermaid
 flowchart TD
-    F["Agent produced a wrong or unwanted result"] --> Q1{"Was the needed info,<br/>tool, or permission actually<br/>available to the agent?"}
-    Q1 -->|"No — missing instruction,<br/>stale snapshot, ungranted<br/>MCP tool, blocked domain"| CTX["Context / environment issue<br/>(fix: memory scoping — D3,<br/>tool/MCP/firewall config — D2)"]
+    F["Agent produced wrong result"] --> Q1{"Was the needed info,<br/>tool, or permission actually<br/>available to the agent?"}
+    Q1 -->|"No — missing context"| CTX["Context / environment issue<br/>(fix: memory scoping — D3,<br/>tool/MCP/firewall config — D2)"]
     Q1 -->|"Yes, it was available"| Q2{"Did the agent invoke<br/>the right tool with the<br/>right inputs, and act on<br/>what it actually returned?"}
-    Q2 -->|"No — wrong tool, wrong<br/>params, ignored the<br/>tool's actual output"| TOOL["Tool misuse<br/>(fix: narrow/clarify tool access,<br/>tool-selection guidance)"]
+    Q2 -->|"No — tool misuse"| TOOL["Tool misuse<br/>(fix: narrow/clarify tool access,<br/>tool-selection guidance)"]
     Q2 -->|"Yes, tool use was correct"| REASON["Reasoning error<br/>(fix: revise instructions,<br/>tighten workflow/constraints)"]
 ```
+*Three distinct failure categories, each needing a different fix.*
 
 ### In Practice
 

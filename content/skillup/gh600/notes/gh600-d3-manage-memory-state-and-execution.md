@@ -26,6 +26,7 @@ flowchart TD
     Q3 -->|"Yes"| EXT["External memory:<br/>issue/PR/project record or<br/>MCP-backed store, pulled via tool call"]
     Q3 -->|"No, it must be preloaded"| LT
 ```
+*Deciding which memory tier a piece of information belongs in.*
 
 ### In Practice
 
@@ -108,6 +109,7 @@ sequenceDiagram
     S2--)S2: Session ends (state again lives only in PR/Git)
     Human->>PR: Review, approve, merge
 ```
+*Resuming reads the same branch instead of starting cold.*
 
 ### In Practice
 

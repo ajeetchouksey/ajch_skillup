@@ -80,6 +80,7 @@ flowchart TD
     Scope --> Grant["Expose only the needed<br/>tool names to the agent"]
     Grant --> TestRun["Test in a sandboxed session<br/>before wider rollout"]
 ```
+*Deciding whether an MCP server is needed and scoped.*
 
 ### In Practice
 
@@ -233,9 +234,10 @@ flowchart TD
     Retryable -->|"No — logic, permission,<br/>or genuine test failure"| Escalate["Escalate: stop,<br/>log reason, comment on issue/PR"]
     Escalate --> HumanNow{"Human available now?"}
     HumanNow -->|"Yes"| Live["Human resolves inline"]
-    HumanNow -->|"No"| Async["Session marked failed;<br/>lifecycle event notifies channel/dashboard"]
+    HumanNow -->|"No"| Async["Session marked failed;<br/>notifies channel/dashboard"]
     Async --> Rollback["Branch/PR stays isolated —<br/>no impact on protected branch;<br/>close, amend, or hand off later"]
 ```
+*Transient failures retry; everything else escalates to a human.*
 
 ### In Practice
 

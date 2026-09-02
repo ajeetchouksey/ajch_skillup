@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.12",
+  "contentVersion": "0.1.13",
   "contentUpdatedAt": "2026-09-02",
   "provider": "GitHub",
   "palette": {
@@ -88,6 +88,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Added taxonomyIds to 6 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    },
+    {
+      "version": "0.1.13",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Diagram-craft QA pass (mermaid-diagram-craft/SKILL.md): fixed 6 of 11 diagrams with real violations — reconnected an orphan subgraph in D1's delegation diagram, shortened 4 over-length node labels (D2, D4 x2, D6), shortened 2 over-length edge labels (D1, D4). Added an italic caption line below all 11 diagrams platform-wide had none — the markdown-notes stopgap convention documented in the same skill file. First-draft captions on 7 of the 11 diagrams exceeded the skill's own 5-10 word rule (caught on a second QA pass); all 11 now verified within range. No prose/content changed."
     }
   ],
   "id": "gh600",

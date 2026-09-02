@@ -31,6 +31,7 @@ graph TD
     C -->|"conflict found"| R["Resolution:<br/>rebase, re-scope,<br/>human arbitration"]
     R --> M
 ```
+*Coordinator decomposes work, checks for conflicts, then merges.*
 
 ### In Practice
 
@@ -146,6 +147,7 @@ flowchart TD
     D2 -->|"Yes"| TUNE["Tune that agent<br/>(D4 fix, matched to layer)"]
     D2 -->|"No — spans coordinator<br/>decisions or unclear"| HITL["Human-in-the-loop:<br/>pause workflow, escalate"]
 ```
+*Detecting workflow stalls and quality drift before they compound.*
 
 ### In Practice
 

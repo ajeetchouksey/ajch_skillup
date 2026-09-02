@@ -20,6 +20,10 @@ Some steps must stay human-owned regardless of how capable the agent is, because
 
 ```mermaid
 graph LR
+    Start[New task] -->|reversible, reviewable| R
+    Start -->|irreversible or high-stakes| M
+    Start -->|irreversible or high-stakes| S
+    Start -->|irreversible or high-stakes| A
     subgraph "Good delegation candidates"
         R[Repo research] --> P[Draft implementation plan]
         P --> B[Code changes on a branch]
@@ -32,6 +36,7 @@ graph LR
         A[Architecture decisions]
     end
 ```
+*What flows through agent delegation versus stays human-owned.*
 
 ### In Practice
 
@@ -98,7 +103,7 @@ flowchart TD
     T["Task assigned<br/>(issue + acceptance criteria)"] --> P["Plan phase<br/>tools: read-only (grep / glob / view)"]
     P --> A["Structured plan artifact<br/>(task list: target files + actions)"]
     A --> V{"Human / gate validates plan:<br/>scope match? no destructive ops?<br/>correct target repo/files?"}
-    V -->|"Scope drift, destructive op,<br/>or wrong target"| Rev["Revise plan"]
+    V -->|"Scope or safety issue"| Rev["Revise plan"]
     Rev --> P
     V -->|"Approved"| E["Execution phase<br/>tools unlocked: edit + bash"]
     E --> C["Commits land on branch<br/>(each step = a viewable diff)"]
@@ -107,6 +112,7 @@ flowchart TD
     HR -->|"Changes requested"| E
     HR -->|"Approved"| Merge["Merge<br/>(human-owned gate)"]
 ```
+*Plan reviewed and gated before execution unlocks destructive tools.*
 
 ### In Practice
 

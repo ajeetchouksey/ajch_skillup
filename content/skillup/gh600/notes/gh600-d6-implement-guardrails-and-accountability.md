@@ -27,9 +27,10 @@ flowchart TD
     D -->|Low| R2["Low-risk tier"]
     R1 --> E{"Reversible?"}
     E -->|"No — irreversible or<br/>compliance-sensitive"| F["Autonomy: none —<br/>explicit human authorization required"]
-    E -->|"Yes — reversible, but<br/>still elevated risk"| G["Autonomy: supervised —<br/>agent proposes, human approves before merge"]
+    E -->|"Yes — reversible, but<br/>still elevated risk"| G["Autonomy: supervised —<br/>agent proposes; human approves"]
     R2 --> H["Autonomy: full —<br/>agent executes, standard CI gate only"]
 ```
+*Risk tier and reversibility together set an action's autonomy.*
 
 ### In Practice
 
