@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.2.2",
+  "contentVersion": "1.3.0",
   "contentUpdatedAt": "2026-09-02",
   "provider": "Microsoft",
   "palette": {
@@ -52,6 +52,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Added taxonomyIds to 3 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    },
+    {
+      "version": "1.3.0",
+      "date": "2026-09-02",
+      "type": "minor",
+      "summary": "Notes freshness/drift refresh (no question-bank changes). Verified all 5 questions added in the 2026-09-01 drift check (v1.2.1) against notes coverage — d1-022, d3-017, d3-018 already taught (§1.1b, §3.7, §3.6b). Found and closed 2 genuine D2 gaps: added §2.15 (SharePoint Advanced Management / proactive oversharing governance before a Copilot rollout, closing ab731-d2-016) and §2.16 (Copilot Studio multi-step business-process automation/orchestration, closing ab731-d2-017). Re-checked the live skills-measured guide (still dated July 22, 2026 — no revision since the v1.2.1 check). Backfilled the Docs Engineer Deep Dive Standard, which none of the 3 domains had: added the required '## Deep Dive' section (connective narrative, worked scenario, memory aid, exam strategy) to D1, D2, and D3, plus a Human Angle callout to each domain's overview. Also fleshed out explanatory 'why it works this way' prose under 12 previously pointer-only topic sections across all 3 domains (D1 §1.1/§1.3/§1.4/§1.8/§1.9; D2 §2.1/§2.4/§2.10/§2.13; D3 §3.1/§3.2/§3.15) — mechanism-level reasoning, not new facts."
     }
   ],
   "id": "ab731",

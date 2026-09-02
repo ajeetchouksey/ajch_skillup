@@ -10,6 +10,8 @@
 
 <div class="note-scribble">The trick the exam uses: "Generate a summary" is generative AI. "Identify which emails are spam" is classification (traditional ML). Look for the word "generate," "create," "draft," or "compose" as the tell.</div>
 
+> 💡 **Human Angle**: A CFO doesn't fund the AI that wins the demo — the same way nobody buys a sports car for a grocery run; Domain 1 consistently rewards the leader who asks the business question ("what does this save, and what could it get wrong?") before the technology question.
+
 ---
 
 ## 🗺️ Which Domain Covers This? (Quick Reference)
@@ -32,6 +34,8 @@
 | **Recommendation** | Surfaces relevant items | "Users like you also bought..." |
 
 ![Diagram 1](/content/skillup/ab731/images/d1-business-value-01.png)
+
+These categories differ in what the model is mathematically optimised to output, not just in the words used to describe them. A classifier learns a decision boundary — it outputs a category, or a probability distribution over a fixed set of labels, because that's what its training rewarded it for getting right. A generative model learns a probability distribution over sequences of tokens, and produces a new sequence by sampling from that distribution one token at a time. That's why a generative model can write a paragraph nobody has written before, while a spam classifier can never output a new category — it was never trained to produce anything but "spam" or "not spam."
 
 <mark>Exam shortcut: The word "generate", "draft", "compose", or "create" always points to generative AI.</mark>
 
@@ -99,6 +103,8 @@ When the exam asks *"how should the business customise AI?"*, use this decision 
 - Longer prompts = higher cost; longer responses = higher cost
 - **Context window** — the maximum combined prompt + response tokens a model can hold in a single request; content beyond this limit gets truncated or dropped
 
+Tokens exist because a model can't process raw text directly — it converts words and word-fragments into numeric IDs it can run matrix math on, and the compute cost of that math scales with how many tokens are in play, in and out. That's why a 10-page contract costs more to summarise than a one-paragraph email even with an identical prompt instruction: the model still has to process every token of the source text before it generates a single word of output.
+
 | Cost lever | How to optimise |
 |---|---|
 | Prompt length | Be concise; avoid repeating context unnecessarily |
@@ -128,6 +134,8 @@ The model confidently generates plausible-sounding but **factually incorrect** c
 
 ### Reliability
 AI outputs can vary for the same input (temperature/randomness) and may degrade on edge cases. Not guaranteed deterministic.
+
+This variance traces back to **temperature**, the setting that controls how much randomness the model injects when picking the next token — a temperature of 0 makes the model deterministic (same input, same output, every time), while a higher temperature intentionally samples less-likely tokens for more varied, natural-sounding phrasing. Most production deployments default to a low, non-zero temperature: enough variation to avoid robotic repetition, not so much that the same question gets a materially different answer twice.
 
 ### Bias
 Training data reflects real-world human biases. If the training data over-represents certain demographics, viewpoints, or languages, the model will too.
@@ -202,6 +210,8 @@ A pretrained model's knowledge has a **cutoff date** and doesn't know about your
 
 > **Garbage in, garbage out** — still the most important rule in AI.
 
+AI amplifies whatever pattern is already in the data rather than correcting it — a model has no independent way to know a duplicate record is wrong or a mistyped figure is inaccurate, so it treats every input as equally trustworthy unless the data pipeline filters it first. That's why data cleaning has to happen upstream of the AI system, not downstream of it: no prompt tweak or model upgrade fixes a fact that was already wrong before the model ever saw it.
+
 | Data factor | Impact |
 |---|---|
 | **Data type** | Text, images, structured (tables), audio — model must match data type |
@@ -221,6 +231,8 @@ The exam tests that you know AI introduces **new** attack surfaces beyond tradit
 | **Data poisoning** | Corrupted training data manipulates model behaviour |
 | **Model extraction** | Attacker probes the model to replicate it |
 | **Sensitive data leakage** | Model outputs training data or user data from previous sessions |
+
+These threats work because an LLM can't reliably tell "instructions from the system" apart from "data it's reading" — both arrive as the same stream of tokens. Prompt injection exploits that by hiding new instructions inside content the model retrieves (a document, an email, a webpage), hoping the model treats them as commands rather than as text to summarise. Data poisoning and model extraction target opposite ends of the lifecycle in §1.1b: poisoning corrupts training data before the model ever learns from it, while extraction probes a live, deployed model afterward to reverse-engineer what it learned.
 
 **Application security:** Validate and sanitise inputs. Use access controls. Don't pass raw user input directly to the model with full privileges.
 
@@ -288,6 +300,41 @@ Not all AI use cases are worth doing first. Prioritise using three dimensions:
 <div class="note-important"><strong>Exam pattern:</strong> "What should be measured to determine if an AI pilot was successful?" → KPIs like time saved, adoption rate, error reduction, cost per task. NOT "number of AI features deployed" or "how much the technology impressed users."</div>
 
 <div class="note-scribble">Quick wins matter because they build organisational confidence and executive trust. Even a small pilot that saves 2 hours/week across 50 people creates visible ROI (100 hours/week = £X saved) that funds the next, bigger investment.</div>
+
+---
+
+## Deep Dive: Making Business Value of Generative AI Click
+
+### 1. The connective narrative
+
+Every topic in this domain answers one of three questions a business leader has to ask before committing budget to an AI initiative: *what kind of AI is this, what will it cost, and what could go wrong?* Section 1.1 answers the first question — generative AI creates, traditional ML classifies or predicts, and picking the wrong category means solving the wrong problem. Sections 1.2 through 1.8 answer the second — pretrained vs fine-tuned, tokens, RAG vs fine-tuning, and data quality are all really the same question asked from different angles: how do we get useful output without overspending on customisation we don't need?
+
+Sections 1.9 through 1.11 answer the third. Security threats, hallucinations, and bias aren't abstract compliance checkboxes — they're the reasons a technically successful pilot still fails to scale, because nobody trusted the output or nobody caught the exposure until it was expensive. The value-prioritisation matrix in §1.11 exists precisely because "could we build this?" and "should we build this first?" are different questions, and Domain 1 is testing whether you keep them separate.
+
+The thread that ties all of it together: generative AI's value is real, but it is not automatic. Every mitigation in this domain — grounding, human-in-the-loop review, prompt engineering before fine-tuning, KPI-based pilots before scaling — exists because the raw model, on its own, will confidently produce something plausible-sounding and wrong. The business leader's job is not to be impressed by the output; it's to know which of these guardrails the specific use case actually needs.
+
+### 2. Worked scenario
+
+> **Scenario.** A regional insurer is deciding whether to pilot AI for two separate needs: (1) flagging potentially fraudulent claims, and (2) drafting the plain-language explanation letters sent to customers after a claim decision.
+>
+> For (1), the task is "identify which claims look fraudulent" — that's classification, not generation, so this is traditional ML (§1.1), not a generative AI project. The team trains a fraud-scoring model, validates it against a held-out set of historical claims, deploys it, and — critically — sets up ongoing monitoring, because fraud tactics evolve and the model's accuracy will drift within months without retraining (§1.1b).
+>
+> For (2), "draft an explanation letter" is generative AI. The letters need to reference the specific policy terms and claim details for each customer — private, current company data — so the team grounds the model with RAG against the policy database rather than fine-tuning (§1.2b): RAG is cheaper, needs no retraining when policy wording changes, and can cite the specific clause it used. Cost is estimated in tokens: each letter runs roughly 400 input tokens (claim details + retrieved policy clauses) and 250 output tokens; at 2,000 letters/month, that's a small, predictable line item compared to the fully-loaded cost of a human writing each one (§1.3).
+>
+> Before either pilot ships, both go through the same two checks: a security review (does the fraud model or the letter-drafting tool expose customer PII beyond what the requesting employee could already see? — §1.9), and a KPI plan (time saved per letter, fraud-catch-rate lift, not "how advanced the AI looks" — §1.11). Only the letter-drafting pilot needs human-in-the-loop review before send, because a wrong fraud *score* gets a human investigator's attention anyway, while a wrong *letter* goes straight to a customer.
+
+### 3. Memory aid
+
+**CRAWL** — the order a business leader should actually work through Domain 1's concepts on a real use case:
+- **C**lassify — generative or traditional ML? (§1.1)
+- **R**isk — hallucination, bias, security exposure (§1.4, §1.9)
+- **A**nchor — does it need grounding/RAG, or is prompting enough? (§1.6, §1.7)
+- **W**eigh — token cost and ROI (§1.3)
+- **L**aunch — agent or Copilot, and where it ranks in the value/feasibility matrix (§1.10, §1.11)
+
+### 4. Exam strategy for this domain
+
+D1's distractors are almost always a category swap — an answer that's technically true of the *other* AI type, the *other* customisation method, or the *other* mitigation. The exam rewards recognising which lever is cheapest and fastest for the stated problem (prompt engineering before RAG before fine-tuning; RAG before fine-tuning for facts) and punishes reaching for the most sophisticated-sounding fix when a cheaper one solves it. Five minutes before the exam: when two options both sound plausible, pick the one that solves the stated business need at the lowest cost and risk — not the one that sounds most technically advanced.
 
 ---
 
