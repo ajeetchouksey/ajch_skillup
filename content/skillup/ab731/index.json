@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.2.1",
-  "contentUpdatedAt": "2026-09-01",
+  "contentVersion": "1.2.2",
+  "contentUpdatedAt": "2026-09-02",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -11,12 +11,48 @@
     "btn": "linear-gradient(135deg, #2563eb, #1d4ed8)"
   },
   "changelog": [
-    { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 3 domains, 46 questions" },
-    { "version": "1.1.0", "date": "2026-08-06", "type": "minor", "summary": "Backfilled difficulty on all 46 questions; fixed correct-field type on d3-013/014/015/016; stripped option letter prefixes" },
-    { "version": "1.1.1", "date": "2026-08-06", "type": "patch", "summary": "Enriched D1/D2/D3 notes: RAG vs fine-tune decision tree, Build/Buy/Extend callout, CoE section, licensing framework, and hard question patterns for all three domains" },
-    { "version": "1.1.2", "date": "2026-08-25", "type": "patch", "summary": "Fixed D1: merged duplicate Exam Traps sections, relocated orphaned security content into §1.9, repositioned misplaced §1.2b before §1.3. Fixed D3: removed orphaned duplicate Commitment-tiers table fragment. Added context-window definition, cross-domain quick-reference table, and D1→D3 licensing cross-reference." },
-    { "version": "1.2.0", "date": "2026-08-26", "type": "minor", "summary": "D1 gap-fill: added 6 questions (ab731-d1-016..021) closing task 1.6 (previously zero questions — model selection + all 3 untested §1.9 security threats: prompt injection, data poisoning, model extraction), plus one more each for tasks 1.4 (RAG-vs-fine-tune decision framework) and 1.5 (agent vs RPA). Added the exam's first-ever scenario, ab731-scenario-001, spanning D1+D3." },
-    { "version": "1.2.1", "date": "2026-09-01", "type": "patch", "summary": "Study-guide drift check (skills measured as of 2026-07-22): added 5 questions closing gaps — ab731-d1-022 (ML solution lifecycle/concept drift), ab731-d2-016 (proactive Graph/SharePoint governance ahead of rollout), ab731-d2-017 (automating multi-step business processes with Copilot Studio), ab731-d3-017 (three Copilot licence models incl. included-with-M365 tier), ab731-d3-018 (multinational privacy/data-residency compliance planning)." }
+    {
+      "version": "1.0.0",
+      "date": "2026-08-06",
+      "type": "major",
+      "summary": "Initial release — 3 domains, 46 questions"
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-08-06",
+      "type": "minor",
+      "summary": "Backfilled difficulty on all 46 questions; fixed correct-field type on d3-013/014/015/016; stripped option letter prefixes"
+    },
+    {
+      "version": "1.1.1",
+      "date": "2026-08-06",
+      "type": "patch",
+      "summary": "Enriched D1/D2/D3 notes: RAG vs fine-tune decision tree, Build/Buy/Extend callout, CoE section, licensing framework, and hard question patterns for all three domains"
+    },
+    {
+      "version": "1.1.2",
+      "date": "2026-08-25",
+      "type": "patch",
+      "summary": "Fixed D1: merged duplicate Exam Traps sections, relocated orphaned security content into §1.9, repositioned misplaced §1.2b before §1.3. Fixed D3: removed orphaned duplicate Commitment-tiers table fragment. Added context-window definition, cross-domain quick-reference table, and D1→D3 licensing cross-reference."
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-08-26",
+      "type": "minor",
+      "summary": "D1 gap-fill: added 6 questions (ab731-d1-016..021) closing task 1.6 (previously zero questions — model selection + all 3 untested §1.9 security threats: prompt injection, data poisoning, model extraction), plus one more each for tasks 1.4 (RAG-vs-fine-tune decision framework) and 1.5 (agent vs RPA). Added the exam's first-ever scenario, ab731-scenario-001, spanning D1+D3."
+    },
+    {
+      "version": "1.2.1",
+      "date": "2026-09-01",
+      "type": "patch",
+      "summary": "Study-guide drift check (skills measured as of 2026-07-22): added 5 questions closing gaps — ab731-d1-022 (ML solution lifecycle/concept drift), ab731-d2-016 (proactive Graph/SharePoint governance ahead of rollout), ab731-d2-017 (automating multi-step business processes with Copilot Studio), ab731-d3-017 (three Copilot licence models incl. included-with-M365 tier), ab731-d3-018 (multinational privacy/data-residency compliance planning)."
+    },
+    {
+      "version": "1.2.2",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Added taxonomyIds to 3 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    }
   ],
   "id": "ab731",
   "examCode": "AB-731",
@@ -38,21 +74,49 @@
       "title": "Business Value of Generative AI",
       "weight": 38,
       "color": "bg-blue-600",
-      "notesFile": "content/skillup/ab731/notes/d1-business-value.md"
+      "notesFile": "content/skillup/ab731/notes/d1-business-value.md",
+      "taxonomyIds": [
+        "prompt-engineering",
+        "few-shot",
+        "hallucination",
+        "rag",
+        "human-in-the-loop",
+        "responsible-ai",
+        "reliability",
+        "security",
+        "privacy",
+        "agentic-execution-layer",
+        "automation",
+        "latency"
+      ]
     },
     {
       "id": 2,
       "title": "Microsoft AI Apps & Services",
       "weight": 38,
       "color": "bg-cyan-600",
-      "notesFile": "content/skillup/ab731/notes/d2-microsoft-ai-services.md"
+      "notesFile": "content/skillup/ab731/notes/d2-microsoft-ai-services.md",
+      "taxonomyIds": [
+        "security",
+        "copilot-studio",
+        "rag",
+        "governance"
+      ]
     },
     {
       "id": 3,
       "title": "Implementation & Adoption Strategy",
       "weight": 24,
       "color": "bg-violet-600",
-      "notesFile": "content/skillup/ab731/notes/d3-adoption-strategy.md"
+      "notesFile": "content/skillup/ab731/notes/d3-adoption-strategy.md",
+      "taxonomyIds": [
+        "responsible-ai",
+        "governance",
+        "reliability",
+        "privacy",
+        "human-in-the-loop",
+        "compliance"
+      ]
     }
   ],
   "questionFiles": [

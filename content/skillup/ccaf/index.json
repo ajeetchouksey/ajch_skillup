@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.0",
-  "contentUpdatedAt": "2026-08-06",
+  "contentVersion": "1.0.1",
+  "contentUpdatedAt": "2026-09-02",
   "provider": "Anthropic",
   "palette": {
     "color": "#a78bfa",
@@ -11,7 +11,18 @@
     "btn": "linear-gradient(135deg, #7c3aed, #6d28d9)"
   },
   "changelog": [
-    { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 5 domains, 250 questions" }
+    {
+      "version": "1.0.0",
+      "date": "2026-08-06",
+      "type": "major",
+      "summary": "Initial release — 5 domains, 250 questions"
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Added taxonomyIds to 5 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    }
   ],
   "id": "ccaf",
   "examCode": "CCAR-F",
@@ -28,11 +39,125 @@
   "accentColor": "#7c3aed",
   "colorScheme": "violet",
   "domains": [
-    { "id": 1, "title": "Agentic Architecture & Orchestration", "weight": 27, "color": "bg-violet-600", "notesFile": "content/skillup/ccaf/notes/d1-agentic-architecture.md" },
-    { "id": 2, "title": "Claude Code Configuration & Workflows", "weight": 20, "color": "bg-blue-600", "notesFile": "content/skillup/ccaf/notes/d2-claude-code-config.md" },
-    { "id": 3, "title": "Prompt Engineering & Structured Output", "weight": 20, "color": "bg-emerald-600", "notesFile": "content/skillup/ccaf/notes/d3-prompt-engineering.md" },
-    { "id": 4, "title": "Tool Design & MCP Integration", "weight": 18, "color": "bg-amber-600", "notesFile": "content/skillup/ccaf/notes/d4-tool-design-mcp.md" },
-    { "id": 5, "title": "Context Management & Reliability", "weight": 15, "color": "bg-rose-600", "notesFile": "content/skillup/ccaf/notes/d5-context-management.md" }
+    {
+      "id": 1,
+      "title": "Agentic Architecture & Orchestration",
+      "weight": 27,
+      "color": "bg-violet-600",
+      "notesFile": "content/skillup/ccaf/notes/d1-agentic-architecture.md",
+      "taxonomyIds": [
+        "hooks",
+        "human-in-the-loop",
+        "multi-agent",
+        "agentic-loop",
+        "error-handling",
+        "observability",
+        "architecture",
+        "degradation-ladder",
+        "few-shot",
+        "task-decomposition",
+        "coordinator",
+        "4-layer-agent-stack",
+        "latency",
+        "compliance",
+        "code-review",
+        "reliability",
+        "least-privilege",
+        "context-budget-rule",
+        "tool_choice",
+        "context",
+        "tool-selection",
+        "retry-pattern"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Claude Code Configuration & Workflows",
+      "weight": 20,
+      "color": "bg-blue-600",
+      "notesFile": "content/skillup/ccaf/notes/d2-claude-code-config.md",
+      "taxonomyIds": [
+        "automation",
+        "mcp",
+        "hooks",
+        "slash-commands",
+        "error-handling",
+        "security",
+        "least-privilege",
+        "ci-cd",
+        "prompt-engineering",
+        "json-schema",
+        "retry-pattern",
+        "context",
+        "context-budget-rule",
+        "validation",
+        "latency"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Prompt Engineering & Structured Output",
+      "weight": 20,
+      "color": "bg-emerald-600",
+      "notesFile": "content/skillup/ccaf/notes/d3-prompt-engineering.md",
+      "taxonomyIds": [
+        "prompt-engineering",
+        "retry-pattern",
+        "tool_choice",
+        "json-schema",
+        "prompt-caching",
+        "context-budget-rule",
+        "security",
+        "reliability",
+        "few-shot",
+        "validation",
+        "hallucination",
+        "latency",
+        "ci-cd"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Tool Design & MCP Integration",
+      "weight": 18,
+      "color": "bg-amber-600",
+      "notesFile": "content/skillup/ccaf/notes/d4-tool-design-mcp.md",
+      "taxonomyIds": [
+        "tool-design",
+        "tool_choice",
+        "architecture",
+        "json-schema",
+        "tool-selection",
+        "error-handling",
+        "degradation-ladder",
+        "least-privilege",
+        "latency",
+        "mcp",
+        "validation",
+        "retry-pattern",
+        "context-budget-rule",
+        "coordinator",
+        "reliability"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Context Management & Reliability",
+      "weight": 15,
+      "color": "bg-rose-600",
+      "notesFile": "content/skillup/ccaf/notes/d5-context-management.md",
+      "taxonomyIds": [
+        "context-budget-rule",
+        "human-in-the-loop",
+        "prompt-caching",
+        "error-handling",
+        "reliability",
+        "latency",
+        "agentic-loop",
+        "monitoring",
+        "context"
+      ]
+    }
   ],
   "questionFiles": [
     "content/skillup/ccaf/questions/domain1-agentic.json",
@@ -50,9 +175,18 @@
     "content/skillup/ccaf/scenarios/structured-data-extraction.json"
   ],
   "resources": [
-    { "label": "Anthropic Docs", "url": "https://docs.anthropic.com" },
-    { "label": "Anthropic Cookbook", "url": "https://github.com/anthropics/anthropic-cookbook" },
-    { "label": "MCP Docs", "url": "https://modelcontextprotocol.io" }
+    {
+      "label": "Anthropic Docs",
+      "url": "https://docs.anthropic.com"
+    },
+    {
+      "label": "Anthropic Cookbook",
+      "url": "https://github.com/anthropics/anthropic-cookbook"
+    },
+    {
+      "label": "MCP Docs",
+      "url": "https://modelcontextprotocol.io"
+    }
   ],
   "taskStatementsFile": "content/skillup/ccaf/task-statements.json"
 }

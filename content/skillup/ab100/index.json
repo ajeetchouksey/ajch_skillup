@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.0",
-  "contentUpdatedAt": "2026-08-06",
+  "contentVersion": "1.0.1",
+  "contentUpdatedAt": "2026-09-02",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -11,7 +11,18 @@
     "btn": "linear-gradient(135deg, #2563eb, #1d4ed8)"
   },
   "changelog": [
-    { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 4 domains, 119 questions" }
+    {
+      "version": "1.0.0",
+      "date": "2026-08-06",
+      "type": "major",
+      "summary": "Initial release — 4 domains, 119 questions"
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Added taxonomyIds to 4 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    }
   ],
   "id": "ab100",
   "examCode": "AB-100",
@@ -28,10 +39,103 @@
   "accentColor": "#1d4ed8",
   "colorScheme": "blue",
   "domains": [
-    { "id": 1, "title": "Plan AI-Powered Business Solutions", "weight": 28, "color": "bg-blue-600", "notesFile": "content/skillup/ab100/notes/ab100-d1-plan-ai-solutions.md" },
-    { "id": 2, "title": "Design AI-Powered Business Solutions", "weight": 28, "color": "bg-cyan-600", "notesFile": "content/skillup/ab100/notes/ab100-d2-design-agentic.md" },
-    { "id": 3, "title": "Deploy AI-Powered Business Solutions", "weight": 28, "color": "bg-teal-600", "notesFile": "content/skillup/ab100/notes/ab100-d3-deploy-ai-solutions.md" },
-    { "id": 4, "title": "Responsible AI & Lifecycle Governance", "weight": 16, "color": "bg-purple-600", "notesFile": "content/skillup/ab100/notes/ab100-d4-lifecycle-responsible.md", "officialNote": "Tested within Domain 3 (Deploy 40-45%) on the official AB-100 exam" }
+    {
+      "id": 1,
+      "title": "Plan AI-Powered Business Solutions",
+      "weight": 28,
+      "color": "bg-blue-600",
+      "notesFile": "content/skillup/ab100/notes/ab100-d1-plan-ai-solutions.md",
+      "taxonomyIds": [
+        "copilot-studio",
+        "responsible-ai",
+        "tool-design",
+        "governance",
+        "prompt-caching",
+        "compliance",
+        "4-layer-agent-stack",
+        "architecture",
+        "content-safety",
+        "human-in-the-loop",
+        "rag",
+        "enterprise",
+        "knowledge-base",
+        "enterprise-ai",
+        "fine-tuning",
+        "prompt-engineering",
+        "multi-agent"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Design AI-Powered Business Solutions",
+      "weight": 28,
+      "color": "bg-cyan-600",
+      "notesFile": "content/skillup/ab100/notes/ab100-d2-design-agentic.md",
+      "taxonomyIds": [
+        "multi-agent",
+        "agentic-execution-layer",
+        "4-layer-agent-stack",
+        "context-budget-rule",
+        "copilot-studio",
+        "tool-design",
+        "rag",
+        "prompt-flow",
+        "human-in-the-loop",
+        "security",
+        "compliance",
+        "mcp",
+        "knowledge-base",
+        "governance",
+        "fine-tuning"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Deploy AI-Powered Business Solutions",
+      "weight": 28,
+      "color": "bg-teal-600",
+      "notesFile": "content/skillup/ab100/notes/ab100-d3-deploy-ai-solutions.md",
+      "taxonomyIds": [
+        "hallucination",
+        "evaluation-metrics",
+        "monitoring",
+        "latency",
+        "prompt-caching",
+        "azure-openai",
+        "validation",
+        "evaluation",
+        "content-safety",
+        "rag",
+        "responsible-ai",
+        "security",
+        "compliance",
+        "fine-tuning",
+        "governance"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Responsible AI & Lifecycle Governance",
+      "weight": 16,
+      "color": "bg-purple-600",
+      "notesFile": "content/skillup/ab100/notes/ab100-d4-lifecycle-responsible.md",
+      "officialNote": "Tested within Domain 3 (Deploy 40-45%) on the official AB-100 exam",
+      "taxonomyIds": [
+        "responsible-ai",
+        "content-safety",
+        "security",
+        "compliance",
+        "fine-tuning",
+        "governance",
+        "monitoring",
+        "copilot-studio",
+        "vnet",
+        "evaluation-metrics",
+        "least-privilege",
+        "reliability",
+        "ci-cd"
+      ]
+    }
   ],
   "questionFiles": [
     "content/skillup/ab100/questions/ab100-domain1.json",
@@ -46,11 +150,29 @@
   ],
   "taskStatementsFile": "content/skillup/ab100/task-statements.json",
   "resources": [
-    { "label": "AB-100 Study Guide", "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-100" },
-    { "label": "Training Path: Architect AI Solutions for Business Productivity", "url": "https://learn.microsoft.com/en-us/training/paths/architect-agentic-ai-business-solutions/" },
-    { "label": "Azure AI Foundry Docs", "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/" },
-    { "label": "Microsoft Copilot Studio Docs", "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/" },
-    { "label": "Microsoft Power Platform Docs", "url": "https://learn.microsoft.com/en-us/power-platform/" },
-    { "label": "Dynamics 365 Docs", "url": "https://learn.microsoft.com/en-us/dynamics365/" }
+    {
+      "label": "AB-100 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-100"
+    },
+    {
+      "label": "Training Path: Architect AI Solutions for Business Productivity",
+      "url": "https://learn.microsoft.com/en-us/training/paths/architect-agentic-ai-business-solutions/"
+    },
+    {
+      "label": "Azure AI Foundry Docs",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/"
+    },
+    {
+      "label": "Microsoft Copilot Studio Docs",
+      "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/"
+    },
+    {
+      "label": "Microsoft Power Platform Docs",
+      "url": "https://learn.microsoft.com/en-us/power-platform/"
+    },
+    {
+      "label": "Dynamics 365 Docs",
+      "url": "https://learn.microsoft.com/en-us/dynamics365/"
+    }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.0",
-  "contentUpdatedAt": "2026-08-06",
+  "contentVersion": "1.0.1",
+  "contentUpdatedAt": "2026-09-02",
   "provider": "GitHub",
   "palette": {
     "color": "#60a5fa",
@@ -15,7 +15,13 @@
       "version": "1.0.0",
       "date": "2026-08-06",
       "type": "major",
-      "summary": "Initial release \u2014 5 domains, 284 questions"
+      "summary": "Initial release — 5 domains, 284 questions"
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Added taxonomyIds to 6 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
     }
   ],
   "id": "ghc",
@@ -39,42 +45,131 @@
       "title": "Use GitHub Copilot Responsibly",
       "weight": 18,
       "color": "bg-orange-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d1-responsible-ai.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d1-responsible-ai.md",
+      "taxonomyIds": [
+        "responsible-ai",
+        "security",
+        "hallucination",
+        "context",
+        "ide-integration",
+        "code-review",
+        "compliance",
+        "testing"
+      ]
     },
     {
       "id": 2,
       "title": "Use GitHub Copilot Features",
       "weight": 27,
       "color": "bg-blue-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d2-copilot-features.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d2-copilot-features.md",
+      "taxonomyIds": [
+        "copilot-features",
+        "enterprise",
+        "vscode",
+        "copilot-chat",
+        "context",
+        "testing",
+        "copilot-cli",
+        "ide-integration",
+        "content-exclusions",
+        "code-review",
+        "slash-commands"
+      ]
     },
     {
       "id": 3,
       "title": "Understand GitHub Copilot Data and Architecture",
       "weight": 13,
       "color": "bg-purple-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d3-data-architecture.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d3-data-architecture.md",
+      "taxonomyIds": [
+        "copilot-chat",
+        "ide-integration",
+        "github-copilot",
+        "enterprise",
+        "plans",
+        "vscode",
+        "jetbrains",
+        "copilot-cli",
+        "fine-tuning",
+        "privacy",
+        "responsible-ai",
+        "copilot-extensions",
+        "code-completion",
+        "knowledge-base",
+        "code-filter",
+        "content-exclusions",
+        "proxy-security"
+      ]
     },
     {
       "id": 4,
       "title": "Apply Prompt Engineering and Context Crafting",
       "weight": 13,
       "color": "bg-green-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d4-prompt-engineering.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d4-prompt-engineering.md",
+      "taxonomyIds": [
+        "copilot-chat",
+        "ide-integration",
+        "github-copilot",
+        "enterprise",
+        "vscode",
+        "copilot-cli",
+        "knowledge-base",
+        "code-filter",
+        "privacy",
+        "plans",
+        "responsible-ai",
+        "copilot-extensions",
+        "prompt-engineering",
+        "code-completion",
+        "content-exclusions",
+        "fine-tuning",
+        "slash-commands"
+      ]
     },
     {
       "id": 5,
       "title": "Improve Developer Productivity with GitHub Copilot",
       "weight": 14,
       "color": "bg-teal-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d5-productivity.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d5-productivity.md",
+      "taxonomyIds": [
+        "developer-productivity",
+        "copilot-chat",
+        "context",
+        "testing",
+        "ide-integration",
+        "security",
+        "compliance",
+        "code-review",
+        "copilot-cli"
+      ]
     },
     {
       "id": 6,
       "title": "Configure Privacy, Content Exclusions, and Safeguards",
       "weight": 15,
       "color": "bg-red-600",
-      "notesFile": "content/skillup/ghc/notes/ghc-d6-privacy-safeguards.md"
+      "notesFile": "content/skillup/ghc/notes/ghc-d6-privacy-safeguards.md",
+      "taxonomyIds": [
+        "proxy-security",
+        "ide-integration",
+        "copilot-cli",
+        "responsible-ai",
+        "github-copilot",
+        "content-exclusions",
+        "vscode",
+        "copilot-extensions",
+        "copilot-chat",
+        "plans",
+        "code-completion",
+        "enterprise",
+        "knowledge-base",
+        "jetbrains",
+        "privacy"
+      ]
     }
   ],
   "questionFiles": [

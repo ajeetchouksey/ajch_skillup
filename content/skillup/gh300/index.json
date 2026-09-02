@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.0",
-  "contentUpdatedAt": "2026-08-06",
+  "contentVersion": "1.0.1",
+  "contentUpdatedAt": "2026-09-02",
   "provider": "GitHub",
   "palette": {
     "color": "#94a3b8",
@@ -11,7 +11,18 @@
     "btn": "#1e293b"
   },
   "changelog": [
-    { "version": "1.0.0", "date": "2026-08-06", "type": "major", "summary": "Initial release — 5 domains, 134 questions" }
+    {
+      "version": "1.0.0",
+      "date": "2026-08-06",
+      "type": "major",
+      "summary": "Initial release — 5 domains, 134 questions"
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-09-02",
+      "type": "patch",
+      "summary": "Added taxonomyIds to 4 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    }
   ],
   "id": "gh300",
   "examCode": "GH-300",
@@ -33,28 +44,93 @@
       "title": "Prompt Engineering & Copilot Chat",
       "weight": 28,
       "color": "bg-sky-600",
-      "notesFile": "content/skillup/gh300/notes/gh300-d1-prompt-engineering.md"
+      "notesFile": "content/skillup/gh300/notes/gh300-d1-prompt-engineering.md",
+      "taxonomyIds": [
+        "copilot-chat",
+        "ide-integration",
+        "github-copilot",
+        "enterprise",
+        "vscode",
+        "copilot-cli",
+        "knowledge-base",
+        "code-filter",
+        "privacy",
+        "plans",
+        "responsible-ai",
+        "copilot-extensions",
+        "prompt-engineering",
+        "code-completion",
+        "content-exclusions",
+        "fine-tuning",
+        "slash-commands"
+      ]
     },
     {
       "id": 2,
       "title": "AI Model, Data Pipeline & Core Concepts",
       "weight": 25,
       "color": "bg-violet-600",
-      "notesFile": "content/skillup/gh300/notes/gh300-d2-ai-model-data-pipeline.md"
+      "notesFile": "content/skillup/gh300/notes/gh300-d2-ai-model-data-pipeline.md",
+      "taxonomyIds": [
+        "copilot-chat",
+        "ide-integration",
+        "github-copilot",
+        "enterprise",
+        "plans",
+        "vscode",
+        "jetbrains",
+        "copilot-cli",
+        "fine-tuning",
+        "privacy",
+        "responsible-ai",
+        "copilot-extensions",
+        "code-completion",
+        "knowledge-base",
+        "code-filter",
+        "content-exclusions",
+        "proxy-security"
+      ]
     },
     {
       "id": 3,
       "title": "Privacy, Security & Trust Center",
       "weight": 30,
       "color": "bg-rose-600",
-      "notesFile": "content/skillup/gh300/notes/gh300-d3-privacy-security.md"
+      "notesFile": "content/skillup/gh300/notes/gh300-d3-privacy-security.md",
+      "taxonomyIds": [
+        "proxy-security",
+        "ide-integration",
+        "copilot-cli",
+        "responsible-ai",
+        "github-copilot",
+        "content-exclusions",
+        "vscode",
+        "copilot-extensions",
+        "copilot-chat",
+        "plans",
+        "code-completion",
+        "enterprise",
+        "knowledge-base",
+        "jetbrains",
+        "privacy"
+      ]
     },
     {
       "id": 4,
       "title": "IDE Integration & Developer Tools",
       "weight": 17,
       "color": "bg-emerald-600",
-      "notesFile": "content/skillup/gh300/notes/gh300-d4-ide-integration.md"
+      "notesFile": "content/skillup/gh300/notes/gh300-d4-ide-integration.md",
+      "taxonomyIds": [
+        "ide-integration",
+        "github-copilot",
+        "copilot-chat",
+        "code-completion",
+        "enterprise",
+        "vscode",
+        "copilot-extensions",
+        "copilot-cli"
+      ]
     }
   ],
   "questionFiles": [
