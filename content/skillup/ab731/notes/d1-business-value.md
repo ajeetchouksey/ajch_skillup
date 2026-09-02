@@ -336,3 +336,4 @@ These patterns appear in harder exam questions. Knowing them prevents traps.
 > *"Where does generative AI provide the most business value?"*
 >
 > ✅ Tasks that are high-volume, time-consuming, and require human language (drafting, summarising, translating, coding). AI multiplies human capacity — it doesn't replace expert judgment in high-stakes decisions.
+
