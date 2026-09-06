@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "skill-track",
+  "contentVersion": "2.0.0",
+  "contentUpdatedAt": "2026-09-06",
+  "provider": "Microsoft",
+  "palette": {
+    "color": "#60a5fa",
+    "bg": "rgba(59,130,246,0.10)",
+    "border": "rgba(59,130,246,0.38)",
+    "glow": "rgba(59,130,246,0.18)",
+    "btn": "linear-gradient(135deg, #2563eb, #1d4ed8)"
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-04",
+      "type": "major",
+      "summary": "Initial release — 3 domains, 47 questions covering the Azure AI Foundry platform/model catalog, building and orchestrating AI agents, and responsible AI, security & production operations"
+    },
+    {
+      "version": "2.0.0",
+      "date": "2026-09-06",
+      "type": "major",
+      "summary": "IDEA-0016: reshaped from a fake exam (fabricated examCode \"AIF-200\" — no such Microsoft certification exists) into a Skill Track. 3 domains became 3 modules with 6 lessons; notes split per-lesson and exam-framing language removed; the original 47-question bank retained verbatim under practiceBank as an opt-in drilling tab; a knowledgeCheck of 4-5 questions per lesson drawn from that same bank; cross-linked to the 2 existing HOL Labs covering this platform."
+    }
+  ],
+  "id": "azure-ai-foundry",
+  "title": "Azure AI Foundry Practitioner",
+  "shortTitle": "AI Foundry",
+  "contentLevel": "201",
+  "description": "Build practical mastery of Azure AI Foundry — model catalog and deployment options, building and orchestrating AI agents with the Agent Service, and applying responsible AI, security, and production operations practices. A skill track, not a certification — Azure AI Foundry is a platform you use, not a credential you sit.",
+  "available": true,
+  "accentColor": "#1d4ed8",
+  "colorScheme": "blue",
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Platform & Model Catalog",
+      "lessons": [
+        {
+          "id": "m1-l1",
+          "title": "Projects, Hubs & the Model Catalog",
+          "objectives": [
+            "Choose between a Foundry project and a hub-based project for a given team structure",
+            "Explain what the model catalog surfaces and how to compare models before deploying one"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m1-l1-projects-hubs-model-catalog.md",
+          "knowledgeCheck": [
+            {"id":"m1-l1-k1","question":"A platform team at Contoso is setting up a new generative AI initiative in Azure AI Foundry and needs to decide how to structure their workspace before onboarding multiple product teams. Which resource type provides a single, unified project experience with simplified default network and identity configuration, recommended for teams starting a new project today?","options":["A hub-based project","A Foundry project (Azure AI Foundry resource)","An Azure Machine Learning workspace","A Cognitive Services multi-service resource"],"correct":1,"explanation":"The newer Foundry project (backed by an Azure AI Foundry resource) is Microsoft's recommended starting point — it bundles the endpoint, keys, and default connections in one resource with simpler defaults. Hub-based projects still exist for scenarios needing shared connections/compute across multiple projects, but are no longer the default recommendation for new single-team projects."},
+            {"id":"m1-l1-k2","question":"A platform team is deciding between a hub-based project (shared across three product teams) and separate Foundry projects for each team. What is the primary architectural benefit of a hub in this scenario?","options":["It removes the need for any network security configuration","It centralizes shared connections, compute, and security boundaries that multiple child projects can reuse","It automatically merges all teams' data into one fine-tuned model","It exempts the workspace from content filtering requirements"],"correct":1,"explanation":"A hub acts as the shared container for connections (Azure AI Search, storage, Key Vault), compute, and networking/security configuration that multiple projects underneath it can inherit — useful when several teams need consistent governance without reconfiguring each project."},
+            {"id":"m1-l1-k3","question":"A developer wants to evaluate several LLMs — an Azure OpenAI model, a Meta Llama model, and a Cohere model — before committing to one for a new chatbot. Where in Azure AI Foundry can the developer browse and compare these models from multiple providers side by side?","options":["The model catalog","The Azure AI Search index","The Content Safety Studio","The Azure Monitor workbook"],"correct":0,"explanation":"The model catalog is the central hub for browsing first-party (Azure OpenAI, Phi), partner, and open-source models (Meta Llama, Mistral, Cohere, DeepSeek, and more), including benchmarks, licensing, and supported deployment options for each."},
+            {"id":"m1-l1-k4","question":"Before committing to a model for a cost-sensitive, high-volume summarization feature, a team wants to compare quality, latency, and cost trade-offs across several catalog models. Which model catalog feature directly supports this comparison?","options":["Model benchmarks","Content filter severity settings","Thread history","Prompt Shields configuration"],"correct":0,"explanation":"Model benchmarks in the catalog show comparative quality, cost, and throughput/latency metrics across models on standard datasets, helping teams shortlist candidates before deployment."}
+          ]
+        },
+        {
+          "id": "m1-l2",
+          "title": "Deployment Options, SDKs & Prompt Flow",
+          "objectives": [
+            "Match a workload's traffic pattern and latency needs to the right deployment option",
+            "Distinguish the management-plane SDK from the data-plane SDK",
+            "Describe what Prompt Flow is for and when it earns its place over a raw prompt call"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m1-l2-deployment-sdks-prompt-flow.md",
+          "holLabId": "deploy-first-prompt-flow-azure-ai-foundry",
+          "knowledgeCheck": [
+            {"id":"m1-l2-k1","question":"A team wants to deploy Mistral-Large from the model catalog without provisioning or managing any virtual machines, paying only for the tokens they consume. Which deployment option should they choose?","options":["Managed compute (real-time endpoint on a dedicated VM)","Serverless API (pay-per-token, model-as-a-service)","A local ONNX export","Provisioned throughput units (PTU)"],"correct":1,"explanation":"Serverless API deployment (model-as-a-service) hosts many catalog models — including Mistral, Meta Llama, and Cohere families — on Microsoft-managed infrastructure with consumption-based, pay-per-token billing and no customer-managed compute."},
+            {"id":"m1-l2-k2","question":"A financial-services customer needs a deployment of GPT-4o with guaranteed, consistent low latency for a real-time trading assistant and is willing to commit to reserved capacity. Which Azure OpenAI deployment type best fits this requirement?","options":["Global Standard","Standard","Provisioned throughput (PTU)","Global Batch"],"correct":2,"explanation":"Provisioned throughput (PTU) reserves dedicated model capacity for a customer, delivering predictable, consistent latency and throughput — ideal for latency-sensitive production workloads willing to commit to reserved units."},
+            {"id":"m1-l2-k3","question":"A developer writing Python automation needs to programmatically list deployments and manage connections in a Foundry project, separate from making inference calls to a deployed model. Which SDK is purpose-built for this project- and resource-management task?","options":["azure-ai-inference","azure-ai-projects","openai (community SDK)","azure-storage-blob"],"correct":1,"explanation":"azure-ai-projects is the Azure AI Foundry SDK for management-plane operations — listing connections, deployments, agents, and datasets within a project. azure-ai-inference is used for the data-plane inference calls themselves."},
+            {"id":"m1-l2-k4","question":"A team wants to fine-tune a base model on their own labeled support-ticket conversations to improve response tone and format. What format must the training data file use when submitting a fine-tuning job in Azure AI Foundry?","options":["A CSV file with two columns: prompt and completion","A JSONL file where each line is a conversation object with a messages array of role/content pairs","A plain .txt file with one example per paragraph","A Parquet file exported from Azure AI Search"],"correct":1,"explanation":"Fine-tuning jobs expect a JSONL file, one JSON object per line, each containing a messages array (system/user/assistant turns) matching the chat-completion message format."},
+            {"id":"m1-l2-k5","question":"A team wants to visually chain a retrieval step, a prompt template, and an LLM call, then bulk-test the chain against 200 sample questions before deploying it as an endpoint. Which Azure AI Foundry capability is purpose-built for this visual chaining and bulk evaluation?","options":["Prompt flow","The model catalog","Azure AI Search indexer","Content Safety Studio"],"correct":0,"explanation":"Prompt flow provides a visual, DAG-based authoring canvas for chaining retrieval, prompt, and LLM/code nodes, plus built-in bulk-test and evaluate runs and one-click deployment to a managed endpoint."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Building & Orchestrating AI Agents",
+      "lessons": [
+        {
+          "id": "m2-l1",
+          "title": "Agent Service Fundamentals & Built-in Tools",
+          "objectives": [
+            "Name the four core Agent Service conversation objects and what each one persists",
+            "Pick the correct built-in tool for a given grounding/retrieval/execution need"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m2-l1-agent-fundamentals-tools.md",
+          "knowledgeCheck": [
+            {"id":"m2-l1-k1","question":"A developer is building their first agent with Azure AI Foundry Agent Service and wants to understand its core building blocks before writing code. Which set of objects models a conversation lifecycle in the Agent Service?","options":["Agent, Thread, Message, Run","Model, Dataset, Pipeline, Experiment","Hub, Project, Connection, Deployment","Index, Chunk, Embedding, Query"],"correct":0,"explanation":"The Agent Service models conversations using an Agent (the configured persona/instructions/tools), a Thread (a persistent conversation), Messages (turns within the thread), and a Run (one execution of the agent against the thread's messages)."},
+            {"id":"m2-l1-k2","question":"An agent needs to analyze an uploaded CSV of sales data, compute statistics, and generate a chart image in response to a user's question. Which built-in Agent Service tool should be enabled?","options":["File search","Code interpreter","Bing grounding","Function calling"],"correct":1,"explanation":"Code interpreter runs Python in a sandboxed execution environment, letting the agent load files, perform calculations, and generate outputs like charts — exactly this data-analysis scenario."},
+            {"id":"m2-l1-k3","question":"A support agent should answer questions strictly grounded in a company's uploaded PDF policy documents, citing the source passages. Which tool is designed for this document-grounded retrieval?","options":["Code interpreter","File search","OpenAPI tool","Fabric data agent"],"correct":1,"explanation":"File search lets you attach a vector store of uploaded documents so the agent automatically retrieves and cites relevant passages when answering — the standard RAG-over-documents tool in Agent Service."},
+            {"id":"m2-l1-k4","question":"A team wants their agent to call an existing internal REST API that already has a published OpenAPI 3.0 specification, without hand-writing a function wrapper for every endpoint. Which Agent Service tool is designed for this?","options":["The OpenAPI tool, which lets the agent call the API directly from its spec","Code interpreter, which reimplements the API in Python","File search, by uploading the OpenAPI spec as a document","Bing grounding, since it's a general integration tool"],"correct":0,"explanation":"The OpenAPI tool lets you register an OpenAPI 3.0 specification directly, and the agent can call the described endpoints without you writing individual function wrappers."},
+            {"id":"m2-l1-k5","question":"A team building a news-summary agent needs answers that reflect events from earlier today, beyond the model's training cutoff. Which tool grounds the agent's responses in current web content?","options":["Bing grounding","File search","Code interpreter","Connected agents"],"correct":0,"explanation":"The Bing grounding tool (via a Grounding with Bing Search resource) lets the agent retrieve current web search results to ground time-sensitive answers."}
+          ]
+        },
+        {
+          "id": "m2-l2",
+          "title": "Multi-Agent Orchestration & RAG",
+          "objectives": [
+            "Decide when a problem justifies multiple agents instead of one agent with more tools",
+            "Distinguish connected agents, Semantic Kernel, and AutoGen by the orchestration shape each solves"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m2-l2-multi-agent-orchestration-rag.md",
+          "knowledgeCheck": [
+            {"id":"m2-l2-k1","question":"An enterprise wants a 'triage' agent that, based on the user's request, delegates the actual work to a specialized 'billing agent' or 'technical-support agent' — each configured with its own instructions and tools. Which Agent Service pattern enables one agent to invoke another agent as if it were a tool?","options":["Connected agents","File search","Prompt flow variants","Provisioned throughput"],"correct":0,"explanation":"Connected agents let you register one agent as a callable tool for another agent, enabling a coordinator/specialist multi-agent pattern without leaving the Agent Service."},
+            {"id":"m2-l2-k2","question":"A team wants to build a research assistant where multiple specialized agents (planner, researcher, critic) converse with each other across several rounds to refine an answer before returning it to the user. Which framework is designed specifically for orchestrating this kind of multi-agent conversational workflow?","options":["AutoGen","Azure AI Search","Content Safety Studio","Azure Key Vault"],"correct":0,"explanation":"AutoGen is Microsoft's framework purpose-built for orchestrating conversations among multiple autonomous or semi-autonomous agents (e.g., planner, researcher, critic) that can integrate with Azure AI Foundry-hosted models."},
+            {"id":"m2-l2-k3","question":"A .NET team already uses a plugin-based architecture for their application logic and wants an agent framework that treats their existing functions as 'plugins' the model can call, integrating cleanly with their DI container. Which Microsoft framework is designed for this plugin-oriented agent integration?","options":["Semantic Kernel","Prompt flow","Azure AI Search","Content Safety"],"correct":0,"explanation":"Semantic Kernel is Microsoft's SDK for building AI agents/orchestration where existing code is exposed to the model as 'plugins', with first-class support for .NET, Python, and Java, and integrates with dependency injection patterns."},
+            {"id":"m2-l2-k4","question":"A team building a RAG-enabled agent chooses to manually construct their retrieval pipeline (outside the File search tool) for finer control over chunking and embeddings. Which two steps are essential when preparing documents for a custom RAG index in Azure AI Search?","options":["Compress files and encrypt them with a customer-managed key","Chunk the documents into passages and generate vector embeddings for each chunk","Convert all documents to CSV and assign an agent ID","Fine-tune the base model on the raw document text"],"correct":1,"explanation":"A custom RAG pipeline needs documents split into retrieval-sized chunks and each chunk embedded into a vector representation so the search index can perform vector/hybrid similarity search at query time."},
+            {"id":"m2-l2-k5","question":"An architect is deciding whether a customer-support use case needs a single agent with several tools, or a multi-agent design with connected agents. Which factor most strongly favors a multi-agent design over a single agent with many tools?","options":["The task naturally decomposes into distinct specialist roles (e.g., billing vs. technical triage) each needing different instructions, tools, and guardrails","The team wants to minimize the number of API calls at any cost","The use case only ever needs code interpreter","The team has no budget for additional model deployments"],"correct":0,"explanation":"Multi-agent designs pay off when the problem decomposes into specialist roles that benefit from separate instructions, tool sets, and safety guardrails."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Responsible AI, Security & Operations",
+      "lessons": [
+        {
+          "id": "m3-l1",
+          "title": "Content Safety & Evaluation",
+          "objectives": [
+            "Match a failure mode (harmful content, injection, hallucination, IP recitation) to the right Content Safety capability",
+            "Explain the difference between quality evaluators and risk/safety evaluators"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m3-l1-content-safety-evaluation.md",
+          "holLabId": "wire-content-safety-foundry-endpoint",
+          "knowledgeCheck": [
+            {"id":"m3-l1-k1","question":"An attacker embeds hidden instructions inside a document that a RAG agent retrieves and summarizes, attempting to make the agent ignore its original instructions. Which Azure AI Content Safety capability is designed to detect this kind of attack?","options":["Groundedness detection","Prompt Shields (indirect prompt injection detection)","Protected material detection","Fine-tuning validation"],"correct":1,"explanation":"Prompt Shields detects both direct jailbreak attempts in user input and indirect prompt injection hidden in third-party content (documents, tool/plugin outputs, emails) that the model processes."},
+            {"id":"m3-l1-k2","question":"A team's RAG chatbot occasionally states facts not present in the retrieved source documents. Which capability is designed to flag this kind of ungrounded (hallucinated) output relative to the provided source content?","options":["Groundedness detection","Protected material detection","Prompt Shields","Customer-managed keys"],"correct":0,"explanation":"Groundedness detection compares generated text against the provided source/grounding documents and flags claims not supported by that source — the standard tool for catching RAG hallucination."},
+            {"id":"m3-l1-k3","question":"A legal reviewer is concerned a code-generation feature might reproduce large verbatim snippets of copyrighted open-source code. Which Content Safety capability specifically addresses this risk?","options":["Protected material detection for code","Content filters for violence","Groundedness detection","Prompt Shields"],"correct":0,"explanation":"Protected material detection has a code-specific variant that checks generated code against a database of known public repositories to flag verbatim or near-verbatim recitation."},
+            {"id":"m3-l1-k4","question":"A team wants an automated numeric score for how well their RAG chatbot's answers align with retrieved context, how coherent the text is, and how fluent the language is, across a test set of 200 Q&A pairs. Which Azure AI Foundry capability provides this kind of automated scoring?","options":["Built-in evaluators (e.g., groundedness, coherence, fluency, relevance)","The model catalog benchmark page","Azure Monitor Application Map","Azure Key Vault access policies"],"correct":0,"explanation":"Azure AI Foundry's built-in evaluators compute standardized metrics like groundedness, relevance, coherence, fluency, and similarity over a dataset of generated responses."},
+            {"id":"m3-l1-k5","question":"A security team wants to systematically probe their deployed agent with adversarial prompts to discover jailbreaks before a red-team engagement, using an automated, repeatable process integrated with Azure AI Foundry. Which capability supports this automated adversarial testing?","options":["The AI Red Teaming Agent / PyRIT integration","Prompt flow variants","Managed identity","Customer-managed keys"],"correct":0,"explanation":"Azure AI Foundry integrates with PyRIT (Python Risk Identification Tool) via the AI Red Teaming Agent to automate adversarial probing — generating and running attack prompts against a deployed model/agent."}
+          ]
+        },
+        {
+          "id": "m3-l2",
+          "title": "Security, Privacy & Operations",
+          "objectives": [
+            "Apply least-privilege role assignment to a real access-scoping scenario",
+            "Explain the difference between network-level isolation and identity-based authorization",
+            "Describe the Identify → Measure → Mitigate → Operate responsible-AI lifecycle"
+          ],
+          "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m3-l2-security-privacy-operations.md",
+          "knowledgeCheck": [
+            {"id":"m3-l2-k1","question":"A security review flags that an application currently authenticates to its Azure AI Foundry endpoint using a long-lived API key stored in application configuration. What is the recommended alternative to reduce secret-management risk?","options":["Rotate the same API key more frequently","Authenticate using Microsoft Entra ID-backed managed identity instead of an API key","Embed the key directly in client-side JavaScript for convenience","Disable authentication entirely for internal traffic"],"correct":1,"explanation":"Managed identity lets the application authenticate via Microsoft Entra ID without any stored secret, eliminating the risk of key leakage or the operational burden of rotation."},
+            {"id":"m3-l2-k2","question":"A platform team is assigning permissions so that a data-science team can create and configure Foundry resources but should not be able to grant other users access. Which principle should guide this role assignment?","options":["Grant Owner to everyone for simplicity","Least privilege — assign a scoped role like Azure AI Developer rather than a broad role that includes access-management rights","Grant no roles and rely only on network isolation","Assign the Global Administrator role at the tenant level"],"correct":1,"explanation":"Least privilege means assigning the narrowest role that satisfies the job — e.g., Azure AI Developer allows creating/configuring most AI Foundry resources without the ability to manage other users' access."},
+            {"id":"m3-l2-k3","question":"A healthcare customer's compliance team requires that the Foundry hub and its dependent resources never be reachable from the public internet. Which networking configuration achieves this?","options":["Enabling public network access with IP allow-listing only","Disabling public network access and using private endpoints for the hub and its dependent resources","Relying solely on Content Safety filters","Using a shared API key with a long expiration"],"correct":1,"explanation":"Disabling public network access and configuring private endpoints ensures traffic to the hub and its dependencies never traverses the public internet. IP allow-listing still exposes a public endpoint."},
+            {"id":"m3-l2-k4","question":"A financial institution's data-protection policy requires that encryption keys for data at rest be fully controlled and rotatable by the customer, not Microsoft. Which Azure AI Foundry capability satisfies this requirement?","options":["Customer-managed keys (CMK) stored in Azure Key Vault","Default Microsoft-managed encryption only","Content Safety severity overrides","Prompt Shields"],"correct":0,"explanation":"Customer-managed keys let the customer supply and control the encryption key (via Azure Key Vault) used to protect data at rest, including rotation and revocation."},
+            {"id":"m3-l2-k5","question":"A new team lead asks for a one-sentence summary of Microsoft's responsible AI lifecycle approach as applied to their Azure AI Foundry project, to include in a governance deck. Which four-stage framework does Microsoft describe for operationalizing responsible AI across a project's lifecycle?","options":["Plan, Build, Test, Ship","Identify, Measure, Mitigate, Operate","Design, Code, Review, Merge","Ingest, Transform, Train, Deploy"],"correct":1,"explanation":"Microsoft's responsible AI lifecycle guidance frames governance as four ongoing stages — Identify potential harms, Measure their frequency/severity, Mitigate them, and Operate the solution safely in production — applied iteratively."}
+          ]
+        }
+      ]
+    }
+  ],
+  "practiceBank": {
+    "description": "The original 47-question exam-style bank, retained as opt-in practice — not required, no pass/fail gate. Drilling material for learners who want exam-style reps on top of the lesson knowledge checks.",
+    "questionFiles": [
+      "content/skillup/azure-ai-foundry/questions/azure-ai-foundry-domain1.json",
+      "content/skillup/azure-ai-foundry/questions/azure-ai-foundry-domain2.json",
+      "content/skillup/azure-ai-foundry/questions/azure-ai-foundry-domain3.json"
+    ],
+    "questions": 47
+  },
+  "resources": [
+    { "label": "Azure AI Foundry Docs", "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/" },
+    { "label": "Azure AI Foundry Agent Service", "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview" },
+    { "label": "Azure AI Content Safety Docs", "url": "https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview" },
+    { "label": "Azure AI Foundry Model Catalog", "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-catalog-overview" },
+    { "label": "Responsible AI at Microsoft", "url": "https://www.microsoft.com/en-us/ai/responsible-ai" }
+  ]
+}
