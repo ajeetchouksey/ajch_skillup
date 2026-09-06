@@ -39,8 +39,12 @@ def generate_catalog() -> None:
         with open(path, encoding="utf-8") as f:
             skill = json.load(f)
 
-        # Auto-recount questions from actual question JSON files
-        q_files = skill.get("questionFiles", [])
+        # Auto-recount questions from actual question JSON files.
+        # Skill tracks (IDEA-0016) don't carry a top-level questionFiles/questions
+        # pair the way exams do — their retained MCQ bank, if any, lives nested
+        # under practiceBank instead, precisely so this exam-shaped recount never
+        # touches it. Skip entirely for kind: "skill-track".
+        q_files = skill.get("questionFiles", []) if skill.get("kind") != "skill-track" else []
         if q_files:
             actual_count = count_questions_in_files(q_files)
             if actual_count > 0 and skill.get("questions") != actual_count:

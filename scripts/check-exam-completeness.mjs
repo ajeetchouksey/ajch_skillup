@@ -76,9 +76,22 @@ const INDEX_REQUIRED = [
   'domains', 'questionFiles', 'taskStatementsFile', 'resources',
 ];
 
+// Skill tracks (IDEA-0016) are deliberately exam-metadata-free — no
+// examCode/duration/passScore/passThreshold/examFee, and modules[] instead
+// of domains[]/questionFiles[]. A skill-track entry that DOES carry any of
+// EXAM_ONLY_FIELDS is a defect (NFR-6), not just a missing-field warning.
+const SKILL_TRACK_REQUIRED = [
+  'schemaVersion', 'id', 'title', 'shortTitle',
+  'contentLevel', 'description', 'available',
+  'accentColor', 'colorScheme', 'modules', 'resources',
+];
+const EXAM_ONLY_FIELDS = ['examCode', 'duration', 'passScore', 'passThreshold', 'examFee'];
+
 // ── Check functions ───────────────────────────────────────────────────────────
 
 function checkIndex(idx) {
+  if (idx.kind === 'skill-track') return checkSkillTrackIndex(idx);
+
   const issues = [];
   const warnings = [];
 
@@ -121,6 +134,60 @@ function checkIndex(idx) {
     }
     if (actual > 0 && actual !== idx.questions) {
       issues.push(`question count mismatch: index.json says ${idx.questions}, files contain ${actual}`);
+    }
+  }
+
+  return { issues, warnings };
+}
+
+function checkSkillTrackIndex(idx) {
+  const issues = [];
+  const warnings = [];
+
+  for (const f of SKILL_TRACK_REQUIRED) {
+    if (!(f in idx)) issues.push(`missing required field: "${f}"`);
+  }
+
+  for (const f of EXAM_ONLY_FIELDS) {
+    if (f in idx) issues.push(`kind: "skill-track" must not carry exam-only field "${f}" (fabricated-exam-metadata risk — IDEA-0016 NFR-6)`);
+  }
+
+  if (Array.isArray(idx.modules)) {
+    for (const m of idx.modules) {
+      if (!Array.isArray(m.lessons) || m.lessons.length === 0) {
+        issues.push(`module ${m.id} ("${m.title}"): no lessons`);
+        continue;
+      }
+      for (const l of m.lessons) {
+        if (!l.notesFile) {
+          warnings.push(`lesson ${l.id} ("${l.title}"): missing notesFile`);
+        } else if (!existsSync(absContent(l.notesFile))) {
+          issues.push(`lesson ${l.id}: notesFile not found → ${l.notesFile}`);
+        }
+        if (!Array.isArray(l.knowledgeCheck) || l.knowledgeCheck.length === 0) {
+          warnings.push(`lesson ${l.id}: no knowledgeCheck questions`);
+        } else if (l.knowledgeCheck.length < 3 || l.knowledgeCheck.length > 5) {
+          warnings.push(`lesson ${l.id}: knowledgeCheck has ${l.knowledgeCheck.length} questions (expected 3-5)`);
+        }
+      }
+    }
+  }
+
+  if (idx.practiceBank) {
+    if (!Array.isArray(idx.practiceBank.questionFiles)) {
+      issues.push('practiceBank present but questionFiles is not an array');
+    } else {
+      for (const qf of idx.practiceBank.questionFiles) {
+        if (!existsSync(absContent(qf))) issues.push(`practiceBank questionFile not found → ${qf}`);
+      }
+      let actual = 0;
+      for (const qf of idx.practiceBank.questionFiles) {
+        const data = readJson(absContent(qf));
+        if (Array.isArray(data)) actual += data.length;
+      }
+      if (actual > 0 && actual !== idx.practiceBank.questions) {
+        issues.push(`practiceBank question count mismatch: index.json says ${idx.practiceBank.questions}, files contain ${actual}`);
+      }
     }
   }
 
@@ -177,14 +244,18 @@ function checkTaskStatements(idx) {
 
 function checkNotesCoverage(idx) {
   const warnings = [];
-  if (!Array.isArray(idx.domains)) return warnings;
-  for (const d of idx.domains) {
-    if (!d.notesFile) continue;
-    const p = absContent(d.notesFile);
+  const notesFiles = idx.kind === 'skill-track'
+    ? (idx.modules ?? []).flatMap((m) => (m.lessons ?? []).map((l) => ({ id: l.id, notesFile: l.notesFile })))
+    : (idx.domains ?? []).map((d) => ({ id: d.id, notesFile: d.notesFile }));
+  const unit = idx.kind === 'skill-track' ? 'lesson' : 'domain';
+
+  for (const { id, notesFile } of notesFiles) {
+    if (!notesFile) continue;
+    const p = absContent(notesFile);
     if (!existsSync(p)) continue;
     const content = readFileSync(p, 'utf8');
     if ((content.match(/^#{1,3} /gm) || []).length === 0) {
-      warnings.push(`domain ${d.id}: notes file has no headings`);
+      warnings.push(`${unit} ${id}: notes file has no headings`);
     }
   }
   return warnings;
@@ -209,15 +280,18 @@ function auditExam(examId) {
   const allIssues   = [...i1, ...i2];
   const allWarnings = [...w1, ...w2, ...w3];
 
-  const totalChecks =
-    INDEX_REQUIRED.length +
-    (idx.domains?.length ?? 0) +
-    (idx.questionFiles?.length ?? 0) +
-    (idx.taskStatementsFile ? 1 : 0);
+  const totalChecks = idx.kind === 'skill-track'
+    ? SKILL_TRACK_REQUIRED.length +
+      (idx.modules ?? []).reduce((n, m) => n + (m.lessons?.length ?? 0), 0) +
+      (idx.practiceBank?.questionFiles?.length ?? 0)
+    : INDEX_REQUIRED.length +
+      (idx.domains?.length ?? 0) +
+      (idx.questionFiles?.length ?? 0) +
+      (idx.taskStatementsFile ? 1 : 0);
 
   return {
     examId,
-    examCode: idx.examCode ?? examId,
+    examCode: idx.examCode ?? (idx.kind === 'skill-track' ? 'SKILL-TRACK' : examId),
     title: idx.title ?? examId,
     score: Math.max(0, totalChecks - allIssues.length),
     totalChecks,

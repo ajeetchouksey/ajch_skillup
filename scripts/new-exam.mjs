@@ -17,6 +17,18 @@
  *     --duration "60 min" \
  *     --pass 700 \
  *     --color blue
+ *
+ * Skill Track (IDEA-0016) — no certification to model, e.g. a tool or
+ * framework mastery track:
+ *   node scripts/new-exam.mjs \
+ *     --id semantic-kernel \
+ *     --kind skill-track \
+ *     --title "Semantic Kernel Practitioner" \
+ *     --short "Semantic Kernel" \
+ *     --level 201 \
+ *     --domains "Module 1 Title,Module 2 Title" \
+ *     --provider "Microsoft" \
+ *     --color blue
  */
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -46,16 +58,20 @@ function parseArgs(argv) {
   return map;
 }
 
+const KIND_ALLOWLIST = new Set(['exam', 'skill-track']);
+
 function validateArgs(a) {
+  const kind = a.kind ?? 'exam';
   const errors = [];
+  if (!KIND_ALLOWLIST.has(kind)) errors.push(`--kind must be one of: ${[...KIND_ALLOWLIST].join(', ')}`);
   if (!a.id)     errors.push('--id is required');
-  if (!a.code)   errors.push('--code is required');
+  if (kind === 'exam' && !a.code) errors.push('--code is required for kind=exam (a skill-track has no exam code)');
   if (!a.title)  errors.push('--title is required');
   if (!a.level)  errors.push('--level is required (101 | 201 | 301)');
-  if (!a.domains) errors.push('--domains is required (comma-separated list of domain titles)');
+  if (!a.domains) errors.push('--domains is required (comma-separated list of domain/module titles)');
 
   if (a.id    && !EXAM_ID_PATTERN.test(a.id))     errors.push(`--id must match ${EXAM_ID_PATTERN} (e.g. "ab731", "ghbp")`);
-  if (a.code  && !EXAM_CODE_PATTERN.test(a.code)) errors.push(`--code must match ${EXAM_CODE_PATTERN} (e.g. "AB-731")`);
+  if (kind === 'exam' && a.code && !EXAM_CODE_PATTERN.test(a.code)) errors.push(`--code must match ${EXAM_CODE_PATTERN} (e.g. "AB-731")`);
   if (a.level && !LEVEL_ALLOWLIST.has(a.level))   errors.push(`--level must be one of: 101, 201, 301`);
   if (a.title && a.title.trim().length === 0)      errors.push('--title cannot be empty');
   if (a.title && a.title.length > MAX_TITLE_LEN)   errors.push(`--title too long (max ${MAX_TITLE_LEN} chars)`);
@@ -197,6 +213,66 @@ function makeQuestionJson(domainNum) {
   ];
 }
 
+function makeSkillTrackIndexJson(a, domainList) {
+  const modules = domainList.map((title, i) => ({
+    id: `m${i + 1}`,
+    title,
+    lessons: [
+      {
+        id: `m${i + 1}-l1`,
+        title: `${title} — Overview`,
+        objectives: ['[TODO: what the learner can do after this lesson]'],
+        notesFile: `content/skillup/${a.id}/notes/${a.id}-m${i + 1}-l1-${slugify(title)}.md`,
+        knowledgeCheck: [
+          {
+            id: `m${i + 1}-l1-k1`,
+            question: 'TODO: ask a specific question about this lesson.',
+            options: ['TODO: option A', 'TODO: option B (correct)', 'TODO: option C', 'TODO: option D'],
+            correct: 1,
+            explanation: 'TODO: explain why option B is correct and why the others are wrong.',
+          },
+        ],
+      },
+    ],
+  }));
+
+  return {
+    schemaVersion: '1.0',
+    kind: 'skill-track',
+    id: a.id,
+    title: a.title,
+    shortTitle: a.short ?? a.title,
+    contentLevel: a.level,
+    description: `Skill track for ${a.title}. Covers ${domainList.join(', ')}.`,
+    available: false,
+    accentColor: ACCENT_COLORS[a.color ?? 'blue'],
+    colorScheme: a.color ?? 'blue',
+    modules,
+    resources: [
+      { label: `${a.provider ?? 'Provider'} Official Docs`, url: 'https://learn.microsoft.com' },
+    ],
+  };
+}
+
+function makeSkillTrackNotesMd(lessonTitle, trackTitle) {
+  return `# ${lessonTitle}
+
+> Skill track lesson — **${trackTitle}**
+
+## Overview
+
+<!-- TODO: brief concept overview -->
+
+## Key Concepts
+
+<!-- TODO: core concepts, definitions, diagrams -->
+
+## Try It
+
+<!-- TODO: link the matching hands-on mission (a real HOL Lab id) once one exists; omit rather than invent one -->
+`;
+}
+
 function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
@@ -221,18 +297,20 @@ Usage: node scripts/new-exam.mjs \\
   --provider <string>  e.g. Microsoft  (optional)
   --fee <string>       e.g. "$165 USD"  (optional)
   --duration <string>  e.g. "60 min"  (optional)
-  --pass <number>      pass threshold out of 1000, e.g. 700  (optional)
+  --pass <number>      pass threshold out of 1000, e.g. 700  (optional, kind=exam only)
   --color blue|violet|emerald|rose|amber|gray|sky  (optional)
+  --kind exam|skill-track  (optional, defaults to exam — see Skill Track usage above)
 `);
   process.exit(0);
 }
 
 const a = parseArgs(rawArgs);
 validateArgs(a);
+const kind = a.kind ?? 'exam';
 
 const examDir = buildExamDir(a.id);
 if (existsSync(examDir)) {
-  console.error(`  ✗ Exam directory already exists: ${examDir}`);
+  console.error(`  ✗ Directory already exists: ${examDir}`);
   process.exit(1);
 }
 
@@ -240,6 +318,32 @@ const domainList = a.domains.split(',').map(d => d.trim()).filter(Boolean);
 if (domainList.length === 0) {
   console.error('  ✗ --domains produced no entries after parsing');
   process.exit(1);
+}
+
+if (kind === 'skill-track') {
+  console.log(`\nScaffolding skill track: ${a.title} (${a.id})\n`);
+
+  mkdirSync(join(examDir, 'notes'), { recursive: true });
+  write(join(examDir, 'index.json'), makeSkillTrackIndexJson(a, domainList));
+
+  for (let i = 0; i < domainList.length; i++) {
+    const n = i + 1;
+    const slug = slugify(domainList[i]);
+    write(join(examDir, 'notes', `${a.id}-m${n}-l1-${slug}.md`), makeSkillTrackNotesMd(`${domainList[i]} — Overview`, a.title));
+  }
+
+  console.log(`
+Done. Next steps:
+  1. Fill in notes/${a.id}-m*-l1-*.md with real lesson content
+  2. Replace placeholder knowledgeCheck questions in index.json (3-5 per lesson)
+  3. Add holLabId to any lesson with a real, existing HOL Lab match — never invent one
+  4. Set  "available": true  in index.json when ready to publish
+  5. Run  python scripts/generate-catalog.py  to update catalog.json
+
+Validate at any time:
+  node scripts/check-exam-completeness.mjs --exam ${a.id}
+`);
+  process.exit(0);
 }
 
 console.log(`\nScaffolding exam: ${a.code} (${a.id})\n`);

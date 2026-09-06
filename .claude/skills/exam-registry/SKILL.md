@@ -121,3 +121,86 @@ relative to the repo root prefixed with `content/skillup/...` (as in the schema 
 | `loadQuestionsByDomainForExam(examId, domain)` | Questions filtered by domain number |
 | `loadNoteForExam(examId, domainId)` | Note markdown for one domain |
 | `loadScenariosForExam(examId)` | All scenarios for an exam |
+
+## Skill Tracks (`kind: "skill-track"`) — IDEA-0016
+
+Not every topic worth learning has a certification to model against (Azure
+AI Foundry, GitHub Copilot mastery, MCP servers — tools, not credentials).
+For those, add `"kind": "skill-track"` to the entry instead of the implicit
+default. **Every entry without a `kind` field is treated as `"exam"`** —
+this is purely additive; none of the existing exam entries need editing.
+
+```jsonc
+// content/skillup/{trackId}/index.json — kind: "skill-track"
+{
+  "schemaVersion": "1.0",
+  "kind": "skill-track",
+  "contentVersion": "2.0.0",
+  "contentUpdatedAt": "2026-09-06",
+  "provider": "Microsoft",
+  "id": "azure-ai-foundry",
+  "title": "Azure AI Foundry Practitioner",
+  "shortTitle": "AI Foundry",
+  "contentLevel": "201",
+  "description": "One-line description for the catalog card.",
+  "available": true,
+  "accentColor": "#1d4ed8",
+  "colorScheme": "blue",
+  "palette": { "color": "#60a5fa", "bg": "...", "border": "...", "glow": "...", "btn": "..." },
+  "changelog": [{ "version": "2.0.0", "date": "2026-09-06", "type": "major", "summary": "Reshaped from exam to skill track" }],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Module title",
+      "lessons": [
+        {
+          "id": "m1-l1",
+          "title": "Lesson title",
+          "objectives": ["What the learner can do after this lesson"],
+          "notesFile": "content/skillup/{trackId}/notes/{trackId}-m1-l1-slug.md",
+          "holLabId": "an-id-from-ajch_hol_labs — omit if no matching lab exists, never invent one",
+          "knowledgeCheck": [
+            { "id": "m1-l1-k1", "question": "...", "options": ["...", "...", "...", "..."], "correct": 1, "explanation": "..." }
+          ]
+        }
+      ]
+    }
+  ],
+  "practiceBank": {
+    "description": "Opt-in full-length MCQ bank kept from prior exam-shaped content, if any — never fabricate one to fill this in.",
+    "questionFiles": ["content/skillup/{trackId}/questions/{trackId}-domain1.json"],
+    "questions": 47
+  },
+  "resources": [{ "label": "Official Docs", "url": "https://..." }]
+}
+```
+
+**What's deliberately absent, and why**: no `examCode`, `duration`,
+`passScore`, `passThreshold`, `examFee` — those imply a real, timed,
+gated certification that doesn't exist for a skill track. Their presence
+on a `kind: "skill-track"` entry is a defect, not a stylistic choice (this
+is the exact mistake `azure-ai-foundry`'s fabricated `"examCode": "AIF-200"`
+made before this schema existed).
+
+**`knowledgeCheck` vs. `practiceBank`**: `knowledgeCheck` is light —
+3-5 questions per lesson, no timer, no scoring gate, mirrors
+`german_skill`'s `Lesson.quiz` field. `practiceBank` is the **legacy
+exam-shaped MCQ bank**, kept opt-in for learners who still want
+exam-style drilling — retained content, never deleted, but deliberately
+nested off the top level so exam-shaped tooling (question-count recount,
+`examCode` presence checks) doesn't treat it as this entry's primary
+question bank.
+
+**HOL Lab cross-links**: `holLabId` must reference a real, existing lab id
+in `ajch_hol_labs`'s `content/hol-labs/index.json` — verify it exists
+before writing it; omit the field rather than invent one. A lesson links
+to a lab for the hands-on rep; it never duplicates the lab's steps inline.
+
+### Adding a New Skill Track — Checklist
+
+- [ ] Create `content/skillup/{trackId}/index.json` with `kind: "skill-track"` and no exam-only fields
+- [ ] Create per-lesson notes: `content/skillup/{trackId}/notes/{trackId}-{moduleId}-{lessonId}-{slug}.md`
+- [ ] Verify any `holLabId` referenced actually exists in `ajch_hol_labs`
+- [ ] Add entry to `content/skillup/catalog.json` (via `python scripts/generate-catalog.py`, never by hand)
+- [ ] Run `node scripts/check-exam-completeness.mjs --exam {trackId}` — it branches on `kind` automatically
+- [ ] **No TypeScript or routing changes needed in `ajch_skillup`** — the `ajch_platform` rendering side is a separate, already-scoped change (IDEA-0016's platform-rendering issue)
