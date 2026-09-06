@@ -28,6 +28,30 @@ Neither option is more "modern" than the other — they solve different organiza
 | Foundry project (Azure AI Foundry resource) | A single, unified project with simplified default networking/identity | Recommended default for new, single-team projects |
 | Hub-based project | A project that inherits shared connections, compute, and security boundaries from a parent hub | Multiple teams/projects need consistent shared governance |
 
+```mermaid
+flowchart TD
+  H[Shared Hub]
+  P1[Support Bot Project]
+  P2[Search Assistant Project]
+  P3[Content Gen Project]
+  M1[Chat Model]
+  M2[Embedding Model]
+  M3[Reasoning Model]
+  H -->|shares governance| P1
+  H -->|shares governance| P2
+  H -->|shares governance| P3
+  P1 -->|deploys| M1
+  P2 -->|deploys| M2
+  P3 -->|deploys| M3
+  classDef hub fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef proj fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef model fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class H hub
+  class P1,P2,P3 proj
+  class M1,M2,M3 model
+```
+*One hub, three teams, three independently chosen models.*
+
 ### In Practice
 
 **What breaks without this**: a platform team spins up a separate standalone Foundry project per new initiative "to move fast," and six months later has a dozen projects each with their own duplicated Azure AI Search and Key Vault connections — the same governance rules re-implemented, slightly differently, a dozen times.

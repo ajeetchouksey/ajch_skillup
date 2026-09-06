@@ -31,6 +31,22 @@ An **Agent** is the configured persona: its instructions (system prompt), model,
 
 Editing an agent's **instructions** changes its tone/behavior immediately on the next run — no redeployment or retraining needed.
 
+```mermaid
+flowchart LR
+  AG[Agent Config] -->|creates| TH[Thread]
+  TH -->|holds| U[User Message]
+  U -->|triggers| R[Run]
+  AG -->|shapes| R
+  R -->|creates| RM[Assistant Message]
+  classDef control fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef output fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class AG,R control
+  class TH,U data
+  class RM output
+```
+*How Agent config, Thread state, and Run connect.*
+
 ### In Practice
 
 **What breaks without this**: a developer new to the Agent Service tries to manually resend the full conversation history on every call — the way a plain chat-completion API would require — and ends up either fighting the Thread abstraction or duplicating state it already manages for free.

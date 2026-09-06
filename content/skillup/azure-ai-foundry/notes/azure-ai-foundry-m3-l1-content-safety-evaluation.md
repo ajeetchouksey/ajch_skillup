@@ -27,6 +27,22 @@ This lesson covers how Azure AI Foundry protects against harmful/unsafe outputs 
 | Groundedness detection | Generated claims not supported by the provided source/grounding documents (RAG hallucination) | Protected material detection |
 | Protected material detection (text and code variants) | Verbatim/near-verbatim recitation of copyrighted text or public code | Content filters |
 
+```mermaid
+flowchart TD
+  I[Observed Bad Output] --> Q{What kind of failure?}
+  Q -->|harmful content| F[Content Filters]
+  Q -->|injection attempt| P[Prompt Shields]
+  Q -->|unsupported claim| GD[Groundedness Detection]
+  Q -->|copyrighted text| PM[Protected Material]
+  classDef input fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef decision fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef outcome fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class I input
+  class Q decision
+  class F,P,GD,PM outcome
+```
+*Diagnose the failure mode before picking a capability.*
+
 Four capabilities, four attack/failure modes: harmful content, injection, hallucination, and IP recitation. **A scenario naming one specific failure mode almost always has exactly one correct capability to reach for** — the skill here is diagnosis, not memorizing a list.
 
 ### In Practice

@@ -79,6 +79,23 @@ Microsoft frames responsible AI as four ongoing stages, applied iteratively:
 3. **Mitigate** them (content filters, system prompt design, grounding/RAG)
 4. **Operate** safely in production (monitoring, incident response)
 
+```mermaid
+flowchart LR
+  ID[Identify Harms] --> ME[Measure Frequency]
+  ME --> MI[Mitigate Risks]
+  MI --> OP[Operate in Production]
+  OP -->|system changes| ID
+  classDef stage1 fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef stage2 fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef stage3 fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+  classDef stage4 fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class ID stage1
+  class ME stage2
+  class MI stage3
+  class OP stage4
+```
+*A loop that restarts whenever inputs or the model change.*
+
 ### In Practice
 
 **What breaks without this**: a team runs through all four stages once before launch, checks the box, and never revisits Measure or Mitigate as new documents get ingested into a RAG pipeline or the underlying model gets swapped — drift and new failure modes accumulate undetected because nobody re-ran the loop.

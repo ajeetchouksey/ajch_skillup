@@ -347,7 +347,7 @@
     {
       "schemaVersion": "1.0",
       "kind": "skill-track",
-      "contentVersion": "2.1.0",
+      "contentVersion": "2.2.0",
       "contentUpdatedAt": "2026-09-06",
       "provider": "Microsoft",
       "palette": {
@@ -375,6 +375,12 @@
           "date": "2026-09-06",
           "type": "minor",
           "summary": "Re-authored all 6 lesson notes against the platform's Docs Engineer Deep Dive Standard, adapted for a skill track (no exam framing): added Prerequisites to every lesson, upgraded topic bodies from bare tables to Key Concept + In Practice blocks (production-grounded: what breaks without this, the decision trigger, when you'd choose differently), and added a Deep Dive section per lesson (connective narrative, an expanded worked scenario, a memory aid, and \"Applying this in real projects\" guidance). Total notes content grew from ~326 to ~800 lines. No schema/JSON changes \u2014 knowledgeCheck questions and holLabId cross-links unchanged."
+        },
+        {
+          "version": "2.2.0",
+          "date": "2026-09-06",
+          "type": "minor",
+          "summary": "Added one Mermaid diagram to each of the 6 lessons, per mermaid-diagram-craft's earns-its-place rule: hub/project/model hierarchy (m1-l1), deployment-option decision tree (m1-l2), Agent/Thread/Message/Run relationship (m2-l1), SupportCoordinator tool-routing architecture (m2-l2), content-safety failure-mode diagnostic tree (m3-l1), and the Identify-Measure-Mitigate-Operate lifecycle loop (m3-l2) \u2014 each with a color-by-meaning palette, labeled edges, and an italic caption. Validated PASS by the qa-engineer diagram gate. Required a companion ajch_platform fix (SkillTrackHome had no mermaid renderer wired up) to actually display, not just parse."
         }
       ],
       "id": "azure-ai-foundry",

@@ -33,6 +33,24 @@ Global Batch is the odd one out — it isn't really competing on latency at all.
 | Azure OpenAI — Provisioned (PTU) | Reserved, dedicated capacity | Reserved-unit commitment | Latency-sensitive production workloads needing predictable throughput |
 | Azure OpenAI — Global Batch | Asynchronous, 24-hour window | Discounted per-token | Large, non-latency-sensitive batch jobs |
 
+```mermaid
+flowchart TD
+  A{Urgent response needed?}
+  A -->|no, can wait 24h| B[Global Batch]
+  A -->|yes| C{Traffic shape?}
+  C -->|flat and predictable| D{Need hardware control?}
+  C -->|spiky or unknown| E[Serverless API]
+  D -->|yes| F[Managed Compute]
+  D -->|no| G{Need guaranteed latency?}
+  G -->|yes| H[Provisioned Throughput]
+  G -->|no| I[Azure OpenAI Standard]
+  classDef decision fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef outcome fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class A,C,D,G decision
+  class B,E,F,H,I outcome
+```
+*Which of the five deployment options fits your traffic.*
+
 ### In Practice
 
 **What breaks without this**: a team that defaults to managed compute "because that's what we did before Foundry" ends up paying for a VM that sits at 8% utilization overnight — real money for capacity nobody's using, when a serverless deployment would have cost near-zero during those same idle hours.

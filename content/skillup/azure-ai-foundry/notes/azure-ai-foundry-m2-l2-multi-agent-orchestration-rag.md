@@ -95,6 +95,24 @@ Walking the tool/pattern choice for each requirement:
 }
 ```
 
+```mermaid
+flowchart TD
+  U[Customer Question] --> C[SupportCoordinator Agent]
+  C -->|policy question| FS[File Search Tool]
+  C -->|order status| OA[OpenAPI Tool]
+  C -->|billing dispute| BA[BillingSpecialist Agent]
+  FS -->|cites| ANS[Streamed Answer]
+  OA -->|returns status| ANS
+  BA -->|resolves| ANS
+  classDef control fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef output fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class C,BA control
+  class U,FS,OA data
+  class ANS output
+```
+*SupportCoordinator routing three request types to three tools.*
+
 **Common gotcha to notice**: nothing above required AutoGen or Semantic Kernel — most real support-bot scenarios resolve with File search + OpenAPI tool + (at most) connected agents. Reach for the heavier orchestration frameworks only when the scenario actually describes autonomous multi-agent reasoning, not just "the agent uses several tools."
 
 ## Deep Dive: Making Multi-Agent Orchestration & RAG Click
