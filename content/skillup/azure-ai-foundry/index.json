@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "kind": "skill-track",
-  "contentVersion": "2.3.0",
+  "contentVersion": "2.4.0",
   "contentUpdatedAt": "2026-09-07",
   "provider": "Microsoft",
   "palette": {
@@ -41,6 +41,12 @@
       "date": "2026-09-07",
       "type": "minor",
       "summary": "Added taxonomyIds to all 3 modules (reusing the original 3 domains' tag sets verbatim — same content, same taxonomy, no new authoring) so this skill track participates in the cross-vertical relationship engine (IDEA-0008) again — it had gone dark after the domains[] -> modules[] migration in v2.0.0, since build-content-intelligence.mjs only read domains[]. Companion ajch_platform changes: SkillTrackModule.taxonomyIds type, collectRelDocs() branches on kind to emit one exam/{id}/module-{id} doc per module, and SkillTrackHome now renders a ComputedRelatedList per module. Also fixed a live production crash (Quiz.tsx and four other exam sub-pages read exam.domains/.passThreshold/.questions unconditionally, which are absent on a skill-track entry) caught via a real user report against the promoted production site."
+    },
+    {
+      "version": "2.4.0",
+      "date": "2026-09-07",
+      "type": "minor",
+      "summary": "Added the coarse \"azure-ai-foundry\" node itself to all 3 modules' taxonomyIds, alongside their existing fine-grained feature tags. Without it, nothing tagged only with the coarse platform-level concept (rather than a specific feature like agent-service) could ever match this track in the relationship engine. Paired with a companion ajch_ai_usecases backfill (via an extended backfill-taxonomy-ids.mjs mention-matcher) that found 4 real use cases genuinely built with \"Azure AI Foundry agent framework\" and tagged them accordingly — this module-level tag is what lets those matches actually produce a relationship edge."
     }
   ],
   "id": "azure-ai-foundry",
@@ -55,7 +61,7 @@
     {
       "id": "m1",
       "title": "Platform & Model Catalog",
-      "taxonomyIds": ["foundry-project", "hub-project", "deployment", "model-catalog", "serverless-api", "provisioned-throughput", "azure-openai", "rag", "connections", "azure-ai-search", "sdk", "fine-tuning", "quota", "playground", "content-filters", "prompt-flow"],
+      "taxonomyIds": ["azure-ai-foundry", "foundry-project", "hub-project", "deployment", "model-catalog", "serverless-api", "provisioned-throughput", "azure-openai", "rag", "connections", "azure-ai-search", "sdk", "fine-tuning", "quota", "playground", "content-filters", "prompt-flow"],
       "lessons": [
         {
           "id": "m1-l1",
@@ -95,7 +101,7 @@
     {
       "id": "m2",
       "title": "Building & Orchestrating AI Agents",
-      "taxonomyIds": ["agent-service", "threads-runs", "code-interpreter", "file-search", "rag", "function-calling", "openapi-tool", "bing-grounding", "connected-agents", "multi-agent", "autogen", "semantic-kernel", "azure-ai-search", "fabric", "streaming"],
+      "taxonomyIds": ["azure-ai-foundry", "agent-service", "threads-runs", "code-interpreter", "file-search", "rag", "function-calling", "openapi-tool", "bing-grounding", "connected-agents", "multi-agent", "autogen", "semantic-kernel", "azure-ai-search", "fabric", "streaming"],
       "lessons": [
         {
           "id": "m2-l1",
@@ -134,7 +140,7 @@
     {
       "id": "m3",
       "title": "Responsible AI, Security & Operations",
-      "taxonomyIds": ["content-safety", "prompt-shields", "groundedness", "evaluation", "protected-material", "content-filters", "governance", "evaluation-metrics", "red-teaming", "tracing", "observability", "managed-identity", "security", "rbac", "least-privilege", "private-endpoint", "customer-managed-keys", "data-privacy", "responsible-ai", "monitoring"],
+      "taxonomyIds": ["azure-ai-foundry", "content-safety", "prompt-shields", "groundedness", "evaluation", "protected-material", "content-filters", "governance", "evaluation-metrics", "red-teaming", "tracing", "observability", "managed-identity", "security", "rbac", "least-privilege", "private-endpoint", "customer-managed-keys", "data-privacy", "responsible-ai", "monitoring"],
       "lessons": [
         {
           "id": "m3-l1",
