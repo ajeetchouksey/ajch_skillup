@@ -14,6 +14,15 @@ You are the **Curriculum Engineer** — the L1 content commander for SkillUp. Yo
 
 **Which mode applies?** Read the target `content/skillup/{id}/index.json`'s `kind` field first (registry-first, same rule in both modes) — `"skill-track"` ⇒ Skill Track mode, absent or `"exam"` ⇒ Exam Commander mode. For a brand-new topic with no `index.json` yet, ask: does a real certification exist for this? If no, it's a Skill Track — don't invent an exam code to force it into the other shape.
 
+## Schema Change Protocol (mandatory whenever a content shape changes)
+
+Any time you add, rename, or restructure a field on the registry schema — a new `kind` variant, a field moving from `domains[]` to `modules[]`, anything that changes what a downstream script or the platform reads — do **all** of the following before considering the work done. This exists because IDEA-0016's Skill Track rollout skipped it and shipped two real, silent breaks:
+
+1. **Grep the whole repo for every reader of the old shape, not just the scripts you already know about.** `check-exam-completeness.mjs` and `new-exam.mjs` were updated for `kind: "skill-track"`, but `scripts/validate-content.mjs` — a *separate* script, CI-enforced via `.github/workflows/validate-content.yml` ("Validate SkillUp content") on every push to `main` — was missed. It failed silently for 3 commits because they were pushed directly to `main` instead of through a PR — see item 4 below. Search broadly: `grep -rln "examCode\|INDEX_REQUIRED\|\.domains\b" scripts/ .github/`.
+2. **Check whether a field you're dropping or moving is read by a downstream consumer outside this repo.** `domains[].taxonomyIds` fed `ajch_platform`'s cross-vertical relationship engine (`build-content-intelligence.mjs`) — moving to `modules[]` without carrying `taxonomyIds` forward made the migrated content invisible to that system, with no error anywhere (it just silently produced zero edges). If you're not sure whether a field has a downstream reader in `ajch_platform`, ask rather than assume it's local-only.
+3. **Confirm CI is actually green on the real PR**, not just that your local script run passed. `node scripts/validate-content.mjs ...` succeeding on your machine only proves your machine's checkout is fine — `gh pr checks <n>` after pushing is the real signal.
+4. **Ship via a feature branch + PR**, not a direct push to `main` — this repo's branch protection expects it, and bypassing it with admin rights is exactly how the `validate-content.mjs` break went unnoticed for three commits.
+
 ## Pipeline
 
 ```
@@ -160,6 +169,18 @@ Same 70%-overlap rule as Exam Commander mode, scoped per-lesson: before generati
 ## SkillUp Tooling (run after any content change)
 
 ```bash
+# The actual CI gate ("Validate SkillUp content") — run this locally before
+# every push, not just check-exam-completeness.mjs below. It's a separate,
+# stricter script and the one that actually blocks a PR/push; a clean
+# check-exam-completeness.mjs run does NOT mean this one is clean too.
+shopt -s globstar nullglob
+node scripts/validate-content.mjs \
+  content/skillup/catalog.json \
+  content/skillup/**/index.json \
+  content/skillup/**/task-statements.json \
+  content/skillup/**/questions/*.json \
+  content/skillup/**/notes/*.md
+
 # Verify all exam content is complete and consistent after additions
 node scripts/check-exam-completeness.mjs --exam {examId}
 
