@@ -152,6 +152,7 @@ this is purely additive; none of the existing exam entries need editing.
     {
       "id": "m1",
       "title": "Module title",
+      "taxonomyIds": ["aggregated from this module's lesson content — mirrors DomainConfig.taxonomyIds, drives the cross-vertical relationship engine (IDEA-0008)"],
       "lessons": [
         {
           "id": "m1-l1",
