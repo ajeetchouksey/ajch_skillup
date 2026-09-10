@@ -111,6 +111,7 @@
             "Pick the correct built-in tool for a given grounding/retrieval/execution need"
           ],
           "notesFile": "content/skillup/azure-ai-foundry/notes/azure-ai-foundry-m2-l1-agent-fundamentals-tools.md",
+          "holLabId": "build-first-agent-foundry-agent-service",
           "knowledgeCheck": [
             {"id":"m2-l1-k1","question":"A developer is building their first agent with Azure AI Foundry Agent Service and wants to understand its core building blocks before writing code. Which set of objects models a conversation lifecycle in the Agent Service?","options":["Agent, Thread, Message, Run","Model, Dataset, Pipeline, Experiment","Hub, Project, Connection, Deployment","Index, Chunk, Embedding, Query"],"correct":0,"explanation":"The Agent Service models conversations using an Agent (the configured persona/instructions/tools), a Thread (a persistent conversation), Messages (turns within the thread), and a Run (one execution of the agent against the thread's messages)."},
             {"id":"m2-l1-k2","question":"An agent needs to analyze an uploaded CSV of sales data, compute statistics, and generate a chart image in response to a user's question. Which built-in Agent Service tool should be enabled?","options":["File search","Code interpreter","Bing grounding","Function calling"],"correct":1,"explanation":"Code interpreter runs Python in a sandboxed execution environment, letting the agent load files, perform calculations, and generate outputs like charts — exactly this data-analysis scenario."},
