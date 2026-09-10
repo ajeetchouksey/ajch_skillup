@@ -37,6 +37,8 @@ AppSec Engineer — schema + path validation (HARD GATE)
     ↓ PASS ✓
     (sub-agents write their respective files)
     ↓
+AppSec Engineer — post-build audit of the written files (HARD GATE)
+    ↓ PASS ✓
 Exam Agent (you) — synthesize: N questions added, D{X} notes updated
 ```
 
@@ -117,6 +119,8 @@ AppSec Engineer — schema + path validation (HARD GATE)
     ↓ PASS ✓
     (sub-agents write their respective files)
     ↓
+AppSec Engineer — post-build audit of the written files (HARD GATE)
+    ↓ PASS ✓
 Curriculum Engineer (you) — synthesize: N lessons added, M knowledgeChecks written, P HOL Lab cross-links found
 ```
 
