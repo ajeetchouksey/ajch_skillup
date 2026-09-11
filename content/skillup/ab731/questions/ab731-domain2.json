@@ -354,5 +354,68 @@
       "workflow-orchestration"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-018",
+    "scenario": "A national-security contractor must deploy a document-analysis model entirely within its own accredited, air-gapped facility — contractual and regulatory terms prohibit sending data to, or running inference through, any externally hosted or vendor-managed API, no matter how the endpoint is licensed. Leadership also does not want to commit to an ongoing per-token licence fee for a workload the team expects to run heavily once live. The AI lead is choosing a model from the Foundry Model Catalog for this document-analysis workload.",
+    "question": "Which model choice best satisfies both the air-gapped deployment constraint and the cost/licensing preference, and what trade-off should the team accept in return?",
+    "options": [
+      "GPT-4o, accessed through Azure OpenAI Service — it is the most capable model in the catalog, and its managed hosting means the team never has to worry about infrastructure",
+      "Phi-3 mini, accessed via a Foundry Tools managed endpoint — its small footprint keeps inference costs low even at high query volume",
+      "An open-source model such as Llama or Mistral, deployed entirely on the organisation's own infrastructure — published weights mean no per-token licence fee and the model can run fully inside the accredited facility, at the cost of the organisation now owning the hosting, scaling, and security work itself",
+      "A fine-tuned version of GPT-4o, trained on the contractor's own classified documents to improve domain accuracy — fine-tuning gives the organisation ownership of the resulting model"
+    ],
+    "correct": 2,
+    "explanation": "Llama and Mistral are open source, which means their weights are published rather than only reachable through a vendor's hosted API — the organisation can download and run them entirely inside its own accredited, air-gapped facility, satisfying the contractual requirement that no inference call ever leave infrastructure the organisation controls, and it pays no per-token licence fee for however heavily the workload runs. The trade-off the notes call out explicitly is that this shifts hosting, scaling, and security work from the vendor onto the organisation itself — there is no managed service to fall back on if the deployment needs to scale or gets attacked. Option A fails immediately on the deployment constraint: GPT-4o is only available through Azure OpenAI Service's managed, cloud-hosted endpoint, which by definition cannot run inside an air-gapped facility, and the per-token fee continues regardless of how capable the model is. Option B makes the same mistake in a cheaper wrapper — Phi-3 mini's small footprint lowers cost, but accessing it 'via a Foundry Tools managed endpoint' still routes inference through a Microsoft-hosted service, which is exactly the dependency the regulatory requirement rules out; being lightweight doesn't make an endpoint self-hostable. Option D misreads what fine-tuning changes: fine-tuning GPT-4o still means running inference against a vendor-hosted model at query time (and, worse, would require sending classified documents into that tuning job in the first place), so it neither moves the workload inside the air-gapped facility nor removes the ongoing per-token cost — 'ownership' of a fine-tuned variant is not the same as owning the deployment infrastructure the requirement actually demands.",
+    "tags": [
+      "model-selection",
+      "foundry-models",
+      "open-source-models",
+      "licensing"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-019",
+    "scenario": "A logistics company wants roughly 500 warehouse staff to be able to ask ad hoc natural-language questions against a custom shipment-tracking database that lives entirely outside Microsoft 365 — it isn't stored in SharePoint, Exchange, or Teams, so Microsoft Graph has no visibility into it. Two technically workable delivery options are on the table. Option one: build it as a Copilot Studio agent inside Microsoft 365 Copilot, which would require all 500 staff to hold the paid Microsoft 365 Copilot add-on licence at roughly $30/user/month — about $15,000/month, fixed, regardless of how often any individual actually uses it. Option two: build a standalone Azure AI Foundry-based chat agent embedded in Teams that queries the shipment database directly, billed through Azure pay-as-you-go metered consumption with no per-user licence at all. A four-week trial shows usage is rare and unpredictable — about two queries per person per month at roughly $0.50 per query — projecting close to $500/month if extended to all 500 staff.",
+    "question": "Extending the trial to all 500 staff, which approach minimises total monthly cost for this usage pattern?",
+    "options": [
+      "Purchase the Microsoft 365 Copilot add-on licence for all 500 staff, so the shipment-tracking capability sits inside their existing Teams and Outlook experience",
+      "Build the capability as a standalone Azure AI Foundry-based agent billed through pay-as-you-go metered consumption, so cost tracks the small, unpredictable query volume the trial observed",
+      "Reserve a Foundry Tools provisioned throughput (PTU) commitment tier sized for the warehouse's theoretical peak query volume, to lock in a discounted rate",
+      "Rely on Copilot Chat, which is already included with the staff's existing Microsoft 365 subscription at no additional licence cost"
+    ],
+    "correct": 1,
+    "explanation": "At roughly two queries per person per month, the trial's projected pay-as-you-go cost (~$500/month across all 500 staff) is dramatically lower than the ~$15,000/month a fixed per-user Copilot add-on licence would cost regardless of actual usage — for infrequent, unpredictable demand, a metered model tracks the real, low volume instead of paying for standing capacity nobody is using most days. Building the capability as a standalone Foundry-based agent also sidesteps the Graph limitation entirely, since it queries the shipment database directly rather than depending on Microsoft 365's data connectivity. Option A commits to the full per-user fee for all 500 people every month specifically to reach a database Copilot's own Graph grounding cannot see, so the company would be paying a large fixed licence cost for capability the licence doesn't even deliver on its own — Copilot Studio could technically reach the database via a connector, but that still requires the same $15,000/month base of Copilot seats this scenario is trying to avoid. Option C misapplies the commitment-tier logic from §3.8: provisioned throughput earns back its discount only when usage is high and predictable enough to make a capacity reservation worth it; reserving capacity for peak volume on a workload the trial just showed is low and irregular means paying for throughput that sits idle most of the time, the same overpayment problem as option A in a different Foundry product. Option D is tempting because it is genuinely free, but Copilot Chat is grounded in Microsoft Graph and, like the paid add-on, has no visibility into a database that was never part of Microsoft 365 — it doesn't satisfy the requirement at all, regardless of its zero incremental cost.",
+    "tags": [
+      "licensing",
+      "cost-optimisation",
+      "foundry-tools",
+      "pay-as-you-go"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-020",
+    "scenario": "A financial services firm's compliance team uses AI to review complex, multi-document loan agreements for regulatory conflicts before submission to a regulator. An incorrect determination — missing a conflict that should have been flagged — triggers costly manual rework, potential regulatory penalties, and deal delays worth far more than the AI's running cost. Trying to 'optimise AI costs' for this workload, a junior analyst proposes routing every agreement through Phi-3 mini, the cheapest and fastest model in the Foundry Model Catalog, instead of GPT-4o.",
+    "question": "Which model strategy actually optimises total cost for this compliance-review task?",
+    "options": [
+      "Use Phi-3 mini for every agreement, since it has the lowest per-token cost and optimising AI cost means minimising per-token spend on every task",
+      "Use GPT-4o for this task — its higher accuracy and larger context window on complex, multi-document reasoning reduce the far larger downstream cost of a missed regulatory conflict, even though its per-token price is higher than Phi-3 mini's",
+      "Route every agreement through Phi-3 mini first, and only escalate to GPT-4o when Phi-3 mini reports low confidence in its own determination",
+      "Fine-tune Phi-3 mini on the firm's historical loan agreements so it can match GPT-4o's accuracy on regulatory conflicts while keeping Phi-3 mini's low per-token cost"
+    ],
+    "correct": 1,
+    "explanation": "Optimising AI cost means minimising total cost, not per-token price — and for a task where a wrong output triggers rework, regulatory penalties, and deal delays worth far more than the model's running cost, the model with high accuracy and a large context window over complex, multi-document reasoning (GPT-4o, per the notes' own match for complex legal document analysis) is the cost-optimal choice even though it costs more per token than Phi-3 mini. Option A applies the 'smaller model = cheaper = better' shortcut the domain explicitly warns against: Phi-3 mini is built for simple, low-latency tasks, and its higher error rate on complex multi-document contract analysis means the per-token savings are dwarfed by the cost of the regulatory conflicts it misses. Option C sounds like a reasonable cost-saving compromise, but it assumes Phi-3 mini can reliably tell when it has missed something — the actual failure mode in complex regulatory analysis is a model confidently producing a wrong determination, not a model that flags its own uncertainty, so a confidence-gated handoff doesn't catch the errors that matter most here. Option D confuses fine-tuning with capability: fine-tuning can teach a small model the firm's specific wording and patterns, but it doesn't give a smaller model architecture the general reasoning depth and context window needed to reliably catch conflicts across long, complex, multi-document agreements — that gap is exactly why the notes reserve GPT-4o for this category of task rather than treating model choice as something fine-tuning can always compensate for.",
+    "tags": [
+      "model-selection",
+      "cost-optimisation",
+      "foundry-models",
+      "risk"
+    ],
+    "difficulty": "hard"
   }
 ]

@@ -452,5 +452,67 @@
       "concept-drift"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-023",
+    "scenario": "A sales manager just finished a call with a prospective client and wants a polished, personalised follow-up email sent within the hour. She has her own call notes in hand and only needs this one email drafted — there is no ongoing monitoring, no repeated action, and no follow-on step required after the email goes out.",
+    "question": "What is the most appropriate way to use AI for this task?",
+    "options": [
+      "Use Microsoft 365 Copilot to draft the email from her notes in a single prompted interaction — the task is a one-off, single-session request with no need for autonomous action across multiple steps or sessions",
+      "Build a custom AI agent in Copilot Studio that watches her calendar for client calls and autonomously drafts follow-up emails going forward",
+      "Fine-tune a model on her past correspondence so it can generate this follow-up automatically without her reviewing it each time",
+      "Deploy an autonomous agent to monitor her inbox and calendar going forward so that any future follow-up email is drafted and sent without her intervention"
+    ],
+    "correct": 0,
+    "explanation": "This is exactly the kind of request Copilot is built for: a single, prompted, single-session task — she asks once, gets a draft, reviews it, sends it, and the interaction is over. Reaching for anything more autonomous is unnecessary engineering overhead for a task that has no multi-step workflow, no need to act without being asked, and no requirement to persist context beyond this one exchange. Option B fails because building and maintaining a custom agent in Copilot Studio is justified when a process is recurring, multi-step, and needs to run without a human prompting each step (as in ab731-d1-013's inbox-monitoring scenario) — spinning up that infrastructure to handle one ad hoc email is the classic trap of reaching for the most sophisticated-sounding tool when the cheapest one already solves the stated need. Option C misapplies fine-tuning, which exists to teach a model a persistent, specialised writing style or vocabulary at volume (§1.2b), not to automate a single email; it also strips out the human review that a customer-facing, one-off message should get before sending. Option D repeats the same over-reach as B in a different form — standing up ongoing, unattended monitoring and autonomous sending is a solution to a recurring, hands-off need that was never described here; the manager asked for one email, not a standing process, so an agent's defining traits (autonomy, multi-step action, persistence) bring no benefit and add unnecessary risk (an unreviewed message going out on her behalf).",
+    "tags": [
+      "ai-agents",
+      "copilot-vs-agent",
+      "use-case-selection"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-024",
+    "scenario": "A procurement team is running a vendor contract negotiation that unfolds over several weeks. Each morning, someone reviews the vendor's latest correspondence, checks it against everything already agreed or countered in prior days, flags any change in terms, and updates the internal negotiating position — all without re-explaining the full history of the negotiation from scratch each time.",
+    "question": "Which capability makes an AI agent — rather than Copilot — the right fit for sustaining this process across many separate days without a human re-briefing it each morning?",
+    "options": [
+      "An agent can maintain state and context across sessions and tasks, so it retains the negotiation history and prior decisions between sessions; Copilot's context is limited to a single session and requires the human to re-supply relevant background each time",
+      "Copilot can also retain full conversational memory across sessions once a user pins the chat, so either tool works equally well for this process",
+      "Agents are simply able to process a higher volume of correspondence per hour than Copilot, which is what a weeks-long negotiation needs",
+      "Only an agent can reference a document like the negotiating-position file at all — Copilot has no ability to read anything outside the chat window"
+    ],
+    "correct": 0,
+    "explanation": "The defining trait being tested here is memory: Copilot's context is single-session — each new conversation starts fresh, so a human has to re-supply whatever background the model needs — while an agent can maintain state and context across sessions and tasks, which is exactly what lets it pick up a weeks-long negotiation each morning already 'knowing' what was agreed on prior days without anyone re-briefing it. Option B is the specific misconception this angle is designed to catch: pinning or continuing a chat thread is a UI convenience for staying in the same conversation, not the architectural property of persisting state across genuinely separate sessions the way an agent does — the notes' table draws this distinction as an inherent design difference between the two, not something a chat feature grants Copilot. Option C swaps in a different dimension entirely — scalability, the ability to handle higher volume than a human (§1.5) — which has nothing to do with why a process needs to remember yesterday's decisions today; a tool could process correspondence quickly and still fail this scenario if it forgot everything between sessions. Option D overstates Copilot's limitations: Copilot can reference organisational documents it has permission to see (§1.9) and isn't blind to content outside the chat window; what it lacks is the ability to autonomously carry that context forward, unprompted, across separate sessions — the memory/state distinction, not document access, is what actually separates the two tools here.",
+    "tags": [
+      "ai-agents",
+      "copilot-vs-agent",
+      "agent-memory",
+      "agentic-ai"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-025",
+    "scenario": "A market-research team needs to gather information from public news sources and the company's internal M&A briefing documents on a competitor, then synthesise the findings into a report. Separately, the finance team wants an agent that, whenever a new invoice lands in a specific shared mailbox, extracts its line items, checks them against three approval rules unique to the company's own workflow, and posts the result into a proprietary internal database used only by that team.",
+    "question": "Which of these two needs is already covered by an existing Microsoft 365 built-in agent, and which actually requires a custom agent built in Copilot Studio?",
+    "options": [
+      "The market-research task matches the Researcher agent's purpose (autonomously researching a topic across web and org data, then synthesising a report) and needs no custom build; the invoice-approval workflow is company-specific business logic tied to a proprietary database and rules, so it requires a custom agent built in Copilot Studio",
+      "Both tasks should use the Analyst agent, since Analyst agents can write and run code to complete any workflow, including company-specific business processes",
+      "Both tasks require a custom agent built in Copilot Studio, because Microsoft's built-in M365 agents are limited to answering questions and cannot perform research or work with data",
+      "The invoice-approval workflow matches the Researcher agent, since Researcher agents can already autonomously interact with mailboxes and internal databases, while the market-research task requires a custom build"
+    ],
+    "correct": 0,
+    "explanation": "Matching each need to its documented scope resolves this cleanly: the Researcher agent's stated purpose is autonomously researching a topic across web and organisational data and synthesising a report — precisely what the market-research team needs, with no custom build required. The invoice workflow, by contrast, depends on three approval rules unique to this company and a write into a proprietary internal database — that is exactly the kind of business-workflow-specific automation the notes reserve for a custom agent built in Copilot Studio, since no built-in M365 agent is designed to know a specific company's approval logic or integrate with its bespoke database. Option B overstates the Analyst agent's scope: its documented purpose is writing and running code for data analysis — generating charts and insights from data — not automating arbitrary company-specific business processes with custom rules and proprietary system integrations; 'can run code' does not mean 'can replace any custom workflow.' Option C denies the well-documented existence of the Researcher and Analyst agents altogether, contradicting the very examples given for M365 built-in agents — treating the market-research need as requiring a custom build would mean duplicating capability that already exists off-the-shelf. Option D simply reverses the correct mapping: the Researcher agent's scope is research and synthesis, not autonomous mailbox monitoring against a proprietary database and custom approval rules, and the market-research task is squarely research-and-synthesis work, not something that needs a custom build.",
+    "tags": [
+      "ai-agents",
+      "copilot-vs-agent",
+      "m365-agents",
+      "use-case-selection"
+    ],
+    "difficulty": "medium"
   }
 ]
