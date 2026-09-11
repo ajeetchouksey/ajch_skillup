@@ -59,7 +59,10 @@
           "title": "Evaluate AI agents and agentic automation",
           "questionIds": [
             "ab731-d1-013",
-            "ab731-d1-019"
+            "ab731-d1-019",
+            "ab731-d1-023",
+            "ab731-d1-024",
+            "ab731-d1-025"
           ]
         },
         {
@@ -112,7 +115,10 @@
           "id": "2.4",
           "title": "Optimise AI model costs, licensing, and selection",
           "questionIds": [
-            "ab731-d3-006"
+            "ab731-d3-006",
+            "ab731-d2-018",
+            "ab731-d2-019",
+            "ab731-d2-020"
           ]
         },
         {
@@ -145,7 +151,9 @@
           "title": "Design AI governance structures and councils",
           "questionIds": [
             "ab731-d3-004",
-            "ab731-d3-016"
+            "ab731-d3-016",
+            "ab731-d3-019",
+            "ab731-d3-020"
           ]
         },
         {
@@ -180,7 +188,9 @@
           "id": "3.6",
           "title": "Scale AI initiatives with governance frameworks",
           "questionIds": [
-            "ab731-d3-014"
+            "ab731-d3-014",
+            "ab731-d3-021",
+            "ab731-d3-022"
           ]
         }
       ]

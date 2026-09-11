@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ab731-scenario-002",
+  "title": "Solstice Retail Sorts Three AI Requests Into Buy, Extend, Build",
+  "description": "A global retailer's IT team must route three simultaneous AI proposals — a marketing copy request, an HR onboarding automation, and a custom recommendation model — to the correct layer of the Microsoft AI stack using the Buy/Extend/Build framework, while also catching a years-old SharePoint sharing problem before the first rollout goes live.",
+  "examId": "ab731",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [1, 2],
+  "scenario": {
+    "background": "Three unrelated AI requests landing on the same quarter's roadmap force Solstice Retail Group to run the same buy/extend/build decision three separate times — and a two-year-old SharePoint sharing mistake threatens to turn the very first rollout into a data-exposure incident on day one, before anyone has even asked a security question about the other two. Solstice Retail Group is a 6,000-employee apparel and home-goods retailer operating in 14 countries, with Microsoft 365 E5 licences enterprise-wide and analytics workloads already split across Fabric and Azure. This quarter, three separate teams have brought AI proposals to IT for review at the same time: marketing wants faster on-brand product copy, HR wants a faster and less error-prone new-hire process, and data science wants to finally build the personalized recommendation engine it has been requesting for two years. IT's job is to route each request to the right layer of the Microsoft AI stack, and to make sure none of them go live on top of a permissions problem nobody has looked at in years.",
+    "characters": [
+      {
+        "name": "Elena Vasquez",
+        "role": "VP of Marketing",
+        "concern": "Her team spends hours each week hand-writing product descriptions and social captions in a brand tone that's already documented in a shared style guide, and she wants an AI tool live before next month's seasonal catalog, without waiting on a custom build."
+      },
+      {
+        "name": "Raj Patel",
+        "role": "Director of HR Operations",
+        "concern": "New hires have slipped through the cracks between IT provisioning, badge access, and facilities before, and he wants the onboarding handoffs to run themselves the moment a new-hire record appears in the HR system, not depend on a manager remembering to prompt each step."
+      },
+      {
+        "name": "Sam Okafor",
+        "role": "Head of Data Science",
+        "concern": "He wants a recommendation engine trained on three years of Solstice's own purchase history, with full control over the model architecture and evaluation pipeline — not just a chatbot that answers questions about existing catalog data."
+      },
+      {
+        "name": "Diane Reyes",
+        "role": "IT Security Manager",
+        "concern": "She's about to sign off on the marketing team's Copilot rollout when a routine sharing audit turns up two years of company-wide sharing links on old campaign folders, and she needs to decide what has to happen before go-live, not after."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ab731-scenario-002-q1",
+      "stem": "Elena's team needs to draft dozens of product descriptions and social captions each week using the brand's existing tone-of-voice guide, already documented in a shared Word doc, with no new data source and no need to customize workflows outside Word and Outlook. Per the Buy/Extend/Build framework, what should her team use?",
+      "options": [
+        "Build a custom AI application in Azure AI Foundry trained specifically on the tone-of-voice guide and past campaign copy",
+        "Use Microsoft 365 Copilot directly in Word and Outlook — this is a Buy scenario, since no customization or new data source is required",
+        "Build a Copilot Studio agent connected to a dedicated product-description knowledge base",
+        "Fine-tune a model specifically to reproduce the brand's tone of voice before letting the team use it"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: Elena's team needs AI capability immediately, with no customization and no data source beyond what M365 Copilot already reaches inside Word and Outlook — the textbook definition of Buy. A is wrong because building a custom Foundry application is the Build tier, reserved for needs no low-code tool can reach at all; here, out-of-the-box Copilot already covers the requirement, so a custom build is expensive overkill. C is wrong because Extend (Copilot Studio) is for adding org-specific data sources or workflows Copilot doesn't already have access to — there's no new knowledge base here, just a tone guide Copilot can already read as a Word document. D is wrong because fine-tuning is reserved for cases where prompting and existing documented guidance genuinely cannot get the desired tone or vocabulary — Elena's team already has a written tone guide Copilot can reference directly, so fine-tuning would be a costly, premature step before ever trying the free capability already available."
+    },
+    {
+      "id": "ab731-scenario-002-q2",
+      "stem": "Raj wants new-hire onboarding to trigger the moment a record appears in the HR system, then automatically create the IT ticket, initiate the access request, and notify facilities — pausing only for a manager's approval on high-risk access requests — without anyone re-opening a chat window to prompt each step. Which approach fits this requirement?",
+      "options": [
+        "Have managers use Copilot in Outlook to draft the IT ticket, the access request, and the facilities email themselves, one at a time, as each step comes due",
+        "Build a Copilot Studio agent that triggers on the new-hire event and orchestrates the IT ticket, access request, and facilities notification, routing only high-risk approvals to a manager",
+        "Build a fully custom onboarding application in Azure AI Foundry, integrating directly with the HR, IT, and facilities systems from scratch",
+        "Give managers a longer, more detailed prompt template covering all three onboarding steps, so they can paste it into Copilot chat at the right moment"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: this is exactly the Extend layer's purpose — a Copilot Studio agent that triggers itself on an event and orchestrates a multi-step, multi-system process end to end, inserting a human only where a genuine decision (high-risk access) is required. A is wrong because it keeps a human prompting every single step, which is ad hoc Copilot chat, not automation — it doesn't solve Raj's actual complaint about steps slipping through the cracks. C is wrong because Build (Foundry) is reserved for needs a low-code tool cannot reach at all; a multi-step internal workflow across systems Microsoft already has connectors for is squarely what Copilot Studio exists to orchestrate, making a from-scratch custom application unnecessary cost and complexity. D is wrong because a longer prompt template still requires a human to open Copilot chat and paste it in at each step — it never removes the human from the loop between steps, which is the entire requirement Raj described."
+    },
+    {
+      "id": "ab731-scenario-002-q3",
+      "stem": "Sam's team wants to train a personalized recommendation model on three years of Solstice's own purchase history, with full control over model architecture, evaluation, and the MLOps pipeline — not a tool that just answers questions about existing catalog data. Which layer of the Microsoft AI stack fits this need?",
+      "options": [
+        "Microsoft 365 Copilot, connected to the purchase history data through a custom connector",
+        "A Copilot Studio agent that queries the purchase history as a knowledge source and answers questions about it",
+        "Azure AI Foundry (Microsoft Foundry), training a custom model at the Foundation and Platform layers, since no low-code tool trains a model from scratch",
+        "Microsoft Copilot (the free, consumer version), with web search enabled to pull in general retail buying trends"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: training a custom model with full control over architecture and evaluation is Foundation/Platform-layer work, and Azure AI Foundry is the only tool in the stack built for that — no low-code layer above it trains a model from scratch. A is wrong because M365 Copilot, even with a custom connector, only lets Copilot read the purchase history as context for answering questions — it cannot train a new model on that data. B is wrong for the same reason: Copilot Studio is a no-code agent builder for retrieving and acting on existing data sources, not a model-training platform, so it can't produce the custom recommendation model Sam wants. D is wrong because the consumer Copilot has no access to Solstice's private purchase history at all, and web search on general retail trends is the opposite of a model personalized to Solstice's own customers."
+    },
+    {
+      "id": "ab731-scenario-002-q4",
+      "stem": "Before Elena's Word/Outlook rollout goes tenant-wide, Diane runs a routine sharing audit and finds two years of company-wide sharing links on old campaign folders, plus stale guest access nobody has reviewed. She's worried a single Copilot query could now surface all of it instantly, under whichever employee's permissions happen to include it. What should Diane do before rollout?",
+      "options": [
+        "Trust that Copilot's respect for existing permissions is sufficient protection, since Copilot cannot show a user anything they couldn't already open manually",
+        "Disable Microsoft Graph connectivity for the whole marketing team until every sharing link has been reviewed one by one",
+        "Use SharePoint Advanced Management to run an oversharing report, restrict discoverability of the flagged folders, and apply sensitivity labels — then proceed with rollout",
+        "Require every marketing employee to individually re-request access to every folder they currently use, resetting all permissions to zero"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: SharePoint Advanced Management's oversharing report, discoverability restriction, and sensitivity labelling target the actual problem — content shared far more broadly than it should be — and clear it before a fast, tenant-wide search surface makes it instantly discoverable. A is wrong because 'Copilot respects existing permissions' is true but is not a substitute for a clean permission baseline; it guarantees Copilot won't show someone something they lack permission for, but says nothing about permissions that were already granted too broadly two years ago. B is wrong because disabling Graph entirely blocks the legitimate marketing work Elena needs and doesn't fix the underlying oversharing — it's an overcorrection that trades one problem for a bigger one. D is wrong for the same reason in the opposite direction: forcing everyone to re-request every folder is disruptive to real work and untargeted, when the actual fix is finding and shrinking the specific overshared content, not resetting access wholesale."
+    },
+    {
+      "id": "ab731-scenario-002-q5",
+      "stem": "Sam's team is also deciding which model powers the live 'customers like you also bought' recommendations shown in real time as a shopper browses a product page, separate from the offline nightly job that re-trains the ranking model on purchase history. The live component needs to respond in well under a second. Which model choice best fits it?",
+      "options": [
+        "GPT-4o, because a larger model with a bigger context window will always produce the most accurate recommendations regardless of the task",
+        "A lightweight, cost-effective model such as Phi, because the real-time component needs low latency far more than it needs deep multi-step reasoning",
+        "An open-source model such as Llama, because open-source models are inherently faster than proprietary models at any size",
+        "Whatever model powers the offline nightly re-training job, so the recommendation system only has to maintain one model"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: matching model to task means weighing latency, cost, and accuracy together, and a live, sub-second recommendation surface is exactly the scenario where a lightweight model like Phi wins — it does less computation per token, responding fast enough that shoppers never notice a delay, at a fraction of the cost of running a large model on every page view. A is wrong because bigger isn't automatically better; GPT-4o's extra reasoning capacity is wasted on a narrow, well-defined recommendation task and its higher latency directly works against the sub-second requirement. C is wrong because being open source is about licensing and hosting control, not speed — an open-source model can be just as large and slow as a proprietary one; speed comes from model size and architecture, not licence type. D is wrong because the real-time and offline components have different requirements (latency-critical vs. accuracy-critical, unconstrained by response time), and forcing them onto one model sacrifices the real-time page's responsiveness for a consistency benefit that isn't actually required here."
+    }
+  ],
+  "keyLearnings": [
+    "Apply Buy/Extend/Build per use case, not per company — the same organisation can correctly land on Buy for one request, Extend for another, and Build for a third, all in the same quarter, because the decision follows each requirement's own scope, not a blanket policy.",
+    "A Copilot Studio agent that triggers itself and orchestrates a multi-step process across systems is the right call whenever a workflow shouldn't need a human to re-open chat at every step — that's Extend, not a from-scratch Foundry build.",
+    "Training a custom model on your own historical data is Foundation/Platform-layer work that belongs in Azure AI Foundry — no low-code layer above it trains a model from scratch, no matter how well-defined the data is.",
+    "Permission inheritance only prevents new accidental exposure; it does nothing about oversharing that already exists. Run SharePoint Advanced Management's oversharing report and remediate before a broad Copilot rollout, not after."
+  ]
+}

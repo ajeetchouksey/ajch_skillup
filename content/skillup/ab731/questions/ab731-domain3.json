@@ -379,5 +379,93 @@
       "data-residency"
     ],
     "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-019",
+    "scenario": "A talent acquisition team wants to launch a Copilot Studio agent that automatically screens incoming job applications, scores each candidate's resume against the role's requirements, and rejects candidates who fall below a threshold score before a recruiter ever reviews the application. The agent would pull data from the HR applicant-tracking system, background-check vendor records, and Legal's candidate litigation-history log to compute its score.",
+    "question": "Should this use case be approved directly by the talent acquisition team, or does it need to go before the AI Council first?",
+    "options": [
+      "The talent acquisition team can approve it themselves, since hiring decisions have always been an HR responsibility and this tool sits entirely within HR's existing authority",
+      "It must go before the AI Council before deployment — the automated reject decision affects candidates directly, draws on regulated background-check and litigation data spanning HR and Legal, and is exactly the kind of high-risk, cross-functional use case the Council exists to review",
+      "IT can approve it unilaterally once it confirms the Copilot Studio connectors are technically configured correctly, since the risk here is a data-integration risk, not a governance risk",
+      "The Centre of Excellence can sign it off on its own once it confirms the agent follows Copilot Studio build standards, without needing the Council's separate review"
+    ],
+    "correct": 1,
+    "explanation": "B is correct because this use case crosses every threshold that routes a decision to the AI Council rather than a lower level: it makes an automated adverse decision about real people (candidate rejection) with no human in the loop, it draws on regulated and sensitive data (background-check records, litigation history) that spans HR and Legal rather than staying inside one department, and per §3.6b that data-classification step feeds directly into the Council's use-case approval process — the Council shouldn't approve a use case at this risk tier until that classification and cross-functional review has happened. A is wrong because 'HR has always owned hiring' confuses functional ownership of the business process with governance authority over a new automated decision system that touches Legal-held data and carries Fairness/discrimination risk (§3.1) — HR doesn't have unilateral authority to accept that risk on the organisation's behalf. C is wrong because it treats a governance and Fairness/Accountability risk (an algorithm rejecting candidates with no human review) as though it were purely a technical connector-configuration problem; correctly wiring the data feed says nothing about whether the automated decision itself is appropriate or compliant. D is wrong because it conflates the CoE's role (technical build standards, reusable patterns) with the Council's role (strategy, risk, and use-case approval — §3.13's 'WHAT we do and SHOULD we do it') — the CoE can confirm the agent was built well without ever answering whether it should be allowed to auto-reject candidates in the first place.",
+    "tags": [
+      "ai-council",
+      "governance",
+      "use-case-approval",
+      "data-classification",
+      "risk-escalation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-020",
+    "scenario": "A regional facilities team wants to build a small Copilot Studio agent that summarises its own weekly internal stand-up notes — stored only in that team's private Teams channel — into a short recap posted back to the same channel. No customer data, personal data, or data from any other department is involved, and no automated decisions are made; the agent only produces a summary for the team's own reference.",
+    "question": "Does this use case need to go before the full AI Council for approval before the team can turn it on?",
+    "options": [
+      "No — it can be approved at the business-unit level by following the organisation's existing acceptable-use and data-handling policy, since it is narrowly scoped, touches no sensitive or cross-functional data, and makes no automated decision about anyone",
+      "Yes — every AI use case, regardless of scope, must go before the full AI Council before it can be switched on, since the Council is the organisation's single approval gate for all AI activity",
+      "No — the team can turn it on without following any governance policy at all, since the data involved belongs entirely to the team itself",
+      "No — but the team should wait until a formal AI Council has been fully staffed and holds its first meeting before building anything, even at low-code, department-internal scale"
+    ],
+    "correct": 0,
+    "explanation": "A is correct because the AI Council's role (§3.3) is to review and approve use cases that carry real risk — sensitive or cross-functional data, automated decisions affecting people, regulatory exposure — and this agent has none of that: it's single-team, internally scoped, touches no data outside the team's own notes, and makes no decision about anyone. Not every AI initiative needs top-level Council sign-off; the governance checklist from §3.2 (acceptable use, data handling) exists precisely so lower-risk, department-internal builds can be approved at the business-unit level against written policy rather than escalated every time. B is wrong because it turns the Council into a bottleneck for every trivial build in the organisation — the over-engineering the exam consistently marks wrong — when the Council's value comes from focusing its attention on genuinely high-risk decisions, not acting as a mandatory checkpoint for a single-team notes summary. C is wrong because 'no governance at all' ignores that even low-risk builds still need to follow the organisation's written acceptable-use and data-handling policy (§3.2) — skipping governance entirely is the 'figure it out after problems occur' failure mode the notes warn against, even when the risk happens to be low. D is wrong because treating an unstaffed or not-yet-convened Council as a reason to freeze all AI activity contradicts the notes' repeated point that governance should enable safe progress, not create paralysis — a properly scoped low-risk build can proceed under existing policy while the Council forms or focuses on higher-risk items.",
+    "tags": [
+      "ai-council",
+      "governance",
+      "use-case-approval",
+      "risk-escalation",
+      "governance-structure"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-021",
+    "scenario": "A Finance team's Copilot Studio pilot — an agent that summarises monthly expense reports — was a clear success. Word spreads, and within a few weeks Marketing, Sales, and HR each independently start building their own Copilot Studio agents. Each team is choosing its own data connectors, applying different security configurations, and producing agents of noticeably inconsistent quality, with Marketing and Sales duplicating almost identical functionality without realising it.",
+    "question": "As AI usage grows from a single successful pilot toward enterprise scale, what is the best way to address this duplication and inconsistency?",
+    "options": [
+      "Let each department keep building independently, since Copilot Studio is low-code and the whole point of the pilot's success was proving that business units don't need central involvement",
+      "Route these builds through the Centre of Excellence's reusable asset library and technical standards, with Business Unit AI Leads bridging the CoE and each business team, so departments stop reinventing the same components at different quality levels",
+      "Have central IT take over and build every department's agent from scratch itself, so there is a single team responsible for all technical quality",
+      "Pause all department-level building entirely and require the AI Council to personally review and approve the configuration of each individual agent before any team may proceed"
+    ],
+    "correct": 1,
+    "explanation": "B is correct because this is precisely the duplication-and-inconsistency problem the CoE exists to solve at scale (§3.13, §3.14): a reusable asset library and shared technical standards mean Marketing and Sales stop rebuilding the same connector logic from scratch, and Business Unit AI Leads — embedded in each department specifically to bridge the CoE and the business — carry those standards into each team's build without slowing teams down or centralising the work in IT. A is wrong because it's the status quo that caused the problem in the scenario — 'low-code means no central involvement needed' is exactly the reasoning that produced duplicated effort and inconsistent quality once usage moved past a single pilot; low-code lowers the skill bar to build, it doesn't remove the need for shared standards. C is wrong because centralising all building in IT contradicts the 'empower SMEs' principle of scaling (§3.13) and doesn't scale itself — IT becomes the very bottleneck the framework is designed to avoid, and it discards the domain expertise Marketing, Sales, and HR bring to their own agents. D is wrong because it conflates the Council's strategic/risk-approval role with the CoE's technical-quality role (§3.14's Council-vs-CoE distinction) — routing routine, low-risk build-quality problems through the Council personally reviewing every agent's configuration is the over-engineering the exam marks wrong, since the CoE's governance gate is exactly the layer designed to catch these issues without escalating everything to the top.",
+    "tags": [
+      "scale-ai",
+      "centre-of-excellence",
+      "governance-structure",
+      "reusable-assets",
+      "business-unit-ai-leads"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-022",
+    "scenario": "As Copilot Studio adoption grows beyond the original pilot, IT's queue of requests for department-specific agents keeps growing faster than IT can build them. Legal is next in the backlog, waiting for IT to build them an agent that reviews vendor contracts for non-standard clauses — a task that requires deep knowledge of contract law that IT engineers don't have.",
+    "question": "Consistent with Microsoft's scale-AI framework, what is the best way to resolve this bottleneck as the organisation moves from pilot toward enterprise-wide AI use?",
+    "options": [
+      "Keep IT as the sole builder of every department's agent and hire additional IT developers to work through the growing backlog faster",
+      "Empower the legal team's own subject-matter experts to build the contract-review agent themselves using low-code Copilot Studio, with the Centre of Excellence providing mentoring, technical standards, and a governance-gate review rather than building it centrally",
+      "Freeze all new agent requests across every department until a single company-wide agent-building tool is selected to replace Copilot Studio",
+      "Have the AI Council build and configure the contract-review agent directly, since contract review is a high-risk activity that warrants the organisation's most senior oversight body handling it personally"
+    ],
+    "correct": 1,
+    "explanation": "B is correct because this is exactly the 'empower SMEs' phase of scaling described in §3.13: a legal expert building their own contract-review agent is more powerful than IT building one for them, since the SME brings domain knowledge (what actually counts as a non-standard clause) that IT lacks, while low-code Copilot Studio supplies the speed and scale — and the CoE's mentoring, standards, and governance gate (§3.14) ensure that self-built agent still meets quality and responsible-AI requirements without IT having to build it. A is wrong because it keeps IT as the bottleneck the scaling framework is specifically designed to remove — adding headcount to a centralised build model doesn't scale as fast as distributing building capability to the business units that actually need the agents, and it still leaves Legal dependent on people without contract-law expertise. C is wrong because freezing all requests to standardise tooling stalls the organisation's entire scaling progress over a tooling decision that isn't what's blocking Legal — the actual blocker is the centralised-build model, not the choice of platform, and this option doesn't empower anyone. D is wrong because it conflates the Council's strategic/risk-governance role with hands-on technical building (§3.13, §3.14's Council-vs-CoE distinction) — the Council approves high-risk use cases and sets policy, but building and configuring the agent itself is a CoE-and-SME activity with a CoE governance gate, not something the Council does personally.",
+    "tags": [
+      "scale-ai",
+      "centre-of-excellence",
+      "sme-empowerment",
+      "copilot-studio",
+      "governance-structure"
+    ],
+    "difficulty": "medium"
   }
 ]
