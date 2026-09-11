@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.4.0",
+  "contentVersion": "1.5.0",
   "contentUpdatedAt": "2026-09-11",
   "provider": "Microsoft",
   "palette": {
@@ -64,6 +64,12 @@
       "date": "2026-09-11",
       "type": "minor",
       "summary": "Added 10 questions closing 4 low-coverage task-statement gaps flagged by check-exam-completeness.mjs: task 1.5 (ab731-d1-023..025 — Copilot-sufficient single-session use vs agent, agent cross-session memory/state, M365 built-in Researcher/Analyst agents vs a custom Copilot Studio agent), task 2.4 (ab731-d2-018..020 — open-source model selection for air-gapped/no-per-token-fee deployment, quantitative Copilot-licence-vs-pay-as-you-go cost comparison, accuracy-critical model choice as the actual total-cost-optimal pick over the cheapest model), task 3.2 (ab731-d3-019..020 — AI Council approval threshold: which use cases must escalate to Council review vs which can be approved at business-unit level), and task 3.6 (ab731-d3-021..022 — scaling governance from pilot to enterprise: CoE reusable-asset standardisation across departments, and the 'empower SMEs' phase of Copilot Studio adoption). All 4 tasks now meet the ≥3-question coverage minimum checked by check-exam-completeness.mjs."
+    },
+    {
+      "version": "1.5.0",
+      "date": "2026-09-11",
+      "type": "minor",
+      "summary": "Added 2 new scenarios closing Domain 2's zero-scenario gap and reinforcing Domain 3's governance-council/scaling coverage. ab731-scenario-002 (\"Solstice Retail Sorts Three AI Requests Into Buy, Extend, Build\", domains 1+2) is built on the D2 notes' own retailer worked example — Copilot vs Copilot Studio vs Azure AI Foundry for three simultaneous requests, plus the §2.15 SharePoint oversharing pre-rollout governance check and a model-latency selection question. ab731-scenario-003 (\"Calderwood & Finch Builds Its First AI Council\", domains 2+3) targets task-statement gaps 3.2 (AI governance structures/councils) and 3.6 (scaling with governance frameworks) — AI Council composition, Council-vs-CoE approval scope, data classification as a pre-approval gate, and the dual governance gate (CoE technical + Council strategic) a pilot must clear before enterprise-wide scale. Also cross-links to the new ajch_hol_labs lab \"Build the AI Council Governance Gate\" (domain ai-strategy-and-governance), which picks up exactly at this scenario's governance decision point and has the learner produce the actual council roster/checklist artifacts."
     }
   ],
   "id": "ab731",
@@ -137,7 +143,9 @@
     "content/skillup/ab731/questions/ab731-domain3.json"
   ],
   "scenarioFiles": [
-    "content/skillup/ab731/scenarios/ab731-ai-steering-committee.json"
+    "content/skillup/ab731/scenarios/ab731-ai-steering-committee.json",
+    "content/skillup/ab731/scenarios/ab731-buy-extend-build-retailer.json",
+    "content/skillup/ab731/scenarios/ab731-ai-council-scaling-gate.json"
   ],
   "resources": [
     {

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ab731-scenario-003",
+  "title": "Calderwood & Finch Builds Its First AI Council",
+  "description": "A newly formed AI Council at an insurance and financial advisory firm must decide who belongs on it, which decisions require its sign-off versus the Centre of Excellence's, what governance gate a successful pilot must clear before scaling company-wide, and how to keep that governance from becoming a bottleneck.",
+  "examId": "ab731",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [2, 3],
+  "scenario": {
+    "background": "Whether Calderwood & Finch's first AI Council survives its first real test depends less on the claims-triage tool it's reviewing than on who has a seat at the table and what still needs that table's sign-off once the Centre of Excellence is up and running. Calderwood & Finch is a 3,000-employee insurance and financial advisory firm licensed to operate in the UK, US, and Canada, each with its own regulator watching how the company uses AI in customer-facing decisions. A six-week pilot of an AI-assisted claims-triage assistant in the Underwriting division went well, and leadership wants to move fast — but the company has never had to decide, in writing, who governs an AI use case, what a Centre of Excellence is allowed to approve on its own, or what has to happen before a pilot is trusted with production claims data company-wide.",
+    "characters": [
+      {
+        "name": "David Kessler",
+        "role": "Chief Digital Officer",
+        "concern": "He is sponsoring the company's first AI Council and is under pressure from the board to show fast results, but he's wary of building a Council that Legal will later overrule."
+      },
+      {
+        "name": "Farah Haddad",
+        "role": "General Counsel & Chief Compliance Officer",
+        "concern": "She insists the Council reflect the regulatory reality of operating in three countries, not just IT's view of what's technically ready."
+      },
+      {
+        "name": "Priya Desai",
+        "role": "VP of Underwriting",
+        "concern": "She ran the successful claims-triage pilot and wants it live in every regional office as soon as possible, arguing the pilot already proved it works."
+      },
+      {
+        "name": "Tomás Rivera",
+        "role": "Centre of Excellence Lead",
+        "concern": "He is newly appointed and worried that routing every AI change through full Council review, no matter how small, will turn the CoE into a bottleneck instead of an accelerator."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ab731-scenario-003-q1",
+      "stem": "David is forming Calderwood & Finch's first AI Council and initially proposes staffing it with just the CTO, the Head of Infrastructure, and two senior engineers — arguing that the people who understand the AI systems best should decide what gets approved. Farah objects. Who is right, and what should the Council actually look like?",
+      "options": [
+        "David is right — AI Council decisions are fundamentally technical, so the people who best understand how the models work should make them",
+        "Farah is right — the Council should be cross-functional, including Legal/Compliance, HR, and business unit leaders alongside IT, since a technical-only council misses the business, legal, and ethical judgment strategy decisions require",
+        "Neither is right — the Council should be made up entirely of external AI ethics consultants, since internal staff cannot be objective about their own company's use cases",
+        "Neither is right — Council membership should rotate monthly among any employee who volunteers, to keep AI governance fully democratic"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: an AI Council is explicitly cross-functional — it sets strategy, approves use cases, and owns responsible-AI judgment calls, all of which require legal, compliance, HR, and business perspective alongside technical understanding, not technical understanding alone. A is wrong because it's exactly the trap the exam tests: a council that's only IT can assess whether something works technically, but not whether it's fair, compliant across three countries' regulators, or aligned with business risk appetite — the judgment calls a Council exists to make. C is wrong because excluding internal staff entirely removes the people who actually understand the company's regulatory obligations, customer base, and business priorities — objectivity doesn't require handing governance entirely to outsiders. D is wrong because monthly rotation among volunteers produces no consistent institutional judgment or accountability — governance requires continuity of the people making risk decisions, not a revolving door."
+    },
+    {
+      "id": "ab731-scenario-003-q2",
+      "stem": "Priya's team wants to launch two changes next month: (1) an AI-assisted claim-denial recommendation tool that will influence which claims adjusters escalate for denial, and (2) a reusable SharePoint connector template Tomás's CoE built so every regional office can plug its document library into Copilot Studio the same way. Which needs full AI Council review, and which can the CoE approve on its own?",
+      "options": [
+        "Both require full Council review, since any change involving AI carries enough risk to justify the same level of scrutiny",
+        "The claim-denial tool needs Council approval as a high-risk, customer-impacting use case; the connector template is a technical standards asset the CoE can approve on its own",
+        "The connector template needs Council approval because it touches every region's data, while the claim-denial tool can be approved by Priya's own business unit since she owns the use case",
+        "Neither needs review — the claim-denial tool already proved itself in the pilot, and the connector template is just infrastructure, not a use case"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the Council's role is approving high-risk, customer-impacting use cases and setting strategy — a tool that influences claim-denial decisions clearly qualifies — while the CoE's role is defining and approving technical standards and reusable patterns, which is exactly what a connector template is. A is wrong because treating every AI-related change as equally high-risk erases the entire point of having both a Council and a CoE — it would make the Council a bottleneck for routine technical assets that don't need strategic or ethical review. C is wrong because it reverses the two: a reusable technical template is squarely CoE territory, while letting a business unit approve its own high-risk, customer-impacting tool is a conflict of interest the Council exists to prevent. D is wrong because a successful pilot demonstrates technical viability, not governance clearance, and 'just infrastructure' undersells that a shared connector template still needs to meet the CoE's own build-quality and security standards before every region reuses it."
+    },
+    {
+      "id": "ab731-scenario-003-q3",
+      "stem": "Before the Council can vote on approving the claim-denial tool, Farah points out that the pilot used historical claims data that includes some customers' health information. What has to happen first?",
+      "options": [
+        "The Council can approve the use case immediately, since the six-week pilot already demonstrated it performs well in practice",
+        "Data classification of the health information and any other sensitive categories must be completed first and fed into the Council's review — the Council shouldn't approve a use case until classification is complete",
+        "Marketing should be consulted before Legal, since customer perception of an AI claim-denial tool matters more than how its underlying data is classified",
+        "The tool should simply be renamed to avoid the phrase \"claim denial,\" which resolves the underlying compliance concern without further review"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: data classification — identifying that health information and other sensitive categories are involved — is an input the Council needs before it can properly weigh risk and compliance; approving first and classifying later reverses the order the framework requires. A is wrong because a pilot proving the tool works technically says nothing about whether its data handling meets regulatory or privacy requirements across the UK, US, and Canada — technical success and compliance clearance are different questions. C is wrong because reordering consultation to put marketing ahead of the actual compliance requirement doesn't address the underlying issue — customer perception is a separate concern from whether sensitive health data is properly classified and protected. D is wrong because renaming the tool changes nothing about what data it processes or how — it's a cosmetic change, not a compliance action, and the Council's review exists precisely to catch this kind of surface-level non-fix."
+    },
+    {
+      "id": "ab731-scenario-003-q4",
+      "stem": "Priya argues the six-week pilot already proved the claim-denial tool works, and wants it deployed to every regional office next week. What should happen before that scale-up, per the Scale AI Framework?",
+      "options": [
+        "Priya, as the business owner who ran the pilot, should be authorized to approve the enterprise-wide rollout herself, since she has the most direct evidence that it works",
+        "The tool should pass the CoE's technical governance gate (security, responsible AI, data privacy review) and receive AI Council approval for scaling a use case this sensitive — a successful pilot proves the technology works, not that it's cleared for production risk",
+        "Rollout can proceed to all regions immediately, since delaying a proven pilot risks losing the momentum and staff goodwill it built",
+        "IT Security alone should sign off, since the main remaining risk at enterprise scale is technical infrastructure capacity"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: scaling beyond pilot is exactly the decision the Scale AI Framework routes through both governance layers — the CoE's technical gate checks build quality, security, and responsible-AI standards, while the Council approves scaling a use case this sensitive and customer-impacting; a pilot proves the technology can work, not that it has cleared either gate. A is wrong because letting the business owner who championed the use case also approve its own scale-up is a conflict of interest — the same reason it was wrong in question 2 — and bypasses the cross-functional review the Council exists to provide. C is wrong because it contradicts the framework's core principle that governance precedes scale — momentum is not a substitute for a completed risk and compliance review, especially for a tool influencing claim decisions across three regulatory jurisdictions. D is wrong because IT Security's technical sign-off covers only one slice of the risk (infrastructure); it misses the responsible-AI, fairness, and regulatory-compliance review that a claim-denial tool specifically requires."
+    },
+    {
+      "id": "ab731-scenario-003-q5",
+      "stem": "Tomás is worried that if every future AI change — no matter how small — has to go through full Council review, the CoE will become a bottleneck instead of an accelerator. How should governance be structured so this doesn't happen?",
+      "options": [
+        "Eliminate the Council-approval requirement entirely once the CoE is fully staffed, since a mature CoE makes Council review redundant",
+        "The Council focuses on strategy, ethics, and approving high-risk or novel use cases, while the CoE independently owns technical standards and approves lower-risk builds that match those standards — keeping the Council from bottlenecking every asset",
+        "Require every AI change, regardless of risk level, to pass through both the Council and the CoE in sequence, to guarantee nothing is ever missed",
+        "Let each regional office define and run its own separate governance process, since one company-wide Council can't move at the pace every region needs"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: this is the actual division of labor the Council/CoE structure is built for — Council bandwidth is reserved for strategy and high-risk or novel use cases (like the claim-denial tool), while the CoE independently clears lower-risk, pattern-matching builds like the connector template against its own established standards, so routine work never has to wait on Council time. A is wrong because eliminating Council approval entirely removes the strategic, ethical, and cross-jurisdictional regulatory judgment the CoE isn't chartered to provide — the CoE handles 'how to build it well,' not 'should we build it at all.' C is wrong because it produces exactly the bottleneck Tomás fears: forcing even trivial, low-risk technical assets through two sequential reviews slows the CoE down for no added risk reduction. D is wrong because fragmenting governance by region reintroduces the very problem a Council and CoE exist to prevent — inconsistent standards and no single body accountable for cross-regional regulatory compliance."
+    }
+  ],
+  "keyLearnings": [
+    "An AI Council must be cross-functional — Legal/Compliance, HR, and business leaders alongside IT — because strategy, ethics, and regulatory risk decisions require perspectives a technical-only council can't provide.",
+    "Route decisions by risk and type: high-risk, customer-impacting use cases need full AI Council approval; technical standards and reusable assets (connector templates, prompting guidelines) are the Centre of Excellence's to approve on its own.",
+    "Data classification is an input to Council approval, not an afterthought — the Council shouldn't vote on a use case until the sensitive data categories it touches have been identified.",
+    "Scaling a pilot enterprise-wide requires clearing both governance gates — the CoE's technical/build-quality review and the Council's strategic/risk approval — because a successful pilot proves the technology works, not that it's cleared for production risk at scale."
+  ]
+}
