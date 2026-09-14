@@ -2,7 +2,6 @@
 **Exam Weight: 38% — Heaviest Domain (tied)**
 
 ---
-<div class="note-important"><strong>This distinction drives ~30% of D1 questions.</strong> The exam will give you scenarios and ask which AI type is appropriate. If the task is "generate text / images / code / summaries" → generative AI. If it's "classify fraud / predict churn / detect spam" → traditional ML.</div>
 
 > **🧠 The Golden Rule - "Generative AI CREATES new content. Other AI CLASSIFIES or PREDICTS existing patterns."**
 
@@ -11,16 +10,6 @@
 <div class="note-scribble">The trick the exam uses: "Generate a summary" is generative AI. "Identify which emails are spam" is classification (traditional ML). Look for the word "generate," "create," "draft," or "compose" as the tell.</div>
 
 > 💡 **Human Angle**: A CFO doesn't fund the AI that wins the demo — the same way nobody buys a sports car for a grocery run; Domain 1 consistently rewards the leader who asks the business question ("what does this save, and what could it get wrong?") before the technology question.
-
----
-
-## 🗺️ Which Domain Covers This? (Quick Reference)
-
-| Domain | Topics Covered |
-|---|---|
-| **D1 — Business Value** | Generative vs traditional AI, tokens & cost, ROI, RAG vs fine-tuning, prompt engineering, security threats, agents vs Copilot, use-case prioritisation |
-| **D2 — Microsoft AI Apps & Services** | Microsoft 365 Copilot features, Copilot Studio, Azure AI Foundry, agent-building tools, product-specific capabilities |
-| **D3 — Implementation & Adoption** | Responsible AI principles, governance & AI Council, adoption barriers & champions, licensing models, Centre of Excellence, culture change |
 
 ---
 
