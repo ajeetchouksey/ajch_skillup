@@ -22,7 +22,7 @@
 | **Predictive / Regression** | Forecasts a numeric outcome | Sales forecasting, demand prediction |
 | **Recommendation** | Surfaces relevant items | "Users like you also bought..." |
 
-![Diagram 1](/content/skillup/ab731/images/d1-business-value-01.png)
+![Input data branches to four AI types: generative AI to generate new content, discriminative ML to classify, regression ML to predict a number, and recommendation to surface relevant items](/content/skillup/ab731/images/ab731-d1-ai-type-selection.svg)
 
 These categories differ in what the model is mathematically optimised to output, not just in the words used to describe them. A classifier learns a decision boundary — it outputs a category, or a probability distribution over a fixed set of labels, because that's what its training rewarded it for getting right. A generative model learns a probability distribution over sequences of tokens, and produces a new sequence by sampling from that distribution one token at a time. That's why a generative model can write a paragraph nobody has written before, while a spam classifier can never output a new category — it was never trained to produce anything but "spam" or "not spam."
 
@@ -134,7 +134,7 @@ Training data reflects real-world human biases. If the training data over-repres
 - **Representation bias** — some groups under-represented in training data
 - **Measurement bias** — data collected inconsistently across groups
 
-![Diagram 2](/content/skillup/ab731/images/d1-business-value-02.png)
+![Bias flows from training data through the model into biased outputs and business, legal and ethical risk; mitigation through diverse data, RLHF and evaluation acts on the data and the model](/content/skillup/ab731/images/ab731-d1-bias-chain.svg)
 
 ---
 
@@ -181,7 +181,7 @@ A pretrained model's knowledge has a **cutoff date** and doesn't know about your
 
 ### The Solution: RAG
 
-![Diagram 3](/content/skillup/ab731/images/d1-business-value-03.png)
+![RAG sequence: the user asks for Q3 sales, the AI model retrieves relevant chunks from your data, gets $4.2M back from the report, and answers with a grounded reply](/content/skillup/ab731/images/ab731-d1-rag-sequence.svg)
 
 **Grounding** = connecting the model's responses to authoritative, verified data sources so it doesn't fabricate.
 
@@ -244,7 +244,7 @@ These threats work because an LLM can't reliably tell "instructions from the sys
 
 ### How agents work
 
-![Diagram 4](/content/skillup/ab731/images/d1-business-value-04.png)
+![An agent takes the goal of processing new contracts, plans it into four steps from retrieving the contract to updating the tracker, and outputs a summary report to legal](/content/skillup/ab731/images/ab731-d1-agent-workflow.svg)
 
 **M365 agent examples:**
 - **Researcher agent** — autonomously researches a topic across web + your org data, synthesises a report
@@ -267,7 +267,7 @@ Not all AI use cases are worth doing first. Prioritise using three dimensions:
 
 ### The Value × Feasibility Matrix
 
-![Diagram 5](/content/skillup/ab731/images/d1-business-value-05.png)
+![Value by feasibility matrix: Quick Wins do first, Strategic Bets plan for later, Incremental Gains do if capacity, Avoid don't do](/content/skillup/ab731/images/ab731-d1-value-feasibility-matrix.svg)
 
 | Quadrant | Value | Feasibility | Action |
 |---|---|---|---|

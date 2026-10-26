@@ -14,7 +14,7 @@
 
 Not every automation problem benefits from an AI agent. The decision tree:
 
-![The Agentic AI Decision Framework](/content/skillup/ab100/images/ab_100_ai_decisiontree.png)
+![Decision tree: structured and rules-based problems go to RPA or Logic Apps; no language understanding goes to traditional ML; no multi-step reasoning goes to Copilot Studio; no autonomous tool use goes to Azure OpenAI with prompt flow; otherwise agentic AI on the AI Foundry Agent Service](/content/skillup/ab100/images/ab100-decision-framework.svg)
 
 ### ROI Calculation Factors
 - **Cost of current process**: FTE hours × hourly rate × volume
@@ -40,7 +40,7 @@ For Azure AI Foundry, think of the relationship as:
 
 **Project** = Individual AI application/team workspace
 
-![Hub vs Project](/content/skillup/ab100/images/ab_100_ai_hub_project.png)
+![Azure AI Foundry Hub providing shared Key Vault, Storage Account, Container Registry and App Insights under one governance layer to the HR Agent, Finance Agent and Customer Support projects](/content/skillup/ab100/images/ab100-d1-hub-vs-project.svg)
 
 
 | Concept | Hub | Project |
@@ -65,7 +65,7 @@ If you're talking about agents, prompts, knowledge bases, evaluations, and deplo
 
 ### Model Selection Decision Tree
 
-![Model Selection Decision Tree](/content/skillup/ab100/images/ab_100_model_selection_decision_tree.png) 
+![Model selection decision tree: edge or embedded goes to Phi-3 / Phi-3.5; deep reasoning to GPT-4o / o1-series; standard reasoning with low latency to GPT-4o-mini / Phi-3-mini, otherwise GPT-4o](/content/skillup/ab100/images/ab100-d1-model-selection.svg) 
 
 
 | Model | Best For | Context | Cost Tier |
@@ -100,7 +100,7 @@ If you're talking about agents, prompts, knowledge bases, evaluations, and deplo
 
 ### Provisioned Throughput Units (PTU)
 
-![Provisioned Throughput Units (PTU)](/content/skillup/ab100/images/ab_100_ptu.png) 
+![Capacity decision from the traffic estimate: sustained peaks above 100K TPM use PTU, spiky traffic uses pay-as-you-go, and both use a PTU baseline with PAYG overflow](/content/skillup/ab100/images/ab100-d1-ptu-capacity.svg) 
 
 
 - **PTU**: billed by provisioned unit/hour regardless of usage — best when utilization > 60%
@@ -144,7 +144,7 @@ If you're talking about agents, prompts, knowledge bases, evaluations, and deplo
 
 ### Event-Driven Agent Trigger Patterns
 
-![Provisioned Throughput Units (PTU)](/content/skillup/ab100/images/ab_100_event_driven_agent_trigger_patterns.png) 
+![Event sources (Exchange email, Power Apps form, Service Bus message, Blob upload) trigger an AI Foundry agent via Logic Apps, Power Automate, Azure Function or Event Grid, and the agent updates CRM, sends a response or creates a ticket](/content/skillup/ab100/images/ab100-d1-event-trigger-patterns.svg) 
 
 | Trigger Pattern | Best For | Latency |
 |----------------|----------|---------|

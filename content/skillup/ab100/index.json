@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.1",
-  "contentUpdatedAt": "2026-09-02",
+  "contentVersion": "1.0.2",
+  "contentUpdatedAt": "2026-10-26",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -22,6 +22,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Added taxonomyIds to 4 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    },
+    {
+      "version": "1.0.2",
+      "date": "2026-10-26",
+      "type": "patch",
+      "summary": "Replaced all 5 diagram PNGs in d1 notes with AaryaAI-branded SVGs (decision framework, hub vs project, model selection, PTU capacity, event-trigger patterns) — 680px, embedded Barlow fonts, descriptive alt text; old PNGs removed. Fixed the event-driven trigger diagram's alt text, which was mislabelled as PTU."
     }
   ],
   "id": "ab100",
