@@ -18,7 +18,8 @@
       "copilot-cli",
       "responsible-ai",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-002",
@@ -39,7 +40,8 @@
       "vscode",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-003",
@@ -58,7 +60,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-004",
@@ -79,7 +82,8 @@
       "ide-integration",
       "responsible-ai",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-005",
@@ -97,142 +101,142 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-006",
     "domain": 6,
-    "scenario": "The InfoSec team at Apex Technologies is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "What is the primary function of the command ‘gh copilot suggest’?",
+    "question": "In GitHub Copilot CLI, what does plan mode (toggled with Shift+Tab) do?",
     "options": [
-      "To provide an explanation of a given command.",
-      "To automatically execute a series of commands based on a predefined alias.",
-      "To initiate an interactive session where Copilot helps you construct a command.",
-      "To update the Copilot in the CLI extension to the latest version."
+      "Copilot asks clarifying questions and builds a plan before writing any code",
+      "Copilot runs every command without asking for approval",
+      "Copilot switches to the cheapest available model",
+      "Copilot exports the session as a reusable shell script"
     ],
-    "correct": 2,
-    "explanation": "https://docs.github.com/en/copilot/using-github-copilot/using-github-copilot-in-the-command- line#getting-command-suggestions",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's Copilot CLI docs say Shift+Tab switches between the default mode and plan mode, in which Copilot analyzes the request, asks clarifying questions and produces a plan before any code is written. B is wrong because auto-approval is controlled by permission settings such as `--allow-all-tools`, not plan mode. C is wrong because models are changed with `/model`. D is wrong because plan mode does not export scripts.",
     "tags": [
-      "ide-integration",
       "copilot-cli",
-      "copilot-extensions",
-      "github-copilot"
-    ]
+      "concept",
+      "recall"
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-007",
     "domain": 6,
     "scenario": "A DevSecOps engineer at NovaTech is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "What is a key limitation of the GitHub Copilot Free plan for individual users?",
+    "question": "What is a documented limit of the GitHub Copilot Free plan?",
     "options": [
-      "Cannot execute edits across multiple files",
-      "Limited to 1000 code completions per month",
-      "Limited to 50 chat messages per month",
-      "Access is restricted to GitHubaOUs proprietary Al models only"
+      "Up to 2,000 inline code completions per month",
+      "Unlimited chat but no code completions",
+      "Access only in Visual Studio",
+      "A fixed 50 premium requests per day"
     ],
-    "correct": 2,
-    "explanation": "C. Limited to 50 chat messages per month. The GitHub Copilot Free plan imposes a monthly cap of 50 chat messages, making it suitable for lightweight exploration but not continuous development workflows. Incorrect: A. Multi-file edits are not a documented Free plan limitation in this context. B. The code completion limit on Free is 2,000 per month, not 1,000. D. Copilot Free provides access to multiple models including GPT-4o mini — not restricted to GitHub-proprietary models. The 50-message chat cap is the most impactful limitation for daily developers on the Free tier.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's plans page says Copilot Free is limited to 2,000 completions per month, with an allowance of GitHub AI Credits and Auto model selection only. B is wrong because Free includes completions and limits chat through its credit allowance. C is wrong because Free works in the supported IDEs, including VS Code. D is wrong because usage is now metered in GitHub AI Credits, not a daily count of premium requests.",
     "tags": [
       "code-completion",
       "plans",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-008",
     "domain": 6,
-    "scenario": "The GRC team at Cascade Financial is evaluating GitHub Copilot Enterprise for the organisation's 500-person engineering team. The procurement team wants to understand Enterprise-exclusive features before approving a multi-year contract.",
-    "question": "In the context of GitHub Copilot Enterprise, what are docsets(Knowledge Bases)?",
+    "scenario": "The CISO at Harbor Financial wants Copilot's answers about an internal platform to be grounded in the platform's design docs and three repositories, and shared with the whole platform team.",
+    "question": "Which GitHub Copilot feature fits this requirement best?",
     "options": [
-      "Pre-defined sets of coding style guidelines.",
-      "Publicly available collections of code and documentation.",
-      "Tools for generating automated code reviews.",
-      "Private collections of internal code and documentation customized to an organization’s needs."
+      "Create a Copilot Space with the docs and repositories and share it with the team",
+      "Fine-tune a custom Copilot model on the documents",
+      "Add the documents to content exclusion so Copilot reads them first",
+      "Create a knowledge base in the enterprise settings"
     ],
-    "correct": 3,
-    "explanation": "Docsets will be renamed Knowledge Bases. Please review these details., Docsets: https://learn.microsoft.com/en-us/training/modules/introduction-to-github-copilot-enterprise/2-about- github-copilot-enterprise, Knowledge Base: https://docs.github.com/en/enterprise- cloud@latest/copilot/customizing-copilot/managing-copilot-knowledge-bases",
+    "correct": 0,
+    "explanation": "A is correct: Copilot Spaces hold curated context (repositories, files, notes and more) that grounds Copilot's answers, and a space can be shared across an organization. B is wrong because grounding answers in documents does not need a fine-tuned model. C is wrong because content exclusion stops Copilot using files, the opposite of what is wanted. D is wrong because knowledge bases were retired on November 1, 2025 and replaced by Spaces.",
     "tags": [
-      "enterprise",
-      "ide-integration",
-      "knowledge-base",
-      "github-copilot"
-    ]
+      "copilot-spaces",
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-009",
     "domain": 6,
-    "scenario": "The CISO at Harbor Financial is evaluating GitHub Copilot Enterprise for the organisation's 500-person engineering team. The procurement team wants to understand Enterprise-exclusive features before approving a multi-year contract.",
-    "question": "What type of documentation can be used to create docsets(Knowledge Bases) in GitHub Copilot Enterprise?",
+    "question": "How can developers use a Copilot Space from their IDE?",
     "options": [
-      "Any type of documentation, including Markdown files, internal wikis, and code repositories.",
-      "Solely official documentation from software vendors.",
-      "Exclusively code comments within repositories.",
-      "Only public API documentation."
+      "Through the remote GitHub MCP server",
+      "By cloning the space as a Git repository",
+      "They can't; Spaces are only available on GitHub.com",
+      "Through a separate Copilot Spaces IDE extension"
     ],
     "correct": 0,
-    "explanation": "Docsets will be renamed Knowledge Bases. Please review these details., Docsets: https://learn.microsoft.com/en-us/training/modules/introduction-to-github-copilot-enterprise/2-about- github-copilot-enterprise, Knowledge Base: https://docs.github.com/en/enterprise- cloud @latest/copilot/customizing-copilot/managing-copilot-knowledge-bases",
+    "explanation": "A is correct: GitHub's general availability changelog for Copilot Spaces added the option to access spaces directly in the IDE through the remote GitHub MCP server. B is wrong because a space is not a Git repository. C is wrong because IDE access via MCP is supported. D is wrong because no separate Spaces extension is needed.",
     "tags": [
-      "enterprise",
-      "knowledge-base",
-      "github-copilot"
-    ]
+      "copilot-spaces",
+      "mcp",
+      "recall"
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-010",
     "domain": 6,
-    "scenario": "The security team at Summit Health Systems is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "What is the purpose of the ‘Danger Zone’ section in the Copilot Extension settings?",
+    "question": "GitHub App-based Copilot Extensions were sunset on November 10, 2025. What does GitHub point developers to instead for connecting Copilot to external tools and data?",
     "options": [
-      "To provide a way to suspend or uninstall a Copilot Extension and manage its access to organization",
-      "resources.",
-      "To configure advanced settings for the extension that may impact its functionality.",
-      "To report security concerns or vulnerabilities found within a Copilot Extension.",
-      "To allow organization owners to completely uninstall GitHub Copilot from their organization."
+      "Model Context Protocol (MCP) servers",
+      "GitHub Actions marketplace actions",
+      "Copilot Spaces",
+      "OAuth apps with a `copilot` scope"
     ],
     "correct": 0,
-    "explanation": "The ‘Danger Zone’ specifically deals with controlling a Copilot Extension’s authorization to access resources within the organization, allowing for suspension or complete uninstallation.",
+    "explanation": "A is correct: GitHub's sunset notice deprecated GitHub App-based Copilot Extensions in favor of MCP servers, noting that the architectures differ so it is a replacement rather than a straight migration. B is wrong because Actions automate workflows rather than give Copilot tools during a conversation. C is wrong because Spaces curate context but do not connect external tools. D is wrong because there is no `copilot` OAuth scope that replaces extensions.",
     "tags": [
-      "ide-integration",
-      "copilot-extensions",
-      "github-copilot"
-    ]
+      "mcp",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-011",
     "domain": 6,
-    "scenario": "An IT administrator at Orion Defense is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "Which feature of the GitHub Copilot Free plan enhances collaboration and efficiency?",
+    "question": "Which model choice does the GitHub Copilot Free plan provide?",
     "options": [
-      "A fixed the best model with no customization",
-      "Access to unlimited chat messages",
-      "Support for only Visual Studio IDE",
-      "The ability to execute edits across multiple files"
+      "Auto model selection only",
+      "Every premium model, with priority access",
+      "Only Claude models",
+      "Bring-your-own model via an API key only"
     ],
-    "correct": 3,
-    "explanation": "D. The ability to execute edits across multiple files. A standout feature of GitHub Copilot Free is the inclusion of Copilot Edits (multi-file editing), which allows developers to apply AI-suggested changes across several files simultaneously — a capability that normally requires a paid plan in many tools. Incorrect: A. Copilot Free does not lock users into a single model — model selection is available. B. Chat messages are limited on the Free plan (50 per month), not unlimited. C. Copilot Free supports multiple IDEs including VS Code, JetBrains, Neovim, and others — not only Visual Studio.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's plans comparison lists Copilot Free with Auto model selection only. B is wrong because priority access to premium models belongs to plans such as Max and Enterprise. C is wrong because Free is not tied to one provider. D is wrong because bring-your-own provider settings are an advanced Copilot CLI option, not how Free works.",
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-012",
     "domain": 6,
-    "scenario": "The compliance officer at FinServe Capital is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "When using ‘ghcs’ to execute a command, how does Copilot in the CLI handle potential errors?",
+    "question": "In manual approval mode, what happens when GitHub Copilot CLI wants to run a tool such as a shell command?",
     "options": [
-      "It automatically corrects the command and executes it without confirmation.",
-      "It displays a warning message but proceeds with the execution regardless.",
-      "It prompts you to confirm the execution, especially if the command could be destructive.",
-      "It aborts the command execution and provides alternative suggestions."
+      "It asks you to approve once, approve that tool for the rest of the session, or decline with feedback",
+      "It runs the command immediately and reports the result afterwards",
+      "It cancels the request and prints alternative commands",
+      "It sends the command to an organization administrator for approval"
     ],
-    "correct": 2,
-    "explanation": "https://docs.github.com/en/copilot/managing-copilot/configure-personal-settings/configuring-github- copilot-in-the-cli#setting-up-aliases",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's Copilot CLI docs list the choices as Yes (once), Yes and approve the tool for the rest of the running session, or No with feedback. B is wrong because running without asking only happens with options such as `--allow-all-tools`, which GitHub warns increase risk. C is wrong because Copilot asks rather than giving up. D is wrong because approval is given by the user in the session.",
     "tags": [
       "ide-integration",
       "copilot-cli",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-013",
@@ -251,21 +255,21 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-014",
     "domain": 6,
-    "scenario": "The enterprise admin at Apex Technologies is configuring GitHub Copilot for a team that maintains proprietary algorithms. Specific files must never be sent to Copilot's API. The InfoSec team at Apex Technologies is setting up content exclusions and needs to understand the correct configuration approach.",
-    "question": "Are there any exceptions to content exclusion in Copilot Chat?",
+    "question": "Does content exclusion apply to Copilot code review on GitHub.com?",
     "options": [
-      "No, content exclusion applies universally.",
-      "Yes, when using the @github chat participant.",
-      "Yes, in Visual Studio only.",
-      "Yes, when the excluded content is less than 10 lines long."
+      "Yes; files covered by content exclusion are not reviewed",
+      "No; code review always sees every file in the pull request",
+      "Only when the pull request author has a Copilot seat",
+      "Only for repository-level rules, not organization-level rules"
     ],
-    "correct": 1,
-    "explanation": "B. Yes, when using the @github chat participant. Content exclusion settings (like those configured via .gitignore or VS Code settings to prevent Copilot from analyzing certain local files) primarily apply to how Copilot processes your local workspace code. When you use the @github chat participant, you are specifically asking Copilot Chat to interact with and retrieve information from public GitHub repositories (e.g., issues, pull requests, files from specific repos) or GitHub features. In this context, your local content exclusion settings do not apply because you are explicitly querying external, public GitHub data, not instructing Copilot to process your private, locally excluded files. Incorrect: A. No, content exclusion applies universally. This is incorrect because, as explained above, there are specific contexts (like interacting with @github for public repo data) where local content exclusion rules are not relevant or applied. C. Yes, in Visual Studio only. Content exclusion settings are implemented across supported IDEs (Visual Studio Code, Visual Studio, Neovim, JetBrains IDEs) where Copilot is available. The exception is tied to the nature of the request (e.g., @github participant) rather than the specific IDE being used. D. Yes, when the excluded content is less than 10 lines long. There is no documented exception for content exclusion based on the number of lines. Exclusion rules (like those in .gitignore) apply to files or directories regardless of their size, as long as they meet the exclusion pattern. This option is arbitrary and not a known feature of Copilot’s content exclusion.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's content exclusion docs say content exclusions also apply to Copilot code review on the GitHub website, and affected files are not reviewed. B is wrong because excluded files are skipped. C is wrong because the exclusion depends on the rules, not on the author's seat. D is wrong because the doc doesn't limit this to repository-level rules.",
     "tags": [
       "copilot-chat",
       "content-exclusions",
@@ -273,7 +277,8 @@
       "vscode",
       "jetbrains",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-015",
@@ -287,11 +292,12 @@
       "By preventing the need for any code refactoring or restructuring, as the initial code is always optimally designed."
     ],
     "correct": 0,
-    "explanation": "https://learn.microsoft.com/en-us/training/modules/implement-code-improvements-using-github-copilot- tools/3-exercise-improve-code-quality-github-copilot-chat",
+    "explanation": "A is correct: Copilot Chat can suggest changes that make code easier to read and change, such as clearer names, smaller functions and removed duplication, which lowers maintenance effort. B is wrong because Copilot does not fix every bug without the developer. C is wrong because no code is free of future change. D is wrong because generated code still needs review and later refactoring.",
     "tags": [
       "copilot-chat",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-016",
@@ -309,21 +315,21 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-017",
     "domain": 6,
-    "scenario": "The CISO at Harbor Financial is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "What is the primary purpose of the API endpoint for ‘Get Copilot metrics for an enterprise team‘?",
+    "question": "What do the current Copilot usage metrics REST endpoints return?",
     "options": [
-      "To retrieve individual developer license usage within an enterprise team.",
-      "To analyze the aggregated usage patterns of Copilot features within an enterprise team.",
-      "To access detailed logs of code completion suggestions for an enterprise team.",
-      "To control and limit the Copilot feature access for an enterprise team."
+      "Download links to usage reports, such as a one-day report or the latest 28-day report, for an organization or enterprise",
+      "The raw prompts and completions for each user",
+      "Live per-keystroke telemetry streamed over a WebSocket",
+      "Endpoints that change Copilot policies"
     ],
-    "correct": 1,
-    "explanation": "B. To analyze the aggregated usage patterns of Copilot features within an enterprise team. An API endpoint specifically named “Get Copilot metrics for an enterprise team” is designed to provide aggregated data on how Copilot is being used by that specific team. This includes overall statistics like the number of suggestions accepted, lines of code suggested, or active users within that team. This information helps enterprise administrators and team leads understand adoption, effectiveness, and overall usage trends for their team, rather than individual granular details. Incorrect: A. To retrieve individual developer license usage within an enterprise team. While related, “metrics” typically refers to aggregated, statistical data. Retrieving individual developer license usage (e.g., who is actively using a license) might be part of a broader user management API, but this specific “metrics” endpoint is focused on patterns and aggregates, not granular individual activity. C. To access detailed logs of code completion suggestions for an enterprise team. “Detailed logs\" of every code completion suggestion would be an extremely high volume of data and is generally not what a “metrics” API provides. Metrics APIs offer summary statistics and trends, not raw, individual log entries of every suggestion. Such detailed logs would raise significant privacy concerns and would be handled by a different type of logging or auditing API, if at all exposed. D. To control and limit the Copilot feature access for an enterprise team. An API for “metrics” is for retrieving data, not for controlling or limiting features. Control and limitation would be handled by a configuration, management, or administration API, which would typically involve POST, PUT, or DELETE operations, not a GET metrics endpoint.",
+    "correct": 0,
+    "explanation": "A is correct: the Copilot usage metrics endpoints (for example `/orgs/{org}/copilot/metrics/reports/organization-1-day`) return download links to reports. They replaced the legacy Copilot metrics API, which closed on April 2, 2026. B is wrong because prompts and completions are not exposed. C is wrong because reports are generated files, not live streams. D is wrong because policies are managed in settings, not through metrics endpoints.",
     "tags": [
       "code-completion",
       "privacy",
@@ -331,7 +337,8 @@
       "plans",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-018",
@@ -349,7 +356,8 @@
     "tags": [
       "copilot-chat",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-019",
@@ -363,11 +371,12 @@
       "Direct questions about programming concepts or issues"
     ],
     "correct": 2,
-    "explanation": "https://learn.microsoft.com/en-us/training/modules/introduction-prompt-engineering-with-github- copilot/4-github-copilot-data",
+    "explanation": "C is correct: Copilot Chat is built for coding, so detailed questions about computer hardware specifications are not one of its typical input types. A, B and D are wrong because requests to generate, modify or explain code, open-ended coding guidance and direct questions about programming concepts are all normal Copilot Chat inputs.",
     "tags": [
       "copilot-chat",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-020",
@@ -389,13 +398,14 @@
       "ide-integration",
       "jetbrains",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-021",
     "domain": 6,
     "scenario": "The enterprise admin at Meridian Group is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "How does GitHub Copilot handle prompts for code suggestions?",
+    "question": "For Copilot Business, how does GitHub Copilot handle prompts for code completion in the IDE?",
     "options": [
       "It retains all prompts for future improvements and model training purposes.",
       "It keeps prompts only temporarily during the current coding session for processing.",
@@ -403,11 +413,12 @@
       "It sends prompts to a remote server where they are processed and stored for later analysis."
     ],
     "correct": 2,
-    "explanation": "https://learn.microsoft.com/en-us/training/modules/introduction-prompt-engineering-with-github- copilot/4-github-copilot-data",
+    "explanation": "C is correct: Microsoft Learn's GitHub Copilot data unit says that for code completions, prompts are discarded once the suggestion is returned. A is wrong because Business and Enterprise data is not used to train GitHub's models. B is wrong because the prompt isn't kept for the session. D is wrong because completion prompts are not stored for later analysis. Chat on GitHub.com, Mobile and the CLI follows different retention rules.",
     "tags": [
       "domain-3",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-022",
@@ -417,88 +428,76 @@
     "options": [
       "Modifications to Copilot settings.",
       "File names edited by users.",
-      "Commits made to organization repositories.",
       "Content of generated code snippets.",
       "User prompts provided to Copilot."
     ],
     "correct": 0,
-    "explanation": "https://docs.github.com/en/copilot/managing-copilot/managing-github-copilot-in-your- organization/reviewing-activity-related-to-github-copilot-in-your-organization/reviewing-audit-logs-for- copilot-business",
+    "explanation": "A is correct: the Copilot audit log records changes to your Copilot plan, such as settings and policy changes and seats being added or removed; filter with `action:copilot`. B and C are wrong because file activity and generated code are not audit log events. D is wrong because GitHub states that the audit log does not include client session data such as the prompts a user sends to Copilot.",
     "tags": [
       "plans",
       "ide-integration",
       "audit-logs",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-023",
     "domain": 6,
-    "scenario": "A DevSecOps engineer at NovaTech is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "Which statements accurately describe either a setting’s function or a current limitation of Copilot Edit Mode (Select two correct answers)",
+    "question": "An organization owner wants Copilot to be able to finish a multi-file change in VS Code agent mode without asking before every tool call. What is the trade-off?",
     "options": [
-      "Multiple simultaneous Edit Mode sessions are currently listed as not being supported.",
-      "The ‘github.copilot.chat.codesearch.enabled’ setting helps Copilot find relevant files more effectively.",
-      "Setting ‘chat.editing.autoAcceptDelay’ to zero (0) enables automatic acceptance of edits after a delay.",
-      "Support for custom text formats and binary files has been fully tested and confirmed.",
-      "The ‘@workspace /new' command is supported for scaffolding within an active Edit session."
+      "Approving all tool calls removes per-step review, so mistakes or destructive commands can run without a check",
+      "Agent mode cannot run tools, so there is nothing to approve",
+      "Auto-approval turns off content exclusion for the session",
+      "Auto-approval is safe because agent mode only reads files"
     ],
-    "correct": [
-      0,
-      1
-    ],
-    "explanation": "A and B are correct. A. Multiple simultaneous Edit Mode sessions are a documented current limitation — only one active Edit session is supported at a time per the official VS Code Copilot Edits documentation. B. The github.copilot.chat.codesearch.enabled setting activates workspace file search, improving suggestion accuracy when relevant context is spread across multiple files. Incorrect: C. Setting chat.editing.autoAcceptDelay to zero does not enable automatic acceptance — it controls the delay timer, which must be separately enabled via a different setting. D. Support for custom text formats and binary files is explicitly listed as NOT yet fully tested or confirmed. E. The @workspace /new command is documented as unsupported within an active Copilot Edit session.",
+    "correct": 0,
+    "explanation": "A is correct: VS Code lets you set a session permission level, and 'Allow all' bypasses confirmations; GitHub warns about the same risk in Copilot CLI, where automatic approval lets Copilot run commands without review. B is wrong because agent mode does call tools, such as editing files and running terminal commands. C is wrong because approval settings do not change content exclusion (which, separately, is not supported in VS Code agent mode). D is wrong because agent mode can edit files and run commands, not just read.",
     "tags": [
       "domain-3",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-024",
     "domain": 6,
-    "scenario": "The IT governance team at Cascade Financial is running a quarterly review of GitHub Copilot usage across 15 departments. The GRC team at Cascade Financial needs to understand which usage metrics are visible in the enterprise admin panel and what each metric represents.",
-    "question": "When reviewing GitHub Copilot usage within your enterprise account, which types of information can you find (Select two correct answers)",
+    "question": "An organization removes a user's Copilot seat with `DELETE /orgs/{org}/copilot/billing/selected_users`. When does the user lose access?",
     "options": [
-      "The specific calculation method used for monthly billed seat usage.",
-      "Real-time code completion statistics for individual users.",
-      "A breakdown at the organization level showing seats carried over from prior cycles.",
-      "Daily cost estimates for each individual Copilot user.",
-      "The number of Copilot seats currently assigned across all organizations."
+      "At the end of the current billing cycle, because the seat becomes 'pending cancellation'",
+      "Immediately, when the API call returns",
+      "After a 30-day grace period",
+      "Only after the user signs out of every IDE"
     ],
-    "correct": [
-      2,
-      4
-    ],
-    "explanation": "https://docs.github.com/en/enterprise-cloud @latest/copilot/managing-copilot/managing-copilot-for-your- enterprise/managing-access-to-copilot-in-your-enterprise/viewing-copilot-license-usage-in-your- enterprise#about-your-github-copilot-usage",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's Copilot user management API says removed seats are set to pending cancellation and users lose access at the end of the current billing cycle; a user who still gets a seat through a team keeps access. B is wrong because removal is not immediate. C is wrong because there is no fixed 30-day grace period. D is wrong because access depends on the seat, not on signing out.",
     "tags": [
-      "code-completion",
+      "rest-api",
       "enterprise",
-      "plans",
-      "github-copilot"
-    ]
+      "recall"
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-025",
     "domain": 6,
-    "scenario": "The CISO at Harbor Financial is leading the GitHub Copilot security review ahead of enterprise rollout. The information security team must verify that Copilot's privacy controls meet the organisation's data handling standards before sign-off.",
-    "question": "What are effective strategies for validating and influencing GitHub Copilot's generated code or chat responses?",
+    "scenario": "The CISO at Harbor Financial is leading the GitHub Copilot security review ahead of enterprise rollout. One requirement is that developers validate Copilot-generated code before it is merged, rather than trusting it by default.",
+    "question": "Which practice is an effective way for a developer to validate code that Copilot generated?",
     "options": [
-      "Asking Copilot Chat directly to clarify complex generated code structures.",
-      "Ignoring irrelevant conversational context by deleting it from the Chat history.",
-      "Continuously accepting the first code completion suggestion provided.",
-      "Focusing prompts only on high-level concepts without specific examples.",
-      "Relying solely on automated scanning for intellectual property issues."
+      "Accept the first completion Copilot offers, because later suggestions are usually variations of the same code",
+      "Keep prompts to high-level goals without specific examples, so Copilot isn't biased toward one implementation",
+      "Rely on automated intellectual-property scanning, since it confirms the generated code is both safe and correct",
+      "Ask Copilot Chat to explain the generated code, then check that explanation against the intended behaviour"
     ],
-    "correct": [
-      0,
-      1
-    ],
-    "explanation": "A and B are correct. A. Asking Copilot Chat to clarify generated code is an effective validation strategy — it helps verify intent, understand logic, and catch misunderstandings before merging. B. Deleting irrelevant conversational context from Chat history prevents Copilot from being influenced by stale or off-topic prior messages, producing more accurate and focused responses. Incorrect: C. Continuously accepting the first suggestion without review bypasses the human judgment necessary for quality code and defeats the purpose of AI-assisted development. D. High-level prompts without specifics produce generic suggestions. Specificity is one of the four core prompting principles (Single, Specific, Short, Surround). E. Automated scanning helps with IP issues but cannot validate whether code logic is correct — human review remains essential for quality validation.",
+    "correct": 3,
+    "explanation": "D is correct: asking Copilot Chat to explain generated code helps the developer confirm the intent and logic and catch misunderstandings before merging. It keeps a human judging the result, which is the point of validation.\n\nA is wrong because accepting the first suggestion without review skips exactly the human judgement that validation requires.\n\nB is wrong because high-level prompts without specifics produce generic suggestions; specific prompts with examples give better, more checkable output.\n\nC is wrong because automated scanning can flag intellectual-property issues but can't tell you whether the code's logic is correct, so human review is still needed.",
     "tags": [
       "copilot-chat",
       "code-completion",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-026",
@@ -512,32 +511,34 @@
       "To convert code written in one programming language into another, allowing users to work across different languages seamlessly."
     ],
     "correct": 0,
-    "explanation": "https://learn.microsoft.com/en-us/training/modules/introduction-prompt-engineering-with-github- copilot/4-github-copilot-data",
+    "explanation": "A is correct: Copilot Chat formats responses with Markdown, such as headings, lists and code blocks, so answers are easy to read and code can be copied or inserted. B is wrong because analysing code quality is a separate request, not formatting. C is wrong because formatting does not fix syntax errors. D is wrong because translating between languages is a separate request.",
     "tags": [
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-027",
     "domain": 6,
     "scenario": "Developers at Orion Defense are unable to use GitHub Copilot because the corporate proxy intercepts HTTPS traffic and presents a self-signed certificate. An IT administrator at Orion Defense is troubleshooting the issue and must balance restoring Copilot access with maintaining the organisation's security standards.",
-    "question": "What is the purpose of the “GitHub Copilot: Collect Diagnostics” command?",
+    "question": "Which proxy configuration does GitHub say Copilot does NOT currently support?",
     "options": [
-      "To submit a bug report directly to GitHub about Copilot.",
-      "To analyze the performance of Copilot's code completion engine.",
-      "To generate a report on Copilot’s code suggestion accuracy.",
-      "To gather information about potential network connectivity issues with Copilot."
+      "Proxy URLs that begin with `https://`",
+      "Basic authentication to the proxy",
+      "Kerberos authentication to the proxy",
+      "HTTP proxy URLs that begin with `http://`"
     ],
-    "correct": 3,
-    "explanation": "D. To gather information about potential network connectivity issues with Copilot. According to GitHub’s troubleshooting documentation for Copilot, the “Collect Diagnostics” command is specifically designed to help diagnose and resolve issues related to network connectivity. When you run this command, it compiles various pieces of information, such as: Network requests and responses related to Copilot. Proxy configurations. SSL/TLS certificate information. Other environment details that might impact Copilot’s ability to communicate with its servers. This diagnostic information is then typically provided to GitHub Support to help them understand and troubleshoot connection problems you might be experiencing. Incorrect: A. To submit a bug report directly to GitHub about Copilot. While the diagnostics might be part of a bug report, this command itself primarily collects data. Submitting a bug report would typically involve a separate process (e.g., through GitHub Issues, a feedback form, or contacting support) where you would attach or include the collected diagnostics. B. To analyze the performance of Copilot’s code completion engine. The command is focused on connectivity issues, not general performance analysis of the code completion engine itself (e.g., how fast it suggests, how often suggestions are accepted). Performance analysis would typically involve different metrics and logging. C. To generate a report on Copilot's code suggestion accuracy. Evaluating code suggestion accuracy is a complex task usually done through internal metrics by GitHub or through user feedback and acceptance rates. The “Collect Diagnostics” command is not designed to generate a report on the accuracy of the suggestions, but rather on the health and connectivity of the service.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's network troubleshooting guide says proxy URLs beginning with `https://` aren't currently supported. B and C are wrong because Copilot supports basic authentication and Kerberos (Kerberos needs a valid ticket and the correct service principal name). D is wrong because standard `http://` proxy URLs work.",
     "tags": [
       "code-completion",
       "proxy-security",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-028",
@@ -561,7 +562,8 @@
       "ide-integration",
       "vscode",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-029",
@@ -580,7 +582,8 @@
       "proxy-security",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-030",
@@ -601,7 +604,8 @@
       "copilot-cli",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-031",
@@ -620,7 +624,8 @@
       "privacy",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-032",
@@ -628,8 +633,7 @@
     "scenario": "The IT governance team at Cascade Financial is running a quarterly review of GitHub Copilot usage across 15 departments. The GRC team at Cascade Financial needs to understand which usage metrics are visible in the enterprise admin panel and what each metric represents.",
     "question": "What is the significance of the ‘422’ HTTP response status code when adding users to the Copilot subscription?",
     "options": [
-      "Copilot Business or Enterprise is not enabled, billing is not set up, or a public code suggestions policy",
-      "is not set for the organization.",
+      "Copilot Business or Enterprise is not enabled, billing is not set up, or a public code suggestions policy is not set for the organization.",
       "The request was successful, and users were added.",
       "The resource requested was not found.",
       "Authentication is required to perform the action."
@@ -641,7 +645,8 @@
       "ide-integration",
       "copilot-cli",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-033",
@@ -651,8 +656,7 @@
     "options": [
       "The hate speech filter is a component of the broader toxicity filter.",
       "The toxicity filter and the hate speech filter are independent and operate separately.",
-      "The hate speech filter is more lenient than the toxicity filter, allowing for some forms of offensive",
-      "language.",
+      "The hate speech filter is more lenient than the toxicity filter, allowing for some forms of offensive language.",
       "The toxicity filter is triggered only after the hate speech filter detects offensive language."
     ],
     "correct": 0,
@@ -660,48 +664,51 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-034",
     "domain": 6,
     "scenario": "The enterprise admin at Summit Health Systems is configuring GitHub Copilot for a team that maintains proprietary algorithms. Specific files must never be sent to Copilot's API. The security team at Summit Health Systems is setting up content exclusions and needs to understand the correct configuration approach.",
-    "question": "In which IDEs can you configure GitHub Copilot to exclude specific content?",
+    "question": "In which set of IDEs is content exclusion supported for inline suggestions?",
     "options": [
-      "Visual Studio Code, Visual Studio, JetBrains IDEs, Vim/Neovim and xCode",
-      "Visual Studio Code only",
+      "VS Code, Visual Studio, JetBrains IDEs, Vim/Neovim, Xcode and Eclipse",
+      "VS Code only",
       "Visual Studio and JetBrains IDEs only",
-      "It's a universal feature, working in all IDEs"
+      "Every editor, including Azure Data Studio"
     ],
     "correct": 0,
-    "explanation": "39/60 Correct: A. Visual Studio Code, Visual Studio, JetBrains IDEs, Vim/Neovim and xCode GitHub’s official documentation for content exclusions (which prevent Copilot from sending content as context to the service) explicitly lists support for configuration in: Visual Studio Code Visual Studio JetBrains IDEs Vim/Neovim Xcode This means that across a wide range of popular development environments, developers and organizations can implement content exclusion rules to protect sensitive data or adhere to internal policies. Incorrect: B. Visual Studio Code only This is incorrect because content exclusion is also supported in Visual Studio, JetBrains IDEs, Vim/Neovim, and Xcode. C. Visual Studio and JetBrains IDEs only This is incorrect as it omits Visual Studio Code, Vim/Neovim, and Xcode, all of which support content exclusions. D. It's a universal feature, working in all IDEs This is incorrect. While GitHub Copilot aims for broad compatibility, advanced features like content exclusion often require specific integration points within the IDE. It’s not a truly universal feature that works “in all IDEs” without explicit support. It is supported in a wide range of major IDEs, but not all of them.",
+    "explanation": "A is correct: GitHub's content exclusion support table marks inline suggestions as supported in Visual Studio, VS Code, JetBrains IDEs, Xcode, Eclipse and Vim/Neovim. B and C are wrong because support goes well beyond one or two IDEs. D is wrong because the table marks Azure Data Studio as not supported. Exclusions themselves are configured in GitHub settings, not in the IDE.",
     "tags": [
       "content-exclusions",
       "ide-integration",
       "jetbrains",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-035",
     "domain": 6,
     "scenario": "The enterprise admin at Orion Defense is configuring GitHub Copilot for a team that maintains proprietary algorithms. Specific files must never be sent to Copilot's API. An IT administrator at Orion Defense is setting up content exclusions and needs to understand the correct configuration approach.",
-    "question": "How are content exclusions applied in Copilot Chat for Visual Studio Code and Visual Studio?",
+    "question": "According to GitHub's support table, in which IDEs does content exclusion cover inline suggestions, chat and agent?",
     "options": [
-      "Content exclusions are fully functional in Copilot Chat.",
-      "Content exclusions are not applied at all in Copilot Chat.",
-      "Content exclusions are applied except when the @github chat participant is used.",
-      "Content exclusions are only applied when explicitly invoked by the user."
+      "Visual Studio and JetBrains IDEs",
+      "VS Code only",
+      "Xcode and Eclipse",
+      "Vim/Neovim"
     ],
-    "correct": 2,
-    "explanation": "C. Content exclusions are applied except when the @github chat participant is used. This option accurately reflects the behavior documented by GitHub. Content exclusion rules (set via .gitignore files or editor settings like files.exclude) are designed to prevent Copilot from sending specified local workspace content to its services as context. This applies to both inline code suggestions and interactions with Copilot Chat when it's reasoning about your local files. However, when you use the @github chat participant, you are explicitly asking Copilot Chat to interact with and retrieve information from public GitHub repositories, issues, or pull requests. In these cases, Copilot Chat is accessing data that is already public on GitHub, not your local, potentially sensitive, excluded content. Therefore, your local content exclusion rules do not apply to information fetched and processed when using the @github participant. Incorrect: A. Content exclusions are fully functional in Copilot Chat. This is incorrect because of the specific limitation related to the @github chat participant. While generally effective for local files, it's not “fully functional” without any limitations. B. Content exclusions are not applied at all in Copilot Chat. This is incorrect. Content exclusions are applied to Copilot Chat when it’s processing your local files for context, serving the purpose of preventing sensitive local data from being sent. D. Content exclusions are only applied when explicitly invoked by the user. This is incorrect. Content exclusion rules are typically configured globally (at the repo, org, or enterprise level, or via IDE settings) and then automatically apply when Copilot interacts with files that match those exclusion patterns. They don’t require explicit invocation by the user for each interaction.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's table marks inline, chat and agent as supported in Visual Studio and JetBrains IDEs. B is wrong because VS Code supports inline and chat but not Edit or Agent modes. C is wrong because Xcode and Eclipse support inline only. D is wrong because Vim/Neovim supports inline suggestions and has no chat.",
     "tags": [
       "copilot-chat",
       "content-exclusions",
       "enterprise",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d6-036",
@@ -723,7 +730,8 @@
       "plans",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d6-037",
@@ -732,12 +740,12 @@
     "question": "Where can you find detailed information about the specific data collected by GitHub Copilot?",
     "options": [
       "In the GitHub Copilot release notes",
-      "In the ‘GitHub Terms for Additional Products and Features’ and the Copilot privacy FAQ",
-      "Within the IDE’s Copilot plugin settings",
+      "In GitHub's published Copilot Trust Center, terms and privacy documentation",
+      "Within the IDE's Copilot plugin settings",
       "By contacting GitHub customer support"
     ],
     "correct": 1,
-    "explanation": "B. In the ‘GitHub Terms for Additional Products and Features’ and the Copilot privacy FAQ GitHub is transparent about its data practices, and the most authoritative and comprehensive sources for information on data collection, usage, and privacy are its official legal and privacy documentation. The ‘GitHub Terms for Additional Products and Features’ document, which includes the specific terms for GitHub Copilot, outlines the contractual obligations and data handling policies. The Copilot privacy FAQ (Frequently Asked Questions), often found within the GitHub Copilot Trust Center or privacy policy pages, provides clear, direct answers to common questions about data collection, retention, and how data is used to provide the service. This is where you'll find details on what data is sent (prompts, user engagement data, feedback data) and how it’s handled (encryption, retention periods, use for model training). Incorrect: A. In the GitHub Copilot release notes Release notes primarily focus on new features, bug fixes, and improvements in a specific version of Copilot. While they might briefly mention data-related features (like new exclusion rules), they are not the primary source for detailed data collection policies. C. Within the IDE’s Copilot plugin settings IDE settings for Copilot (e.g., in VS Code or JetBrains IDEs) allow you to configure certain aspects of its behavior (like enabling/disabling it, or setting content exclusion rules). However, they typically don’t provide a comprehensive, detailed breakdown of all the data collected by GitHub. They are for user configuration, not policy documentation. D. By contacting GitHub customer support While customer support can assist with specific queries, the official documentation (Terms and FAQs) is the primary, public, and legally binding source of information. You should always refer to the official documentation first, as customer support representatives will likely direct you there for comprehensive details on such policies.",
+    "explanation": "B is correct: the GH-300 study guide points to GitHub's Trust Center for how Copilot works and handles data, and GitHub's terms and privacy statement describe what is collected and how it is used. A is wrong because release notes describe features, not data practices. C is wrong because IDE settings control behavior but don't document data collection. D is wrong because the information is published; support is not the authoritative source.",
     "tags": [
       "content-exclusions",
       "privacy",
@@ -746,28 +754,29 @@
       "vscode",
       "jetbrains",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-038",
     "domain": 6,
-    "scenario": "Developers at Apex Technologies are unable to use GitHub Copilot because the corporate proxy intercepts HTTPS traffic and presents a self-signed certificate. The InfoSec team at Apex Technologies is troubleshooting the issue and must balance restoring Copilot access with maintaining the organisation's security standards.",
-    "question": "What is the primary cause of the ‘GitHub Copilot could not connect to server’ error?",
+    "question": "A developer sees 'GitHub Copilot could not connect to server. Extension activation failed: \"read ECONNRESET\"'. How does GitHub's troubleshooting guide treat this?",
     "options": [
-      "Outdated version of GitHub Copilot",
-      "Using an unsupported code editor",
-      "Incorrect proxy settings",
-      "Firewall configuration issues"
+      "As a network problem: test with `curl --verbose https://copilot-proxy.githubusercontent.com/_ping` and check proxy, firewall and certificate settings",
+      "As proof that the user's Copilot seat has been removed",
+      "As a sign that content exclusion is blocking the current file",
+      "As a model problem that is fixed by switching models"
     ],
-    "correct": 2,
-    "explanation": "C. Incorrect proxy settings According to GitHub’s official documentation and common troubleshooting guides for Copilot, incorrect or misconfigured proxy settings are frequently cited as the primary cause for the “could not connect to server” error. Copilot needs to communicate with GitHub’s cloud services, and if your network uses a proxy, it must be correctly configured in your IDE (like VS Code) or system environment for Copilot to establish a connection. If the proxy settings are wrong or missing, the connection attempt will fail. Incorrect: A. Outdated version of GitHub Copilot While an outdated version can cause various issues and unexpected behavior, it's less likely to be the primary cause of a direct “could not connect to server\" error. Outdated versions might lead to features not working, or general instability, but not necessarily a fundamental inability to establish a connection due to network- related issues. B. Using an unsupported code editor If you're using an unsupported code editor, Copilot simply wouldn't work at all or the extension wouldn't install correctly. You wouldn't typically get a “could not connect to server\" error within an unsupported editor, as the prerequisite for such an error is often that the Copilot extension is running, but cannot reach its backend service. D. Firewall configuration issues Firewall configuration issues can certainly prevent Copilot from connecting to its server, as a firewall might block the necessary outbound connections. However, in troubleshooting guides, proxy settings are often highlighted as the most frequent or primary cause when a connection failure occurs, especially in corporate or controlled network environments where proxies are common. While a firewall issue is a possibility, proxy misconfiguration tends to be a more common culprit for this specific error message.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's network troubleshooting guide says this error can come from many network problems and suggests testing connectivity with curl (a 200 response means you can connect), then checking proxy and certificate settings. B is wrong because a missing seat does not show up as a connection reset. C is wrong because exclusions don't stop the extension from activating. D is wrong because switching models can't fix a failed connection.",
     "tags": [
       "proxy-security",
       "ide-integration",
       "vscode",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-039",
@@ -781,13 +790,14 @@
       "Repository administrators and collaborators with write access"
     ],
     "correct": 0,
-    "explanation": "A. Repository administrators and organization owners According to GitHub’s documentation, content exclusion settings for GitHub Copilot can be configured at multiple levels: Repository administrators have the authority to set exclusion rules for the specific repository they administer. Organization owners have the authority to set exclusion rules that apply to all repositories within their organization. These organization-level rules can override repository-level settings. Additionally, Enterprise administrators also have the ability to set enterprise-wide content exclusion policies, which would encompass all organizations and repositories within the enterprise. However, since “Enterprise administrators” is not an option by itself, and the question asks specifically about repositories, combining repository administrators and organization owners covers the most direct levels of control at the repository level and above. Incorrect: B. Any member of the organization with a Copilot seat This is incorrect. While any member with a Copilot seat can use Copilot, configuring content exclusion is an administrative function that requires specific permissions, not just a Copilot license. C. Only repository administrators This is incorrect because organization owners (and enterprise administrators, though not explicitly an option here) also have the ability to configure content exclusion, and their rules can be more encompassing than just repository-level rules. D. Repository administrators and collaborators with write access While collaborators with write access can push code to a repository, the specific administrative privilege to configure Copilot content exclusion settings (which are typically found under repository settings) usually falls to repository administrators or higher roles, not all collaborators with write access.",
+    "explanation": "A is correct: repository administrators can set exclusions for their own repositories, and organization owners can set exclusions that apply to users with a seat from their organization. (Enterprise owners can also set enterprise-wide rules.) B is wrong because a Copilot seat gives no right to change exclusions. C is wrong because organization owners can also configure them. D is wrong because write access is not enough.",
     "tags": [
       "content-exclusions",
       "enterprise",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d6-040",
@@ -806,6 +816,572 @@
       "ide-integration",
       "responsible-ai",
       "github-copilot"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d6-041",
+    "domain": 6,
+    "scenario": "The legal team at Cascade Digital is reviewing contracts before approving a company-wide Copilot purchase made directly through GitHub.",
+    "question": "What is the purpose of the GitHub Customer Agreement (GCA) when using GitHub Copilot?",
+    "options": [
+      "It provides a detailed tutorial on using GitHub Copilot effectively",
+      "It sets out the terms of service and acceptable use for Copilot when purchased directly through GitHub",
+      "It offers technical support and troubleshooting resources for Copilot users",
+      "It grants users permission to modify and redistribute the Copilot software"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the GitHub Customer Agreement is the contract that governs GitHub products bought directly from GitHub, and GitHub's Generative AI Services Terms (March 2026) add the Copilot-specific terms, such as GitHub not owning inputs or outputs. A is wrong because tutorials live in the documentation, not the contract. C is wrong because support resources are not the agreement's purpose. D is wrong because the agreement does not license redistributing Copilot.",
+    "tags": [
+      "compliance",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d6-042",
+    "domain": 6,
+    "scenario": "Copilot stops returning suggestions in VS Code and a developer opens Help > Toggle Developer Tools.",
+    "question": "What is the Console tab in the VS Code Developer Tools window useful for when troubleshooting Copilot?",
+    "options": [
+      "Visualizing network traffic between Copilot and the IDE",
+      "Showing errors or warnings from Copilot or the IDE",
+      "Displaying real-time code suggestions from Copilot",
+      "Changing Copilot settings and configuration"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the Console tab shows errors and warnings raised by extensions such as Copilot and by the editor itself, which is a quick way to see why something failed. A is wrong because network requests appear in the Network tab. C is wrong because suggestions appear in the editor, not the console. D is wrong because settings are changed in VS Code's Settings, not Developer Tools.",
+    "tags": [
+      "troubleshooting",
+      "recall"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d6-043",
+    "domain": 6,
+    "question": "What is a sensible first step if GitHub Copilot suddenly stops working for everyone on a team?",
+    "options": [
+      "Check for an update to the Copilot extension",
+      "Contact GitHub Support immediately",
+      "Re-read the Copilot quickstart guide",
+      "Check githubstatus.com for an active incident"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: when Copilot fails suddenly for many people at once, GitHub's troubleshooting guide suggests checking githubstatus.com for an active incident before changing anything locally. A is wrong because an outdated extension is a cause to check later, but it rarely breaks a whole team at the same moment. B is wrong because support is for problems that aren't explained by an incident. C is wrong because a quickstart won't explain a sudden outage.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d6-044",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What is the PRIMARY purpose of 'content exclusions' in GitHub Copilot?",
+    "options": [
+      "To prevent Copilot from accessing and using specific files, directories, or repositories as context when generating suggestions",
+      "To prevent Copilot from making API calls that exceed usage quotas",
+      "To block Copilot suggestions in programming languages not supported by the organization",
+      "To restrict which users in an organization are allowed to receive Copilot suggestions"
+    ],
+    "correct": 0,
+    "explanation": "Content exclusions prevent Copilot from using specific files, directories, or repositories as context. This protects sensitive code (credentials, proprietary algorithms, PII-containing files) from being included in Copilot's prompt context.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d6-045",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Where can content exclusions be configured for GitHub Copilot? Select the most complete answer.",
+    "options": [
+      "Only in each developer's VS Code settings.json",
+      "Only in the organization's Copilot settings; repositories cannot configure exclusions",
+      "In GitHub settings at the repository, organization and enterprise levels",
+      "Only through the GitHub CLI, using `gh copilot exclude` commands"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: repository administrators, organization owners and enterprise owners can each define exclusions in GitHub settings; the rules add together, and an enterprise rule applies to every Copilot user in the enterprise. A is wrong because there is no developer-level exclusion in the IDE. B is wrong because repository admins can set exclusions for their repositories. D is wrong because there is no `gh copilot exclude` command.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-046",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A repository administrator at TechNova wants Copilot to ignore everything in the repository's `secrets/` directory. Which repository-level exclusion entry should they add?",
+    "options": [
+      "`- \"/secrets/**\"`",
+      "`- \"/secrets/*.*\"`",
+      "`exclude: secrets/`",
+      "`- \"!secrets/\"`"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: repository-level exclusions are a YAML list of fnmatch paths, and GitHub's example `- \"/scripts/**\"` excludes everything under that directory, including subfolders. B is wrong because `*.*` only matches files with a dot directly in `secrets/`, not nested folders. C is wrong because there is no `exclude:` key. D is wrong because negation patterns aren't part of the syntax.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "context",
+      "administration"
+    ]
+  },
+  {
+    "id": "ghc-d6-047",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What is the 'public code filter' (duplication detection filter) in GitHub Copilot?",
+    "options": [
+      "A filter that prevents Copilot from suggesting any code at all when using public Wi-Fi networks",
+      "An optional filter that prevents Copilot from suggesting code that closely matches known public open-source code, reducing intellectual property and license concerns",
+      "A real-time GitHub scan that detects when your code is copied by other GitHub users",
+      "A filter that prevents public GitHub users from viewing private organization repositories"
+    ],
+    "correct": 1,
+    "explanation": "The public code filter (duplication detection filter) optionally prevents Copilot from suggesting code that closely matches (~150 characters) publicly available open-source code. This helps organizations manage potential license compliance and IP concerns.",
+    "tags": [
+      "privacy-safeguards",
+      "ip-licensing",
+      "compliance"
+    ]
+  },
+  {
+    "id": "ghc-d6-048",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Where does an organization administrator enable the public code (duplication detection) filter for GitHub Copilot?",
+    "options": [
+      "In the organization's Copilot settings under 'Suggestions matching public code' — set to 'Blocked' to filter out matches",
+      "In each developer's individual VS Code settings under `github.copilot.enable`",
+      "In the repository's `.github/copilot-config.json` file using `duplication: false`",
+      "Via the GitHub CLI using `gh org settings --copilot-public-filter=block`"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: organization owners set 'Suggestions matching public code' in the organization's Copilot policies (enterprise owners can set it under AI controls for the whole enterprise); Blocked stops matching suggestions from being shown. B is wrong because the setting isn't a local editor setting. C is wrong because Copilot has no repository config file for this. D is wrong because there is no such `gh` command.",
+    "tags": [
+      "privacy-safeguards",
+      "administration"
+    ]
+  },
+  {
+    "id": "ghc-d6-049",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer at ClearPath Technologies reports that Copilot is still suggesting content from excluded files. What should they check FIRST?",
+    "options": [
+      "Reinstall the GitHub Copilot extension and restart the IDE",
+      "File a support ticket with GitHub — content exclusions should work without any troubleshooting",
+      "Verify the exclusion glob patterns are correctly formatted and that the IDE has been reloaded/restarted after the exclusion was configured",
+      "Disable and re-enable the Copilot enterprise license from the admin console"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's troubleshooting guide says exclusion changes can take up to 30 minutes to reach IDEs that already loaded the settings, so check the path syntax and then reload (in VS Code, Developer: Reload Window). A is wrong because reinstalling doesn't refresh the policy any faster than a reload. B is wrong because exclusions do need propagation and can be misconfigured. D is wrong because license changes don't fix a path pattern.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-050",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Who owns the intellectual property (IP) of code generated by GitHub Copilot?",
+    "options": [
+      "GitHub owns all Copilot-generated code and licenses it back to users",
+      "The open-source community, because Copilot was trained on public code",
+      "GitHub does not claim ownership of outputs; ownership follows applicable law, and the user is responsible for code they accept",
+      "Microsoft owns all AI-generated code under the Azure AI terms"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's Generative AI Services Terms state that GitHub does not own inputs or outputs, and you keep any ownership you already have; the law on ownership of AI-generated content is still developing. A and D are wrong because neither GitHub nor Microsoft claims the output. B is wrong because training on public code doesn't give the community ownership of suggestions.",
+    "tags": [
+      "privacy-safeguards",
+      "ip-licensing"
+    ]
+  },
+  {
+    "id": "ghc-d6-051",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What does GitHub's Copilot Indemnification policy protect organizations against?",
+    "options": [
+      "Protection against bugs introduced by Copilot suggestions that pass code review",
+      "Full legal liability coverage for any malicious code introduced through Copilot suggestions",
+      "Protection against certain third-party intellectual property claims arising from using Copilot-generated code, subject to conditions",
+      "Protection against GitHub service outages affecting developer productivity metrics"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's terms say that if your agreement provides for defense of third-party claims, that provision also applies to Copilot outputs, which covers certain IP claims. Since April 3, 2026, Microsoft's Customer Copyright Commitment requires no additional mitigations for GitHub offerings, and the duplicate detection filter is no longer required for coverage. A is wrong because indemnity doesn't cover bugs. B is wrong because it isn't blanket liability for malicious code. D is wrong because outages aren't IP claims.",
+    "tags": [
+      "privacy-safeguards",
+      "policies",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-052",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A developer opens a file containing database connection strings and API keys. How does GitHub Copilot handle this file?",
+    "options": [
+      "Copilot automatically encrypts and stores the credentials in its secure vault",
+      "Copilot automatically detects and redacts all secrets before including file content in context",
+      "By default, the file's content may be included in Copilot's context; content exclusions should be configured to prevent sensitive credential files from being used as context",
+      "Copilot Chat is disabled whenever secret patterns are detected in the active file"
+    ],
+    "correct": 2,
+    "explanation": "By default, open file content may be included in Copilot's context. Organizations should configure content exclusions (glob patterns) for files containing credentials, API keys, and sensitive data to prevent accidental inclusion in prompts.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d6-053",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What is the correct way to configure content exclusions at the repository level in GitHub?",
+    "options": [
+      "Create a file at `.copilot/exclusions` in the root of the repository",
+      "Use the GitHub CLI command `gh repo copilot-exclude --add 'pattern'`",
+      "Add exclusion patterns to the repository's `.gitignore` file",
+      "Navigate to Repository Settings → Copilot → Content Exclusion and add glob patterns for files/directories to exclude"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: repository administrators add exclusion paths under the repository's Settings > Copilot > Content exclusion, one fnmatch path per line. A is wrong because Copilot doesn't read a `.copilot/exclusions` file. B is wrong because there is no such `gh` command. C is wrong because Copilot doesn't treat `.gitignore` as an exclusion list.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "administration"
+    ]
+  },
+  {
+    "id": "ghc-d6-054",
+    "domain": 6,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "Pinnacle Corp has a monorepo with three projects: `core/` (proprietary algorithms), `shared/` (utilities), and `docs/` (public documentation). Which content exclusion strategy is MOST appropriate?",
+    "options": [
+      "Configure exclusions for `core/**` only, allowing Copilot to use `shared/` and `docs/` as helpful context",
+      "Exclude the entire monorepo from Copilot to guarantee no proprietary code is exposed",
+      "Configure separate Copilot policies for each project within the monorepo",
+      "Use the duplication detection filter as the sole protection mechanism for proprietary code"
+    ],
+    "correct": 0,
+    "explanation": "Targeted exclusion of `core/**` (proprietary algorithms) while allowing `shared/` and `docs/` provides the best balance — protecting sensitive IP while preserving helpful context from non-proprietary code, maximizing Copilot's usefulness.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "context",
+      "documentation"
+    ]
+  },
+  {
+    "id": "ghc-d6-055",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer gets no Copilot suggestions in a file that isn't in their repository's exclusion list. What could explain this?",
+    "options": [
+      "Copilot refuses any file over 500 lines",
+      "An organization-level or enterprise-level content exclusion rule matches the file",
+      "Copilot only works in files that have been committed",
+      "Individual developers' local exclusion lists override the repository's rules"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: exclusion rules from the repository, organization and enterprise all apply, so a file can be excluded by a rule set above the repository; GitHub's troubleshooting guide notes that the status bar icon shows a diagonal line on excluded files and hovering shows which setting applies. A is wrong because no 500-line limit exists. C is wrong because Copilot works on uncommitted files. D is wrong because there are no developer-level exclusion lists.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "policies",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-056",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which privacy-related Copilot setting can a user on the Copilot Pro plan control in their own account settings?",
+    "options": [
+      "Nothing; all Copilot settings are controlled by GitHub",
+      "Their own content exclusions that override organization rules",
+      "'Allow GitHub to use my data for AI model training', which they can turn off",
+      "Whether Copilot sends any context to GitHub at all"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's settings page lists 'Allow GitHub to use my data for AI model training' for Copilot Free, Pro, Pro+ and Max, and users can opt out; the same page has settings such as suggestions matching public code and web search. A is wrong because individuals do control these settings. B is wrong because content exclusion is a Business/Enterprise feature configured by admins. D is wrong because Copilot has to send context to the cloud to work.",
+    "tags": [
+      "privacy-safeguards",
+      "privacy",
+      "telemetry",
+      "administration"
+    ]
+  },
+  {
+    "id": "ghc-d6-057",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "An organization administrator wants to verify that content exclusions are working correctly after configuration. What is the recommended validation approach?",
+    "options": [
+      "Open a file that matches an exclusion pattern in the IDE and verify that Copilot does not provide suggestions based on that file's content",
+      "Disable all Copilot suggestions for 24 hours to clear cached content, then re-enable",
+      "Check the GitHub Copilot usage dashboard for a reduction in suggestion count",
+      "Run `gh copilot validate-exclusions` from the repository root directory"
+    ],
+    "correct": 0,
+    "explanation": "To validate exclusions: open a file that should be excluded, verify Copilot doesn't suggest content derived from that file, and check that the excluded file isn't surfaced as context in Copilot Chat. Reload the IDE after configuration changes before testing.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "copilot-chat",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d6-058",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What are the key limitations of GitHub Copilot's output ownership that organizations should understand?",
+    "options": [
+      "Ownership of AI-generated output follows applicable law, the legal landscape is still evolving, and defense of IP claims depends on the terms of your agreement",
+      "There are no limitations; all Copilot-generated code is free of legal constraints",
+      "Copilot-generated code can only be used in non-commercial projects on the Free plan",
+      "Copilot output is MIT-licensed and must credit GitHub"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub doesn't claim ownership of outputs, but how the law treats AI-generated code is still developing, and IP protection comes from your agreement's defense terms. B is wrong because limitations do exist and suggestions can match public code. C is wrong because Free-plan output has no non-commercial restriction. D is wrong because GitHub attaches no license or attribution requirement.",
+    "tags": [
+      "privacy-safeguards",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-059",
+    "domain": 6,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A security architect at NovaBuild wants to ensure that `.env` files, certificates, and private keys are never used as Copilot context across all repositories. What is the MOST scalable approach?",
+    "options": [
+      "Communicate via email asking all developers to manually exclude these files in their local IDE settings",
+      "Use repository-level CODEOWNERS to restrict access to sensitive files, which also prevents Copilot from reading them",
+      "Require all developers to store credentials in a separate non-Git location — Copilot only reads Git-tracked files",
+      "Configure organization-level content exclusions with glob patterns: `**/.env`, `**/*.pem`, `**/*.key`, `**/*.p12`, `**/*.pfx` — applied automatically to all repositories in the org"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: an organization-level rule under `\"*\":` with paths such as `- \"**/.env\"`, `- \"**/*.pem\"` and `- \"**/*.key\"` applies to every repository (and to non-Git files) for users who get a seat from the organization, with no per-repository or per-developer setup. A is wrong because developers can't set exclusions in their IDE. B is wrong because CODEOWNERS controls review, not Copilot context. C is wrong because Copilot reads files that aren't tracked by Git.",
+    "tags": [
+      "privacy-safeguards",
+      "security",
+      "content-exclusions",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d6-060",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What Copilot audit log events should an organization security team monitor to understand Copilot usage?",
+    "options": [
+      "Copilot does not generate audit log events — usage monitoring requires third-party tools",
+      "Audit log events for Copilot are only available through the GitHub Advanced Security license add-on",
+      "Audit logs only capture billing changes — not feature-level usage events",
+      "Events such as Copilot policy changes, subscription assignments/removals, and feature flag changes are captured in GitHub's audit log"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the Copilot audit log records changes to Copilot settings and policies, seat assignments and removals (for example `copilot.cfb_seat_assignment_created`), content exclusion changes and agent activity; filter with `action:copilot`, and events are kept for 180 days. A is wrong because Copilot does produce audit events. B is wrong because no add-on is needed. C is wrong because policy and settings changes are captured, not just billing.",
+    "tags": [
+      "privacy-safeguards",
+      "security",
+      "content-exclusions",
+      "audit"
+    ]
+  },
+  {
+    "id": "ghc-d6-061",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which of the following represents a correctly formatted content exclusion glob pattern to exclude all YAML files from an `infra/` directory?",
+    "options": [
+      "`infra/**/*.yaml`",
+      "`exclude: infra/*.yaml`",
+      "`infra/**` (YAML only)",
+      "`*.yaml` within the `infra/` folder scope"
+    ],
+    "correct": 0,
+    "explanation": "`infra/**/*.yaml` is the correct glob pattern: `infra/` scopes to that directory, `**/` matches any subdirectory depth, `*.yaml` matches all YAML files. This correctly handles YAML files in nested subdirectories within `infra/`.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions"
+    ]
+  },
+  {
+    "id": "ghc-d6-062",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A developer enables the 'suggestions matching public code' filter. What IMMEDIATELY happens to Copilot's behavior?",
+    "options": [
+      "Copilot filters out suggestions whose code closely matches known publicly available open-source code — unmatched suggestions continue working normally",
+      "Copilot stops providing all suggestions and must be reconfigured from scratch",
+      "Copilot adds mandatory source attribution to all suggestions regardless of their origin",
+      "The filter only activates after a 24-hour review period by GitHub's safety team"
+    ],
+    "correct": 0,
+    "explanation": "Enabling the public code filter causes Copilot to suppress suggestions that closely match (~150 character window) publicly known code. Suggestions that don't match public code continue to work normally — it's a suppression filter, not a full disable.",
+    "tags": [
+      "privacy-safeguards"
+    ]
+  },
+  {
+    "id": "ghc-d6-063",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "How do content exclusions affect Copilot Chat compared with inline suggestions in VS Code?",
+    "options": [
+      "They apply only to inline suggestions; Chat always has access to all files",
+      "They apply to inline suggestions and Chat, but are not supported in Chat's Edit and Agent modes",
+      "They apply only to Chat; inline suggestions have unrestricted access",
+      "They must be configured separately for inline suggestions and Chat"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's support table marks inline suggestions and chat as supported in VS Code, and notes that content exclusion is not supported in the Edit and Agent modes of Copilot Chat in VS Code. A and C are wrong because both inline suggestions and chat respect exclusions. D is wrong because one set of rules covers every supported feature.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "copilot-chat",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d6-064",
+    "domain": 6,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A CISO at Meridian Analytics asks whether GitHub Copilot Enterprise data (prompts and suggestions) is used to train future models. What is the CORRECT answer?",
+    "options": [
+      "Yes — all Enterprise data is used to train models and this cannot be disabled",
+      "No — GitHub Copilot Business and Enterprise do not use customer code snippets (prompts or suggestions) to train or improve Copilot models, and telemetry is not used for training by default",
+      "Enterprise data is anonymized and then used for training after a 90-day retention window",
+      "Enterprise data is used only to fine-tune a tenant-specific model instance for that organization"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's terms say it won't use inputs or outputs to train generative AI models, and the April 2026 interaction-data update states that Copilot Business and Enterprise users are not affected. A is wrong because Enterprise data isn't used for training. C is wrong because no anonymize-then-train period exists. D is wrong because Copilot doesn't fine-tune a per-tenant model on customer prompts.",
+    "tags": [
+      "privacy-safeguards",
+      "privacy",
+      "prompting",
+      "telemetry"
+    ]
+  },
+  {
+    "id": "ghc-d6-065",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "When should a repository administrator choose repository-level content exclusions over organization-level exclusions?",
+    "options": [
+      "Repository-level exclusions are always preferred and should be used for all exclusions",
+      "Repository-level exclusions are only available for public repositories; org-level applies to private repos",
+      "Use repository-level exclusions for files that are unique to that repository; use org-level for patterns that should apply consistently across all org repositories",
+      "Repository-level and org-level exclusions perform identically — the choice is purely cosmetic"
+    ],
+    "correct": 2,
+    "explanation": "Repository-level exclusions are appropriate for repository-specific sensitive content unique to that project. Org-level exclusions are better for consistent policies applied across all repositories (e.g., always exclude `.env` files, always exclude `secrets/`).",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "administration"
+    ]
+  },
+  {
+    "id": "ghc-d6-066",
+    "domain": 6,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "Which of the following files should ALWAYS be excluded from GitHub Copilot context as a security best practice?",
+    "options": [
+      "TypeScript interface definition files (`.d.ts`) as they contain type exposure risks",
+      "Markdown documentation files because they may reveal system architecture",
+      "Test files because they may expose business logic through test assertions",
+      "Files containing secrets, credentials, and API keys (e.g., `.env`, `*.pem`, `config/secrets.yml`)"
+    ],
+    "correct": 3,
+    "explanation": "Security best practice: always exclude files containing credentials, API keys, certificates, and secrets (`.env`, `*.pem`, `secrets.yml`, `credentials.json`). These should not appear in Copilot's prompt context under any circumstances.",
+    "tags": [
+      "privacy-safeguards",
+      "security",
+      "content-exclusions",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d6-067",
+    "domain": 6,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer at Apex Engineering configures content exclusions for `tests/fixtures/**` (test data with PII). However, they notice Copilot still suggests content from those files. After verifying the glob pattern is correct, what should they do NEXT?",
+    "options": [
+      "Reload/restart the IDE — content exclusion changes require the IDE to reload its Copilot configuration to take effect",
+      "Delete the fixture files and recreate them in a different directory",
+      "Submit a support ticket to GitHub — content exclusions should work immediately without any IDE action",
+      "Downgrade to an older version of the Copilot extension that handles exclusions differently"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub says exclusion changes can take up to 30 minutes to reach an IDE that has already loaded the settings; reloading (Developer: Reload Window in VS Code, restarting JetBrains or Visual Studio) applies them sooner. B is wrong because moving files doesn't fix a configuration that hasn't propagated. C is wrong because a delay is expected behavior. D is wrong because downgrading isn't a fix, and outdated clients can stop working.",
+    "tags": [
+      "privacy-safeguards",
+      "content-exclusions",
+      "testing",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d6-068",
+    "domain": 6,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "An organization enables GitHub Copilot but has concerns about compliance in their financial services environment. Which combination of controls provides the STRONGEST compliance posture?",
+    "options": [
+      "Use individual Copilot Pro licenses and trust developers to manage exclusions themselves",
+      "Use Copilot Business or Enterprise, configure organization-level exclusions for sensitive paths, block suggestions matching public code, review audit logs, and train developers on responsible use",
+      "Disable Copilot Chat and use only inline suggestions to reduce data sent to GitHub",
+      "Configure content exclusions in each developer's IDE only"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Business and Enterprise data isn't used for model training, organization-level exclusions protect sensitive paths consistently, blocking public-code matches reduces licensing risk, audit logs show policy changes, and training keeps people reviewing output. A is wrong because individual plans have no admin-managed exclusions and their interaction data can be used for training unless each user opts out. C is wrong because inline suggestions also send context, so this gives up value without a real control. D is wrong because exclusions can't be configured in the IDE.",
+    "tags": [
+      "privacy-safeguards",
+      "ip-licensing",
+      "compliance",
+      "audit"
     ]
   }
 ]

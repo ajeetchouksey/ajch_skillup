@@ -1,18 +1,118 @@
 {
+  "schemaVersion": "2.0",
   "id": "structured-data-extraction",
-  "title": "Structured Data Extraction",
-  "officialDescription": "You are building a structured data extraction system using Claude. The system extracts information from unstructured documents, validates the output using JSON schemas, and maintains high accuracy. It must handle edge cases gracefully and integrate with downstream systems.",
-  "primaryDomains": ["Prompt Engineering & Structured Output", "Context Management & Reliability"],
-  "description": "Build a pipeline that processes 100,000 customer feedback documents per day. Each document must be classified by sentiment (positive/negative/neutral), have key product mentions extracted as an array, be assigned a priority score (1-5), and have action items extracted. Some documents may have no products mentioned or no action items. The pipeline runs overnight — latency is not a concern but cost and reliability are.",
-  "architecture_notes": "Use the Message Batches API for the overnight processing job — 50% cost reduction vs. synchronous API, supports up to 100K requests per batch. Use custom_id matching to reconcile results with input documents. Use tool_use with forced tool_choice and strict JSON Schema for the extraction — this is the most reliable structured output method. Schema design: products as array (empty array if none, not nullable), action_items as array (empty if none), sentiment as enum with 'other' escape. Implement a validation-retry loop: if extraction fails schema validation, return specific error context and retry up to 3 times before flagging for manual review. Results must be retrieved within 24 hours.",
-  "key_patterns": [
-    "Message Batches API for overnight processing",
-    "50% cost reduction with batch API",
-    "custom_id for result matching",
-    "tool_use + forced tool_choice for reliable extraction",
-    "strict JSON Schema with proper nullable/array design",
-    "validation-retry loop with specific error context",
-    "24-hour expiry window awareness"
+  "title": "Overnight Extraction of 100K Feedback Documents",
+  "description": "A retailer needs to classify and extract structured fields from 100,000 customer-feedback documents every night. The scenario tests choosing the Message Batches API, reconciling batch results by `custom_id`, guaranteeing schema-valid output with structured outputs, designing a schema the feature supports, running a validation-retry loop, and combining prompt caching with batches.",
+  "examId": "ccaf",
+  "difficulty": "medium",
+  "estimatedMinutes": 18,
+  "domains": [
+    3,
+    5
   ],
-  "questionIds": ["d3-003", "d3-004", "d3-009", "d4-002", "d4-009", "d5-006", "d5-007"]
+  "scenario": {
+    "background": "The warehouse load fails whenever a single record breaks the schema, and the extraction budget was set assuming batch pricing, so reliability and cost matter far more than latency. Corvid Retail collects about 100,000 customer-feedback documents a day. Each one must get a sentiment label, an array of product mentions, a priority from 1 to 5, and an array of action items. Many documents mention no products or contain no action items. The job runs overnight, and results must be loaded into the warehouse before the 7 a.m. dashboards refresh.",
+    "characters": [
+      {
+        "name": "Nadia Petrov",
+        "role": "Data Platform Lead",
+        "concern": "She needs every record to be schema-valid and correctly matched to its source document, at the lowest possible cost."
+      },
+      {
+        "name": "Marcus Lee",
+        "role": "Voice-of-Customer Analytics Manager",
+        "concern": "He needs the extracted fields to be accurate: no invented product mentions when none exist, and priority scores that actually separate urgent issues from noise."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "structured-data-extraction-q1",
+      "stem": "Latency doesn't matter, but cost and throughput do. How should Nadia submit the nightly workload?",
+      "options": [
+        "Synchronous Messages API calls with high client-side concurrency, to finish as fast as possible",
+        "Message Batches API requests, each with a unique `custom_id`, at a 50% cost reduction, polling until the batch ends",
+        "Message Batches API requests with `stream: true`, so results arrive progressively",
+        "Synchronous calls during off-peak hours, which are billed at the batch rate"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the Message Batches API processes requests asynchronously at 50% lower cost, accepts up to 100,000 requests or 256 MB per batch, and finishes most batches within an hour, with a 24-hour processing limit. That fits an overnight job. A is wrong because it pays full price and has to manage rate limits for throughput the job doesn't need. C is wrong because `stream: true` isn't supported in batch requests; results come back as a single file. D is wrong because there is no off-peak discount for synchronous calls; the 50% saving applies only to the Batches API."
+    },
+    {
+      "id": "structured-data-extraction-q2",
+      "stem": "When the batch ends, the results file isn't in submission order, and 300 results are `errored` while 40 are `expired`. How should the pipeline reconcile them?",
+      "options": [
+        "Match each result to its document by position in the results file, and drop the failed ones",
+        "Ask the model to echo the document ID in its output, and parse it from the text",
+        "Set each request's `custom_id` to the document ID (1–64 characters: letters, digits, hyphens, underscores), match results by `custom_id`, and resubmit only the errored and expired IDs in a new batch",
+        "Resubmit the entire batch whenever any request fails, so the results stay consistent"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: the docs warn that batch results can come back in any order and say to always match them by `custom_id`. Because each result carries its type (`succeeded`, `errored`, `canceled` or `expired`), the pipeline can retry only what failed, and expired requests aren't billed. A is wrong because order isn't guaranteed, so matching by position silently attaches results to the wrong documents. B is wrong because it relies on generated text to carry a key the API already provides as metadata. D is wrong because it pays again for roughly 99,660 requests that already succeeded."
+    },
+    {
+      "id": "structured-data-extraction-q3",
+      "stem": "Nadia needs every response to parse and conform to the schema. Which approach provides that guarantee on the Claude API?",
+      "options": [
+        "Ask for JSON in the system prompt, set temperature to 0, and repair any malformed output with a regex",
+        "Set `response_format: {\"type\": \"json_object\"}` on the request",
+        "Use the `output_format` parameter without a beta header, because structured outputs is now generally available",
+        "Use structured outputs: put the JSON Schema in `output_config.format` with `type: \"json_schema\"` (or define the extraction as a tool with `strict: true`)"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: structured outputs constrain generation to the supplied schema, and the feature is generally available. JSON outputs use `output_config.format`, and strict tool use (`strict: true`) guarantees schema-valid tool inputs. A is wrong because prompting raises compliance but doesn't guarantee it, and regex repair is the brittleness Nadia is trying to remove. B is wrong because `response_format` isn't a Claude API parameter. C is wrong because `output_format` is deprecated; the docs say it returns a 400 error unless you add the `structured-outputs-2025-11-13` beta header, so the right move is to migrate to `output_config.format`."
+    },
+    {
+      "id": "structured-data-extraction-q4",
+      "stem": "Marcus wants priority limited to 1–5, and he doesn't want invented product mentions when a document names none. Which schema design works with structured outputs and meets both goals?",
+      "options": [
+        "`priority` as `{\"type\": \"integer\", \"minimum\": 1, \"maximum\": 5}`; `products` as an optional nullable field that is omitted when there are none",
+        "`priority` as `{\"type\": \"integer\", \"enum\": [1, 2, 3, 4, 5]}`; `products` and `action_items` as required arrays that may be empty; `sentiment` as an enum that includes an escape value such as `\"mixed\"`; and `additionalProperties: false`",
+        "`priority` as a free-text string, such as \"high\" or \"4/5\"; `products` as a comma-separated string",
+        "`priority` as an enum; `products` as a required array with `minItems: 1`, so every record lists at least one product"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: numeric enums are supported, so `[1, 2, 3, 4, 5]` enforces the range. Required arrays that may be empty give an unambiguous 'none', so the model doesn't have to choose between null, omission and inventing something. An escape value in the sentiment enum avoids forcing a wrong label, and `additionalProperties` must be `false`. A is wrong because the structured-outputs docs list numerical constraints such as `minimum` and `maximum` as unsupported (they return a 400 error, though SDK helpers can move them into descriptions and validate locally), and a nullable optional field creates three ways to say 'none'. C is wrong because free text defeats the purpose of a schema and pushes parsing into downstream code. D is wrong because `minItems: 1` forces at least one product into documents that mention none, which manufactures the hallucinations Marcus wants to prevent."
+    },
+    {
+      "id": "structured-data-extraction-q5",
+      "stem": "Structured outputs now guarantees valid JSON, but spot checks show some records list products that never appear in the document. A few responses also ended with `stop_reason: \"max_tokens\"`. What should the pipeline do?",
+      "options": [
+        "Nothing more; schema-valid output means the extraction is correct",
+        "Retry every record three times and keep whichever answer appears most often",
+        "Drop any record that fails a check, so that only clean data reaches the warehouse",
+        "Add semantic validation (for example, each product must appear in the source text, and priority must agree with the severity rules); when a check fails, re-request with the specific error and the field it concerns, up to a retry limit, then send the record to a manual-review queue. Retry `max_tokens` truncations with a higher `max_tokens`"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: schema validity isn't factual correctness, so semantic checks catch values that are well-formed but wrong. Feeding back the specific error gives the retry something to fix, and a retry limit with a manual-review fallback keeps the job bounded. The docs also note that a response that stops at `max_tokens` may be incomplete and invalid, so the fix there is a higher `max_tokens`. A is wrong because it treats syntax as truth. B is wrong because it triples cost for every record, and repeated identical requests share the same blind spots. C is wrong because silently dropping records corrupts the analytics and hides how often the problem occurs."
+    },
+    {
+      "id": "structured-data-extraction-q6",
+      "stem": "Every request shares the same 3,000-token block of instructions and few-shot examples, followed by a different feedback document. How can Nadia reduce cost further?",
+      "options": [
+        "Add prompt caching with a `cache_control` breakpoint after the shared block and the 1-hour cache duration, and accept that cache hits in batches are best-effort",
+        "Don't bother, because prompt caching isn't supported in the Message Batches API",
+        "Use the default 5-minute cache, because batch requests are guaranteed to run back-to-back in submission order",
+        "Put the feedback document before the shared instructions, so the instructions are cached as the suffix"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: prompt caching works with batches, and because batches can take longer than 5 minutes, the batch docs recommend the 1-hour cache duration for better hit rates when requests share context. Because requests are processed concurrently and in any order, hits are best-effort, so the savings are real but not guaranteed. B is wrong because the docs explicitly confirm that caching can be used with the Message Batches API. C is wrong because batch requests are processed concurrently and in any order, so the 5-minute lifetime is more likely to lapse. D is wrong because caching matches a prefix; a varying document at the front means the shared block can never be reused."
+    }
+  ],
+  "keyLearnings": [
+    "For latency-tolerant bulk work, use the Message Batches API: it costs 50% less, accepts up to 100,000 requests or 256 MB per batch, has a 24-hour processing window, and keeps results for 29 days. Always reconcile results by `custom_id`.",
+    "Guarantee schema validity with structured outputs (`output_config.format` or `strict: true` tools); the older `output_format` parameter is deprecated.",
+    "Design schemas within the supported subset: use enums instead of `minimum`/`maximum`, required arrays that may be empty instead of nullable fields, escape values in enums, and `additionalProperties: false`.",
+    "A valid schema doesn't make the data correct: add semantic checks, retry with specific error feedback up to a limit, then send failures to manual review. Combine batches with 1-hour prompt caching for shared prefixes."
+  ],
+  "officialDescription": "You are building a structured data extraction system using Claude. The system extracts information from unstructured documents, validates the output using JSON schemas, and maintains high accuracy. It must handle edge cases gracefully and integrate with downstream systems.",
+  "questionIds": [
+    "d3-003",
+    "d3-004",
+    "d3-009",
+    "d4-002",
+    "d4-009",
+    "d5-006",
+    "d5-007"
+  ]
 }

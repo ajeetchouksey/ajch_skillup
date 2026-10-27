@@ -45,7 +45,7 @@
         "Increase sampling temperature to generate more varied possible summaries and pick the best one"
       ],
       "correct": 1,
-      "explanation": "B is correct because a specific, non-obvious schema needs few-shot examples to lock the exact structure, and getting the *policy application* wrong is worse than getting the format wrong — the light CoT instruction (identify the clause first) targets that specific risk. A fails because a zero-shot description alone won't reliably reproduce an exact, non-standard schema. C fails because reasoning without examples doesn't teach the model the exact JSON shape it needs to reproduce. D fails because raising temperature increases output variability, which works against reliably reproducing a fixed schema."
+      "explanation": "B is correct because a specific, non-obvious schema needs few-shot examples to lock the exact structure, and getting the *policy application* wrong is worse than getting the format wrong — the light CoT instruction (identify the clause first) targets that specific risk. A fails because a zero-shot description alone won't reliably reproduce an exact, non-standard schema. C fails because reasoning without examples doesn't teach the model the exact JSON shape it needs to reproduce. D fails because raising temperature increases output variability, which works against reliably reproducing a fixed schema (and Claude 4.7 and later models accept only the default sampling values, so the lever is not available on current models anyway)."
     },
     {
       "id": "ccap-scenario-008-q3",

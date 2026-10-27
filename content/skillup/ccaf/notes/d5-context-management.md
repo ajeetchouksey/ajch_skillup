@@ -1,4 +1,4 @@
-# Domain 5: Context Management & Optimization
+# Domain 5: Context Management & Reliability
 **Exam Weight: 15%**
 
 ---
@@ -133,7 +133,7 @@ def manage_context(messages: list, max_tokens: int = 100000) -> list:
 
     # Summarize old messages (preserve specifics!)
     summary = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5-5",
         system="""Summarize conversation. PRESERVE VERBATIM:
 - IDs, order numbers, account numbers
 - Dollar amounts, dates, times
@@ -158,7 +158,7 @@ REMOVE: pleasantries, reasoning, repetition.""",
 
 ### 📖 Story: "The 10,000-Row Explosion"
 
-A developer built an MCP tool that returned full database query results. One user asked "show me all customers in California." The tool returned 10,247 rows, each with 15 fields. That's ~200K tokens dumped into the context window — exceeding the limit and causing a hard failure. Even if it fit, Claude would lose critical info buried in the middle of those rows.
+A developer built an MCP tool that returned full database query results. One user asked "show me all customers in California." The tool returned 10,247 rows, each with 15 fields: hundreds of thousands of tokens dumped into the context window. Even when it fits, critical details get lost in the middle of those rows, and every later turn pays for them again.
 
 The fix: return the top 5 results with a `total_count` and a pagination hint. Claude learned to ask for more only when needed.
 
@@ -210,47 +210,43 @@ def list_customers(page: int = 1, per_page: int = 10) -> dict:
 
 ---
 
-## 5.4 Escalation Logic
+## 5.4 Escalation and Ambiguity Resolution
 
-### 📖 Story: "The Bot That Wouldn't Quit"
+### Key Concept
 
-A customer support agent hit an edge case: the customer's account was in a corrupted state that no tool could fix. The agent tried the `repair_account` tool. Failed. Tried `reset_billing`. Failed. Tried `escalate_ticket`... which called `repair_account` again internally. 14 turns later, the customer was furious, and the agent was still spinning. The team added escalation triggers: after 3 consecutive tool failures OR 10 turns without resolution, auto-escalate to a human with full context.
+**Escalate for the right reasons: the customer asks for a human, policy is silent or needs an exception, or the agent can't make progress.**
 
-### Mental Model: The 3-Strikes Rule
+The exam guide's escalation triggers are explicit customer requests for a human (honoured immediately, without investigating first), policy exceptions or gaps (for example competitor price matching when the policy only covers your own site), and inability to make meaningful progress. Complexity alone isn't a trigger, and neither are frustration or the agent's own confidence score: **sentiment-based escalation and self-reported confidence are unreliable proxies for actual case complexity.**
 
-> A good agent knows when to tap out. Three strikes (tool failures), ten rounds (turn limit), or a prohibited move (dangerous action) = hand off to a human. Always pass the baton WITH context — what you tried, what failed, what you recommend.
+When a customer is frustrated but the issue is within the agent's capability, acknowledge it and offer the resolution, escalating only if they reiterate that they want a person. When a lookup returns several matching customers, ask for another identifier instead of picking one. **A good agent is a good receptionist: it hands you to the manager the moment you ask, but it doesn't send every raised voice upstairs.**
 
-```mermaid
-graph TD
-    C[Claude processing] --> G{Gate Check}
-    G -->|"Confidence < 70%"| ESC
-    G -->|"3+ tool failures"| ESC
-    G -->|"10+ turns, no resolution"| ESC
-    G -->|"Prohibited action"| ESC
-    G -->|"All clear"| CONT[Continue normally]
-    ESC["Escalate to Human"] --> H["Generate handoff: 1. Summary 2. Context gathered 3. Actions tried 4. Recommendation"]
-```
+### In Practice
 
-<div class="note-important"><strong>Four escalation triggers:</strong> (1) Confidence < 70%, (2) 3+ consecutive tool failures, (3) 10+ turns without resolution, (4) Prohibited action requested.</div>
+**What breaks without this**: First-contact resolution sinks to 55% because the agent escalates easy cases with photo evidence while improvising refunds that needed a policy exception.
 
-### Implementation
+**Decision trigger**: Before tuning thresholds or adding classifiers, ask whether the system prompt states explicit escalation criteria with few-shot examples of escalate versus resolve. That's the proportionate first fix.
+
+**When you'd choose differently**: Hard business limits (refunds over $500) aren't an escalation *judgment* at all; enforce them in code with a hook that blocks the call and redirects to a human.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Escalate when self-rated confidence drops below 7/10", "escalate on negative sentiment", and "train a classifier on historical tickets" are the three standard distractors. The exam answer is explicit criteria plus few-shot examples, and a structured handoff (customer ID, root cause, amounts, recommended action) when escalation happens.</div>
+
+### Handoff Payload
 
 ```python
-ESCALATION_TRIGGERS = {
-    "low_confidence": lambda ctx: ctx["confidence"] < 0.7,
-    "tool_failures": lambda ctx: ctx["consecutive_failures"] >= 3,
-    "stalled": lambda ctx: ctx["turns_without_resolution"] > 10,
-    "prohibited": lambda ctx: ctx["action"] in ["delete_account", "refund_over_500"],
+handoff = {
+    "customer_id": "CUS-20931",
+    "issue": "Duplicate charge on order ORD-4829AF01",
+    "root_cause": "Payment retried after gateway timeout; both captures settled",
+    "amounts": {"charged": 147.32, "duplicate": 147.32},
+    "actions_taken": ["verified identity", "confirmed two captures in billing"],
+    "recommended_action": "Refund duplicate capture of $147.32",
+    "escalation_reason": "Refund requires approval above agent limit",
 }
-
-def check_escalation(context: dict) -> dict | None:
-    reasons = [name for name, check in ESCALATION_TRIGGERS.items() if check(context)]
-    if reasons:
-        return {"escalate": True, "reasons": reasons, "team": classify_team(context)}
-    return None
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> The exam may ask "What should the agent do after 3 consecutive tool failures?" The answer is escalate to a human — NOT "try a different tool" or "increase retry count."</div>
+The human may never read the transcript, so the handoff has to stand on its own.
 
 ---
 
@@ -258,9 +254,11 @@ def check_escalation(context: dict) -> dict | None:
 
 ### 📖 Story: "The $15 Cache That Saved $15K"
 
-A legal-tech startup sent the same 50K-token system prompt (case law, compliance rules, firm policies) with every single API call. With 1,000 calls/hour, they were spending $15/hour just on that static prompt — $360/day, $10K+/month on *unchanging text*.
+A legal-tech startup sent the same 50K-token system prompt (case law, compliance rules, firm policies) with every API call, paying full input price for *unchanging text* thousands of times a day.
 
-One engineer added `cache_control: {"type": "ephemeral"}` to the system prompt block. The first call cost 25% more (the cache write). The next 999 calls cost 90% less. Monthly bill dropped from $10K to $1.6K. That single annotation paid for itself in the first hour.
+One engineer added `cache_control: {"type": "ephemeral"}` to the system prompt block. The first call cost 25% more (the cache write). Every hit after that was billed at a small fraction of the input price (0.1x on most models, 0.05x on Claude Opus 5.5 and Sonnet 5.5) and returned faster. That single annotation paid for itself within minutes.
+
+<div class="note-important"><strong>Exam scope:</strong> the exam guide lists "prompt caching implementation details (beyond knowing it exists)" and "API pricing calculations" as out of scope. Know what caching is for; treat the numbers below as reference.</div>
 
 <div class="note-scribble">Caching is the easiest win in the entire Anthropic API. If you send the same big block repeatedly, you're burning money for no reason.</div>
 
@@ -275,7 +273,7 @@ graph TD
     end
 
     subgraph "Subsequent Requests (Cache Read)"
-        CACHE -->|"0.1x cost (90% savings)"| R2[System prompt from cache]
+        CACHE -->|"0.1x cost (lower on some current models)"| R2[System prompt from cache]
     end
 ```
 
@@ -283,7 +281,7 @@ graph TD
 
 ```python
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     system=[{
         "type": "text",
         "text": large_system_prompt,       # 50K tokens
@@ -307,27 +305,25 @@ response = client.messages.create(
 
 | Property | Value |
 |----|---|
-| TTL | <mark>**5 minutes**</mark> (refreshed on each hit) |
-| Minimum block size | <mark>**1024 tokens**</mark> (Sonnet) |
+| TTL | <mark>**5 minutes**</mark> (refreshed on each hit); 1 hour optional |
+| Minimum cacheable prompt | 512 tokens on current models (Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1); 1,024–4,096 on some older models |
 | Max breakpoints per request | <mark>**4**</mark> |
-| Cache write cost | **1.25x** normal input cost |
-| Cache read cost | **0.1x** normal input cost (90% savings) |
-| Scope | Per-model, per-organization |
+| Cache write cost | **1.25x** base input (5-minute) or **2x** (1-hour) |
+| Cache read cost | **0.1x** base input on most models; 0.05x on Opus 5.5 and Sonnet 5.5; 0.025x on Fable 5.1 |
+| Prefix order | tools → system → messages, up to the breakpoint |
 
 <div class="note-important"><strong>TTL refreshes on every cache hit.</strong> If requests come in every 4 minutes, the cache lives forever. If there's a 5+ minute gap with no hits, the cache expires and the next request pays the 1.25x write cost again.</div>
 
 <div class="note-trap"><strong>TRAP:</strong> Exam might say "cache TTL is 5 minutes total regardless of usage." WRONG — it's 5 minutes since LAST hit. Continuous usage keeps it alive indefinitely.</div>
 
-### Use Case: "The $15/hr to $1.68/hr Math"
+### Use Case: "The Relative-Cost Math"
 
 ```
-Without caching (every request = 50K input tokens):
-  100 requests x 50K x $3/MTok = $15/hour
+100 requests/hour, each with the same 50K-token prefix (in units of "base input price x 50K tokens"):
 
-With caching:
-  1st request (write): 50K x $3.75/MTok = $0.19
-  99 requests (read):  50K x $0.30/MTok x 99 = $1.49
-  Total: $1.68/hour --> 89% savings!
+Without caching:  100 x 1.0              = 100 units
+With caching:     1 x 1.25 + 99 x 0.1    = ~11 units   (0.1x read models)
+                  1 x 1.25 + 99 x 0.05   = ~6 units    (Opus 5.5 / Sonnet 5.5)
 ```
 
 ### Optimal Breakpoint Placement
@@ -348,7 +344,7 @@ NO cache: Current user message (changes always)
 
 ### 📖 Story: "The Batch That Ran Overnight"
 
-A content team needed to classify 50,000 product descriptions into 12 categories. Real-time API calls at $3/MTok would cost ~$450. They switched to the Batches API — same model, same prompts — at 50% cost: $225. The trade-off? Results came back in ~6 hours instead of real-time. They submitted at 6 PM, had fully classified data by midnight, and saved $225 while the team slept.
+A content team needed to classify 50,000 product descriptions into 12 categories. They switched from real-time calls to the Message Batches API — same model, same prompts — at half the price. The trade-off: results arrive asynchronously (most batches finish within an hour, and anything not processed within 24 hours expires) instead of in real time. Nobody was waiting on the result, so it was an easy call.
 
 ### Mental Model: Overnight Shipping vs. Same-Day
 
@@ -368,8 +364,10 @@ graph LR
 |----|---|
 | Max requests per batch | <mark>**100,000**</mark> |
 | Cost | <mark>**50% of standard**</mark> API pricing |
-| Processing time | Up to <mark>**24 hours**</mark> (usually faster) |
-| Results available | **29 days** after completion |
+| Processing time | Most finish within 1 hour; requests not processed within <mark>**24 hours**</mark> expire |
+| Size limit | 100,000 requests or 256 MB, whichever comes first |
+| Results available | **29 days** after the batch is created |
+| Result types | succeeded, errored, canceled, expired (expired requests aren't billed) |
 | `custom_id` | <mark>YOUR tracking key</mark> (echoed in results) |
 
 <div class="note-important"><strong>custom_id is YOUR identifier.</strong> You set it per-request in the batch. Anthropic echoes it back in results so you can map outputs to your original inputs. It's not auto-generated — YOU control it.</div>
@@ -388,25 +386,24 @@ graph LR
 ### Implementation
 
 ```python
-# Step 1: Create JSONL input
+# Step 1: Build the request list
 requests = []
 for i, doc in enumerate(documents):
     requests.append({
         "custom_id": f"doc-{i}",  # YOUR tracking ID - echoed in results
         "params": {
-            "model": "claude-sonnet-4-20250514",
+            "model": "claude-sonnet-5-5",
             "max_tokens": 1024,
             "messages": [{"role": "user", "content": f"Classify: {doc}"}]
         }
     })
 
-# Step 2: Submit batch
-batch = client.batches.create(input_file=jsonl_file)
+# Step 2: Submit the batch (a list of requests, each with its own custom_id)
+batch = client.messages.batches.create(requests=requests)
 
-# Step 3: Get results (custom_id maps back to your data)
-results = client.batches.results(batch.id)
-for r in results:
-    print(f"{r.custom_id}: {r.result}")  # "doc-42": {"type": "succeeded", ...}
+# Step 3: Poll until processing has ended, then read results (custom_id maps back to your data)
+for r in client.messages.batches.results(batch.id):
+    print(f"{r.custom_id}: {r.result.type}")  # succeeded / errored / canceled / expired
 ```
 
 ---
@@ -415,9 +412,9 @@ for r in results:
 
 ### 📖 Story: "The Retry Loop From Hell"
 
-An engineer's code retried every failed API call. Worked great for 429s (rate limits) — backoff, retry, succeed. Then one day, a malformed request started returning 400 (Bad Request). The code retried it. And retried. And retried. 5 retries x exponential backoff = 63 seconds of waiting for a request that would *never* succeed. Multiply by 10,000 concurrent users. The retry queue grew until the service OOM-crashed. The fix: <mark>never retry 4xx errors</mark> — they mean YOUR request is broken, not the server.
+An engineer's code retried every failed API call. Worked great for 429s (rate limits) — backoff, retry, succeed. Then one day, a malformed request started returning 400 (Bad Request). The code retried it. And retried. And retried. 5 retries x exponential backoff = 63 seconds of waiting for a request that would *never* succeed. Multiply by 10,000 concurrent users. The retry queue grew until the service OOM-crashed. The fix: <mark>don't retry client errors such as 400, 401, or 403</mark>; they mean YOUR request is broken. 429 is the exception: it's a 4xx code that means "slow down", so you back off and retry.
 
-<div class="note-important"><strong>The Golden Rule of Retries:</strong> 429 and 5xx = retry (server's problem). 4xx = do NOT retry (your problem — fix the request).</div>
+<div class="note-important"><strong>The Golden Rule of Retries:</strong> 429 and 5xx = retry with backoff. Other 4xx (400, 401, 403, 404) = do NOT retry; fix the request. Rate limits are out of scope for the exam, but the retry logic shows up in reliability questions.</div>
 
 ### Mental Model: Traffic Lights
 
@@ -429,7 +426,7 @@ graph TD
     R -->|"200 OK"| S["Success"]
     R -->|"429 Rate Limit"| RL{Retries left?}
     R -->|"5xx Server Error"| SE{Retries left?}
-    R -->|"4xx Client Error"| F["Fail immediately (don't retry)"]
+    R -->|"Other 4xx Client Error"| F["Fail immediately (don't retry)"]
 
     RL -->|"Yes"| BACK["Exponential backoff 2^attempt + jitter"]
     SE -->|"Yes"| BACK
@@ -475,7 +472,7 @@ x-ratelimit-reset-requests: 2025-...  <-- When request limit resets
 |----|----|------|
 | 429 (Rate Limited) | Retry with exponential backoff + jitter | Red light — wait your turn |
 | 500-599 (Server Error) | Retry with backoff | Road construction — try later |
-| 400-499 (Client Error) | **Do NOT retry** — fix the request | Wrong way — turn around |
+| Other 4xx (400, 401, 403...) | **Do NOT retry** — fix the request | Wrong way — turn around |
 
 <div class="note-trap"><strong>TRAP:</strong> "Your API returns 401 Unauthorized intermittently. What should you do?" The answer is NOT "add retry logic." 401 is a 4xx — it means your API key is wrong or expired. Fix the credential, don't retry.</div>
 
@@ -502,11 +499,11 @@ print(response.usage.cache_creation_input_tokens)  # Tokens written to cache
 ### Estimation Rule of Thumb
 
 ```
-1 token ~ 4 characters (English text)
-1 token ~ 0.75 words
+Current tokenizer (Claude Opus 4.7 and later): 1M tokens ≈ 555k words ≈ 2.5M characters
+Older models: 1M tokens ≈ 750k words
 ```
 
-<div class="note-scribble">Quick math: a 2000-word document is about 2,667 tokens. A 10-page PDF is about 5,000-8,000 tokens. A full 200K context window is about 150,000 words — a 500-page book.</div>
+<div class="note-scribble">Quick math: current Claude models have a 1M-token context window, roughly 555,000 words on the current tokenizer. Token counting specifics are out of scope for the exam; what matters is that every resent turn and every verbose tool result consumes budget.</div>
 
 <div class="note-important"><strong>Always check response.usage after API calls.</strong> The usage object tells you exactly what you spent. Use it for budget monitoring, alerting, and deciding when to trigger summarization.</div>
 
@@ -524,7 +521,7 @@ Instead of manually placing `cache_control` on individual blocks, add it at the 
 
 ```python
 response = client.messages.create(
-    model="claude-opus-4-7",
+    model="claude-opus-5-5",
     max_tokens=1024,
     cache_control={"type": "ephemeral"},  # Top-level: auto-caches last block
     system="You are a helpful assistant.",
@@ -549,7 +546,7 @@ Warm the cache BEFORE users arrive using `max_tokens: 0`:
 ```python
 # Fire at application startup - no output generated, no output tokens billed
 prewarm = client.messages.create(
-    model="claude-opus-4-7",
+    model="claude-opus-5-5",
     max_tokens=0,  # Zero output = cache write only
     system=[{
         "type": "text",
@@ -561,7 +558,7 @@ prewarm = client.messages.create(
 # prewarm.stop_reason == "max_tokens", prewarm.content == []
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> max_tokens: 0 CANNOT be combined with: streaming, extended thinking, structured outputs, or forced tool_choice. It's also rejected inside the Batches API. Exam loves to test these incompatibilities.</div>
+<div class="note-trap"><strong>TRAP:</strong> max_tokens: 0 is rejected inside the Message Batches API (an ephemeral cache entry written during batch processing would likely expire before the follow-up request runs). Check the prompt caching docs for its other restrictions.</div>
 
 <div class="note-important"><strong>max_tokens: 0 produces no output.</strong> stop_reason will be "max_tokens" and content will be an empty array. You're paying only for the cache write — no output tokens billed.</div>
 
@@ -577,10 +574,10 @@ For agents where users take >5 minutes between interactions (think: agentic side
 
 | TTL | Write Cost | Read Cost | When to Use |
 |---|-----|-----|-----|
-| 5 min (default) | 1.25x | 0.1x | Rapid multi-turn, frequent reuse |
-| 1 hour | 2x | 0.1x | Agentic side-agents, slow user turns |
+| 5 min (default) | 1.25x | 0.1x (0.05x on Opus 5.5 / Sonnet 5.5) | Rapid multi-turn, frequent reuse |
+| 1 hour | 2x | same as 5 min | Agentic side-agents, slow user turns, batches with shared context |
 
-<div class="note-trap"><strong>TRAP:</strong> The 1-hour TTL costs 2x on write (not 1.25x). Reads are still 0.1x. The exam may ask "what's the cost difference between 5-min and 1-hour caching?" — the answer is only the write cost changes.</div>
+<div class="note-trap"><strong>TRAP:</strong> The 1-hour TTL costs 2x on write (not 1.25x). Read pricing is the same as for the 5-minute cache.The exam may ask "what's the cost difference between 5-min and 1-hour caching?" — the answer is only the write cost changes.</div>
 
 ### Updated Cache Properties (2026) — <mark>Full Reference</mark>
 
@@ -588,13 +585,13 @@ For agents where users take >5 minutes between interactions (think: agentic side
 |----|---|
 | Default TTL | <mark>**5 minutes**</mark> (refreshed on each hit) |
 | Extended TTL | <mark>**1 hour**</mark> (at 2x write cost) |
-| Min tokens (Opus 4.5+) | <mark>**4,096 tokens**</mark> |
-| Min tokens (Sonnet 4.5+) | <mark>**1,024 tokens**</mark> |
+| Min tokens (current models: Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1) | <mark>**512 tokens**</mark> |
+| Min tokens (older models) | 1,024 (e.g. Sonnet 4.5/4.6, Opus 4.8), 2,048 (Opus 4.7), 4,096 (Opus 4.5/4.6, Haiku 4.5) |
 | Max breakpoints | <mark>**4 per request**</mark> |
 | Cache write cost | **1.25x** (5-min) or **2x** (1-hour) |
-| Cache read cost | **0.1x** (90% savings) |
+| Cache read cost | **0.1x** on most models; 0.05x Opus 5.5 / Sonnet 5.5; 0.025x Fable 5.1 |
 
-<div class="note-important"><strong>Minimum token sizes differ by model!</strong> Opus requires 4,096 tokens minimum per cached block. Sonnet requires only 1,024. If your cached block is smaller than the minimum, caching silently does nothing.</div>
+<div class="note-important"><strong>Minimum cacheable length differs by model.</strong> If the prompt up to your breakpoint is shorter than the minimum, it isn't cached and no error is returned.</div>
 
 ---
 
@@ -607,19 +604,19 @@ For agents where users take >5 minutes between interactions (think: agentic side
 | Lost-in-the-middle | Put critical info at START + END; middle gets less attention | U-shaped bathtub |
 | Summarization rule | NEVER round/approximate specific values — preserve verbatim | Filing, not shredding |
 | Tool result trim | Return summary + pagination, not raw 10K rows | Librarian, not dump truck |
-| Escalation triggers | Low confidence, 3+ failures, 10+ turns, prohibited action | 3-strikes rule |
+| Escalation triggers | Customer asks for a human, policy gap/exception, no meaningful progress (not sentiment or self-rated confidence) | Receptionist, not a panic button |
 | Cache TTL | 5 minutes (refreshed on hit) | Name badge — unused ones expire |
-| Cache minimum | 1024 tokens (Sonnet) / 4096 tokens (Opus) | — |
+| Cache minimum | 512 tokens on current models; up to 4,096 on some older ones | — |
 | Cache breakpoints | Max 4 per request | — |
-| Cache savings | 90% on reads (0.1x cost) | First badge costs time, rest free |
-| Extended cache | 1-hour TTL at 2x write cost (reads still 0.1x) | — |
-| Pre-warming | max_tokens: 0 (no streaming, no thinking, no tool_choice, no batches) | Heating the oven before cooking |
+| Cache savings | Reads at 0.1x on most models (0.05x Opus 5.5 / Sonnet 5.5) | First badge costs time, rest free |
+| Extended cache | 1-hour TTL at 2x write cost | — |
+| Pre-warming | max_tokens: 0 (not supported inside batches) | Heating the oven before cooking |
 | Batches API | 100K requests, 50% cost, up to 24h processing | Ground shipping |
 | Batches custom_id | Your tracking key — echoed back in results | Your label on the package |
 | Retry: 429 | Exponential backoff + jitter | Red light — wait |
-| Retry: 4xx | Do NOT retry (fix the request) | Wrong way — turn around |
+| Retry: other 4xx | Do NOT retry (fix the request) | Wrong way — turn around |
 | Retry: 5xx | Retry with backoff | Road construction — try later |
-| Token estimate | 1 token ~ 4 chars ~ 0.75 words | — |
+| Context window | 1M tokens on current models (~555k words) | — |
 
 ---
 
@@ -631,7 +628,145 @@ For agents where users take >5 minutes between interactions (think: agentic side
 4. **50% cost reduction but async?** Batches API
 5. **API returns 400 — retry?** NO. Fix the request.
 6. **max_tokens: 0 — what does it do?** Cache pre-warming (no output generated)
-7. **Can max_tokens: 0 stream?** NO. Also no thinking, no structured output, no forced tool_choice, no batches.
-8. **Minimum cache size for Opus?** 4,096 tokens
+7. **Can max_tokens: 0 run inside a batch?** NO.
+8. **Minimum cacheable prompt on current models?** 512 tokens (higher on some older models)
 9. **How many cache breakpoints max?** 4 per request
 10. **custom_id in batches — who sets it?** YOU (the developer), not Anthropic
+
+---
+
+## 5.10 Error Propagation Across Multi-Agent Systems
+
+### Key Concept
+
+**Recover locally when you can; when you can't, tell the coordinator exactly what failed, what you tried, and what you still have.**
+
+A subagent should handle transient failures itself (retry, alternate source) and propagate only what it can't resolve, as structured context: failure type, the query it attempted, partial results, and possible alternatives. That lets the coordinator retry with a modified query, try another source, or proceed with partial results.
+
+Two anti-patterns sit on either side. Suppressing an error by returning empty results marked as success makes the coordinator reason from false data; terminating the whole workflow on a single failure throws away everything that worked. **Report errors like a field medic's tag: what happened, what was done, what's still needed.**
+
+### In Practice
+
+**What breaks without this**: A timeout comes back as `{"results": []}`, and the final report confidently says no evidence exists. Or a generic "search unavailable" status hides that the failure was a single malformed query.
+
+**Decision trigger**: Ask whether the coordinator could make a good next decision from the error alone. If not, add the missing fields, and keep "access failed" distinct from "query succeeded with no matches".
+
+**When you'd choose differently**: When a source is down for the whole run, finish anyway and annotate the synthesis with coverage gaps (which findings are well supported, which areas lack sources) rather than blocking.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">Generic retry-then-"unavailable" (hides context), empty-success (suppresses the error), and terminate-everything (over-reacts) are all wrong. The answer is structured error context plus partial results, and coverage annotations in the final output.</div>
+
+---
+
+## 5.11 Context in Large Codebase Exploration
+
+### Key Concept
+
+**Long explorations degrade; persist what you learn outside the conversation and delegate the noisy parts.**
+
+In extended sessions, models start giving inconsistent answers and refer to "typical patterns" instead of the specific classes they found earlier. That's context degradation. Counter it with scratchpad files that record key findings, subagents that investigate specific questions ("find all test files", "trace refund flow dependencies") and return summaries, and `/compact` when the window fills with verbose discovery output.
+
+Between phases, summarize what you've learned and inject that summary into the next phase's subagents. For crash recovery, have each agent export its state to a known location and let the coordinator load a manifest on resume and inject the relevant state into each agent's prompt. **Treat the context window as working memory and the scratchpad as the lab notebook: the notebook survives when memory doesn't.**
+
+### In Practice
+
+**What breaks without this**: Two hours in, the agent contradicts what it established in the first twenty minutes, and a crash means starting the whole analysis again.
+
+**Decision trigger**: When answers start drifting toward generic patterns, or before spawning the next phase of subagents, write the findings down and pass the summary forward.
+
+**When you'd choose differently**: If prior tool results are mostly still valid, resume the session and tell it which files changed; if they're stale, start a fresh session seeded with a structured summary.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Use a model with a larger context window" and "lower the temperature" don't fix context degradation. Scratchpad files, subagent delegation, phase summaries, and <code>/compact</code> do. For crash recovery, the answer is exported state plus a manifest the coordinator loads on resume.</div>
+
+---
+
+## 5.12 Human Review Workflows and Confidence Calibration
+
+### Key Concept
+
+**An aggregate accuracy number can hide a broken segment; measure by document type and field before you automate.**
+
+A pipeline that is 97% accurate overall may be failing badly on one document type or one field. Validate accuracy by segment before reducing human review, and keep measuring with **stratified random sampling** of high-confidence extractions, which estimates error rates per segment and surfaces novel error patterns.
+
+Field-level confidence scores are useful only once they're calibrated against a labelled validation set (items marked ~80% confident should be right ~80% of the time). Then route low-confidence fields, and documents with ambiguous or contradictory sources, to human reviewers, so their limited time goes where errors are likely. **Calibrated confidence is a triage nurse; uncalibrated confidence is a patient diagnosing themselves.**
+
+### In Practice
+
+**What breaks without this**: Human review is cut back because "accuracy is 97%", and handwritten invoices, 5% of volume, quietly go wrong for months.
+
+**Decision trigger**: Before auto-accepting any class of extraction, ask for accuracy broken down by document type and field, and for the calibration curve of the confidence scores.
+
+**When you'd choose differently**: Reviewing only low-confidence items misses confident-but-wrong errors, so keep a stratified sample of high-confidence items under review too.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Overall accuracy is high, so remove human review", "trust the model's self-reported accuracy", and "review only items that failed schema validation" are distractors. The answers are segment-level accuracy, stratified sampling, and confidence calibrated on labelled data.</div>
+
+---
+
+## 5.13 Provenance and Uncertainty in Multi-Source Synthesis
+
+### Key Concept
+
+**Every claim should arrive at the final report still attached to its source, its date, and any disagreement.**
+
+Source attribution is lost when findings are summarized without claim-source mappings. Require subagents to output structured mappings (claim, excerpt, source URL or document name, page, publication or collection date) and require the synthesis agent to preserve and merge them.
+
+When credible sources conflict, annotate the conflict with both values and their sources rather than picking one; dates often explain apparent contradictions (different collection years). Structure reports to separate well-established findings from contested ones, and render each content type in its natural form: financial data as tables, news as prose, technical findings as lists. **A good report is a court transcript, not a rumour: who said what, when, and where they disagree.**
+
+### In Practice
+
+**What breaks without this**: The final report states one market-size figure with no citation, when two sources disagreed and one of them was five years older.
+
+**Decision trigger**: Ask whether a reader could trace every number back to its source and date. If not, fix the subagent output schema first.
+
+**When you'd choose differently**: If the coordinator must reconcile conflicts (for example, a policy that the most recent official figure wins), let the analysis step flag conflicts and leave the decision to the coordinator before synthesis.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Average the two figures", "pick the more recent value silently", and "summarize sources into one blended paragraph" all destroy provenance. The answer keeps both values with attribution and dates, and labels the finding as contested.</div>
+
+---
+
+## Deep Dive
+
+### 1. The connective narrative
+
+Domain 5 is about keeping an agent **honest over time**. Context is finite and attention is uneven: models handle the start and end of long inputs better than the middle, summaries quietly round away the numbers customers care about, and verbose tool results crowd out reasoning. So you keep transactional facts in a persistent "case facts" block, trim tool output to the fields that matter, put key findings first, and use headers to organize the rest.
+
+Reliability then extends outward. Escalation follows explicit criteria rather than mood or self-rated confidence, and ambiguity is resolved by asking, not guessing. Errors travel as structured context, so a coordinator can recover rather than collapse. Long explorations survive through scratchpads, phase summaries, and manifests.
+
+Finally, trust is earned with measurement: accuracy by segment, stratified sampling, calibrated confidence for routing human review, and provenance that keeps every claim tied to its source and date. Caching and batching are the cost levers around all of this, but the exam treats them lightly; the reliability patterns carry the weight.
+
+### 2. Worked scenario
+
+> **Scenario.** A multi-issue support agent forgets a customer's order number after summarization, escalates every frustrated customer, and its monthly accuracy report says 96% while one document type is failing.
+>
+> **Step 1 — persist facts.** Extract order IDs, amounts, dates, and statuses into a case-facts block sent with every prompt, outside the summarized history.
+>
+> **Step 2 — trim tools.** Keep only the five return-relevant fields from the 40-field order lookup before it enters context.
+>
+> **Step 3 — fix escalation.** Replace the sentiment trigger with explicit criteria and few-shot examples; honour explicit requests for a human immediately; ask for another identifier when lookups return multiple customers.
+>
+> **Step 4 — measure honestly.** Break accuracy down by document type and field, sample high-confidence items per segment, and calibrate field-level confidence before deciding what to auto-accept.
+>
+> **Outcome:** no more lost order numbers, fewer unnecessary escalations, and a review process that finds the failing segment instead of averaging it away.
+
+### 3. Memory aid
+
+**FACTS** — Domain 5 in five moves:
+- **F**acts block: amounts, dates, IDs kept outside summaries
+- **A**ttention-aware ordering: key findings first, headers for the rest
+- **C**riteria for escalation, not sentiment or self-rated confidence
+- **T**raceable claims: sources, dates, conflicts preserved
+- **S**egmented measurement: stratified sampling, calibrated confidence
+
+### 4. Exam strategy for this domain
+
+- When a question mentions summaries losing detail, the answer preserves specifics verbatim or moves them out of the summarized history.
+- "Overall accuracy is high" in a stem is a warning sign; look for the option that segments the metric.
+- Escalation questions punish both over-escalation (sentiment) and under-escalation (ignoring explicit requests or policy gaps).
+- Five minutes before the exam: **keep the facts, show the sources, measure by segment, escalate on criteria.**

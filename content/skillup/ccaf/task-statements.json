@@ -102,7 +102,11 @@
             "d1-005",
             "d1-006",
             "d1-029",
-            "d1-062"
+            "d1-062",
+            "d1-023",
+            "d1-025",
+            "d1-036",
+            "d1-069"
           ]
         },
         {
@@ -197,152 +201,6 @@
     },
     {
       "id": 2,
-      "title": "Tool Design & MCP Integration",
-      "weight": 18,
-      "tasks": [
-        {
-          "id": "2.1",
-          "title": "Design effective tool interfaces with clear descriptions and boundaries",
-          "knowledge": [
-            "Tool descriptions as the primary mechanism LLMs use for tool selection; minimal descriptions lead to unreliable selection among similar tools",
-            "The importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions",
-            "How ambiguous or overlapping tool descriptions cause misrouting",
-            "The impact of system prompt wording on tool selection: keyword-sensitive instructions can create unintended tool associations"
-          ],
-          "skills": [
-            "Writing tool descriptions that clearly differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives",
-            "Renaming tools and updating descriptions to eliminate functional overlap",
-            "Splitting generic tools into purpose-specific tools with defined input/output contracts",
-            "Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions"
-          ],
-          "questionIds": [
-            "d4-001",
-            "d4-016",
-            "d4-014",
-            "d4-018",
-            "d4-019",
-            "d4-021",
-            "d4-022",
-            "d4-023",
-            "d4-024",
-            "d4-025",
-            "d4-026",
-            "d4-028",
-            "d4-029",
-            "d4-030",
-            "d4-031",
-            "d4-033",
-            "d4-034",
-            "d4-040",
-            "d4-042",
-            "d4-043",
-            "d4-044",
-            "d4-045"
-          ]
-        },
-        {
-          "id": "2.2",
-          "title": "Implement structured error responses for MCP tools",
-          "knowledge": [
-            "The MCP isError flag pattern for communicating tool failures back to the agent",
-            "The distinction between transient errors (timeouts), validation errors (invalid input), business errors (policy violations), and permission errors",
-            "Why uniform error responses ('Operation failed') prevent the agent from making appropriate recovery decisions",
-            "The difference between retryable and non-retryable errors, and how returning structured metadata prevents wasted retry attempts"
-          ],
-          "skills": [
-            "Returning structured error metadata including errorCategory (transient/validation/permission), isRetryable boolean, and human-readable descriptions",
-            "Including retriable: false flags and customer-friendly explanations for business rule violations",
-            "Implementing local error recovery within subagents for transient failures, propagating to the coordinator only errors that cannot be resolved locally",
-            "Distinguishing between access failures (needing retry decisions) and valid empty results (representing successful queries with no matches)"
-          ],
-          "questionIds": [
-            "d1-002",
-            "d1-017",
-            "d4-004",
-            "d4-013",
-            "d4-020"
-          ]
-        },
-        {
-          "id": "2.3",
-          "title": "Distribute tools appropriately across agents and configure tool choice",
-          "knowledge": [
-            "The principle that giving an agent access to too many tools (e.g., 18+) degrades tool selection reliability by increasing decision complexity",
-            "Why agents with tools outside their specialisation tend to misuse them",
-            "Scoped tool access: giving agents only the tools needed for their role, with limited cross-role tools for specific high-frequency needs",
-            "tool_choice configuration options: 'auto', 'any', and forced tool selection"
-          ],
-          "skills": [
-            "Restricting each subagent's tool set to those relevant to its role, preventing cross-specialisation misuse",
-            "Replacing generic tools with constrained alternatives",
-            "Providing scoped cross-role tools for high-frequency needs (e.g., a verify_fact tool for the synthesis agent) while routing complex cases through the coordinator",
-            "Using tool_choice forced selection to ensure a specific tool is called first",
-            "Setting tool_choice: 'any' to guarantee the model calls a tool rather than returning conversational text"
-          ],
-          "questionIds": [
-            "d4-002",
-            "d4-003",
-            "d4-017",
-            "d4-010",
-            "d4-011",
-            "d4-012",
-            "d4-027",
-            "d4-041"
-          ]
-        },
-        {
-          "id": "2.4",
-          "title": "Integrate MCP servers into Claude Code and agent workflows",
-          "knowledge": [
-            "MCP server scoping: project-level (.mcp.json) for shared team tooling vs user-level (~/.claude.json) for personal/experimental servers",
-            "Environment variable expansion in .mcp.json (e.g., ${GITHUB_TOKEN}) for credential management without committing secrets",
-            "That tools from all configured MCP servers are discovered at connection time and available simultaneously to the agent",
-            "MCP resources as a mechanism for exposing content catalogs to reduce exploratory tool calls"
-          ],
-          "skills": [
-            "Configuring shared MCP servers in project-scoped .mcp.json with environment variable expansion for authentication tokens",
-            "Configuring personal/experimental MCP servers in user-scoped ~/.claude.json",
-            "Enhancing MCP tool descriptions to explain capabilities and outputs in detail, preventing the agent from preferring built-in tools over more capable MCP tools",
-            "Choosing existing community MCP servers over custom implementations for standard integrations, reserving custom servers for team-specific workflows",
-            "Exposing content catalogs as MCP resources to give agents visibility into available data without requiring exploratory tool calls"
-          ],
-          "questionIds": [
-            "d4-005",
-            "d4-008",
-            "d4-015",
-            "d4-032"
-          ]
-        },
-        {
-          "id": "2.5",
-          "title": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
-          "knowledge": [
-            "Grep for content search (searching file contents for patterns like function names, error messages, or import statements)",
-            "Glob for file path pattern matching (finding files by name or extension patterns)",
-            "Read/Write for full file operations; Edit for targeted modifications using unique text matching",
-            "When Edit fails due to non-unique text matches, using Read + Write as a fallback for reliable file modifications"
-          ],
-          "skills": [
-            "Selecting Grep for searching code content across a codebase",
-            "Selecting Glob for finding files matching naming patterns (e.g., **/*.test.tsx)",
-            "Using Read to load full file contents followed by Write when Edit cannot find unique anchor text",
-            "Building codebase understanding incrementally: starting with Grep to find entry points, then using Read to follow imports and trace flows",
-            "Tracing function usage across wrapper modules by first identifying all exported names, then searching for each name across the codebase"
-          ],
-          "questionIds": [
-            "d4-006",
-            "d4-007",
-            "d4-035",
-            "d4-036",
-            "d4-037",
-            "d4-038",
-            "d4-039"
-          ]
-        }
-      ]
-    },
-    {
-      "id": 3,
       "title": "Claude Code Configuration & Workflows",
       "weight": 20,
       "tasks": [
@@ -501,13 +359,14 @@
             "d2-003",
             "d2-009",
             "d2-010",
-            "d2-017"
+            "d2-017",
+            "d2-051"
           ]
         }
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "title": "Prompt Engineering & Structured Output",
       "weight": 20,
       "tasks": [
@@ -671,7 +530,157 @@
           ],
           "questionIds": [
             "d3-008",
-            "d1-018"
+            "d1-018",
+            "d3-051",
+            "d3-052",
+            "d3-053"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Tool Design & MCP Integration",
+      "weight": 18,
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "Design effective tool interfaces with clear descriptions and boundaries",
+          "knowledge": [
+            "Tool descriptions as the primary mechanism LLMs use for tool selection; minimal descriptions lead to unreliable selection among similar tools",
+            "The importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions",
+            "How ambiguous or overlapping tool descriptions cause misrouting",
+            "The impact of system prompt wording on tool selection: keyword-sensitive instructions can create unintended tool associations"
+          ],
+          "skills": [
+            "Writing tool descriptions that clearly differentiate each tool's purpose, expected inputs, outputs, and when to use it versus similar alternatives",
+            "Renaming tools and updating descriptions to eliminate functional overlap",
+            "Splitting generic tools into purpose-specific tools with defined input/output contracts",
+            "Reviewing system prompts for keyword-sensitive instructions that might override well-written tool descriptions"
+          ],
+          "questionIds": [
+            "d4-001",
+            "d4-016",
+            "d4-014",
+            "d4-018",
+            "d4-019",
+            "d4-021",
+            "d4-022",
+            "d4-023",
+            "d4-024",
+            "d4-025",
+            "d4-026",
+            "d4-028",
+            "d4-029",
+            "d4-030",
+            "d4-031",
+            "d4-033",
+            "d4-034",
+            "d4-040",
+            "d4-042",
+            "d4-043",
+            "d4-044",
+            "d4-045"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Implement structured error responses for MCP tools",
+          "knowledge": [
+            "The MCP isError flag pattern for communicating tool failures back to the agent",
+            "The distinction between transient errors (timeouts), validation errors (invalid input), business errors (policy violations), and permission errors",
+            "Why uniform error responses ('Operation failed') prevent the agent from making appropriate recovery decisions",
+            "The difference between retryable and non-retryable errors, and how returning structured metadata prevents wasted retry attempts"
+          ],
+          "skills": [
+            "Returning structured error metadata including errorCategory (transient/validation/permission), isRetryable boolean, and human-readable descriptions",
+            "Including retriable: false flags and customer-friendly explanations for business rule violations",
+            "Implementing local error recovery within subagents for transient failures, propagating to the coordinator only errors that cannot be resolved locally",
+            "Distinguishing between access failures (needing retry decisions) and valid empty results (representing successful queries with no matches)"
+          ],
+          "questionIds": [
+            "d1-002",
+            "d1-017",
+            "d4-004",
+            "d4-013",
+            "d4-020"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Distribute tools appropriately across agents and configure tool choice",
+          "knowledge": [
+            "The principle that giving an agent access to too many tools (e.g., 18+) degrades tool selection reliability by increasing decision complexity",
+            "Why agents with tools outside their specialisation tend to misuse them",
+            "Scoped tool access: giving agents only the tools needed for their role, with limited cross-role tools for specific high-frequency needs",
+            "tool_choice configuration options: 'auto', 'any', and forced tool selection"
+          ],
+          "skills": [
+            "Restricting each subagent's tool set to those relevant to its role, preventing cross-specialisation misuse",
+            "Replacing generic tools with constrained alternatives",
+            "Providing scoped cross-role tools for high-frequency needs (e.g., a verify_fact tool for the synthesis agent) while routing complex cases through the coordinator",
+            "Using tool_choice forced selection to ensure a specific tool is called first",
+            "Setting tool_choice: 'any' to guarantee the model calls a tool rather than returning conversational text"
+          ],
+          "questionIds": [
+            "d4-002",
+            "d4-003",
+            "d4-017",
+            "d4-010",
+            "d4-011",
+            "d4-012",
+            "d4-027",
+            "d4-041"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Integrate MCP servers into Claude Code and agent workflows",
+          "knowledge": [
+            "MCP server scoping: project-level (.mcp.json) for shared team tooling vs user-level (~/.claude.json) for personal/experimental servers",
+            "Environment variable expansion in .mcp.json (e.g., ${GITHUB_TOKEN}) for credential management without committing secrets",
+            "That tools from all configured MCP servers are discovered at connection time and available simultaneously to the agent",
+            "MCP resources as a mechanism for exposing content catalogs to reduce exploratory tool calls"
+          ],
+          "skills": [
+            "Configuring shared MCP servers in project-scoped .mcp.json with environment variable expansion for authentication tokens",
+            "Configuring personal/experimental MCP servers in user-scoped ~/.claude.json",
+            "Enhancing MCP tool descriptions to explain capabilities and outputs in detail, preventing the agent from preferring built-in tools over more capable MCP tools",
+            "Choosing existing community MCP servers over custom implementations for standard integrations, reserving custom servers for team-specific workflows",
+            "Exposing content catalogs as MCP resources to give agents visibility into available data without requiring exploratory tool calls"
+          ],
+          "questionIds": [
+            "d4-005",
+            "d4-008",
+            "d4-015",
+            "d4-032",
+            "d4-046"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
+          "knowledge": [
+            "Grep for content search (searching file contents for patterns like function names, error messages, or import statements)",
+            "Glob for file path pattern matching (finding files by name or extension patterns)",
+            "Read/Write for full file operations; Edit for targeted modifications using unique text matching",
+            "When Edit fails due to non-unique text matches, using Read + Write as a fallback for reliable file modifications"
+          ],
+          "skills": [
+            "Selecting Grep for searching code content across a codebase",
+            "Selecting Glob for finding files matching naming patterns (e.g., **/*.test.tsx)",
+            "Using Read to load full file contents followed by Write when Edit cannot find unique anchor text",
+            "Building codebase understanding incrementally: starting with Grep to find entry points, then using Read to follow imports and trace flows",
+            "Tracing function usage across wrapper modules by first identifying all exported names, then searching for each name across the codebase"
+          ],
+          "questionIds": [
+            "d4-006",
+            "d4-007",
+            "d4-035",
+            "d4-036",
+            "d4-037",
+            "d4-038",
+            "d4-039"
           ]
         }
       ]
@@ -734,7 +743,11 @@
             "Instructing the agent to ask for additional identifiers when tool results return multiple matches, rather than selecting based on heuristics"
           ],
           "questionIds": [
-            "d1-015"
+            "d1-015",
+            "d5-038",
+            "d5-039",
+            "d5-040",
+            "d5-041"
           ]
         },
         {
@@ -754,7 +767,10 @@
           ],
           "questionIds": [
             "d1-002",
-            "d1-017"
+            "d1-017",
+            "d5-042",
+            "d5-043",
+            "d5-044"
           ]
         },
         {
@@ -775,7 +791,11 @@
           ],
           "questionIds": [
             "d5-003",
-            "d5-004"
+            "d5-004",
+            "d5-045",
+            "d5-046",
+            "d5-047",
+            "d5-048"
           ]
         },
         {
@@ -833,5 +853,6 @@
         }
       ]
     }
-  ]
+  ],
+  "domainNumbering": "domains[].id follows this exam's index.json numbering so objectives group under the right domain; task ids (e.g. \"2.4\") keep the official exam-guide numbering (guide: 1 Agentic, 2 Tool Design, 3 Claude Code, 4 Prompt Engineering, 5 Context)."
 }

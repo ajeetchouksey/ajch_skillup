@@ -16,21 +16,22 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-002",
     "domain": 4,
     "scenario": "The engineering team at Apex Systems uses GitHub Copilot CLI to accelerate shell scripting and Git workflows. During a knowledge-sharing session, the team debates which CLI capabilities are available by default versus those requiring additional configuration.",
-    "question": "What functionality does Copilot offer within the command-line interface (CLI)?",
+    "question": "What does GitHub Copilot CLI offer in the terminal?",
     "options": [
-      "Al-generated text completion for pull request descriptions",
-      "The ability to create and manage collections of documentation",
-      "Al-generated summaries of pull requests",
-      "A chat-like interface for asking questions about the command line"
+      "An agent that can answer questions, write and debug code, run commands with your approval, and work with GitHub.com",
+      "Only AI-generated text for pull request descriptions",
+      "A way to manage Copilot Spaces membership",
+      "Read-only explanations of shell commands, with no ability to edit files"
     ],
-    "correct": 3,
-    "explanation": "D. A chat-like interface for asking questions about the command line. This is the primary functionality Copilot offers within the CLI. GitHub Copilot in the CLI provides a conversational interface (accessed, for example, via gh copilot explain or gh copilot suggest) where users can ask natural language questions about shell commands, Git commands, or GitHub CLI commands. Copilot then provides command suggestions, explanations of existing commands, or helps formulate complex commands, directly within the terminal environment. Incorrect: A. AI-generated text completion for pull request descriptions While GitHub Copilot does offer AI-generated text completion for pull request descriptions, this functionality is typically integrated into the GitHub web interface or within IDEs (e.g., GitHub Desktop, VS Code’s Source Control view), not directly as a primary chat function within the general command-line interface. B. The ability to create and manage collections of documentation Creating and managing collections of documentation (like internal knowledge bases) is a feature available with GitHub Copilot Enterprise, which allows Copilot to draw context from an organization's private documentation. However, this is a broader enterprise capability, not a specific functionality offered within the general CLI as a chat interface. C. AI-generated summaries of pull requests GitHub Copilot does provide AI-generated summaries of pull requests. This feature is integrated into the GitHub web interface for pull requests to help reviewers quickly grasp changes. It is not a direct interactive chat feature within the general command-line interface.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub describes Copilot CLI as bringing the Copilot agent to the terminal to answer questions, write and debug code, and work with GitHub.com, for example making changes and opening a pull request, with tools approved by you. B is wrong because PR description text is a GitHub.com feature. C is wrong because Spaces are managed on GitHub.com or through the Spaces API. D is wrong because that describes the retired gh-copilot extension, not the current CLI, which can edit files.",
     "tags": [
       "enterprise",
       "ide-integration",
@@ -38,7 +39,8 @@
       "copilot-cli",
       "knowledge-base",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-003",
@@ -46,40 +48,41 @@
     "scenario": "A developer at Cascade Digital is establishing prompting guidelines for the development team. During a code review, a debate arises about what constitutes an effective Copilot Chat prompt and how to structure requests for optimal results.",
     "question": "How does GitHub Copilot identify matching code when the public code filter is enabled?",
     "options": [
-      "By stripping out all whitespace and comparing suggestions over ~150 characters against an index of",
-      "public code",
-      "By hashing the suggestion and comparing it to a database of hashed public code snippets",
-      "By using natural language processing (NLP) techniques to identify semantic similarity",
-      "By comparing the abstract syntax trees (ASTs) of the suggestion and public code"
+      "It compares the suggestion plus about 150 characters of surrounding code against an index of public GitHub code",
+      "It hashes the whole file and compares it with hashed public files",
+      "It runs semantic similarity on the developer's natural-language comment",
+      "It compares abstract syntax trees of the suggestion and the user's private repositories"
     ],
     "correct": 0,
-    "explanation": "A. By stripping out all whitespace and comparing suggestions over ~150 characters against an index of public code. This is the accurate method described in GitHub’s documentation. When the public code filter is active, Copilot will: Take the generated code suggestion. Combine it with some of the surrounding code that would be present if the suggestion were accepted. Strip out all whitespace from this combined code snippet. Compare these “normalized” snippets that are longer than approximately 150 characters against an extensive index of public code available on GitHub.com. If a match or a “near match” is found, the suggestion may be suppressed (if blocking is enabled) or details about the matching public code (including repositories and licenses) will be provided to the user. This “fuzzy” matching, ignoring whitespace and focusing on substantial code blocks, helps identify actual duplication rather than just common boilerplate. Incorrect: B. By hashing the suggestion and comparing it to a database of hashed public code snippets. While hashing can be used for fast comparisons in some systems, the public documentation explicitly mentions “stripping out all whitespace” and comparing snippets over a certain length, which suggests a more direct comparison of normalized code content rather than solely relying on cryptographic hashes. The emphasis is on identifying “near matches” which hashing alone might miss without complex collision handling. C. By using natural language processing (NLP) techniques to identify semantic similarity. NLP techniques are crucial for how Copilot understands prompts and generates new code based on context. However, for the public code filter, the mechanism described is a more direct code-to-code comparison (after normalization) to detect duplication, rather than a high-level semantic analysis for similarity. Semantic similarity is a broader concept than direct code matching for the filter. D. By comparing the abstract syntax trees (ASTs) of the suggestion and public code. Comparing Abstract Syntax Trees (ASTs) is a sophisticated method for identifying structural and semantic similarity in code, often used in plagiarism detection or refactoring tools. While powerful, GitHub’s public documentation for the Copilot public code filter specifically details the “stripping out whitespace” and “150 characters” rule, indicating a more practical, performance-optimized string-based comparison for this ( particular feature. AST comparison is generally more computationally intensive and is not cited as the primary mechanism for this filter.",
+    "explanation": "A is correct: GitHub's code referencing docs say Copilot compares the potential suggestion and about 150 characters of surrounding code against an index of public repositories on GitHub.com. B is wrong because the check works on the suggestion and nearby code, not on hashes of whole files. C is wrong because the comparison is against code, not the meaning of comments. D is wrong because private repositories are not searched.",
     "tags": [
       "ide-integration",
       "code-filter",
       "duplication-detection",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-004",
     "domain": 4,
     "scenario": "Rohan, a full-stack engineer at NovaTech is establishing prompting guidelines for the development team. During a code review, a debate arises about what constitutes an effective Copilot Chat prompt and how to structure requests for optimal results.",
-    "question": "According to the provided texts, which statement about GitHub Copilot’s use of user data is FALSE?",
+    "question": "Which statement about GitHub Copilot's handling of user data is FALSE?",
     "options": [
-      "Copilot can filter code suggestions that match public code from GitHub.",
-      "Copilot gathers context from the code being edited and the user’s repository.",
-      "Copilot uses HTTPS to secure the transmission of prompts and responses.",
-      "Copilot retains user prompts for future model retraining and personalization."
+      "Copilot can block or annotate suggestions that match public code on GitHub",
+      "Copilot gathers context from the code being edited and related open files",
+      "Copilot uses HTTPS to protect prompts and responses in transit",
+      "Copilot Business and Enterprise prompts are used to train GitHub's models unless an admin opts out"
     ],
     "correct": 3,
-    "explanation": "D. Copilot retains user prompts for future model retraining and personalization. This statement is typically FALSE based on common knowledge about GitHub Copilot’s data privacy practices. GitHub has stated that user prompts and code are not used for retraining the underlying models that power Copilot or for personalizing the model for individual users. Their primary focus is on providing suggestions without using private user code to enhance the general model, addressing privacy concerns. While they might collect telemetry for service improvement (like latency or suggestion acceptance rates), the actual code input by. users is generally not retained or used for retraining. Incorrect: A. Copilot can filter code suggestions that match public code from GitHub. This statement is TRUE. GitHub Copilot has a feature that allows it to filter out code suggestions that are exact or near-exact matches to publicly available code on GitHub. This is designed to help users avoid inadvertently copying open-source code without proper attribution and to mitigate intellectual property concerns. B. Copilot gathers context from the code being edited and the user's repository. This statement is TRUE. For Copilot to provide relevant and accurate suggestions, it needs context. It analyzes the code you are currently editing, including the surrounding lines, the open files in your editor, and often even other files within your repository (depending on the editor integration and project size) to understand the larger context of your project. C. Copilot uses HTTPS to secure the transmission of prompts and responses. This statement is TRUE. Like virtually all secure web services, GitHub Copilot uses HTTPS (Hypertext Transfer Protocol Secure) to encrypt the communication between your editor and GitHub’s servers. This ensures that your prompts (code snippets, comments) and the generated responses (code suggestions) are transmitted securely and are protected from eavesdropping or tampering.",
+    "explanation": "D is the false statement: GitHub's April 2026 interaction-data update applies to Copilot Free, Pro and Pro+ (individuals can opt out), and it states that Copilot Business and Enterprise users are not affected. A is true because matching suggestions can be blocked or shown with a reference. B is true because the prompt is built from the file you're editing and context such as open tabs. C is true because prompts travel over HTTPS.",
     "tags": [
       "privacy",
       "plans",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-005",
@@ -97,7 +100,8 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-006",
@@ -116,7 +120,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-007",
@@ -127,8 +132,7 @@
       "To check the prompt for any potential malicious intent or attempts to manipulate the model",
       "To translate the user’s natural language query into a format understandable by the language model",
       "To remove any sensitive information that might compromise user privacy",
-      "To optimize the prompt for efficient processing by the language model and improve the quality of",
-      "code suggestions"
+      "To optimize the prompt for efficient processing by the language model and improve the quality of code suggestions"
     ],
     "correct": 0,
     "explanation": "Primary Purpose of Preprocessing User Prompts in GitHub Copilot The preprocessing stage in any AI data pipeline is crucial for optimizing the input provided to the core AI model. In the context of GitHub Copilot, which aims to generate high-quality code suggestions, prompt preprocessing plays a vital role in enhancing the efficiency and effectiveness of the underlying language model. Correct: D. To optimize the prompt for efficient processing by the language model and improve the quality of code suggestions. This is the primary purpose. Preprocessing involves a series of steps to refine the raw user prompt before it’s fed into Copilot’s large language model. This optimization can include: Tokenization: Breaking down the prompt into smaller units (tokens) that the model can understand. Normalization: Standardizing text (e.g., lowercasing, handling punctuation, removing redundant spaces). Contextualization: Incorporating relevant surrounding code, file names, or open tabs to enrich the prompt's context, making suggestions more accurate. Feature Engineering: Extracting specific signals or features from the prompt that can guide the model's generation process. Filtering (minor): While not the primary purpose, some basic filtering might occur to clean up noise, contributing to better efficiency. By making the prompt more precise and efficient for the model to consume, preprocessing directly contributes to faster response times and, crucially, higher quality, more relevant code suggestions. Incorrect: A. To check the prompt for any potential malicious intent or attempts to manipulate the model. While security and safety are critical considerations for AI systems, and some form of safety filtering might occur at various stages, prompt preprocessing’s primary purpose is not malicious intent detection. Dedicated safety filters and moderation layers are typically implemented separately or as specific components within a broader safety pipeline, rather than being the overarching goal of general prompt optimization. B. To translate the user's natural language query into a format understandable by the language model. This describes a component of preprocessing (like tokenization), but it’s not the primary purpose in its entirety. The language model already understands natural language. Preprocessing refines and optimizes that natural language, often by adding context and preparing it into a specific tokenized format, rather than merely “translating” it into something fundamentally different. The goal is enhancement for better output, not just basic comprehension. C. To remove any sensitive information that might compromise user privacy. Privacy protection is indeed a critical aspect of GitHub Copilot’s design, and measures are in place to handle sensitive data. However, the primary purpose of prompt preprocessing as a general step in the data pipeline is not solely privacy scrubbing. Privacy filters and data governance policies would handle sensitive information, often upstream or as a distinct security layer, rather than being the defining characteristic of “prompt preprocessing” for model optimization.",
@@ -136,7 +140,8 @@
       "privacy",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-008",
@@ -154,7 +159,8 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-009",
@@ -174,7 +180,8 @@
       "ide-integration",
       "responsible-ai",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-010",
@@ -185,14 +192,10 @@
       "It highlights that Copilot collects data from various sources to enhance its code suggestions.",
       "It emphasizes that Copilot only uses data explicitly provided by the user in the prompt.",
       "It implies that Copilot stores all collected data indefinitely to personalize user experiences.",
-      "It suggests that Copilot primarily relies on user input for generating code and rarely utilizes its internal",
-      "knowledge base."
+      "It suggests that Copilot primarily relies on user input for generating code and rarely utilizes its internal knowledge base."
     ],
-    "correct": [
-      0,
-      2
-    ],
-    "explanation": "Incorrect Significance of ‘GitHub Copilot Gathers Input and Context’ in the Data Pipeline The statement “GitHub Copilot gathers input and context\" is fundamental to understanding how Copilot functions and provides relevant code suggestions. It describes the crucial initial phase of its data pipeline, where the AI system collects and processes information to inform its generative capabilities. This concept is central to the GitHub Copilot Certification, emphasizing the factors that influence suggestion quality. Correct: A. It highlights that Copilot collects data from various sources to enhance its code suggestions. This is the core significance. “Input and context\" for GitHub Copilot isn’t limited to just what a user types in a prompt. It encompasses a rich array of data points that Copilot considers to generate contextually relevant code. These sources include: The active file: The code you are currently writing. Other open files: Relevant files in your IDE that provide broader project context (e.g., related modules, definitions). Comments: Explanations and intent expressed by the developer. Function and variable names: Semantic clues from existing code. Docstrings/Documentation: High-level descriptions of code elements. Recent chat history (for Copilot Chat): Previous turns in the conversation. For Enterprise: Private code repositories and internal documentation. By gathering this diverse input and context, Copilot can generate suggestions that are tailored to the specific task, adhere to project conventions, and integrate seamlessly with existing code. Incorrect: B. It emphasizes that Copilot only uses data explicitly provided by the user in the prompt. This is incorrect. While user prompts are a vital source of input, Copilot’s power comes from its ability to go beyond the explicit prompt and leverage the surrounding code context. If it only used prompt data, its suggestions would be far less intelligent and relevant. C. It implies that Copilot stores all collected data indefinitely to personalize user experiences. This is incorrect. The phrase “gathers input and context” describes the real-time processing for generating a suggestion, not the long-term storage or personalization strategy. GitHub Copilot has specific data retention and privacy policies that do not involve indefinite storage of all user input for personalization. While some aggregated telemetry might be used for model improvement, it's not about persistent personalization of individual user experiences based on indefinite data storage. D. It suggests that Copilot primarily relies on user input for generating code and rarely utilizes its internal knowledge base. This is incorrect. “Internal knowledge base” refers to the vast amount of code and natural language data Copilot was trained on. Copilot always relies on this massive training data to generate suggestions. The “input and context\" from the user and the current coding environment are what help Copilot select and adapt relevant knowledge from its internal base to the specific situation. It’s a combination of both: context guides the application of the knowledge base.",
+    "correct": 0,
+    "explanation": "A is correct: 'gathers input and context' means Copilot builds its prompt from several sources, such as code before and after the cursor, the file name and type, open tabs and project structure, to make suggestions relevant. B is wrong because Copilot uses more than the text you type. C is wrong because gathering context says nothing about storing data indefinitely. D is wrong because the model relies on its training as well as the gathered context.",
     "tags": [
       "copilot-chat",
       "privacy",
@@ -201,7 +204,8 @@
       "ide-integration",
       "knowledge-base",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-011",
@@ -209,8 +213,7 @@
     "scenario": "A developer at Cascade Digital is establishing prompting guidelines for the development team. During a code review, a debate arises about what constitutes an effective Copilot Chat prompt and how to structure requests for optimal results.",
     "question": "Which statement BEST describes GitHub Copilot Chat's ability to generate code?",
     "options": [
-      "It predicts and suggests code based on the context of the code being written, sometimes producing",
-      "matches with existing code.",
+      "It predicts and suggests code based on the context of the code being written, sometimes producing matches with existing code.",
       "It generates entirely novel code with no resemblance to any existing code.",
       "It relies solely on the developer's input and doesn’t use any internal knowledge or data.",
       "It exclusively copies and pastes code from its training data."
@@ -222,7 +225,8 @@
       "ide-integration",
       "code-filter",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-012",
@@ -244,7 +248,8 @@
       "vscode",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-013",
@@ -263,7 +268,8 @@
       "prompt-engineering",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-014",
@@ -283,21 +289,21 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-015",
     "domain": 4,
-    "scenario": "The DevOps team at Summit Tech is exploring GitHub Copilot Chat slash commands to speed up code reviews. The team wants to standardise which slash commands to use for different debugging and explanation scenarios.",
-    "question": "What is a limitation of content exclusion in Copilot Chat within Visual Studio Code and Visual Studio?",
+    "question": "What is a documented limitation of content exclusion in Copilot Chat in Visual Studio Code?",
     "options": [
-      "It only works for code completion, not for general questions in Copilot Chat.",
-      "It's fully effective in Copilot Chat, with no known limitations.",
-      "It only works for files within Git repositories, not for other file system locations.",
-      "It doesn't apply when using the @github chat participant in a question."
+      "It is not supported in the Edit and Agent modes of Copilot Chat",
+      "It only works for inline suggestions, never for Ask-mode chat",
+      "It only works for files outside Git repositories",
+      "There are no limitations; it applies in every chat mode"
     ],
-    "correct": 3,
-    "explanation": "D. It doesn’t apply when using the @github chat participant in a question. Content exclusion settings (like those based on .gitignore files or specific IDE settings) are designed to prevent Copilot from sending your local, private, and excluded project files as context to the Copilot service. However, when you use the @github chat participant (e.g., @github /explain #repo:octocat/Spoon- Knife/src/main,js), you are explicitly asking Copilot Chat to access and process information from public GitHub repositories (or specific GitHub features like issues/PRs). In this scenario, your local content exclusion rules are irrelevant because Copilot is operating on publicly available data directly from GitHub, not your local codebase that you might have explicitly excluded. Therefore, your local exclusion settings do not prevent Copilot Chat from fetching and reasoning about content from public GitHub repositories when you use the @github participant. Incorrect: A. It only works for code completion, not for general questions in Copilot Chat. This is incorrect. Content exclusion settings do apply to Copilot Chat interactions that involve your local codebase. If a local file is excluded, Copilot Chat will generally not use its content as context for answering questions about your local project. B. It's fully effective in Copilot Chat, with no known limitations. This is incorrect because option D highlights a specific, known limitation. No system is typically “fully effective with no known limitations.” C. It only works for files within Git repositories, not for other file system locations. While .gitignore is primarily used for Git repositories, Copilot's content exclusion can often be configured through IDE settings (like VS Code’s files.exclude or search.exclude) which can apply to any folder opened in the IDE, regardless of whether it's a Git repository. Therefore, this statement is not universally true. The core limitation lies in the @github participant interaction.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's content exclusion docs say exclusion is currently not supported in the Edit and Agent modes of Copilot Chat in VS Code, though it is supported for inline suggestions and chat. B is wrong because chat does respect exclusions. C is wrong because exclusions target repository paths, and org-level `\"*\"` rules also cover non-Git files. D is wrong because the Edit and Agent mode gap is a documented limitation.",
     "tags": [
       "copilot-chat",
       "code-completion",
@@ -305,7 +311,8 @@
       "ide-integration",
       "vscode",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-016",
@@ -316,8 +323,7 @@
       "Answering non-coding questions.",
       "Providing code fixes.",
       "Translating natural language to code.",
-      "Generating code documentation.",
-      "Creating unit test cases."
+      "Generating code documentation."
     ],
     "correct": 0,
     "explanation": "A. Answering non-coding questions. Copilot Chat is designed as an AI assistant for developers and coding-related tasks. While LLMs can answer general knowledge questions, Copilot Chat's specialized training and integration with IDEs are geared towards programming. Its primary purpose and advertised use cases revolve around code, debugging, refactoring, documentation, and testing. Answering arbitrary non-coding questions (e.g., “What's the capital of France?” or “Explain quantum physics in simple terms”) falls outside its intended scope and specialized functionality within the GitHub Copilot ecosystem. Incorrect: B. Providing code fixes. This is a core use case for Copilot Chat. Developers can paste problematic code snippets or describe errors, and Copilot Chat can suggest fixes, refactorings, or debug strategies. C. Translating natural language to code. This is a fundamental capability of Copilot (both the completion feature and Chat). You can describe what you want to achieve in plain English (e.g., “Write a Python function to read a CSV file\"), and Copilot Chat can generate the corresponding code. D. Generating code documentation. Copilot Chat can be used to generate docstrings, comments, or even higher-level documentation for functions, classes, or entire modules, significantly aiding in improving code readability and maintainability. E. Creating unit test cases. Developers frequently use Copilot Chat to generate unit tests for their existing code. You can provide a function or class, and ask Copilot to write test cases for it, covering various scenarios and edge cases.",
@@ -325,7 +331,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-017",
@@ -344,7 +351,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-018",
@@ -363,7 +371,8 @@
       "prompt-engineering",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-019",
@@ -381,7 +390,8 @@
     "tags": [
       "fine-tuning",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-020",
@@ -399,7 +409,8 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-021",
@@ -419,29 +430,27 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-022",
     "domain": 4,
-    "scenario": "Ananya, a backend developer at Harbor Cloud is establishing prompting guidelines for the development team. During a code review, a debate arises about what constitutes an effective Copilot Chat prompt and how to structure requests for optimal results.",
-    "question": "If an organization's Copilot policy blocks suggestions matching public code, what are two resulting behaviors (Select two correct answers)",
+    "scenario": "Ananya, a backend developer at Harbor Cloud, notices that Copilot occasionally offers nothing at a point where she expected a completion. Her organization's Copilot policy is set to block suggestions that match public code.",
+    "question": "With that policy enabled, what happens when a suggestion matches public code?",
     "options": [
-      "Users receive notifications when suggestions are blocked due to a match.",
-      "Copilot will cease providing any code suggestions whatsoever.",
-      "The check for matches uses about 150 characters of surrounding code context.",
-      "Only suggestions derived from the organization's private code are permitted.",
-      "Suggestions identical or very similar to public code will not be displayed."
+      "Copilot shows the suggestion but displays a notification telling the user it was flagged as matching public code",
+      "Copilot stops providing code suggestions for the whole file once any match against public code is detected",
+      "The suggestion is not shown; Copilot checks it, with about 150 characters of surrounding code, against public code on GitHub.com",
+      "Copilot only offers suggestions derived from the organization's own private repositories, never from its general model"
     ],
-    "correct": [
-      2,
-      4
-    ],
-    "explanation": "https://docs.github.com/en/copilot/managing-copilot/managing-github-copilot-in-your- organization/managing-policies-for-copilot-in-your-organization#about-policies-for-github-copilot",
+    "correct": 2,
+    "explanation": "C is correct: when the policy blocks matches, Copilot checks each suggestion together with about 150 characters of surrounding code against public code on GitHub.com, and a suggestion that matches is simply not displayed. Everything else keeps working.\n\nA is wrong because blocked suggestions are not shown at all; no notification is documented.\n\nB is wrong because only the matching suggestion is suppressed, not all suggestions for the file.\n\nD is wrong because the policy filters matches against public code; it doesn't restrict Copilot to suggestions derived from the organization's private code.",
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-023",
@@ -462,7 +471,8 @@
       "ide-integration",
       "knowledge-base",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-024",
@@ -481,7 +491,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-025",
@@ -499,7 +510,8 @@
     "tags": [
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-026",
@@ -521,7 +533,8 @@
       "privacy",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-027",
@@ -545,37 +558,34 @@
       "fine-tuning",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-028",
     "domain": 4,
-    "scenario": "Rohan, a full-stack engineer at NovaTech uses GitHub Copilot CLI to accelerate shell scripting and Git workflows. During a knowledge-sharing session, the team debates which CLI capabilities are available by default versus those requiring additional configuration.",
-    "question": "What is NOT a primary benefit of using the ‘ghce’ alias instead of typing the full ‘gh copilot explain’ command (Select three correct answers)",
+    "question": "A team scripts GitHub Copilot CLI with `copilot -p`. Which statement about tool approval flags is correct?",
     "options": [
-      "It allows Copilot to interpret and generate multi-step shell workflows automatically.",
-      "It removes built-in safety prompts for commands that could alter or delete files.",
-      "It streamlines the process of requesting explanations for shell commands by reducing typing effort.",
-      "It enables command execution in offline mode, bypassing the need for an active network connection."
+      "`--deny-tool` takes precedence over `--allow-tool` and `--allow-all-tools`",
+      "`--allow-all-tools` overrides any `--deny-tool` rule",
+      "Programmatic mode never runs tools, so approval flags are ignored",
+      "Approvals granted for a session automatically carry over to future sessions"
     ],
-    "correct": [
-      0,
-      1,
-      3
-    ],
-    "explanation": "Understanding ghce and gh copilot explain: The gh copilot explain command (often aliased to ghce) is part of the GitHub CLI Copilot extension. Its purpose is to provide natural language explanations for shell commands or to suggest shell commands based on natural language input. The benefit of using an alias like ghce is purely for convenience and reduced typing. It does not fundamentally change the behavior or capabilities of the underlying command. Correct (These are NOT benefits): A. It allows Copilot to interpret and generate multi-step shell workflows automatically. This is NOT a benefit of using the alias. The ability to interpret and generate multi-step shell workflows is a core capability of the gh copilot explain command itself (and the underlying Copilot model), not something conferred or enhanced by merely using a shorter alias. The alias just saves typing. B. It removes built-in safety prompts for commands that could alter or delete files. This is NOT a benefit of using the alias, and it's a dangerous misconception. Aliases are purely shortcuts. They do not alter the underlying command's safety features, prompts, or behavior. If gh copilot explain has safety prompts, they will still be present when using ghce. Removing safety features would be a significant security flaw, and aliases are designed for convenience, not for bypassing security. D. It enables command execution in offline mode, bypassing the need for an active network connection. This is NOT a benefit of using the alias. GitHub Copilot, including its CLI functionalities, requires an active internet connection to communicate with GitHub’s backend servers and the underlying AI models. Aliases do not enable offline functionality. The command itself is dependent on network access. Incorrect (This IS a benefit): C. It streamlines the process of requesting explanations for shell commands by reducing typing effort. This is the primary and only actual benefit of using an alias like ghce. It makes typing the command faster and more convenient, thus streamlining the workflow by reducing the number of characters you need to type.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub's Copilot CLI docs say `--deny-tool` blocks specific tools and takes precedence over both allow options, so you can allow all tools while still denying `shell(rm)`. B is wrong because deny rules win over allow rules. C is wrong because programmatic mode does run tools, which is why pre-approval is needed. D is wrong because session-wide approvals do not carry over to new or resumed sessions.",
     "tags": [
       "ide-integration",
       "copilot-cli",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-029",
     "domain": 4,
     "scenario": "The AI pair-programming team at Vertex Labs uses GitHub Copilot CLI to accelerate shell scripting and Git workflows. During a knowledge-sharing session, the team debates which CLI capabilities are available by default versus those requiring additional configuration.",
-    "question": "What is the purpose of the '/doc’ smart action in Copilot Chat?",
+    "question": "In Visual Studio, what does the `/doc` slash command in Copilot Chat do?",
     "options": [
       "To open the Chat view for a full chat session with Copilot.",
       "To run a VS Code command directly within the chat interface.",
@@ -583,14 +593,15 @@
       "To generate code documentation for a selected block of code."
     ],
     "correct": 3,
-    "explanation": "D. To generate code documentation for a selected block of code. The /doc smart action in Copilot Chat is specifically designed to generate documentation (like JSDoc, Python docstrings, etc.) for a selected function, class, or block of code. When you highlight a piece of code and then use /doc in the chat, Copilot will analyze the selected code and suggest appropriate comments and documentation for it, helping to improve code clarity and maintainability. Incorrect: A. To open the Chat view for a full chat session with Copilot. This is incorrect. The chat view is usually opened by clicking an icon or using a command like Ctrl+Alt+! (or Cmd-+Alt+l). /doc is an action within an existing chat session. B. To run a VS Code command directly within the chat interface. This is incorrect. While Copilot Chat can interpret commands, /doc is a specific instruction for generating documentation, not a general mechanism to run arbitrary VS Code commands. VS Code commands are typically executed via the Command Palette (Ctrl+Shift+P or Cmd+Shift+P). C. To clear the chat history and start a new session. This is incorrect. There's usually a separate command or button within the chat interface to clear the history or start a new session (e.g., a “New Chat” button or a specific slash command like /clear if available, though /doc is not it).",
+    "explanation": "D is correct: GitHub's cheat sheet lists `/doc` for Visual Studio as 'Add documentation comment for this symbol'; it is not listed for VS Code, where you ask for documentation in chat instead. A is wrong because opening the Chat view is a UI action, not `/doc`. B is wrong because running editor commands is not what `/doc` does. C is wrong because `/clear` starts a new chat session.",
     "tags": [
       "slash-commands",
       "copilot-chat",
       "vscode",
       "copilot-cli",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-030",
@@ -599,8 +610,7 @@
     "question": "What is the role of the ‘toxicity filter’ in the GitHub Copilot data pipeline?",
     "options": [
       "To identify and remove potentially harmful or offensive language from code comments",
-      "To filter out prompts and responses that contain inappropriate or offensive content, including hate",
-      "speech",
+      "To filter out prompts and responses that contain inappropriate or offensive content, including hate speech",
       "To ensure that the generated code adheres to established coding style guidelines and best practices",
       "To prevent the model from generating code that could be used for malicious purposes"
     ],
@@ -610,13 +620,14 @@
       "ide-integration",
       "responsible-ai",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-031",
     "domain": 4,
     "scenario": "The DevOps team at Summit Tech is exploring GitHub Copilot Chat slash commands to speed up code reviews. The team wants to standardise which slash commands to use for different debugging and explanation scenarios.",
-    "question": "What is the purpose of chat participants like '@workspace' or '@vscode’ in Copilot Chat?",
+    "question": "What is the purpose of chat participants such as `@vscode` and `@terminal` in VS Code Copilot Chat?",
     "options": [
       "To specify the programming language for code generation",
       "To indicate the type of request, such as code generation or testing",
@@ -624,7 +635,7 @@
       "To reference specific code snippets or files"
     ],
     "correct": 2,
-    "explanation": "C. To direct the question to a specific context or domain Chat participants (also sometimes called “slash commands” or “context variables” depending on the tool, but @ typically denotes participants) are used to explicitly tell Copilot Chat which source of information or which domain of knowledge it should draw upon to answer your question. @workspace: Directs Copilot Chat to consider the content of your entire open workspace when generating a response. This allows it to answer questions about files you haven't explicitly mentioned, understand project structure, or perform actions that span multiple files. @vscode: Directs Copilot Chat to answer questions about the Visual Studio Code IDE itself, such as how to use a feature, configure a setting, or troubleshoot an issue within VS Code. This capability allows developers to precisely scope their questions and receive more relevant, context-aware answers. Incorrect: A. To specify the programming language for code generation While the context provided by these participants might indirectly indicate the language (e.g., if the workspace is primarily Python), their primary purpose is not to specify the programming language. Copilot usually infers the language from the file extension, surrounding code, or explicit mentions in the prompt. B. To indicate the type of request, such as code generation or testing The type of request (e.g., generate code, explain code, write tests) is typically conveyed through the natural language of your prompt or by using specific slash commands (e.g., /fix, /explain, /test), not by participants like @workspace or @vscode. D. To reference specific code snippets or files While @workspace helps Copilot understand the context of files, specific code snippets or files are referenced using chat variables like #file (e.g., #file:path/to/file.js) or #selection (for selected code). Chat participants broaden the domain or scope of the query, while variables pinpoint specific content within that domain.",
+    "explanation": "C is correct: a participant directs the question to a domain with its own context; `@vscode` knows VS Code commands and features and `@terminal` knows the terminal shell and its contents. VS Code now marks `@` participants as deprecated and unsupported in the Copilot harness, though they remain in the Local harness. A is wrong because the language comes from your files and prompt. B is wrong because slash commands such as `/tests` indicate the type of request. D is wrong because `#` references attach files, symbols and selections.",
     "tags": [
       "slash-commands",
       "copilot-chat",
@@ -632,7 +643,8 @@
       "vscode",
       "copilot-extensions",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-032",
@@ -651,7 +663,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-033",
@@ -671,7 +684,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-034",
@@ -690,7 +704,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "id": "ghc-d4-035",
@@ -710,7 +725,8 @@
       "copilot-chat",
       "ide-integration",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-036",
@@ -731,7 +747,8 @@
       "ide-integration",
       "fine-tuning",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "id": "ghc-d4-037",
@@ -752,30 +769,619 @@
       "copilot-chat",
       "single-specific-short-surround",
       "github-copilot"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "id": "ghc-d4-038",
     "domain": 4,
-    "scenario": "The engineering lead at Harbor Cloud is evaluating which language model to use for different tasks via GitHub Copilot's model switching feature. The team needs to understand availability and limitations before updating their Copilot usage guidelines.",
-    "question": "Which of the following statements are true about model switching in GitHub Copilot? (Select two correct answers)",
+    "question": "Which statement about choosing models in GitHub Copilot is accurate?",
     "options": [
-      "The primary benefit of model switching is the ability to leverage different models for different programming tasks",
-      "Model switching is not supported in VS Code or on GitHub.com",
-      "Model switching is only available for organizations and enterprises, not individual developers",
-      "Model switching is currently available in Copilot Chat and will be rolled out to other Copilot features soon",
-      "All models available for switching have the same capabilities and performance characteristics"
+      "Models differ in strengths and cost; you can pick one in the model picker (or with `/model` in Copilot CLI), and organizations can control which models are available",
+      "All available models have identical capabilities and the same usage cost",
+      "Model choice is available only to organizations, never on individual plans",
+      "Model selection is limited to Copilot Chat on GitHub.com"
     ],
-    "correct": [
-      0,
-      3
-    ],
-    "explanation": "A and D are correct. A. The primary benefit of model switching is leveraging different models for different tasks — GitHub Copilot offers multiple models (GPT-4o variants, Claude, Gemini) with different strengths in speed, reasoning, and verbosity. D. Model switching is currently prominent in Copilot Chat and is being rolled out to code completion and other features in VS Code, Visual Studio, and JetBrains IDEs. Incorrect: B. Model switching IS supported in VS Code and GitHub.com. C. Model switching is available to individual subscribers (Copilot Free and Pro), not just enterprises. E. Different models have varying capabilities — that is the entire point of model switching.",
+    "correct": 0,
+    "explanation": "A is correct: Copilot offers several models; Copilot CLI switches with `/model` or `--model`, usage is measured in GitHub AI Credits that vary by model, and organization owners manage availability on the Models settings page. B is wrong because models differ in capability, context window and credit cost. C is wrong because individual plans such as Pro and Pro+ include model choice (Copilot Free offers Auto model selection only). D is wrong because model choice is also available in IDEs and Copilot CLI.",
     "tags": [
       "model-switching",
       "copilot-chat",
       "ide-integration",
       "github-copilot"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "id": "ghc-d4-039",
+    "domain": 4,
+    "question": "How does GitHub Copilot use the existing code in your project when making suggestions?",
+    "options": [
+      "It extracts reusable snippets and pastes them unchanged",
+      "It overwrites the existing code with its own version",
+      "It ignores existing code and generates entirely new code",
+      "It analyzes the existing code as context to make suggestions relevant"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Copilot builds its prompt from context such as code before and after the cursor, the file type and open tabs, so suggestions fit the surrounding code. A is wrong because Copilot generates new code from context rather than copying snippets. B is wrong because suggestions are applied only when you accept them. C is wrong because surrounding code is the main context for inline suggestions.",
+    "tags": [
+      "context",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d4-040",
+    "domain": 4,
+    "question": "In Copilot Chat, what does 'multi-turn conversation' mean?",
+    "options": [
+      "Asking follow-up questions in an extended dialogue that keeps the earlier context",
+      "Using several chat participants in one session",
+      "Letting Chat read several files in the workspace",
+      "Getting several alternative suggestions for one prompt"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: in a multi-turn conversation Copilot Chat uses the earlier messages in the session as context, so you can refine a request step by step. B is wrong because participants route a question but don't define a conversation. C is wrong because reading files is context gathering, not conversation turns. D is wrong because alternative suggestions are a completion feature.",
+    "tags": [
+      "chat-history",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d4-041",
+    "domain": 4,
+    "question": "When you want Copilot to understand a specific coding task better, which practice is most useful in the file?",
+    "options": [
+      "Declaring precise import and include statements for the libraries you use",
+      "Using unconventional coding patterns to challenge the model",
+      "Disabling Copilot while writing the first lines",
+      "Enabling every available Copilot setting"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: imports tell Copilot which libraries are in scope, so it can suggest calls to the right APIs instead of generic or invented ones. B is wrong because unusual patterns make the intent harder to infer. C is wrong because turning Copilot off provides no context. D is wrong because settings don't describe the task.",
+    "tags": [
+      "prompt-engineering",
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d4-042",
+    "domain": 4,
+    "question": "When is few-shot prompting most useful?",
+    "options": [
+      "For a simple, very common task",
+      "When you need output that follows a specific format or pattern that the model wouldn't guess",
+      "When the output is already highly predictable",
+      "When you want Copilot to work with no guidance at all"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: few-shot prompting gives a few examples of input and output so the model can copy a specific pattern, such as a house style or an unusual format. A and C are wrong because simple, predictable tasks usually work zero-shot. D is wrong because examples are guidance, so this describes zero-shot prompting.",
+    "tags": [
+      "prompt-engineering",
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d4-043",
+    "domain": 4,
+    "question": "In Copilot Chat in VS Code, what does the `#selection` chat variable add to the prompt?",
+    "options": [
+      "The last command run in the integrated terminal",
+      "The entire workspace",
+      "The text currently selected in the editor",
+      "The whole file currently open in the editor"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's cheat sheet describes `#selection` as including the currently selected text in the prompt. A is wrong because terminal output has its own context tools. B is wrong because workspace-wide questions use `#codebase`. D is wrong because the current file is `#file`.",
+    "tags": [
+      "copilot-chat",
+      "context",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d4-044",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which of the following BEST describes an effective GitHub Copilot prompt structure?",
+    "options": [
+      "A single one-word command telling Copilot what to generate",
+      "A formal API specification written in YAML or OpenAPI format",
+      "A context-rich description including the goal, relevant constraints, expected input/output format, and examples where helpful",
+      "Any text typed before pressing Tab to accept a suggestion"
+    ],
+    "correct": 2,
+    "explanation": "Effective prompts include: context (what you're working on), intent (what you want), clarifications (constraints, requirements), and optionally examples. This gives the model sufficient information to generate accurate, relevant suggestions.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d4-045",
+    "domain": 4,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A developer writes the comment `// Function to process data` as a Copilot prompt. Why will this likely produce poor results?",
+    "options": [
+      "Comments are not processed by GitHub Copilot's context-building system",
+      "GitHub Copilot only reads docstrings, not single-line comments",
+      "The comment is too vague — it lacks specifics about what data type, what processing logic, and what the expected output format is",
+      "The comment uses incorrect syntax for triggering Copilot suggestions"
+    ],
+    "correct": 2,
+    "explanation": "Vague prompts produce generic, often unusable suggestions. Effective prompts specify: exact data type (List[Dict]), transformation required (filter by date, aggregate by category), return type, and any edge cases to handle.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-046",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What is 'zero-shot prompting' when applied to GitHub Copilot?",
+    "options": [
+      "Asking the model to perform a task without providing any examples, relying entirely on the model's pre-trained knowledge",
+      "Prompting Copilot before any code has been written in the current file",
+      "Using Copilot without an internet connection via a local model",
+      "Sending an empty prompt to trigger Copilot's default suggestion mode"
+    ],
+    "correct": 0,
+    "explanation": "Zero-shot prompting means asking the model to perform a task without providing any examples in the prompt. The model relies entirely on its training to generate an appropriate response. Effective for common, well-established patterns.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-047",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What is 'few-shot prompting' and when is it most effective with GitHub Copilot?",
+    "options": [
+      "Using Copilot for only a few files within a larger project",
+      "Sending prompts with fewer than 10 words to maximize model focus",
+      "Limiting Copilot usage to short code snippets under 10 lines",
+      "Providing 2–5 concrete examples of the desired input/output pattern before requesting a new completion"
+    ],
+    "correct": 3,
+    "explanation": "Few-shot prompting provides concrete examples (2–5 input/output pairs) before asking for a new completion. Most effective when the pattern is non-standard, domain-specific, or when zero-shot produces inconsistent results.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-048",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer at Meridian Analytics wants Copilot to generate a function that transforms financial transaction records. Which prompt approach yields the BEST results?",
+    "options": [
+      "`// transform data`",
+      "`// Transform List[Dict{amount: float, currency: str, date: str}] to USD using daily rates. Return Dict[str, float] mapping date to total USD. Raise ValueError for unsupported currencies.`",
+      "`// financial transformation function for the analytics team`",
+      "Just starting to type the function signature with no comment"
+    ],
+    "correct": 1,
+    "explanation": "The detailed prompt specifies the exact input data structure (List[Dict] with typed fields), transformation logic (currency conversion), return type (Dict[str, float]), and error handling (ValueError for unsupported currencies) — leaving no ambiguity for Copilot.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-049",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "How does GitHub Copilot use content from other open editor tabs when building suggestions?",
+    "options": [
+      "Copilot only ever uses the currently focused tab for building prompts",
+      "Content from open tabs is included as 'neighboring tab' context, providing Copilot knowledge of codebase style, types, and patterns",
+      "Open tabs are only used for suggesting import statements, nothing else",
+      "Tabs must be explicitly pinned and marked before Copilot uses them as context"
+    ],
+    "correct": 1,
+    "explanation": "Copilot includes content from other open editor tabs as 'neighboring tab' context in its prompt, enabling it to understand codebase patterns, type definitions, naming conventions, and function signatures from across the project.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d4-050",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which prompt engineering technique involves showing 2–3 example implementations before asking Copilot to generate a new one following the same pattern?",
+    "options": [
+      "Zero-shot prompting",
+      "Few-shot prompting",
+      "Chain-of-thought prompting",
+      "Role prompting"
+    ],
+    "correct": 1,
+    "explanation": "Few-shot prompting demonstrates 2–3 examples of the desired format/pattern, letting the model infer the pattern and continue it. Particularly effective for enforcing consistent function signatures, docstring formats, or domain-specific patterns.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-051",
+    "domain": 4,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A developer writes detailed JSDoc comments before a function signature. How does this benefit GitHub Copilot's suggestions?",
+    "options": [
+      "It slows Copilot because it must process more tokens before generating a suggestion",
+      "JSDoc comments are completely ignored by GitHub Copilot's prompt builder",
+      "It provides Copilot with structured information about parameters, return types, and purpose, improving suggestion accuracy",
+      "JSDoc only helps in JavaScript files; TypeScript files with interfaces are preferred"
+    ],
+    "correct": 2,
+    "explanation": "JSDoc, Python docstrings, and type annotations provide Copilot with structured context about expected behavior, parameter types, and return values — leading to significantly more accurate and correctly-typed suggestions.",
+    "tags": [
+      "prompt-engineering",
+      "context",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-052",
+    "domain": 4,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "Which of the following is a prompt engineering BEST practice for getting high-quality Copilot suggestions?",
+    "options": [
+      "Use single-character variable names to minimize tokens consumed by the context",
+      "Write all prompts in UPPERCASE to signal importance to the model",
+      "Always start prompts with a greeting to establish conversational context",
+      "Use meaningful, descriptive variable and function names that clearly convey intent and purpose"
+    ],
+    "correct": 3,
+    "explanation": "Meaningful, descriptive names (e.g., `calculateCompoundInterest()` vs `calc()`) are one of the most impactful prompt engineering practices. Names provide Copilot with strong semantic signals about the function's purpose and expected behavior.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-053",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What is 'chat history' in the context of GitHub Copilot Chat prompt engineering?",
+    "options": [
+      "A persistent log of all Copilot conversations stored in GitHub's servers",
+      "A markdown file that stores frequently used prompts for reuse across sessions",
+      "The developer's chat history across all repositories and sessions on all devices",
+      "The conversation context from earlier in the current chat session that Copilot uses to maintain coherence and continuity across the conversation"
+    ],
+    "correct": 3,
+    "explanation": "Chat history is the conversation context from the current session. Copilot Chat uses previous messages to maintain coherence, remember established context, and provide relevant follow-up responses — each new conversation starts fresh without prior session history.",
+    "tags": [
+      "prompt-engineering",
+      "copilot-chat",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d4-054",
+    "domain": 4,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "A developer asks Copilot: 'Fix the bug in my code.' What critical information is MISSING from this prompt?",
+    "options": [
+      "The word 'please' to maintain conversational politeness",
+      "Specific context: which function/code has the bug, what the expected behavior is, what the actual wrong behavior is, and any error messages",
+      "The programming language being used (assumed from context)",
+      "The file name and exact line number in GitHub-compatible format"
+    ],
+    "correct": 1,
+    "explanation": "Effective debugging prompts need: (1) which code has the issue, (2) what the expected behavior should be, (3) what the actual/wrong behavior is, and (4) any error messages. Without this, Copilot cannot provide targeted assistance.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-055",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which approach BEST leverages GitHub Copilot's context-awareness for generating unit tests?",
+    "options": [
+      "Keeping the implementation file open alongside the test file so Copilot has context about function signatures, parameters, return types, and behavior",
+      "Opening a separate test file without the implementation file and asking Copilot for tests",
+      "Copy-pasting the entire implementation code into the Copilot Chat message",
+      "Using `/tests` with no additional context or open files"
+    ],
+    "correct": 0,
+    "explanation": "Having the implementation file open alongside the test file provides Copilot with function signatures, types, and implementation context — enabling it to generate tests that correctly match the actual function contracts.",
+    "tags": [
+      "prompt-engineering",
+      "context",
+      "testing",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-056",
+    "domain": 4,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A developer at TechNova asks Copilot: 'Using our repository's existing error handling pattern, add error handling to the fetchUserProfile function.' What prompt engineering technique is demonstrated?",
+    "options": [
+      "Zero-shot prompting with minimal context",
+      "Context-aware prompting that references existing codebase conventions to ensure consistent output",
+      "Chain-of-thought prompting with explicit reasoning steps",
+      "Role prompting where Copilot is assigned the role of a senior developer"
+    ],
+    "correct": 1,
+    "explanation": "This prompt explicitly references existing codebase conventions ('our repository's existing error handling pattern'), directing Copilot to generate code consistent with established patterns rather than using a generic approach.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-057",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What does 'prompt process flow' describe in GitHub Copilot Chat?",
+    "options": [
+      "The technical pipeline: user input → context collection → prompt construction → model inference → response delivery back to the IDE",
+      "The order in which developers should compose their prompts for best results",
+      "A flowchart that must be created before using Copilot on a new project",
+      "The process of saving and cataloging prompts in the `.github/prompts/` directory"
+    ],
+    "correct": 0,
+    "explanation": "The prompt process flow is the technical pipeline: user types a message → Copilot collects context (open files, chat history, workspace) → constructs the full prompt → sends to model → model generates response → response returned to the IDE.",
+    "tags": [
+      "prompt-engineering",
+      "copilot-chat",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d4-058",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Which prompt engineering principle suggests breaking complex implementation tasks into smaller, sequential Copilot prompts?",
+    "options": [
+      "Zero-shot decomposition into parallel tasks",
+      "Parallel prompting — submitting multiple prompts simultaneously in separate chat sessions",
+      "Batch processing — combining all subtasks into one comprehensive prompt",
+      "Single-responsibility prompting — asking Copilot to do one specific, well-defined thing at a time"
+    ],
+    "correct": 3,
+    "explanation": "Single-responsibility prompting breaks complex tasks into focused, one-at-a-time requests. Instead of 'build a complete authentication system', prompt sequentially: 'generate the User model', then 'generate the JWT middleware', etc. This produces higher quality output.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-059",
+    "domain": 4,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A developer at NovaBuild wants Copilot to follow their team's snake_case naming conventions across all sessions. Which combination is MOST effective?",
+    "options": [
+      "Mention the convention in each individual Copilot Chat message",
+      "Configure naming conventions in VS Code's settings.json editor preferences",
+      "Add naming convention documentation to the project README",
+      "Create `.github/copilot-instructions.md` defining the conventions and open representative example files as neighboring context"
+    ],
+    "correct": 3,
+    "explanation": "Combining `copilot-instructions.md` (defines conventions system-level for all Chat interactions) with opening representative example files as neighboring context (demonstrates the pattern concretely) provides both explicit instruction and few-shot exemplars.",
+    "tags": [
+      "prompt-engineering",
+      "copilot-chat",
+      "context",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-060",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "What is 'role prompting' in the context of GitHub Copilot Chat?",
+    "options": [
+      "Asking Copilot to adopt a specific expert persona (e.g., 'Act as a security engineer reviewing this code for OWASP Top 10 vulnerabilities')",
+      "Configuring Copilot's user role and permissions in the organization's admin settings",
+      "Assigning Copilot to specific files or directories in the CODEOWNERS file",
+      "Using the hidden `/role` command to switch Copilot's operating mode between generation and review"
+    ],
+    "correct": 0,
+    "explanation": "Role prompting instructs Copilot to adopt a specific expert perspective — security engineer, performance specialist, accessibility auditor. This frames the request from an expert viewpoint, producing more domain-specific and targeted feedback.",
+    "tags": [
+      "prompt-engineering",
+      "security",
+      "audit",
+      "copilot-chat"
+    ]
+  },
+  {
+    "id": "ghc-d4-061",
+    "domain": 4,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A developer needs Copilot to generate a new function that exactly matches an existing function's style — same error handling, same logging pattern, same variable naming. What is the MOST effective approach?",
+    "options": [
+      "Describe the desired style characteristics in a detailed natural language paragraph",
+      "Use the `/style` slash command to lock Copilot into the existing file's style",
+      "Copy the existing function into the Copilot Chat message and ask Copilot to modify it",
+      "Open an example of the existing function in a neighboring editor tab and write a specific comment describing only the new function's unique logic"
+    ],
+    "correct": 3,
+    "explanation": "Opening the exemplar function in a neighboring tab provides direct few-shot context. A focused comment on only the new function's unique logic lets Copilot infer style from the example, producing the most style-consistent result.",
+    "tags": [
+      "prompt-engineering",
+      "context",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-062",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "In VS Code Copilot Chat, when should you attach a specific file with `#` instead of using `#codebase`?",
+    "options": [
+      "Always, because `#` file references are faster than `#codebase`",
+      "Only in VS Code, because `#codebase` works in every IDE",
+      "Only offline, because `#codebase` needs an internet connection",
+      "When you know which file holds the relevant context; use `#codebase` when Copilot needs to search the workspace for it"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: attaching a known file (type `#` and the file name) gives Copilot precise context, while `#codebase` asks it to search the workspace for relevant code when you don't know where the answer lives. A is wrong because the choice depends on what you know, not speed. B is wrong because both are VS Code chat features. C is wrong because both need Copilot's cloud service. The older `@workspace` participant is deprecated in the Copilot harness.",
+    "tags": [
+      "prompt-engineering",
+      "copilot-chat",
+      "context",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-063",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "Why is including type information (TypeScript interfaces, Python type hints) important for GitHub Copilot prompt engineering?",
+    "options": [
+      "Type information is only relevant for statically typed languages and has no measurable impact on Copilot suggestions",
+      "Types provide Copilot explicit information about data structures, enabling type-safe code, correct method usage, and accurate transformations",
+      "Type annotations consume tokens that reduce the amount of business logic Copilot can process",
+      "Copilot ignores type annotations when generating code and uses only variable names"
+    ],
+    "correct": 1,
+    "explanation": "Type annotations tell Copilot the exact shape of data structures, enabling it to generate correctly typed code, use appropriate methods, and perform valid transformations without having to guess the underlying data model.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-064",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer writes: `// TODO: This function should validate email addresses.` What single improvement would MOST enhance this prompt?",
+    "options": [
+      "Remove the `TODO:` prefix and restructure as an imperative command",
+      "Add the developer's GitHub username as context for personalized suggestions",
+      "Translate the comment into multiple languages to improve model comprehension",
+      "Add specifics: validation rule (RFC 5321 format), return type (bool), and error handling behavior (return False vs. raise ValueError)"
+    ],
+    "correct": 3,
+    "explanation": "Adding specifics transforms vague intent into an actionable specification: validation standard (RFC 5321), expected return type (bool), and error handling behavior (False vs. exception). This gives Copilot enough information to generate an accurate implementation.",
+    "tags": [
+      "prompt-engineering",
+      "prompting"
+    ]
+  },
+  {
+    "id": "ghc-d4-065",
+    "domain": 4,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "Why do shorter, focused prompts often outperform long multi-task prompts in GitHub Copilot?",
+    "options": [
+      "Shorter prompts consume fewer tokens, directly reducing API cost per request",
+      "Long prompts cause network timeouts because they exceed GitHub's request payload limit",
+      "GitHub Copilot has a strict maximum prompt length of 100 characters enforced server-side",
+      "Focused prompts reduce context noise — the model can allocate its attention fully to one specific task without confusion from multiple competing instructions"
+    ],
+    "correct": 3,
+    "explanation": "Focused, single-task prompts reduce context noise and allow the model to allocate attention effectively. Multi-task prompts cause attention diffusion across competing instructions, leading to lower quality or incomplete responses for each subtask.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "context"
+    ]
+  },
+  {
+    "id": "ghc-d4-066",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "How does including relevant import statements in the current file improve GitHub Copilot's suggestions?",
+    "options": [
+      "Import statements are stripped from the prompt context to reduce token count",
+      "Imports only improve suggestions when they appear on the same line as the cursor position",
+      "Import statements signal which libraries are in scope, allowing Copilot to generate API-compatible suggestions for those specific libraries",
+      "Only type imports (import type) are used by Copilot; runtime imports are ignored"
+    ],
+    "correct": 2,
+    "explanation": "Import statements tell Copilot which libraries are available in scope, enabling it to generate correct API calls for those specific libraries rather than suggesting generic implementations or using unknown/unavailable APIs.",
+    "tags": [
+      "prompt-engineering"
+    ]
+  },
+  {
+    "id": "ghc-d4-067",
+    "domain": 4,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A prompt engineering trainer at NovaBuild is teaching junior developers Copilot best practices. Which guideline set is MOST comprehensive?",
+    "options": [
+      "Use minimum words to avoid confusing the model",
+      "Avoid natural language — use only code comments and type annotations",
+      "Provide context, be specific about inputs/outputs, use descriptive names, give examples for non-standard patterns, and iterate when results are unsatisfactory",
+      "Use Copilot Chat exclusively for complex tasks; never use inline suggestions for anything beyond simple completions"
+    ],
+    "correct": 2,
+    "explanation": "Comprehensive best practices: provide context → be specific (inputs/outputs/constraints) → use descriptive naming → provide examples for non-standard patterns → iterate on unsatisfactory results. This covers all key dimensions of effective prompt engineering.",
+    "tags": [
+      "prompt-engineering",
+      "prompting",
+      "context",
+      "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d4-068",
+    "domain": 4,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What happens to Copilot Chat context when a developer starts a 'New Conversation'?",
+    "options": [
+      "All previous conversations are permanently deleted from GitHub's global servers",
+      "Chat history is archived automatically to `.github/copilot-history/` before being cleared",
+      "Starting a new conversation counts as a new usage session and increments subscription billing",
+      "The previous chat history is cleared and Copilot starts fresh without prior context — useful for avoiding context pollution when switching tasks"
+    ],
+    "correct": 3,
+    "explanation": "Starting a new conversation clears the session chat history context. This is useful when switching to an unrelated task, as previous conversation context can pollute new requests. Use new conversations for clean, focused assistance on different topics.",
+    "tags": [
+      "prompt-engineering",
+      "copilot-chat",
+      "context"
     ]
   }
 ]

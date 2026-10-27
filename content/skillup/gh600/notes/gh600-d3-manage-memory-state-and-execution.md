@@ -1,10 +1,10 @@
 # D3: Manage Memory, State, and Execution
 
-> **Exam weight**: 12% · **Questions**: ~14 of 120
+> **Exam weight**: 12% · **Questions**: ~17 of 133
 
 ## Overview
 
-A coding agent session runs inside an ephemeral, sandboxed environment (D2) that's discarded the moment the session ends — which means nothing survives from one session to the next unless a team deliberately puts it somewhere durable first. This domain is about that deliberate design: choosing what an agent should remember and for how long, making task progress and decisions land as artifacts a later session (or a later human) can actually pick up, catching the moment a long-running session's actions stop matching the task it started with, and keeping multiple tools and environments from disagreeing about what's currently true.
+A coding agent session runs inside an ephemeral, sandboxed environment (D2) that's discarded the moment the session ends — which means nothing survives from one session to the next unless it lands somewhere durable first: an artifact the team writes, or a validated repository fact stored by Copilot Memory. This domain is about that deliberate design: choosing what an agent should remember and for how long, making task progress and decisions land as artifacts a later session (or a later human) can actually pick up, catching the moment a long-running session's actions stop matching the task it started with, and keeping multiple tools and environments from disagreeing about what's currently true.
 
 > 💡 **Human Angle**: Agent memory is like a relay race — what matters isn't how much the last runner remembers, it's whether the baton (a durable artifact) actually made it into the next runner's hand.
 
@@ -64,6 +64,22 @@ A session's short-term context resets completely the moment the session ends —
 
 **When you'd choose differently**: for a decision that only matters for the very next tool call and is acted on immediately (no gap for pruning or a session boundary to intervene), there's no need to externalize it separately — the action itself is the record; over-capturing every micro-decision as a standalone artifact just adds noise to the durable trail without adding safety.
 
+### Key Concept
+
+**Copilot Memory is platform-managed long-term memory: repository facts that must keep proving themselves or expire.**
+
+Copilot Memory (in public preview) lets Copilot keep what it learns between sessions instead of relying only on what a team writes down. It stores two kinds of entry. **Repository facts** are learned about one repository and are used only in operations on that same repository. **User preferences** belong to one user and follow that user across repositories. Copilot cloud agent, Copilot code review, Copilot CLI and agentic autofix all use it, so a fact one of them learns can inform another working in the same repository. Code review uses only repository facts, never user preferences.
+
+Each repository fact carries citations to the code that supports it. Before using a fact, Copilot checks those citations against the current branch, and only validated facts are used. Any fact or preference that goes unused is deleted automatically after 28 days; successfully validating and using it can reset that timer. Repository owners can review and delete their repository's facts, and users can view and delete their own preferences. **Think of it like a library that weeds its shelves**: a book that nobody borrows, or that no longer matches the catalogue, doesn't stay on the shelf.
+
+### In Practice
+
+**What breaks without this**: a team that treats remembered facts as permanent ends up with sessions acting on conventions the code no longer follows. Copilot Memory's citation check and 28-day expiry exist to stop that, but they only cover what Copilot stored. Custom instructions never expire on their own, so they need the same deliberate pruning when conventions change.
+
+**Decision trigger**: ask "should this rule be guaranteed in every session, or is it fine for Copilot to learn it and drop it when it stops being used?" A rule that must always apply (a compliance constraint, a forbidden directory) belongs in custom instructions, where a human controls it. Incidental knowledge about how the code fits together suits Copilot Memory. If a stored fact turns out to be wrong, the reset is to delete it from the repository's memory settings rather than waiting for it to expire.
+
+**When you'd choose differently**: on Copilot Business and Enterprise, Copilot Memory stays off until an administrator enables the policy, and users can then opt out. A regulated team that must be able to explain every input to an agent may reasonably keep it off and rely only on version-controlled instructions, which are reviewed in pull requests like any other change.
+
 ### Exam Trap ⚠️
 
 <div class="note-trap">
@@ -90,7 +106,7 @@ The structured plan artifact (D1) records what the agent intended to do before i
 
 **A follow-up PR comment resumes on the same branch — it doesn't re-derive the plan or risk a divergent second solution.**
 
-Because progress is recorded in durable artifacts, an agent can pick up a task exactly where it left off instead of starting over. GitHub Copilot's coding agent supports this directly: a reviewer can leave a follow-up comment on the agent's existing pull request — "this breaks the edge case where the list is empty" — and the agent resumes on the *same branch*, reading the existing commits and the PR thread as its starting context, rather than opening a fresh session with no memory of the work already done. **Resuming on the same branch is picking up the same relay baton, not starting a new race.**
+Because progress is recorded in durable artifacts, an agent can pick up a task exactly where it left off instead of starting over. GitHub Copilot cloud agent supports this directly: a reviewer can leave a follow-up comment on the agent's existing pull request — "this breaks the edge case where the list is empty" — and the agent resumes on the *same branch*, reading the existing commits and the PR thread as its starting context, rather than opening a fresh session with no memory of the work already done. **Resuming on the same branch is picking up the same relay baton, not starting a new race.**
 
 ```mermaid
 sequenceDiagram
@@ -214,6 +230,7 @@ If a scenario question describes state that only ever lived in a session's own r
 ### 4. Exam strategy for this domain
 
 - The exam's favorite distractor pattern here is treating in-session memory as durable: "the agent already knows this from earlier in the conversation" is never a substitute for a written artifact, and it never survives a session boundary.
+- Know Copilot Memory's rules: repository facts stay in their repository, are checked against citations on the current branch before use, and are deleted after 28 days unused; repository owners can delete them sooner.
 - Distinguish the three memory tiers precisely — long-term memory (custom instructions) loads automatically every session; external memory (an issue, an MCP-backed store) is retrieved on demand; short-term memory (the session's own context) doesn't survive past session end. A question describing one but naming another is testing whether you conflate them.
 - Conflicting context (two sources actively disagreeing) and stale context (one source that used to be right and no longer is) are different failure modes with the same fix — treat GitHub's live state as the source of truth and reconcile everything else against it.
 - The one sentence to remember five minutes before the exam: **if it isn't written into a durable artifact, it doesn't exist once the session ends — and a session that "sounds" on-task still needs to be checked against the artifact that didn't drift with it.**
@@ -226,6 +243,8 @@ If a scenario question describes state that only ever lived in a session's own r
 | Long-term memory | Custom instructions (repo-wide + path-scoped) — version-controlled, reloaded fresh every new session |
 | External memory | Issues, PRs, project records, MCP-backed stores — retrieved on demand via a tool call, not preloaded |
 | Scoping memory | Path-scoped instruction files so a session only loads guidance relevant to what it's actually touching |
+| Copilot Memory | Public preview; repository facts (same repo only) + user preferences; used by cloud agent, code review, CLI and agentic autofix |
+| Copilot Memory expiry | Facts validated against cited code on the current branch before use; unused entries deleted after 28 days; repo owners can delete facts |
 | Expiration/reset | Session end = full reset; even mid-session, older context can be pruned if never externalized |
 | Durable artifacts | Plan artifact, commits, PR description/thread, session log — the actual record of task state |
 | Resuming work | Follow-up PR comments continue on the *same branch*, reading existing commits — not a fresh, blank session |

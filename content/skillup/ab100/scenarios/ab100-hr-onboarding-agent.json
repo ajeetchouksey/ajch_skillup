@@ -1,17 +1,99 @@
 {
+  "schemaVersion": "2.0",
   "id": "ab100-hr-onboarding-agent",
   "title": "Multi-Agent HR Onboarding System",
-  "description": "A financial services firm wants to automate new employee onboarding. The process involves: (1) collecting personal and tax information from the new hire via a conversational interface, (2) provisioning Active Directory accounts and software licenses, (3) enrolling the employee in benefits (health, 401k, ESPP), (4) scheduling orientation meetings, and (5) generating and routing the offer letter for HR signature. The solution must integrate with Workday (HRIS), Microsoft 365, and the internal benefits portal. HR policy requires that any changes to compensation data require manager approval.",
-  "architecture_notes": "Deploy a hierarchical multi-agent system in Azure AI Foundry: an OrchestratorAgent (Copilot Studio for the conversational UI) routes to four specialist agents built with Azure AI Agent Service: (1) IdentityAgent — calls Azure Functions to provision Entra ID accounts and M365 licenses; (2) BenefitsAgent — calls the benefits portal REST API to enroll in plans; (3) CalendarAgent — uses Microsoft Graph API to schedule orientation; (4) DocumentAgent — uses Azure AI Document Intelligence to generate and route the offer letter via Power Automate approval flow. The OrchestratorAgent uses Azure Service Bus queues to decouple the parallel specialist tasks. The compensation data modification step routes through a Power Automate approval gate requiring manager sign-off before the IdentityAgent proceeds. Store the onboarding state in Cosmos DB to survive partial failures. Each specialist agent reports status to Cosmos DB — the orchestrator polls status to determine when all tasks are complete before triggering the 'welcome email' conclusion step.",
-  "key_patterns": [
-    "hierarchical coordinator-specialist multi-agent",
-    "Copilot Studio as conversational front-end to AI Agent Service orchestrator",
-    "Azure Service Bus for async specialist task decoupling",
-    "Power Automate approval gate for compensation data changes (HITL)",
-    "Cosmos DB as saga state store for partial failure recovery",
-    "Azure Functions as tool layer for identity and license provisioning",
-    "Microsoft Graph API integration for calendar scheduling",
-    "Azure AI Document Intelligence for offer letter generation"
+  "description": "A financial services firm wants a conversational onboarding assistant that collects new-hire details, sets up accounts and licences, enrols benefits, schedules orientation and routes offer documents, all integrated with Workday and Microsoft 365. The scenario tests the platform choice, governed identity provisioning, multi-agent composition in Copilot Studio, an enforceable approval gate for compensation changes, and keeping sensitive tax data out of conversation logs.",
+  "examId": "ab100",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [1, 2, 4],
+  "scenario": {
+    "background": "Under the firm's internal controls, any change to compensation data that lacks the named manager's approval is a reportable control failure, and the onboarding agent HR wants to launch will be the first AI system allowed to touch Workday. Larkspur Financial hires about 120 people a month, and each new hire currently waits several days for accounts, licences, benefits enrolment and orientation invites, which are handled by email across HR, IT and the benefits team. HR's systems team, who are experienced Power Platform makers but not Python developers, want an assistant in Microsoft Teams that welcomes the hire, collects personal and tax details, and coordinates everything else. The first draft architecture had specialist agents provisioning Microsoft Entra ID accounts directly through Azure Functions, enrolling benefits through the benefits portal API, scheduling through Microsoft Graph, and generating offer documents, with state kept in Cosmos DB so that a partly completed onboarding can resume.",
+    "characters": [
+      {
+        "name": "Maya Lindqvist",
+        "role": "VP, People Operations",
+        "concern": "She wants a friendly Teams experience in production within one quarter, built and maintained by her own Power Platform team rather than waiting on central engineering."
+      },
+      {
+        "name": "Tom Okafor",
+        "role": "Identity and Access Manager",
+        "concern": "He refuses to let any agent hold directory-write or licence-admin credentials, and wants every account to come from an auditable, HR-driven identity process."
+      },
+      {
+        "name": "Sofia Reyes",
+        "role": "HR Controls Lead",
+        "concern": "She must be able to prove to auditors that no compensation change and no tax identifier ever bypassed policy, whatever the agent was asked."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ab100-hr-onboarding-agent-q1",
+      "stem": "Maya's team has strong Power Platform skills but no pro-code developers, the experience must live in Teams, and most steps call Workday, Microsoft 365 and approval flows. Which platform choice best fits the conversational front end?",
+      "options": [
+        "Build the assistant in Copilot Studio, publish it to Teams, and use connectors and agent flows, adding Foundry only where pro-code is genuinely needed",
+        "Build every component as a hosted agent in Foundry Agent Service using Microsoft Agent Framework in Python, with a custom Teams bot as the front end",
+        "Publish a SharePoint onboarding FAQ site and let Microsoft 365 Copilot answer new-hire questions from it",
+        "Train a custom intent-classification model in Azure Machine Learning to route new-hire messages to the right back-end API"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: Copilot Studio is the low-code agent platform that fits the team that will own it. It publishes natively to Teams, reaches Workday and Microsoft 365 through Power Platform connectors, and runs multi-step work and approvals through agent flows. Keeping Foundry in reserve for a genuine pro-code need follows the extend-before-build principle. B is wrong because hosted agents written with Agent Framework in Python need pro-code skills the team doesn't have. That delays the quarter target and leaves central engineering owning a system HR is meant to run. C is wrong because a FAQ site can answer questions but can't collect data, trigger provisioning or coordinate approvals, which is the actual onboarding work. D is wrong because routing intents doesn't need a custom-trained model. Copilot Studio's generative orchestration already selects topics, tools and agents, and building an ML pipeline adds cost without delivering any of the onboarding steps."
+    },
+    {
+      "id": "ab100-hr-onboarding-agent-q2",
+      "stem": "Tom rejects the draft design in which an IdentityAgent calls an Azure Function that creates Entra ID users and assigns licences with a privileged app registration. What should replace it?",
+      "options": [
+        "Keep the Azure Function but grant its app registration only the Microsoft Graph User.ReadWrite.All application permission instead of a directory role",
+        "Run the provisioning step as a Power Automate flow under an HR administrator's connection, so that an identifiable human account performs every change",
+        "Give the IdentityAgent a dedicated service account with the User Administrator role and turn on Entra audit logging for that account",
+        "Use Workday-to-Entra inbound provisioning, Lifecycle Workflows joiner tasks and group-based licensing, with the agent only reading and reporting status"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: identity creation already has a governed, auditable platform path. Workday-to-Entra inbound provisioning creates the user from the HR record. Lifecycle Workflows (part of Microsoft Entra ID Governance) run joiner tasks such as generating a Temporary Access Pass and adding group memberships relative to employeeHireDate, and group-based licensing assigns licences through membership. The agent never holds write permissions; it only reads and reports status, which is exactly Tom's requirement. A is wrong because User.ReadWrite.All is still a tenant-wide write permission held by code the agent can invoke, so it only narrows a privilege Tom wants removed entirely. B is wrong because borrowing an HR administrator's connection gives the flow, and anyone who can trigger it, that person's privileges. It also blurs the audit trail between the human and the automation. C is wrong because a privileged service account is the very credential Tom refuses to give an agent; audit logs record misuse after it happens but don't prevent it."
+    },
+    {
+      "id": "ab100-hr-onboarding-agent-q3",
+      "stem": "The benefits team already runs its own benefits-enrolment agent in Copilot Studio, in the same environment. It is published to the benefits portal and has its own release cycle. Orientation scheduling and offer-document routing are small tasks owned by Maya's team. How should the onboarding agent be composed?",
+      "options": [
+        "Rebuild benefits enrolment, scheduling and document routing as child agents inside the onboarding agent so that everything ships as one solution",
+        "Make every capability, including scheduling and document routing, a separately published connected agent so that each one can be reused later",
+        "Add the existing benefits agent as a connected agent, and implement scheduling and document routing as child agents or tools inside the onboarding agent",
+        "Put all 45 Workday, Graph and benefits actions directly on one flat onboarding agent and rely on generative orchestration to choose between them"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: Copilot Studio's guidance is to connect a separate agent when another team owns it, it is published independently or it needs its own application lifecycle management (ALM). All three apply to the benefits agent. Child agents suit small, single-team tasks that don't need separate settings or deployment, which describes scheduling and document routing. A is wrong because rebuilding benefits as a child agent duplicates a working agent and splits its logic across two teams. It also takes away the benefits team's independent release cycle. B is wrong because each connected agent adds an orchestration hop, which adds latency, and widens the testing and governance surface. Microsoft advises against splitting work into connected agents without a reason such as separate ownership or reuse. D is wrong because Microsoft notes that orchestration accuracy tends to degrade beyond roughly 30 to 40 choices of tools, topics and agents, so a flat set of 45 actions invites the wrong tool firing."
+    },
+    {
+      "id": "ab100-hr-onboarding-agent-q4",
+      "stem": "When a new hire's agreed salary differs from the Workday offer record, the agent must update compensation. Sofia needs proof that no update can reach Workday without the named manager's approval. Which design achieves that?",
+      "options": [
+        "Instruct the agent to ask the hiring manager to confirm the change in the Teams chat, and to call the Workday update tool only after the manager types \"approved\"",
+        "Have the agent call a flow that sends an approval to the manager on record and writes to Workday only on Approve; the agent has no direct write tool",
+        "Use a multistage approval whose AI stage approves any change under 5% automatically and sends only larger changes to the manager",
+        "Let the agent write the change immediately, and send Sofia's team a weekly report of every compensation update for retrospective review"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the control lives in a deterministic flow, not in the model's judgement. The only path to the Workday write runs through an approval assigned to a manager resolved from the system of record, and the write happens only on an Approve outcome. The approval history is the audit evidence Sofia needs. Because the agent has no direct write tool, no prompt can talk it past the gate. A is wrong because a typed chat message isn't an authenticated approval from a verified approver, and the gate exists only in the instructions, which a confused or manipulated conversation can bypass. C is wrong because policy requires the named manager's approval for every compensation change, so an AI stage cannot replace it at any threshold. Microsoft also cautions against AI-only approvals for personnel and financial decisions, and multistage approvals are still in preview. D is wrong because a weekly report detects violations after they've happened; it doesn't prevent them, so every unapproved change would already be a control failure."
+    },
+    {
+      "id": "ab100-hr-onboarding-agent-q5",
+      "stem": "The draft has new hires type their national tax identifier and bank details into the Teams conversation so the agent can pass them to Workday. Sofia asks how to keep these values out of places they don't belong. What is the best design?",
+      "options": [
+        "Send the hire a link to Workday's own secured task for tax and bank details, and have the agent only check that the task is complete",
+        "Collect the values in chat as planned, and apply a PII-redaction guardrail to the agent's output so that the numbers are never repeated back to the hire",
+        "Collect the values in chat as planned, and protect the Dataverse environment that stores conversation transcripts with a customer-managed encryption key",
+        "Turn off conversation transcript recording for the onboarding agent so that nothing the hire types is retained"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: the safest sensitive data is data the agent never handles. Sending the hire to the HR system's own secured task keeps tax and bank identifiers out of prompts, model calls, conversation transcripts and analytics. The agent still orchestrates the step by checking whether it's complete, so the experience stays guided. B is wrong because redacting the output stops the agent repeating the numbers, but the values have already passed through the model and been captured in the conversation record, which is the exposure Sofia is worried about. C is wrong because a customer-managed key protects data at rest from the platform, but the identifiers are still stored in transcripts that makers and analysts can access. D is wrong because turning off transcripts removes the analytics and audit evidence for every conversation the agent has, which weakens Sofia's ability to prove what happened, and the data still passes through the model."
+    }
+  ],
+  "keyLearnings": [
+    "Choose the agent platform to match the team that will own it: Copilot Studio with connectors and agent flows for Power Platform makers, Foundry when a capability genuinely needs pro-code.",
+    "Don't give an agent privileges that a governed platform process already covers. HR-driven provisioning, Lifecycle Workflows and group-based licensing create identities so the agent never needs directory-write rights.",
+    "In Copilot Studio, connect agents that another team owns or releases separately, and use child agents for small tasks within one team; watch the 30 to 40 choice range where orchestration accuracy starts to drop.",
+    "Enforce policy in deterministic flows and system design, not in prompts: approvals gate the write, and sensitive identifiers go to the system of record without passing through the conversation."
   ],
   "questionIds": ["ab100-d1-004", "ab100-d2-001", "ab100-d2-012", "ab100-d4-006"]
 }

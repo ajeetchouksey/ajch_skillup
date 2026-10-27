@@ -40,7 +40,7 @@
       "stem": "Interviews reveal nearly everyone independently re-prompts Claude for the same PR-review checklist and the same test-scaffolding pattern, each with slightly different phrasing and results. What should the architect do?",
       "options": [
         "Leave it as-is, since each engineer's phrasing reflects their own working style",
-        "Codify both as shared slash commands checked into .claude/commands/, and add a PostToolUse hook that runs the team's linter automatically after any file edit",
+        "Codify both as shared project skills checked into .claude/skills/ (each invoked as a slash command), and add a PostToolUse hook that runs the team's linter automatically after any file edit",
         "Ban individual engineers from writing their own prompts for these tasks, without providing any shared alternative",
         "Write a wiki page describing the ideal PR-review prompt phrasing for engineers to copy manually each time"
       ],

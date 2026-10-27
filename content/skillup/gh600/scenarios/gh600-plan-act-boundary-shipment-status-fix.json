@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2.0",
   "id": "gh600-scenario-007",
-  "title": "Protecting the Plan/Act Boundary in a Bug-Fix Coding Agent Workflow",
+  "title": "Protecting the Plan/Act Boundary in a Bug-Fix Cloud Agent Workflow",
   "description": "Tests the ability to design a coding-agent workflow that separates reasoning (which can be wrong) from action (which is irreversible), scope each agent's tools to its role, place review checkpoints correctly, and preserve a reconstructable audit trail.",
   "examId": "gh600",
   "difficulty": "medium",
@@ -28,24 +28,24 @@
       "stem": "Why does the planner agent only having read-only tools (grep, glob, view) matter for this workflow's safety?",
       "options": [
         "It doesn't matter — the planner's tool access is irrelevant since it never takes real actions anyway",
-        "It structurally guarantees the planning phase cannot make any edit, regardless of what the agent reasons its way into wanting to do — the boundary between reasoning and action is enforced by tool capability, not by hoping the agent behaves",
+        "It exists purely to reduce token costs during planning, with no safety implication",
         "It's only there to make the planner run faster, since fewer tools means less overhead",
-        "It exists purely to reduce token costs during planning, with no safety implication"
+        "It structurally guarantees the planning phase cannot make any edit, regardless of what the agent reasons its way into wanting to do — the boundary between reasoning and action is enforced by tool capability, not by hoping the agent behaves"
       ],
-      "correct": 1,
-      "explanation": "B is correct because a planner restricted to read-only tools physically cannot edit anything no matter what its plan concludes — this is the core mechanism that separates agent reasoning (which can be wrong or overconfident) from agent action (which is irreversible), enforced structurally rather than through instruction alone. A dismisses a real safety design choice as irrelevant. C and D both miss that the tool restriction is a deliberate safety boundary, not a performance or cost optimization."
+      "correct": 3,
+      "explanation": "D is correct because a planner restricted to read-only tools physically cannot edit anything no matter what its plan concludes — this is the core mechanism that separates agent reasoning (which can be wrong or overconfident) from agent action (which is irreversible), enforced structurally rather than through instruction alone. A dismisses a real safety design choice as irrelevant. C and B both miss that the tool restriction is a deliberate safety boundary, not a performance or cost optimization."
     },
     {
       "id": "gh600-scenario-007-q2",
       "stem": "Alex reviews the planner's proposed plan in under a minute before it's approved. What makes this review fast and effective?",
       "options": [
         "Alex has to re-read the entire codebase from scratch to verify the plan",
-        "The plan is checked against the issue's explicit constraints (right files touched, no destructive operations, no public API change) — a well-scoped input and an implicit success criterion make the check fast because there's a small, specific thing to verify",
         "Alex trusts the plan automatically since the planner agent is read-only",
+        "The plan is checked against the issue's explicit constraints (right files touched, no destructive operations, no public API change) — a well-scoped input and an implicit success criterion make the check fast because there's a small, specific thing to verify",
         "The review is fast because Alex skips checking whether the plan matches the issue's stated constraints"
       ],
-      "correct": 1,
-      "explanation": "B is correct because the issue gave the workflow a well-scoped input and an implicit success criterion (the named test passes, no public API change), which means the plan review has a small, specific, checkable target — right files, no destructive operations, no API-surface change — rather than an open-ended judgment call. A describes an unnecessarily slow, unscoped review. C substitutes blind trust in the tool restriction for actually checking the plan's content, which isn't what the scenario describes happening. D describes skipping the review's actual purpose entirely."
+      "correct": 2,
+      "explanation": "C is correct because the issue gave the workflow a well-scoped input and an implicit success criterion (the named test passes, no public API change), which means the plan review has a small, specific, checkable target — right files, no destructive operations, no API-surface change — rather than an open-ended judgment call. A describes an unnecessarily slow, unscoped review. B substitutes blind trust in the tool restriction for actually checking the plan's content, which isn't what the scenario describes happening. D describes skipping the review's actual purpose entirely."
     },
     {
       "id": "gh600-scenario-007-q3",

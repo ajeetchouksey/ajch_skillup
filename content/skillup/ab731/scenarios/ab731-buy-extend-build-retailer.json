@@ -37,7 +37,7 @@
       "id": "ab731-scenario-002-q1",
       "stem": "Elena's team needs to draft dozens of product descriptions and social captions each week using the brand's existing tone-of-voice guide, already documented in a shared Word doc, with no new data source and no need to customize workflows outside Word and Outlook. Per the Buy/Extend/Build framework, what should her team use?",
       "options": [
-        "Build a custom AI application in Azure AI Foundry trained specifically on the tone-of-voice guide and past campaign copy",
+        "Build a custom AI application in Microsoft Foundry trained specifically on the tone-of-voice guide and past campaign copy",
         "Use Microsoft 365 Copilot directly in Word and Outlook — this is a Buy scenario, since no customization or new data source is required",
         "Build a Copilot Studio agent connected to a dedicated product-description knowledge base",
         "Fine-tune a model specifically to reproduce the brand's tone of voice before letting the team use it"
@@ -51,7 +51,7 @@
       "options": [
         "Have managers use Copilot in Outlook to draft the IT ticket, the access request, and the facilities email themselves, one at a time, as each step comes due",
         "Build a Copilot Studio agent that triggers on the new-hire event and orchestrates the IT ticket, access request, and facilities notification, routing only high-risk approvals to a manager",
-        "Build a fully custom onboarding application in Azure AI Foundry, integrating directly with the HR, IT, and facilities systems from scratch",
+        "Build a fully custom onboarding application in Microsoft Foundry, integrating directly with the HR, IT, and facilities systems from scratch",
         "Give managers a longer, more detailed prompt template covering all three onboarding steps, so they can paste it into Copilot chat at the right moment"
       ],
       "correct": 1,
@@ -63,11 +63,11 @@
       "options": [
         "Microsoft 365 Copilot, connected to the purchase history data through a custom connector",
         "A Copilot Studio agent that queries the purchase history as a knowledge source and answers questions about it",
-        "Azure AI Foundry (Microsoft Foundry), training a custom model at the Foundation and Platform layers, since no low-code tool trains a model from scratch",
+        "Microsoft Foundry (formerly Microsoft Foundry), training a custom model at the Foundation and Platform layers, since no low-code tool trains a model from scratch",
         "Microsoft Copilot (the free, consumer version), with web search enabled to pull in general retail buying trends"
       ],
       "correct": 2,
-      "explanation": "C is correct: training a custom model with full control over architecture and evaluation is Foundation/Platform-layer work, and Azure AI Foundry is the only tool in the stack built for that — no low-code layer above it trains a model from scratch. A is wrong because M365 Copilot, even with a custom connector, only lets Copilot read the purchase history as context for answering questions — it cannot train a new model on that data. B is wrong for the same reason: Copilot Studio is a no-code agent builder for retrieving and acting on existing data sources, not a model-training platform, so it can't produce the custom recommendation model Sam wants. D is wrong because the consumer Copilot has no access to Solstice's private purchase history at all, and web search on general retail trends is the opposite of a model personalized to Solstice's own customers."
+      "explanation": "C is correct: training a custom model with full control over architecture and evaluation is Foundation/Platform-layer work, and Microsoft Foundry is the only tool in the stack built for that — no low-code layer above it trains a model from scratch. A is wrong because M365 Copilot, even with a custom connector, only lets Copilot read the purchase history as context for answering questions — it cannot train a new model on that data. B is wrong for the same reason: Copilot Studio is a no-code agent builder for retrieving and acting on existing data sources, not a model-training platform, so it can't produce the custom recommendation model Sam wants. D is wrong because the consumer Copilot has no access to Solstice's private purchase history at all, and web search on general retail trends is the opposite of a model personalized to Solstice's own customers."
     },
     {
       "id": "ab731-scenario-002-q4",
@@ -97,7 +97,7 @@
   "keyLearnings": [
     "Apply Buy/Extend/Build per use case, not per company — the same organisation can correctly land on Buy for one request, Extend for another, and Build for a third, all in the same quarter, because the decision follows each requirement's own scope, not a blanket policy.",
     "A Copilot Studio agent that triggers itself and orchestrates a multi-step process across systems is the right call whenever a workflow shouldn't need a human to re-open chat at every step — that's Extend, not a from-scratch Foundry build.",
-    "Training a custom model on your own historical data is Foundation/Platform-layer work that belongs in Azure AI Foundry — no low-code layer above it trains a model from scratch, no matter how well-defined the data is.",
+    "Training a custom model on your own historical data is Foundation/Platform-layer work that belongs in Microsoft Foundry — no low-code layer above it trains a model from scratch, no matter how well-defined the data is.",
     "Permission inheritance only prevents new accidental exposure; it does nothing about oversharing that already exists. Run SharePoint Advanced Management's oversharing report and remediate before a broad Copilot rollout, not after."
   ]
 }

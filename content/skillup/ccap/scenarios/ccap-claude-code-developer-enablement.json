@@ -28,12 +28,12 @@
       "stem": "How should Claude Code's integration into the CI pipeline for automated PR review and test-generation suggestions be scoped?",
       "options": [
         "Grant it direct write access to merge approved changes and trigger production deploys, so the pipeline is fully automated end to end",
-        "Scope it to read-only repository analysis that produces suggested changes as PR comments or draft commits for a human to review and merge, with no access to deployment credentials or the ability to merge or deploy directly, and no secrets exposed in the context it's given",
+        "Run it with production database credentials so test generation can validate against real data patterns",
         "Give it full CI runner permissions, including access to all environment variables and secrets used by the build, so it can debug pipeline failures on its own",
-        "Run it with production database credentials so test generation can validate against real data patterns"
+        "Scope it to read-only repository analysis that produces suggested changes as PR comments or draft commits for a human to review and merge, with no access to deployment credentials or the ability to merge or deploy directly, and no secrets exposed in the context it's given"
       ],
-      "correct": 1,
-      "explanation": "B is correct because least-privilege applies to developer tooling as much as to any other agent — read-only analysis with human-reviewed, human-merged suggested changes captures the productivity benefit while keeping deploy authority and secrets out of the tool's reach, directly addressing Sofia's concern after the prior credential-leak incident. A fails because granting merge and deploy authority to an automated tool removes the human checkpoint before code reaches production, a significant risk for a fintech handling customer financial data. C fails because exposing all environment variables and secrets to the tool's context multiplies the blast radius if that context is ever logged, leaked, or misused — exactly the failure mode of the past incident. D fails because production database credentials should never be handed to a code-assistance tool for test generation; test generation should use synthetic or anonymized data, not live customer financial data."
+      "correct": 3,
+      "explanation": "D is correct because least-privilege applies to developer tooling as much as to any other agent — read-only analysis with human-reviewed, human-merged suggested changes captures the productivity benefit while keeping deploy authority and secrets out of the tool's reach, directly addressing Sofia's concern after the prior credential-leak incident. A fails because granting merge and deploy authority to an automated tool removes the human checkpoint before code reaches production, a significant risk for a fintech handling customer financial data. C fails because exposing all environment variables and secrets to the tool's context multiplies the blast radius if that context is ever logged, leaked, or misused — exactly the failure mode of the past incident. B fails because production database credentials should never be handed to a code-assistance tool for test generation; test generation should use synthetic or anonymized data, not live customer financial data."
     },
     {
       "id": "ccap-scenario-006-q2",
@@ -51,25 +51,25 @@
       "id": "ccap-scenario-006-q3",
       "stem": "Engineers want Claude Code's help debugging production issues, which sometimes involves examining application logs and database records that may contain customer PII. What access design fits this need?",
       "options": [
-        "Grant Claude Code direct read access to production databases and unredacted production logs, so it can debug with the most complete information available",
         "Give Claude Code access to a staging environment and a log pipeline with PII redaction applied, so it can assist with debugging using representative data without exposing real customer PII to the model's context",
+        "Grant Claude Code direct read access to production databases and unredacted production logs, so it can debug with the most complete information available",
         "Deny any debugging access at all, requiring engineers to manually copy relevant log lines into the chat one at a time without any structured tooling",
         "Grant temporary, unrestricted production access to Claude Code whenever an engineer requests it, revoked automatically after 24 hours"
       ],
-      "correct": 1,
-      "explanation": "B is correct because scoped access to a staging environment and redacted logs gives Claude Code the representative data it needs to help debug effectively while keeping real customer PII out of the model's context, matching the same least-privilege principle applied to the CI integration. A fails because direct, unredacted production access exposes customer PII to the tool unnecessarily, creating a data-handling risk disproportionate to the debugging benefit. C fails because manually copying log lines one at a time is not banning access so much as making it inefficient and error-prone, without actually solving the underlying PII exposure question — an engineer could still paste PII manually. D fails because temporary 'unrestricted' access, even time-boxed, still exposes PII during the access window and normalizes broad production access as a routine debugging pattern, which is the risk Sofia is trying to avoid."
+      "correct": 0,
+      "explanation": "A is correct because scoped access to a staging environment and redacted logs gives Claude Code the representative data it needs to help debug effectively while keeping real customer PII out of the model's context, matching the same least-privilege principle applied to the CI integration. A fails because direct, unredacted production access exposes customer PII to the tool unnecessarily, creating a data-handling risk disproportionate to the debugging benefit. C fails because manually copying log lines one at a time is not banning access so much as making it inefficient and error-prone, without actually solving the underlying PII exposure question — an engineer could still paste PII manually. D fails because temporary 'unrestricted' access, even time-boxed, still exposes PII during the access window and normalizes broad production access as a routine debugging pattern, which is the risk Sofia is trying to avoid."
     },
     {
       "id": "ccap-scenario-006-q4",
       "stem": "Six months into the rollout, Wei needs to report on whether the investment in Claude Code is paying off. Which measurement approach gives him a credible answer?",
       "options": [
         "Track lines of code generated per engineer per week as the primary success metric, since more output indicates more productive use of the tool",
-        "Track task-level outcome metrics against a pre-rollout baseline — such as PR cycle time, defect/bug-reopen rate, and adoption rate across teams — over a sustained period, rather than relying on raw usage volume or anecdotal sentiment alone",
         "Rely solely on a single engineer-satisfaction survey question ('Do you like using Claude Code?') as the success metric",
+        "Track task-level outcome metrics against a pre-rollout baseline — such as PR cycle time, defect/bug-reopen rate, and adoption rate across teams — over a sustained period, rather than relying on raw usage volume or anecdotal sentiment alone",
         "Skip formal measurement since productivity gains from developer tooling are inherently too qualitative to measure"
       ],
-      "correct": 1,
-      "explanation": "B is correct because outcome metrics tied to actual engineering work — cycle time, defect rates, adoption breadth — measured against a pre-rollout baseline give a credible, gameable-resistant picture of whether the tool is genuinely improving delivery, which is what Wei actually needs to report. A fails because lines of code is a poor proxy for value; it can be trivially inflated without corresponding improvement in quality or speed, and more code is not inherently better. C fails because a single satisfaction question captures sentiment, not outcomes, and doesn't tell Wei whether the tool actually moved delivery metrics. D fails because developer productivity impact is measurable through proxies like cycle time and defect rate even if it isn't perfectly quantifiable — declining to measure at all leaves Wei unable to justify or adjust the investment with any evidence."
+      "correct": 2,
+      "explanation": "C is correct because outcome metrics tied to actual engineering work — cycle time, defect rates, adoption breadth — measured against a pre-rollout baseline give a credible, gameable-resistant picture of whether the tool is genuinely improving delivery, which is what Wei actually needs to report. A fails because lines of code is a poor proxy for value; it can be trivially inflated without corresponding improvement in quality or speed, and more code is not inherently better. B fails because a single satisfaction question captures sentiment, not outcomes, and doesn't tell Wei whether the tool actually moved delivery metrics. D fails because developer productivity impact is measurable through proxies like cycle time and defect rate even if it isn't perfectly quantifiable — declining to measure at all leaves Wei unable to justify or adjust the investment with any evidence."
     }
   ],
   "keyLearnings": [

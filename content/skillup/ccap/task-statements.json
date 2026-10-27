@@ -81,14 +81,16 @@
           "id": "1.5",
           "title": "Apply decomposition techniques for complex problem solving",
           "knowledge": [
-            "Task decomposition strategies"
+            "Task decomposition strategies",
+            "Workflow patterns: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer"
           ],
           "skills": [
             "Break monolithic prompts into auditable sub-steps"
           ],
           "questionIds": [
             "ccap-d1-017",
-            "ccap-d1-018"
+            "ccap-d1-018",
+            "ccap-d1-021"
           ]
         },
         {
@@ -102,7 +104,8 @@
           ],
           "questionIds": [
             "ccap-d1-019",
-            "ccap-d1-020"
+            "ccap-d1-020",
+            "ccap-d1-022"
           ]
         }
       ]
@@ -117,7 +120,8 @@
           "id": "2.1",
           "title": "Select appropriate Claude models based on trade-offs",
           "knowledge": [
-            "Model tiering and capability/cost/latency trade-offs"
+            "Model tiering and capability/cost/latency trade-offs",
+            "Adaptive thinking and the effort parameter as an in-model cost/latency lever"
           ],
           "skills": [
             "Route tasks to the right model tier"
@@ -127,7 +131,7 @@
             "ccap-d2-002",
             "ccap-d2-003",
             "ccap-d2-009",
-            "ccap-d2-016"
+            "ccap-d2-017"
           ]
         },
         {
@@ -143,22 +147,23 @@
           "questionIds": [
             "ccap-d2-004",
             "ccap-d2-005",
-            "ccap-d2-006",
-            "ccap-d2-014"
+            "ccap-d2-006"
           ]
         },
         {
           "id": "2.3",
           "title": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
           "knowledge": [
-            "Zero-shot, few-shot, and chain-of-thought techniques"
+            "Zero-shot, few-shot, and chain-of-thought techniques",
+            "Few-shot example design: relevant, diverse, wrapped in <example> tags, 3-5 examples"
           ],
           "skills": [
             "Select the right technique for the reasoning demand"
           ],
           "questionIds": [
             "ccap-d2-007",
-            "ccap-d2-008"
+            "ccap-d2-008",
+            "ccap-d2-020"
           ]
         },
         {
@@ -174,8 +179,7 @@
           "questionIds": [
             "ccap-d2-010",
             "ccap-d2-011",
-            "ccap-d2-012",
-            "ccap-d2-013"
+            "ccap-d2-012"
           ]
         },
         {
@@ -183,13 +187,19 @@
           "title": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
           "knowledge": [
             "Prompt caching mechanics",
-            "Modular prompts and Skills"
+            "Modular prompts and Skills",
+            "Prompt caching minimum length, TTL and pricing; Skills progressive disclosure (metadata, SKILL.md, resources)"
           ],
           "skills": [
             "Structure prompts for cache-hit optimization"
           ],
           "questionIds": [
-            "ccap-d2-015"
+            "ccap-d2-013",
+            "ccap-d2-014",
+            "ccap-d2-015",
+            "ccap-d2-016",
+            "ccap-d2-018",
+            "ccap-d2-019"
           ]
         }
       ]
@@ -274,11 +284,7 @@
           "questionIds": [
             "ccap-d3-013",
             "ccap-d3-014",
-            "ccap-d3-015",
-            "ccap-d3-016",
-            "ccap-d3-017",
-            "ccap-d3-018",
-            "ccap-d3-023"
+            "ccap-d3-015"
           ]
         },
         {
@@ -290,7 +296,11 @@
           "skills": [
             "Match retrieval approach to data shape and query pattern"
           ],
-          "questionIds": []
+          "questionIds": [
+            "ccap-d3-016",
+            "ccap-d3-017",
+            "ccap-d3-018"
+          ]
         },
         {
           "id": "3.7",
@@ -304,20 +314,25 @@
           "questionIds": [
             "ccap-d3-019",
             "ccap-d3-020",
-            "ccap-d3-021",
-            "ccap-d3-022"
+            "ccap-d3-021"
           ]
         },
         {
           "id": "3.8",
           "title": "Evaluate progressive discovery vs. monolithic context strategy",
           "knowledge": [
-            "Progressive discovery vs. monolithic context loading"
+            "Progressive discovery vs. monolithic context loading",
+            "Tool search tool with defer_loading, and when standard (monolithic) tool loading fits better"
           ],
           "skills": [
             "Choose context strategy matched to task scope"
           ],
-          "questionIds": []
+          "questionIds": [
+            "ccap-d3-022",
+            "ccap-d3-023",
+            "ccap-d3-024",
+            "ccap-d3-025"
+          ]
         }
       ]
     },
@@ -339,10 +354,7 @@
           "questionIds": [
             "ccap-d4-001",
             "ccap-d4-002",
-            "ccap-d4-003",
-            "ccap-d4-004",
-            "ccap-d4-005",
-            "ccap-d4-006"
+            "ccap-d4-003"
           ]
         },
         {
@@ -350,12 +362,18 @@
           "title": "Design evaluation datasets and test frameworks using mixed methodologies",
           "knowledge": [
             "Golden-set design",
-            "Mixed-methodology test frameworks"
+            "Mixed-methodology test frameworks",
+            "Anthropic eval design principles: task-specific cases, automated grading, volume over hand-graded quality"
           ],
           "skills": [
             "Design representative, non-corrupted evaluation datasets"
           ],
-          "questionIds": []
+          "questionIds": [
+            "ccap-d4-004",
+            "ccap-d4-005",
+            "ccap-d4-006",
+            "ccap-d4-020"
+          ]
         },
         {
           "id": "4.3",
@@ -409,14 +427,16 @@
           "id": "4.6",
           "title": "Monitor system performance using logging and observability tools",
           "knowledge": [
-            "Production monitoring and drift detection"
+            "Production monitoring and drift detection",
+            "Structured response signals for monitoring (stop_reason, token usage)"
           ],
           "skills": [
             "Detect performance drift proactively via continuous monitoring"
           ],
           "questionIds": [
             "ccap-d4-017",
-            "ccap-d4-019"
+            "ccap-d4-019",
+            "ccap-d4-021"
           ]
         }
       ]
@@ -450,14 +470,16 @@
           "id": "5.2",
           "title": "Identify risks, limitations, and failure modes of LLM systems",
           "knowledge": [
-            "LLM risk and failure-mode taxonomy"
+            "LLM risk and failure-mode taxonomy",
+            "Knowledge-cutoff limitations and grounding in current sources"
           ],
           "skills": [
             "Identify hallucination, drift, and error-propagation risks"
           ],
           "questionIds": [
             "ccap-d5-006",
-            "ccap-d5-007"
+            "ccap-d5-007",
+            "ccap-d5-018"
           ]
         },
         {
@@ -496,14 +518,16 @@
           "id": "5.5",
           "title": "Address ethical AI considerations (bias, fairness, transparency)",
           "knowledge": [
-            "Bias, fairness, and transparency principles"
+            "Bias, fairness, and transparency principles",
+            "Counterfactual and disaggregated bias testing"
           ],
           "skills": [
             "Audit for proxy-variable bias and design for transparency"
           ],
           "questionIds": [
             "ccap-d5-015",
-            "ccap-d5-017"
+            "ccap-d5-017",
+            "ccap-d5-019"
           ]
         }
       ]
@@ -560,7 +584,6 @@
             "ccap-d6-009",
             "ccap-d6-010",
             "ccap-d6-011",
-            "ccap-d6-015",
             "ccap-d6-017"
           ]
         },
@@ -584,13 +607,16 @@
           "id": "6.5",
           "title": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
           "knowledge": [
-            "Solution lifecycle phase-gates"
+            "Solution lifecycle phase-gates",
+            "Model deprecation and retirement as a lifecycle event"
           ],
           "skills": [
             "Support handoff and post-launch monitoring ownership"
           ],
           "questionIds": [
-            "ccap-d6-016"
+            "ccap-d6-015",
+            "ccap-d6-016",
+            "ccap-d6-018"
           ]
         }
       ]
@@ -623,28 +649,32 @@
           "id": "7.2",
           "title": "Improve developer workflows using AI-assisted tooling",
           "knowledge": [
-            "Slash commands, subagents, CI integration"
+            "Slash commands, subagents, CI integration",
+            "Non-interactive Claude Code runs in CI (claude -p, --bare)"
           ],
           "skills": [
             "Codify repeated workflows as reusable tooling"
           ],
           "questionIds": [
             "ccap-d7-004",
-            "ccap-d7-006"
+            "ccap-d7-006",
+            "ccap-d7-013"
           ]
         },
         {
           "id": "7.3",
           "title": "Support debugging and operational issue resolution",
           "knowledge": [
-            "Session-log and trace-based debugging"
+            "Session-log and trace-based debugging",
+            "Claude Code settings precedence when diagnosing ignored settings"
           ],
           "skills": [
             "Diagnose intermittent production issues via structured logging"
           ],
           "questionIds": [
             "ccap-d7-007",
-            "ccap-d7-008"
+            "ccap-d7-008",
+            "ccap-d7-014"
           ]
         },
         {

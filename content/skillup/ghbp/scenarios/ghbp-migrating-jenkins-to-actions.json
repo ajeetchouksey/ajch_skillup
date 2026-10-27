@@ -1,19 +1,128 @@
 {
+  "schemaVersion": "2.0",
   "id": "ghbp-migrating-jenkins-to-actions",
   "title": "Migrating Jenkins Pipelines to GitHub Actions",
-  "officialDescription": "Your company runs 40 microservices with Jenkins pipelines that are difficult to maintain, have no secrets rotation, and require a dedicated Jenkins admin. Leadership has approved migrating all pipelines to GitHub Actions over 3 sprints. You must maintain security posture, reduce secret sprawl, and achieve feature parity for build, test, and deploy workflows.",
-  "primaryDomains": ["GitHub Actions & CI/CD", "Repository Security & Governance"],
-  "description": "The platform team is migrating a Java microservices build system from Jenkins (scripted pipelines, shared libraries, credentials store) to GitHub Actions. Current state: Jenkins uses static AWS IAM user keys stored in Jenkins credentials; builds run on self-hosted Jenkins agents; 12 pipelines share a common 'build-library'; deploys target staging and production EKS clusters. Target state: OIDC for AWS authentication (no static keys); reusable workflows replace shared library; GitHub Environments gate production deploys; ephemeral self-hosted runners on Kubernetes for GPU workloads; Dependabot auto-merges patch dependency updates to reduce manual toil.",
-  "architecture_notes": "Replace static AWS IAM keys with OIDC (aws-actions/configure-aws-credentials) so GitHub Actions exchanges a short-lived OIDC token for temporary AWS credentials — no secrets stored in GitHub at all. Replace Jenkins shared libraries with reusable workflows (.github/workflows/) called via the 'uses:' key with 'secrets: inherit'; reusable workflows provide the same DRY benefit and are versioned alongside code. Use GitHub Environments with required reviewers for production deployments — the job is paused until an approved reviewer dismisses the gate; set environment protection rules rather than branch conditions. For GPU workloads requiring self-hosted runners: use ephemeral runners (actions-runner-controller on Kubernetes, --ephemeral flag) so each job gets a clean runner and no state bleeds between jobs. Set GITHUB_TOKEN permissions to least-privilege per job (permissions: block at the job level, not just the workflow level) to limit blast radius if a workflow is compromised. Enable Dependabot for npm/Maven with auto-merge on patch updates using a merge-queue-compatible auto-merge workflow. Use concurrency groups per environment to prevent simultaneous production deploys from parallel PRs.",
-  "key_patterns": [
-    "OIDC replaces static IAM keys: no secrets stored in GitHub",
-    "Reusable workflows (uses:) replace Jenkins shared libraries",
-    "GitHub Environments with required reviewers gate production",
-    "Ephemeral self-hosted runners prevent state bleed between jobs",
-    "GITHUB_TOKEN permissions declared at job level, not workflow level",
-    "Dependabot auto-merge scoped to patch updates only",
-    "Concurrency groups per environment prevent parallel production deploys",
-    "pull_request_target: avoid untrusted code execution — never combine with actions/checkout on the PR head"
+  "description": "A platform team has three sprints to move 40 Jenkins pipelines to GitHub Actions without carrying static cloud keys, persistent build agents or copy-pasted pipeline logic across. The walkthrough tests how GitHub Actions Importer scopes the work, how Jenkinsfile constructs map to workflow syntax, and how OIDC, reusable workflows, environments, ephemeral runners and concurrency replace the Jenkins-era controls.",
+  "examId": "ghbp",
+  "difficulty": "medium",
+  "estimatedMinutes": 16,
+  "domains": [
+    2,
+    3
   ],
-  "questionIds": ["d2-012", "d2-013", "d2-014", "d2-015", "d2-018", "d2-019", "d2-020", "d2-021", "d2-022", "d2-024", "d3-016", "d3-018"]
+  "officialDescription": "Your company runs 40 microservices with Jenkins pipelines that are difficult to maintain, have no secrets rotation, and require a dedicated Jenkins admin. Leadership has approved migrating all pipelines to GitHub Actions over 3 sprints. You must maintain security posture, reduce secret sprawl, and achieve feature parity for build, test, and deploy workflows.",
+  "scenario": {
+    "background": "If the migration simply copies Jenkins habits into GitHub Actions, the company will end up with the same static AWS keys and long-lived build machines, just on a new platform. Northwind Logistics runs 40 Java microservices whose Jenkins pipelines are a mix of declarative Jenkinsfiles and older scripted pipelines; 12 of them call a shared library called build-library, and deploys go to staging and production Amazon EKS clusters. Every pipeline authenticates to AWS with static IAM user keys kept in the Jenkins credentials store, and none of those keys has been rotated in over a year. Builds run on persistent Jenkins agents, including two GPU machines the ML team uses for model packaging. The target state agreed with leadership: OIDC federation to AWS so no cloud keys are stored in GitHub; reusable workflows in a central repository in place of the shared library; GitHub environments with required reviewers in front of production; ephemeral self-hosted runners on Kubernetes for GPU jobs and GitHub-hosted runners for everything else; least-privilege GITHUB_TOKEN permissions; and Dependabot keeping Maven dependencies and pinned actions current.",
+    "characters": [
+      {
+        "name": "Marcus Lee",
+        "role": "Platform Engineering Lead",
+        "concern": "He owns the three-sprint deadline and wants to convert as much as possible automatically, keeping the existing credentials working until the cut-over is finished."
+      },
+      {
+        "name": "Aisha Rahman",
+        "role": "Cloud Security Architect",
+        "concern": "She refuses to let any static AWS key or persistent build machine survive the migration, even temporarily, because those are exactly what an attacker would target."
+      },
+      {
+        "name": "Daniel Ortiz",
+        "role": "Release Manager",
+        "concern": "He needs a named person to approve every production deploy and never wants two production deploys running against EKS at the same time."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q1",
+      "stem": "Marcus wants to know, before committing to the three-sprint plan, how much of the 40-pipeline estate can be converted automatically and how many Actions minutes the converted pipelines are likely to consume. What should the team run first with GitHub Actions Importer?",
+      "options": [
+        "gh actions-importer audit jenkins to measure conversion coverage, then forecast jenkins to estimate usage from past runs",
+        "gh actions-importer migrate jenkins for all 40 pipelines, which commits the converted workflows straight to each default branch",
+        "gh actions-importer dry-run jenkins on every pipeline, since dry-run reports both runner-minute estimates and conversion rates",
+        "No importer command, because GitHub Actions Importer cannot read Jenkins and every Jenkinsfile must be rewritten by hand"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: GitHub Actions Importer's audit subcommand reports how completely each Jenkins pipeline can be converted, and forecast estimates GitHub Actions usage from historical pipeline runs, which together answer Marcus's two planning questions before anything is converted. B is wrong because migrate is the last step, not the first, and it opens a pull request that adds the converted workflow to the target repository rather than committing to the default branch; running it on all 40 pipelines skips the scoping Marcus asked for. C is wrong because dry-run only writes the converted workflow files locally so you can inspect them; usage estimation is the job of forecast. D is wrong because Jenkins is a supported source for GitHub Actions Importer (it runs as a GitHub CLI extension in Docker and authenticates with a Jenkins API token), so a full manual rewrite throws away the automation for the declarative pipelines it can convert."
+    },
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q2",
+      "stem": "The importer's pull requests include a \"Manual steps\" section listing the AWS credentials. Marcus proposes copying the existing IAM user keys into repository secrets so deploys work on day one; Aisha objects. What is the right end state for AWS authentication?",
+      "options": [
+        "Let the importer copy the Jenkins credentials into repository secrets automatically, then rotate the IAM keys after the cut-over",
+        "Move the IAM user keys into production environment secrets, so only approved deploy jobs can read the long-lived credentials",
+        "Federate with OIDC: trust token.actions.githubusercontent.com, check aud and an environment-pinned sub, grant id-token: write",
+        "Federate with OIDC and have the IAM role trust policy check only that aud equals sts.amazonaws.com, so every repository can deploy"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: GitHub's AWS OIDC guidance adds token.actions.githubusercontent.com as an identity provider, has the role's trust policy check aud (sts.amazonaws.com) together with a sub condition such as repo:ORG/REPO:environment:production, and gives the deploy job id-token: write so aws-actions/configure-aws-credentials can exchange the JWT for short-lived credentials. No AWS key is stored in GitHub, which meets Aisha's requirement. A is wrong because GitHub Actions Importer does not migrate credentials; they are a manual step, and copying static keys anywhere preserves the unrotated long-lived secret. B is wrong because environment secrets improve scoping and hide the value until reviewers approve, but the IAM user key is still long-lived and still leakable. D is wrong because a trust policy without a sub condition lets any GitHub workflow that requests that audience try to assume the role; GitHub says at least one condition must stop untrusted repositories from getting tokens."
+    },
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q3",
+      "stem": "One declarative Jenkinsfile uses agent { label 'linux-maven' }, an environment { } block, triggers { cron(...) } and a when { branch 'main' } condition on its deploy stage. Which set of GitHub Actions equivalents matches GitHub's Jenkins migration guide?",
+      "options": [
+        "agent becomes a container step, environment becomes vars, cron becomes on.workflow_dispatch, and when becomes on.push.branches",
+        "agent becomes runner groups, environment becomes an Actions environment, cron becomes on.schedule, when becomes concurrency",
+        "agent becomes jobs.<id>.needs, environment becomes secrets, cron becomes on.workflow_run, and when becomes strategy.matrix",
+        "agent becomes jobs.<id>.runs-on, environment becomes env, cron syntax becomes on.schedule, and when becomes jobs.<id>.if"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: GitHub's Jenkins migration guide maps agent to jobs.<job_id>.runs-on (or container), environment to jobs.<job_id>.env and step-level env, Jenkins cron syntax to on.schedule, and when to jobs.<job_id>.if. A is wrong because workflow_dispatch is a manual trigger, not a schedule, and a trigger-level branch filter stops every job in the workflow, whereas when only skips the one stage; vars also holds repository or organization configuration variables, not a Jenkinsfile environment block. B is wrong because a Jenkins environment block is a set of variables, not a GitHub deployment environment with protection rules, and concurrency serializes runs rather than evaluating a condition. C is wrong because needs expresses job ordering (the guide maps upstream-project triggers to it, not agents), workflow_run fires after another workflow finishes, and a matrix fans a job out rather than deciding whether it runs."
+    },
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q4",
+      "stem": "The 12 pipelines that use build-library will call one deploy workflow in a central platform repository. Daniel wants production reviewers enforced, so Marcus adds environment: production to the caller job that has uses: northwind/platform/.github/workflows/deploy.yml@<sha>. What should he do instead?",
+      "options": [
+        "Turn deploy.yml into a composite action, because composite actions are the documented replacement for whole Jenkins deploy stages",
+        "Declare environment on the job inside deploy.yml (for example from an input); the calling job can't use the environment keyword",
+        "Keep environment on the caller job and switch it to secrets: inherit, which makes the production protection rules apply there",
+        "Drop the environment and turn on Require deployments to succeed in the main branch ruleset, which pauses deploys for approval"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: reusable workflows are called with uses at job level, and GitHub documents that the job calling a reusable workflow can't use the environment keyword. The job inside the reusable workflow declares the environment (often from a workflow_call input), so production's required reviewers, wait timer and environment secrets apply there, and the caller can pass a secret by name even if it only exists in that environment. A is wrong because a composite action runs as steps inside the caller's job and can't declare its own job, runner or environment, so it can't carry the deployment gate a whole deploy stage needs. C is wrong because secrets: inherit only passes the caller's secrets (within the same organization or enterprise); it doesn't lift the restriction on environment in the calling job. D is wrong because Require deployments to succeed gates merging a pull request on a successful deployment; it does not pause a deploy job for a human approval."
+    },
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q5",
+      "stem": "The ML team's GPU packaging jobs can't run on standard GitHub-hosted runners. Aisha won't accept the two persistent GPU agents being re-registered as Actions runners. Which runner design meets both the hardware need and her concern?",
+      "options": [
+        "Re-register both GPU machines as organization-level self-hosted runners available to every repository, including public ones",
+        "Move GPU jobs to standard GitHub-hosted runners and drop GPU acceleration, because self-hosted runners can't read org secrets",
+        "Use Actions Runner Controller on Kubernetes with ephemeral runners in a runner group limited to the private ML repositories",
+        "Keep the persistent GPU agents and add a final cleanup step to each job that deletes the workspace before the next job starts"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: Actions Runner Controller is a Kubernetes operator that runs runner scale sets of ephemeral, container-based runners, which are removed after their job, and putting them in a runner group restricted to the ML team's private repositories limits who can schedule code on GPU hardware. That is GitHub's recommended shape for self-hosted runners: ephemeral, scoped, and private-only. A is wrong because GitHub says self-hosted runners should almost never be used for public repositories, since anyone can open a pull request that runs code on them, and org-wide availability widens the blast radius further. B is wrong because self-hosted runners can use organization secrets; the premise is false, and dropping GPUs abandons a real requirement. D is wrong because a cleanup step runs inside the same job that might be compromised and can't undo persistent changes such as a poisoned toolcache; GitHub notes there is no way to guarantee a persistent self-hosted runner is clean between jobs."
+    },
+    {
+      "id": "ghbp-migrating-jenkins-to-actions-q6",
+      "stem": "Two pull requests merge to main a minute apart and both start the production deploy, racing each other against the same EKS cluster. Daniel wants production deploys to run one at a time without interrupting a deploy that is already halfway through. What should the deploy job use?",
+      "options": [
+        "A concurrency group such as deploy-production without cancel-in-progress, so only one production deploy runs at a time",
+        "A concurrency group such as deploy-production with cancel-in-progress: true, so the newest merge always wins the race",
+        "strategy.max-parallel: 1 on the deploy job, which stops more than one workflow run from deploying to production at once",
+        "timeout-minutes at the workflow level, so a second deploy can't start until the first run's time allowance has expired"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: a concurrency group allows at most one running job or run in the group; without cancel-in-progress the running deploy is left alone and the newer one waits as pending (a still-newer run replaces an older pending one), so production deploys stop racing without being cut off midway. B is wrong because cancel-in-progress cancels the deploy that is already running, which is exactly the half-finished production rollout Daniel wants to avoid; it suits pull-request CI, not deploys. C is wrong because max-parallel limits how many jobs of one matrix run at once within a single run; it doesn't coordinate separate workflow runs. D is wrong because there is no workflow-level timeout-minutes (it is a job or step key), and a timeout ends a stuck job; it doesn't serialize runs."
+    }
+  ],
+  "keyLearnings": [
+    "GitHub Actions Importer works in stages: audit and forecast scope the estate, dry-run writes workflows locally, and migrate opens a pull request with a Manual steps list that always includes credentials.",
+    "A Jenkins migration is the moment to replace static cloud keys with OIDC federation, where the cloud trust policy checks aud plus a narrow sub such as an environment, and the job only needs id-token: write.",
+    "Jenkins shared libraries map naturally to reusable workflows called at job level, but environments must be declared inside the reusable workflow because the calling job can't use the environment keyword.",
+    "Self-hosted runners for special hardware should be ephemeral, grouped and limited to private repositories, and production deploys should share a concurrency group without cancel-in-progress so they never race."
+  ],
+  "questionIds": [
+    "d2-012",
+    "d2-013",
+    "d2-014",
+    "d2-015",
+    "d2-018",
+    "d2-019",
+    "d2-020",
+    "d2-021",
+    "d2-022",
+    "d2-024",
+    "d3-016",
+    "d3-018"
+  ]
 }

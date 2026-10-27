@@ -1,4 +1,5 @@
 {
+  "schemaVersion": "2.0",
   "id": "ghc-enterprise-rollout",
   "examId": "ghc",
   "title": "Enterprise Copilot Rollout at Stellar DevOps",
@@ -36,70 +37,70 @@
       "id": "ghc-s1-q1",
       "question": "Derek wants to protect `core-platform/` from being used as Copilot context for ALL 1,200 developers without requiring individual configuration. What is the MOST effective and scalable configuration approach?",
       "options": [
-        "A. Send an organization-wide email asking all developers to add `core-platform/**` to their local VS Code settings",
-        "B. Configure an organization-level content exclusion with the glob pattern `core-platform/**` in Organization Settings → GitHub Copilot → Content Exclusion",
-        "C. Create a `.copilotignore` file in the `core-platform/` directory root",
-        "D. Set up a CODEOWNERS file that restricts read access to `core-platform/` — Copilot respects CODEOWNERS access controls"
+        "Send an organization-wide email asking all developers to add `core-platform/**` to their local VS Code settings",
+        "Set up a CODEOWNERS file that restricts read access to `core-platform/` — Copilot respects CODEOWNERS access controls",
+        "Create a `.copilotignore` file in the `core-platform/` directory root",
+        "Configure an organization-level content exclusion with the glob pattern `core-platform/**` in Organization Settings → GitHub Copilot → Content Exclusion"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Organization-level content exclusions apply automatically to all repositories and all developers in the organization without any per-developer or per-repository configuration. This is the only scalable approach that guarantees consistent protection."
     },
     {
       "id": "ghc-s1-q2",
-      "question": "Raj wants to ensure GitHub's IP indemnification applies to Stellar DevOps's Copilot usage. Which configuration is REQUIRED to qualify for this protection?",
+      "question": "Raj asks what determines whether GitHub will defend Stellar DevOps against a third-party IP claim about Copilot output. What is the correct answer today?",
       "options": [
-        "A. Use GitHub Copilot Individual licenses for all 1,200 developers",
-        "B. Use GitHub Copilot Business or Enterprise and set 'Suggestions matching public code' to 'Blocked' in organization settings",
-        "C. File a legal attestation with GitHub's legal team confirming responsible use",
-        "D. Configure repository-level content exclusions for all repositories before enabling Copilot"
+        "The defence-of-claims terms in their agreement, which GitHub's Generative AI Services Terms apply to Copilot outputs; blocking public-code matches is optional since April 3, 2026",
+        "Buying individual Copilot Pro licenses for all 1,200 developers",
+        "Filing a legal attestation with GitHub's legal team for each repository",
+        "Configuring repository-level content exclusions for all repositories before enabling Copilot"
       ],
-      "correct": 1,
-      "explanation": "GitHub's IP indemnification requires: (1) Copilot Business or Enterprise subscription, and (2) the 'Suggestions matching public code' filter set to 'Blocked'. Both conditions must be met — the public code filter is mandatory for indemnification eligibility."
+      "correct": 0,
+      "explanation": "A is correct: the GitHub Generative AI Services Terms (March 2026) say that if your agreement provides for the defence of third-party claims, that provision applies to Copilot outputs. Microsoft's Customer Copyright Commitment page states that as of April 3, 2026 there are no additional required mitigations for GitHub offerings and the duplicate detection filter is no longer required, so setting 'Suggestions matching public code' to Blocked is now a risk-reduction choice, not a condition. B is wrong because individual plans are not an enterprise agreement. C is wrong because no attestation process exists. D is wrong because content exclusion controls what Copilot reads; it has nothing to do with IP defence."
     },
     {
       "id": "ghc-s1-q3",
       "question": "Priya needs to assign Copilot seats to all 1,200 developers programmatically as part of the automated onboarding pipeline. What is the correct method?",
       "options": [
-        "A. Use `gh copilot assign-seats --count 1200` from the CLI",
-        "B. Use the GitHub REST API: `POST /orgs/{org}/copilot/billing/selected_users` with the list of usernames to add",
-        "C. Manually assign seats one-by-one through the GitHub web UI Organization Settings page",
-        "D. Send a GitHub Actions workflow trigger that auto-assigns all new user accounts"
+        "Use `gh copilot assign-seats --count 1200` from the CLI",
+        "Manually assign seats one-by-one through the GitHub web UI Organization Settings page",
+        "Use the GitHub REST API: `POST /orgs/{org}/copilot/billing/selected_users` with the list of usernames to add",
+        "Send a GitHub Actions workflow trigger that auto-assigns all new user accounts"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Programmatic seat assignment uses the GitHub REST API endpoint `POST /orgs/{org}/copilot/billing/selected_users`. This supports bulk operations and can be integrated into the onboarding automation pipeline."
     },
     {
       "id": "ghc-s1-q4",
-      "question": "Zara needs to generate complex Kubernetes deployment YAML from natural language descriptions using the Copilot CLI. Which command installs the CLI extension?",
+      "question": "Zara needs to generate complex Kubernetes deployment YAML from natural language descriptions using GitHub Copilot CLI. Which command installs it with npm?",
       "options": [
-        "A. `npm install -g github-copilot-cli`",
-        "B. `gh extension install github/gh-copilot`",
-        "C. `brew install github-copilot-cli`",
-        "D. `pip install gh-copilot`"
+        "`npm install -g github-copilot-cli`",
+        "`pip install gh-copilot`",
+        "`gh extension install github/gh-copilot`",
+        "`npm install -g @github/copilot`"
       ],
-      "correct": 1,
-      "explanation": "The Copilot CLI is installed as a GitHub CLI extension using `gh extension install github/gh-copilot`. The GitHub CLI (`gh`) must be installed first. This is the only supported installation method."
+      "correct": 3,
+      "explanation": "D is correct: GitHub's install guide uses `npm install -g @github/copilot` (Node.js 22 or later); WinGet (`winget install GitHub.Copilot`), Homebrew (`brew install --cask copilot-cli`) and an install script also work, and the organization must not have disabled Copilot CLI by policy. A is wrong because that is not the package name. C is wrong because it installs the gh-copilot extension, which was retired on October 25, 2025. B is wrong because Copilot CLI is not distributed through pip."
     },
     {
       "id": "ghc-s1-q5",
       "question": "Derek's security team needs to monitor all Copilot policy changes, such as when the public code filter setting is modified or content exclusion rules are updated. Where should they look?",
       "options": [
-        "A. GitHub → Organization → Insights → Copilot Usage Dashboard",
-        "B. GitHub → Organization → Settings → Audit Log, filtering by 'copilot' events",
-        "C. GitHub → Organization → Security → Advanced Security Settings → Copilot Audit",
-        "D. GitHub → Organization → Copilot → Governance → Policy Change History"
+        "GitHub → Organization → Insights → Copilot Usage Dashboard",
+        "GitHub → Organization → Settings → Audit Log, filtering by 'copilot' events",
+        "GitHub → Organization → Security → Advanced Security Settings → Copilot Audit",
+        "GitHub → Organization → Copilot → Governance → Policy Change History"
       ],
       "correct": 1,
-      "explanation": "Copilot policy changes are captured in the Organization Audit Log under 'copilot' event types (e.g., `copilot.policy_change`, `copilot.content_exclusion_created`). This is the authoritative source for Copilot governance audit trails."
+      "explanation": "B is correct: changes to Copilot settings and policies, including content exclusion changes and seat assignments, are recorded in the organization audit log; filter with `action:copilot` (and `actor:Copilot` for agent activity). Events are kept for 180 days, so stream them to a SIEM for longer retention. A, C and D are wrong because none of those pages is where Copilot policy changes are recorded."
     },
     {
       "id": "ghc-s1-q6",
       "question": "Stellar DevOps's monorepo also contains `.env` files, deployment certificates (`*.pem`), and Terraform variable files (`terraform.tfvars`) in various directories. What org-level exclusion configuration covers all of these?",
       "options": [
-        "A. `*.env, *.pem, terraform.tfvars` (comma-separated in a single line)",
-        "B. Three separate glob patterns on separate lines: `**/.env`, `**/*.pem`, `**/terraform.tfvars`",
-        "C. A single exclusion for `secrets/**` which recursively covers all sensitive file types",
-        "D. Add these files to `.gitignore` — Copilot automatically respects `.gitignore` patterns as exclusions"
+        "`*.env, *.pem, terraform.tfvars` (comma-separated in a single line)",
+        "Three separate glob patterns on separate lines: `**/.env`, `**/*.pem`, `**/terraform.tfvars`",
+        "A single exclusion for `secrets/**` which recursively covers all sensitive file types",
+        "Add these files to `.gitignore` — Copilot automatically respects `.gitignore` patterns as exclusions"
       ],
       "correct": 1,
       "explanation": "Each file type needs its own glob pattern using the `**` wildcard for recursive matching: `**/.env` (at any depth), `**/*.pem` (all PEM files), `**/terraform.tfvars` (all Terraform var files). They cannot be combined on one line."
@@ -108,35 +109,35 @@
       "id": "ghc-s1-q7",
       "question": "After configuring org-level content exclusions, three developers on the platform team report that Copilot is still suggesting content from `core-platform/` files. What should Priya ask them to do FIRST?",
       "options": [
-        "A. Uninstall and reinstall the GitHub Copilot extension",
-        "B. Reload or restart their IDE — content exclusion configuration changes require the IDE to refresh its Copilot configuration",
-        "C. Sign out and back in to their GitHub account in the IDE",
-        "D. Verify the glob pattern by creating a test file in `core-platform/` and checking if it's suggested"
+        "Uninstall and reinstall the GitHub Copilot extension",
+        "Reload or restart their IDE — content exclusion configuration changes require the IDE to refresh its Copilot configuration",
+        "Sign out and back in to their GitHub account in the IDE",
+        "Verify the glob pattern by creating a test file in `core-platform/` and checking if it's suggested"
       ],
       "correct": 1,
-      "explanation": "Content exclusion changes require the IDE to reload its Copilot configuration. Reloading/restarting the IDE is the first troubleshooting step. If the issue persists after reload, then check glob pattern correctness and org-level policy propagation."
+      "explanation": "B is correct: GitHub says exclusion changes can take up to 30 minutes to reach IDEs that have already loaded the settings, and reloading (Developer: Reload Window in VS Code, restarting JetBrains or Visual Studio) applies them sooner. If the problem persists, check the path pattern, and remember exclusions aren't supported in VS Code's Edit and Agent modes. A is wrong because reinstalling is slower and unnecessary. C is wrong because signing out isn't the documented way to refresh exclusion settings. D is wrong because it tests the pattern before ruling out the propagation delay."
     },
     {
       "id": "ghc-s1-q8",
       "question": "Raj asks whether Stellar DevOps's code prompts (code context sent to Copilot) and suggestions are used to train future GitHub Copilot models. With Copilot Enterprise, what is the correct answer?",
       "options": [
-        "A. Yes — all prompts are anonymized and used for model improvement after 90 days",
-        "B. No — GitHub Copilot Enterprise never uses customer code (prompts or suggestions) to train or improve Copilot models",
-        "C. Only suggestions that developers explicitly accept are used for training",
-        "D. Training data usage depends on the organization's geographic region and data residency settings"
+        "Yes — all prompts are anonymized and used for model improvement after 90 days",
+        "No — GitHub Copilot Enterprise never uses customer code (prompts or suggestions) to train or improve Copilot models",
+        "Only suggestions that developers explicitly accept are used for training",
+        "Training data usage depends on the organization's geographic region and data residency settings"
       ],
       "correct": 1,
-      "explanation": "GitHub Copilot Business and Enterprise explicitly commit that customer code — neither prompts sent nor suggestions returned — is ever used to train or improve Copilot models. This is a core enterprise data privacy commitment."
+      "explanation": "B is correct: GitHub's Generative AI Services Terms say GitHub will not use inputs or outputs to train generative AI models, and the April 2026 interaction-data update (which made training opt-out for Free, Pro and Pro+) states that Copilot Business and Enterprise users are not affected. A, C and D are wrong because none of those training paths exists for Business or Enterprise data."
     }
   ],
   "keyLearnings": [
     "Organization-level content exclusions are the only scalable approach for protecting sensitive directories across 1,200+ developers",
-    "IP indemnification requires Copilot Business/Enterprise + public code filter set to Blocked",
+    "IP defence for Copilot output comes from the agreement's defence-of-claims terms; since April 3, 2026 blocking public-code matches is optional, not a condition",
     "Bulk seat assignment uses the GitHub REST API: POST /orgs/{org}/copilot/billing/selected_users",
-    "Copilot CLI installs via: gh extension install github/gh-copilot",
+    "GitHub Copilot CLI installs via npm install -g @github/copilot (or WinGet, Homebrew, install script); the old gh-copilot extension is retired",
     "Copilot policy changes are monitored via Organization Audit Log filtering by 'copilot' events",
     "Each sensitive file type needs its own `**/*.ext` glob pattern — they cannot be combined",
-    "Content exclusion changes require IDE reload to take effect",
+    "Content exclusion changes can take up to 30 minutes to reach an IDE; reload to apply them sooner",
     "Copilot Enterprise: customer code is NEVER used for model training"
   ]
 }

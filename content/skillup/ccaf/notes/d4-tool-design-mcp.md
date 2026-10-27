@@ -5,51 +5,48 @@
 
 ## Core Principle
 
-> **"Fewer, well-described tools beat many poorly-described tools. Under 18 tools, every time."**
+> **"Fewer, well-described, role-scoped tools beat many overlapping ones."**
 
 ---
 
-## 4.1 The 18-Tool Cliff
+## 4.1 Too Many Tools on One Agent
 
-Your agent has 42 tools. The PM says "just add one more." You watch the logs: Claude calls `update_customer_address` when the user asks to cancel an order. Another request, Claude calls `search_orders` instead of `search_customers`. Same naming patterns, descriptions that all start with "This tool handles..."---and now the model is basically guessing.
+Your agent has 42 tools. The PM says "just add one more." You watch the logs: Claude calls `update_customer_address` when the user asks to cancel an order, and `search_orders` instead of `search_customers`. Same naming patterns, descriptions that all start with "This tool handles..."---and now the model is basically guessing.
 
-<div class="note-important"><strong>The 18-Tool Cliff is the most cited accuracy boundary in Anthropic's documentation.</strong> Past 18 tools, selection accuracy degrades from ~90% to below 75%.</div>
-
-```mermaid
-graph LR
-    subgraph "Tool Selection Accuracy"
-        A["1-5 tools<br/>~99%"] --> B["6-12 tools<br/>~95%"]
-        B --> C["13-18 tools<br/>~90%"]
-        C --> D["19-30 tools<br/>~75%"]
-        D --> E["30+ tools<br/>~60%"]
-    end
-```
+<div class="note-important"><strong>The exam guide's principle:</strong> giving an agent access to too many tools (its example: 18 instead of 4-5) degrades tool selection reliability by increasing decision complexity, and agents given tools outside their specialization tend to misuse them. There is no published accuracy curve or magic cut-off; the risk grows with tool count and with overlap between tools.</div>
 
 ### Why It Happens
 
-Each tool adds **name + description + schema** to the context. Past ~18 tools:
+Each tool adds **name + description + schema** to the context, and every extra option is another candidate to weigh:
 - Similar descriptions blur together
-- Claude "compares" all tools before choosing---more comparisons, more confusion
-- Selection becomes semi-random for tools with overlapping phrasing
+- More candidates mean more chances to pick the *almost right* tool
+- Tools outside an agent's role invite misuse (a synthesis agent starts running web searches)
 
-<div class="note-scribble">Mental model: 18 tools = 18 job postings on a board. Would YOU pick the right one if 40 postings all said "handles customer stuff"?</div>
+<div class="note-scribble">Mental model: tools are job postings on a board. Would YOU pick the right one if 40 postings all said "handles customer stuff"?</div>
+
+### Fix Order: Descriptions First, Then Distribution
+
+1. **Fix the descriptions.** When two tools are confused, the first, low-effort fix is expanding each description with input formats, example queries, edge cases, and when to use it versus the similar tool (the exam guide's sample answer). Anthropic's tool docs call detailed descriptions "by far the most important factor in tool performance."
+2. **Rename or split overlapping tools** so each has one clear contract.
+3. **Distribute tools by role.** If descriptions are already good and one agent simply has too many, give each subagent only its own tools, with a few scoped cross-role tools for high-frequency needs.
+4. **Load on demand.** For large libraries, Anthropic's tool docs suggest tool search (deferred loading) and service-prefixed names such as `github_list_prs`.
 
 ### Use Case: "The 40-Tool Disaster"
 
-Your enterprise team built a monolith MCP server. 40 tools. One namespace. Every third request, Claude picks the wrong one. Three solutions exist---all tested in production:
+Your enterprise team built a monolith MCP server: 40 tools, one namespace. Three structural options:
 
 ```mermaid
 graph TD
-    P["Problem: 40+ tools"] --> S1
+    P["Problem: 40+ tools on one agent"] --> S1
     P --> S2
     P --> S3
-    
-    S1["Solution 1:<br/>MCP Server Segmentation<br/>3 servers x 6 tools each"]
-    S2["Solution 2:<br/>Agent Router<br/>Coordinator to 3 subagents"]
-    S3["Solution 3:<br/>Dynamic Loading<br/>Load only relevant tools per intent"]
+
+    S1["Option 1:<br/>Split MCP servers by domain"]
+    S2["Option 2:<br/>Coordinator + role-scoped subagents"]
+    S3["Option 3:<br/>Load only relevant tools<br/>(tool search / per-intent sets)"]
 ```
 
-**Solution 1: Multiple MCP Servers** --- Split by domain, each stays well under 18.
+**Option 1: Multiple MCP Servers** --- split by domain.
 
 ```json
 {
@@ -61,29 +58,20 @@ graph TD
 }
 ```
 
-**Solution 2: Agent Router** --- Coordinator sees meta-tools, not 40 individuals.
+**Option 2: Coordinator + subagents** --- the coordinator delegates; each subagent holds only its domain's tools.
 
 ```python
-# Coordinator sees 3 meta-tools (not 40 individual tools)
-coordinator_tools = [
-    {"name": "database_agent", "description": "ALL data tasks"},
-    {"name": "deploy_agent", "description": "ALL deployment tasks"},
-    {"name": "monitor_agent", "description": "ALL observability tasks"},
-]
-# Each subagent has its own focused 5-10 tools
+agents = {
+    "database-agent": AgentDefinition(description="Data queries and migrations", prompt=DB_PROMPT,
+                                      tools=["mcp__database__query", "mcp__database__describe"]),
+    "deploy-agent":   AgentDefinition(description="Deployments and rollbacks", prompt=DEPLOY_PROMPT,
+                                      tools=["mcp__deploy__release", "mcp__deploy__rollback"]),
+}
 ```
 
-**Solution 3: Dynamic Loading** --- Load tools per classified intent.
+**Option 3: Dynamic loading** --- expose only the tools a request needs.
 
-```python
-def get_tools_for_intent(message: str) -> list:
-    intent = classify_intent(message)
-    if intent == "database": return db_tools       # 6 tools
-    elif intent == "deploy": return deploy_tools   # 5 tools
-    else: return base_tools                        # 4 tools
-```
-
-<div class="note-trap"><strong>TRAP:</strong> The exam may suggest "just add better descriptions" as a fix for 40 tools. Descriptions help, but the 18-tool cliff is a structural limit---you MUST reduce the number visible per turn.</div>
+<div class="note-trap"><strong>TRAP:</strong> Read the stem. If two tools with minimal descriptions are being confused, "expand the descriptions" is the <em>first</em> step, and a routing layer or consolidation is over-engineering. If descriptions are already good and one agent carries dozens of tools across domains, distribute the tools by role.</div>
 
 ---
 
@@ -189,16 +177,17 @@ graph TD
 
 ### Use Case: "The Guaranteed Schema Machine"
 
-<mark>Forced tool = the most reliable way to get structured output from Claude.</mark> When you force a tool, Claude cannot respond with text, cannot refuse, cannot add caveats. It MUST fill the schema.
+<mark>Forcing a tool guarantees the call; strict: true guarantees the input matches the schema.</mark> With a forced tool, the API prefills the assistant turn so Claude emits the tool_use block with no text before it (and no thinking block). Model support varies: Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject `any` and named-tool `tool_choice` with a 400 error, so on those models use `auto` with strict tools or structured outputs.
 
 ```python
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-opus-5",          # accepts forced tool use
+    max_tokens=1024,
     tools=tools,
     tool_choice={"type": "tool", "name": "classify_intent"},  # MUST call this
     messages=[{"role": "user", "content": customer_message}]
 )
-# Claude CANNOT refuse or respond with text --- must produce valid schema
+# The response starts with the tool_use block; add strict: true for schema guarantees
 result = response.content[0].input  # {"intent": "complaint", "confidence": 0.92}
 ```
 
@@ -385,9 +374,9 @@ def escalation_template(severity: str) -> list:
 You've been asked to build a customer support MCP server. It needs: a tool to look up orders, a resource for the refund policy (loaded at session start), and it needs to run on stdio transport for local development. Here's the complete implementation:
 
 ```python
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP   # FastMCP ships in the official MCP Python SDK
 
-mcp = FastMCP("customer-support", description="Support tools")
+mcp = FastMCP("customer-support")
 
 @mcp.tool()
 def lookup_order(order_id: str) -> dict:
@@ -428,7 +417,7 @@ if __name__ == "__main__":
     "customer-support": {
       "command": "python",
       "args": ["./mcp-servers/support.py"],
-      "transport": "stdio"
+      "type": "stdio"
     }
   }
 }
@@ -468,7 +457,7 @@ Tool: `search_products(query, limit, status)`. No format hints. Claude sends `li
 }
 ```
 
-<div class="note-important"><strong>Enums + ranges + descriptions in the schema = Claude sends correct types every time.</strong> Vague schemas produce garbage inputs.</div>
+<div class="note-important"><strong>Enums + descriptions + required fields steer Claude toward correct inputs.</strong> Vague schemas produce garbage inputs. Note that strict tool use doesn't support numeric or string range keywords (<code>minimum</code>, <code>maximum</code>, <code>minLength</code>...), so with <code>strict: true</code> state ranges in the description and validate them in your code.</div>
 
 <div class="note-scribble">Think of the schema as the "form validation rules" Claude sees before it fills in the form. More constraints = fewer mistakes.</div>
 
@@ -502,9 +491,9 @@ graph TD
 ```python
 # Server tool — Anthropic handles execution
 response = client.messages.create(
-    model="claude-opus-4-7",
+    model="claude-opus-5-5",
     max_tokens=1024,
-    tools=[{"type": "web_search_20260209", "name": "web_search"}],
+    tools=[{"type": WEB_SEARCH_TOOL_TYPE, "name": "web_search"}],  # current versioned type from the tool reference
     messages=[{"role": "user", "content": "What's the latest on Mars rover?"}],
 )
 # Results are IN the response — no tool_result needed from you
@@ -523,27 +512,19 @@ tools = [{
         "type": "object",
         "properties": {
             "name": {"type": "string"},
-            "age": {"type": "integer", "minimum": 0}
+            "age": {"type": "integer"}       # no minimum: strict mode rejects range keywords
         },
-        "required": ["name", "age"]
+        "required": ["name", "age"],
+        "additionalProperties": False
     }
 }]
 ```
 
 <div class="note-trap"><strong>TRAP:</strong> strict: true on tool definitions guarantees schema compliance at the API level. This is DIFFERENT from tool_choice which controls WHETHER a tool is called, not whether the output conforms. The exam WILL test this distinction.</div>
 
-### Tool Use Pricing
+### Tool Use Cost
 
-Tools add tokens to your request. Per-model overhead for enabling tools:
-
-| Config | Additional System Tokens |
-|--------|------------------------|
-| `tool_choice: auto` or `none` | ~346 tokens |
-| `tool_choice: any` or `tool` | ~313 tokens |
-
-Plus: tool definitions (names + descriptions + schemas) + tool_use blocks + tool_result blocks all count as input/output tokens.
-
-<div class="note-scribble">More tools = more tokens = more cost, even if they're never called. Another reason to keep it under 18.</div>
+Tool definitions (names, descriptions, schemas), tool_use blocks, and tool_result blocks all count as tokens, and enabling tools adds a tool-use system prompt. Every tool you attach costs context even if it's never called, which is one more reason to scope tools to each agent's role.
 
 ### Complete Agentic Tool Loop
 
@@ -554,15 +535,18 @@ messages = [{"role": "user", "content": user_input}]
 
 while True:
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5-5",
         max_tokens=4096,
         tools=tools,
         messages=messages,
     )
     
-    # Check if Claude wants to use tools
+    # stop_reason drives the loop
     if response.stop_reason == "end_turn":
         break  # Done — final text response
+    if response.stop_reason != "tool_use":
+        handle_other_stop(response)  # max_tokens, refusal, ...
+        break
     
     # Process ALL tool calls (may be parallel)
     tool_results = []
@@ -580,7 +564,7 @@ while True:
     messages.append({"role": "user", "content": tool_results})
 ```
 
-<div class="note-important"><strong>The agentic loop continues until stop_reason == "end_turn".</strong> If stop_reason == "tool_use", Claude needs you to execute tools and return results. Breaking on the wrong condition = broken agent.</div>
+<div class="note-important"><strong>The agentic loop continues while stop_reason == "tool_use" and ends on "end_turn".</strong>If stop_reason == "tool_use", Claude needs you to execute tools and return results. Breaking on the wrong condition = broken agent.</div>
 
 <div class="note-trap"><strong>TRAP:</strong> The tool_results go in a message with role "user" — NOT "tool" or "system". The assistant's response (including its tool_use blocks) must also be appended BEFORE the results. Skipping either breaks the loop.</div>
 
@@ -590,23 +574,23 @@ while True:
 
 | Concept | Key Fact |
 |---------|----------|
-| Tool limit | <mark>~18 tools before accuracy drops significantly</mark> |
+| Tool count | <mark>Too many tools on one agent (exam example: 18 vs 4-5) degrades selection; scope tools by role</mark> |
 | Tool description | MUST have: what + when to use + when NOT to use |
-| Guaranteed JSON | `tool_choice: {"type": "tool", "name": "X"}` |
+| Guaranteed call | `tool_choice: {"type": "tool", "name": "X"}` (rejected on Opus 5.5 / Sonnet 5.5 / Fable 5.1) |
 | Schema guarantee | `strict: true` on tool definition (different from tool_choice!) |
 | Parallel calls | Independent tools called in same response, matched by `tool_use_id` |
 | Error returns | Structured `{error, message, suggestion}` — never None/crash |
 | MCP Tools | Model-initiated (Claude decides) |
 | MCP Resources | App-initiated (loaded at session start, read-only) |
 | MCP Prompts | User-initiated (user explicitly selects) |
-| MCP transport | stdio for local dev tools |
+| MCP transport | stdio for local servers; HTTP for remote (SSE deprecated) |
 | Server tools | No `tool_result` needed — Anthropic executes them |
 | Client tools | YOU execute and send `tool_result` back |
 | Tool confusion fix | Reduce tools OR improve "Do NOT use when" descriptions |
 | Agentic loop exit | `stop_reason == "end_turn"` (NOT `"tool_use"`) |
-| Tool pricing | ~313-346 token overhead just for enabling tools |
+| Tool cost | Every attached tool's definition costs context, called or not |
 
-<div class="note-scribble">If you remember ONE thing from Domain 4: under 18 tools, 3-element descriptions, structured error returns. That's 60% of the questions right there.</div>
+<div class="note-scribble">If you remember ONE thing from this domain: detailed, differentiated descriptions first; role-scoped tool sets second; structured error returns always.</div>
 
 ---
 
@@ -682,4 +666,93 @@ Edit tool error: "Found multiple matches for anchor text"
 → Fall back to: Read (full file) → Write (full file with changes)
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> Questions ask "Edit failed with non-unique match — what next?" Answer: Read + Write fallback. NOT: try Edit again with different anchor text.</div>
+<div class="note-trap"><strong>TRAP:</strong> Edit requires <code>old_string</code> to appear exactly once. Claude Code's tool reference says to supply a longer string with enough surrounding context, or set <code>replace_all: true</code> to change every occurrence. When no unique anchor can be found, the exam guide's answer is the Read + Write fallback: read the full file, write it back with the change.</div>
+
+---
+
+## 4.10 Built-in Tools: Read, Write, Edit, Bash, Grep, Glob
+
+### Key Concept
+
+**Grep finds content, Glob finds file names, Read and Write move whole files, and Edit changes one unique spot.**
+
+Grep searches file contents for patterns (all callers of a function, an error message, an import). Glob matches file paths by name or extension (`**/*.test.tsx`). Read loads a full file; Write creates or overwrites one; Edit replaces an `old_string` that must appear exactly once (or every occurrence with `replace_all: true`). Bash runs shell commands.
+
+Good exploration is incremental: Grep for entry points, Read to follow imports and trace the flow, and for wrapper modules first list every exported name, then Grep for each one. **Grep is the index at the back of the book, Glob is the table of contents, and Read is turning to the page.**
+
+### In Practice
+
+**What breaks without this**: Reading every file up front floods the context; using Glob to find callers returns file names, not usages; Edit on a repeated anchor fails.
+
+**Decision trigger**: Ask whether you're looking for *text inside files* (Grep), *files by name* (Glob), or *changing a file* (Edit for one unique spot; Read + Write when no unique anchor exists).
+
+**When you'd choose differently**: In current Claude Code on macOS, Linux, and WSL, Glob and Grep are left out of the default tool set and Claude searches with `find` and `grep` through Bash (embedded `bfs` and `ugrep`); naming Glob or Grep in `--tools` or `--allowedTools` (or the SDK equivalents) brings them back. The selection logic the exam tests is the same either way.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Find all callers of <code>processRefund</code>" is Grep, not Glob. "Find all <code>*.test.tsx</code> files" is Glob, not Grep. And when Edit can't match a unique anchor, the exam's answer is Read the file, then Write it back with the change.</div>
+
+---
+
+## 4.11 MCP Servers in Claude Code: Scopes, Secrets, and Build vs Buy
+
+### Key Concept
+
+**Team servers go in the project's `.mcp.json`; personal servers stay in `~/.claude.json`; secrets stay in environment variables.**
+
+`claude mcp add` defaults to **local** scope (your `~/.claude.json`, this project only). `--scope project` writes `.mcp.json` in the repo root for the team, and `--scope user` puts a server in `~/.claude.json` for all of your own projects. `.mcp.json` supports `${VAR}` and `${VAR:-default}` expansion in `command`, `args`, `env`, `url`, and `headers`, so tokens never get committed.
+
+Tools from every configured server are discovered at connection time and available together. A tool's description decides whether Claude prefers it over a built-in like Grep, and MCP **resources** expose catalogs (issue summaries, documentation trees, schemas) so the agent doesn't need exploratory calls. **`.mcp.json` is the office's shared printer list; `~/.claude.json` is the printer on your own desk.**
+
+### In Practice
+
+**What breaks without this**: A teammate adds a server without a scope flag and tells everyone it's shared, but it only exists in their local config; or a token is hard-coded into a committed `.mcp.json`.
+
+**Decision trigger**: Ask who needs the server and where the credential lives. Team → project scope with `${TOKEN}`; experiment → user or local scope.
+
+**When you'd choose differently**: For standard integrations (Jira, GitHub), use an existing community or vendor MCP server; build a custom one only for team-specific workflows. In CI, project servers from `.mcp.json` load without an approval prompt, so use `--strict-mcp-config` or `--bare` when the job shouldn't start repository-defined servers.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Put the token in <code>.mcp.json</code>" (leaks secrets), "configure the team server in <code>~/.claude.json</code>" (not shared), and "the agent keeps using Grep, so delete Grep" (fix the MCP tool's description instead) are the classic distractors.</div>
+
+---
+
+## Deep Dive
+
+### 1. The connective narrative
+
+This domain (Domain 2, Tool Design & MCP Integration, in the official blueprint) starts from one fact: **the model chooses tools by reading their descriptions.** A description has to say what the tool does, what input it expects, when to use it, and when to use the similar tool instead. Overlapping names and vague descriptions cause misrouting, and keyword-heavy system prompts can override even good descriptions.
+
+From there it's about the *shape* of the tool surface. Split a generic tool into purpose-specific ones with clear contracts, constrain risky ones (a validating `load_document` instead of a raw `fetch_url`), and give each agent only the tools its role needs, adding a scoped cross-role tool such as `verify_fact` where round trips would otherwise dominate. `tool_choice` decides whether a call is forced, and strict schemas decide whether its input is valid.
+
+Failures are part of the interface too. Return `isError` with a category (transient, validation, business, permission), a retryable flag, and a human-readable explanation, and keep "nothing found" distinct from "couldn't look". In Claude Code, MCP servers are wired in by scope, with environment variables for secrets and resources for catalogs, while built-in tools follow a simple rule: Grep for content, Glob for names, Edit for one unique change.
+
+### 2. Worked scenario
+
+> **Scenario.** A developer-productivity agent has 26 tools from three MCP servers plus the built-ins. It often greps the repo instead of calling the richer `code_search` MCP tool, retries a permission error ten times, and the Jira server's token was just found in git history.
+>
+> **Step 1 — descriptions.** Rewrite `code_search`'s description: what it indexes, the query formats it accepts, what it returns, and when to prefer it over Grep.
+>
+> **Step 2 — errors.** Make the MCP server return `isError: true` with `errorCategory: "permission"` and `isRetryable: false`, so the agent explains the problem instead of retrying.
+>
+> **Step 3 — secrets.** Rotate the token, replace it with `${JIRA_TOKEN}` in `.mcp.json`, and switch to a maintained community or vendor Jira server rather than the home-grown one.
+>
+> **Step 4 — tool load.** Move release tooling into a release subagent so the exploration agent only sees the tools it uses.
+>
+> **Outcome:** better routing from better descriptions, no wasted retries, no secrets in git, and a smaller decision for every request.
+
+### 3. Memory aid
+
+**DICE** — designing a tool surface:
+- **D**escribe precisely (purpose, inputs, examples, boundaries)
+- **I**solate by role (scoped tool sets, few cross-role tools)
+- **C**ategorize errors (`isError`, category, retryable, explanation)
+- **E**xpose catalogs as resources, and wire servers by the right scope
+
+### 4. Exam strategy for this domain
+
+- When two tools are confused and their descriptions are thin, the first fix is the descriptions; routing layers and consolidation are "valid but more effort than a first step".
+- Access failure versus valid empty result appears in several guises; the answer always keeps them distinct.
+- Watch for over-provisioning: giving the synthesis agent every web tool "to avoid round trips" violates least privilege.
+- Five minutes before the exam: **descriptions first, scope second, structured errors always.**

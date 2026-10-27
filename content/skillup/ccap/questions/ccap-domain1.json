@@ -318,5 +318,37 @@
     "explanation": "**The principle**: Solution design must align to the metric that actually matters to the business, which can diverge from an informal, well-intentioned framing of the problem — architects should design around the real success metric, since optimizing the wrong metric can look like progress while missing the actual business goal.\n\n**Why D is correct**: It directly targets time-to-action on severe violations by prioritizing real-time triage and escalation of the specific category the KPI is about, even at the cost of not moving the overall backlog number as fast — the correct tradeoff because the board KPI is about severe-violation response time, not total ticket count.\n\n**Why the distractors fail**:\n- A: Leaves prioritization entirely to manual human judgment with no change to how quickly severe cases are surfaced, likely leaving time-to-action on severe violations largely unchanged.\n- B: Improves the general backlog number the informal framing cared about but does nothing to specifically prioritize severe violations — an old low-severity message could get cleared before a five-minute-old harassment threat.\n- C: Optimizes to shrink the visible ticket count fastest, which looks good on a dashboard but deprioritizes exactly the severe, low-volume cases the KPI is about.\n\n**In practice**: 'What number is leadership actually being measured on' is a question architects must ask explicitly, because the team's colloquial description of a problem and the metric reported to the board can diverge — designing for the wrong one produces a system that looks successful internally while missing the business value it was funded to deliver.",
     "tags": ["business-value", "performance-sla", "solution-design", "scenario-based", "evaluation"],
     "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ccap-d1-021",
+    "scenario": "A code-migration tool must move a large repository to a new logging library. Which files need changes, and what kind of change each one needs, can only be worked out after reading the codebase, and the answer differs from repository to repository.",
+    "question": "Which decomposition pattern fits this task best?",
+    "options": [
+      "Prompt chaining, with a fixed sequence of steps defined in advance and a programmatic gate check between each step",
+      "Orchestrator-workers, where a central model decides the subtasks after reading the code and delegates each one to a worker",
+      "Parallelization by voting, running the whole migration several times and keeping the result most of the runs agree on",
+      "Routing, classifying the repository into one category and sending it to a prompt specialized for that category"
+    ],
+    "correct": 1,
+    "explanation": "**The principle**: Choose the decomposition pattern by whether the subtasks are known before the input arrives. Fixed subtasks suit a chain; subtasks that depend on the input suit an orchestrator.\n\n**Why B is correct**: Anthropic's guide to building effective agents describes orchestrator-workers as a central LLM that dynamically breaks down tasks, delegates them to workers, and synthesizes the results, and recommends it for complex tasks where you can't predict the subtasks needed. Here the set of files and the type of change are only known after reading each repository.\n\n**Why the distractors fail**:\n- A: Prompt chaining is ideal when a task can be cleanly decomposed into fixed subtasks; a predefined sequence can't anticipate which files each repository needs changed.\n- C: Voting runs the same task several times for higher confidence; it doesn't break a large job into pieces, and comparing whole-repository migrations is expensive and hard to aggregate.\n- D: Routing classifies an input and sends it to one specialized follow-up. It picks a path but doesn't decompose the work inside the repository.\n\n**In practice**: Ask whether you could write the list of subtasks before seeing the input. If you can, build a chain with gates; if you can't, let an orchestrator plan, and keep the workers' tools scoped to their piece.",
+    "tags": ["task-decomposition", "architecture", "scenario-based", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccap-d1-022",
+    "scenario": "A Claude assistant cut average handling time on insurance-policy questions from 12 minutes to 7. The contact center kept the same headcount and is now clearing a backlog it could never reach before. The CFO's steering deck labels the result \"a 40% cost reduction\".",
+    "question": "Which framing of the business value should the architect recommend?",
+    "options": [
+      "Productivity: the same team handles more work per hour, and cost savings follow only if the freed capacity is later reduced or redeployed",
+      "Cost: handling time fell by about 40%, so operating cost fell by about 40%, which is the clearest single number for the committee",
+      "Transformation: the contact center now runs on a fundamentally new AI-driven operating model and should be presented that way",
+      "Performance SLAs: faster handling proves the system meets its latency SLA, which is the only value pillar that finance needs to see"
+    ],
+    "correct": 0,
+    "explanation": "**The principle**: Name the value pillar the evidence actually supports. A time saving becomes a cost saving only when spend changes.\n\n**Why A is correct**: Handling time fell by about 42%, but headcount and payroll are unchanged, so spend hasn't moved. What has changed is output per person: the same team now clears work it couldn't reach before. That is a productivity gain, and it can be converted into cost savings later through reduced hiring or redeployment, which is a decision to show explicitly.\n\n**Why the distractors fail**:\n- B: It treats handling time as if it were spend. With the same headcount, the cost line is flat, and a claimed 40% reduction will fail the first finance review.\n- C: One assistant speeding up one task is an incremental gain, not a new operating model; overclaiming transformation erodes credibility for later phases.\n- D: Handling time is a business outcome, not a latency SLA, and an SLA framing ignores the backlog value the business is actually seeing.\n\n**In practice**: Architects who frame value honestly keep sponsor trust. Report the measured change (minutes per case, backlog cleared), name the pillar it supports, and state what would have to happen for it to become a cost saving.",
+    "tags": ["business-value", "stakeholder-communication", "scenario-based", "evaluation"],
+    "difficulty": "hard"
   }
 ]

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.19",
-  "contentUpdatedAt": "2026-10-26",
+  "contentVersion": "0.2.0",
+  "contentUpdatedAt": "2026-10-27",
   "provider": "Anthropic",
   "palette": {
     "color": "#a78bfa",
@@ -130,6 +130,12 @@
       "date": "2026-10-26",
       "type": "patch",
       "summary": "Replaced 5 diagram PNGs in d1–d2 notes with AaryaAI-branded SVGs (feedback loop, architecture patterns, orchestrator + subagents, prompt caching, context window budget) with descriptive alt text; switched references to absolute /content paths; old PNGs removed."
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Syllabus and fact refresh. Exam guide v1.0 (July 2026) unchanged: domains, weights and objectives already matched. Remapped 13 existing questions to the objectives they test (3.6, 3.8 and 4.2 had none mapped; 2.5 and 6.5 had one). Added 15 questions (d1-021..022, d2-017..020, d3-024..025, d4-020..021, d5-018..019, d6-018, d7-013..014) on effort/adaptive thinking, Skills loading, caching minimums, few-shot diversity, tool search, eval design, stop_reason monitoring, knowledge cutoff, counterfactual bias tests, decomposition patterns, value framing, model deprecation, --bare CI runs and settings precedence; every official objective now has at least 3 mapped questions. Rewrote d2-003 and d3-007 and two options of d2-009 (extended thinking budget_tokens is rejected on Claude 4.7+, effort replaces it; d2-009 now matches the 3-5 example guidance), updated d7-002 and d7-004 (managed settings sources; commands merged into skills), and noted on 6 temperature distractors that Claude 4.7+ accepts only default sampling values. Notes: current model lineup and effort (D2), caching/Skills facts (D2), tool-selection threshold and tool search (D3), batch pricing, effort tuning and removed temperature fix (D4), model deprecation (D6), settings precedence, skills and --bare (D7). 3 scenarios updated for the same facts. Scenario correct-answer positions rebalanced (B had been correct in 87%); ccap-d7-012 options rebalanced so the answer isn't the conspicuously long one."
     }
   ],
   "id": "ccap",
@@ -138,7 +144,7 @@
   "shortTitle": "CCA-P",
   "contentLevel": "301",
   "description": "Validate your expertise designing, building, and delivering production-grade Claude solutions — enterprise integration, evaluation, governance, and stakeholder lifecycle management.",
-  "questions": 124,
+  "questions": 139,
   "duration": "120 min",
   "passScore": "720/1000",
   "passThreshold": 72,
@@ -317,8 +323,12 @@
       "url": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf"
     },
     {
-      "label": "Anthropic Docs",
-      "url": "https://docs.anthropic.com"
+      "label": "Claude Platform Docs",
+      "url": "https://platform.claude.com/docs"
+    },
+    {
+      "label": "Claude Code Docs",
+      "url": "https://code.claude.com/docs"
     },
     {
       "label": "Anthropic Cookbook",

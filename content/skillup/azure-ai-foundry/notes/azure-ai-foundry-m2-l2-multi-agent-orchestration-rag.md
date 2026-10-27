@@ -1,6 +1,6 @@
 # Multi-Agent Orchestration & RAG
 
-> **Skill track**: Azure AI Foundry Practitioner — Module 2, Lesson 2
+> **Skill track**: Microsoft Foundry Practitioner — Module 2, Lesson 2
 
 ## Prerequisites
 
@@ -21,17 +21,19 @@ A well-tooled single agent handles a lot — but not everything. This lesson cov
 
 | Pattern | Description |
 |---|---|
-| Connected agents | One Agent Service agent registers another agent as a callable tool — coordinator/specialist pattern, all within the Agent Service |
-| Semantic Kernel | Microsoft SDK exposing existing app code as "plugins" the model can call; strong DI/.NET-Python-Java support |
-| AutoGen | Microsoft framework for orchestrating multi-round conversations *among* multiple autonomous agents (planner/researcher/critic-style workflows) |
+| A2A tool | An agent calls another agent through an Agent2Agent (A2A) endpoint, including another Foundry agent exposed as one. A2A protocol v1.0 is generally available |
+| Workflows (preview) | Orchestrate several Foundry agents declaratively in the portal or YAML, using sequential, group chat, or human-in-the-loop patterns |
+| Microsoft Agent Framework | Code-first framework (Python, .NET) for agents and graph-based multi-agent workflows; run it yourself or as a Foundry hosted agent |
 
-The three patterns aren't interchangeable difficulty tiers — they solve different shapes of coordination. Connected agents is a coordinator handing off *one bounded task* to a specialist. Semantic Kernel is about exposing *your own existing code* to the model, not about multiple agents talking to each other at all. AutoGen is for genuinely open-ended, multi-round reasoning *among peers* — nobody is just "handing off and waiting."
+The three patterns aren't interchangeable difficulty tiers — they solve different shapes of coordination. The A2A tool is a coordinator handing off *one bounded task* to a specialist that lives behind its own endpoint. Workflows are for a known, repeatable sequence of agent steps that you'd rather declare than code. Agent Framework is for orchestration you want to control in code: fan-out, fan-in, conditional edges, and long-running or human-in-the-loop state.
+
+Two older names you'll still meet: the classic Agent Service's **Connected Agents** tool isn't available in the new Agent Service (Microsoft recommends the A2A tool or workflows instead), and **Semantic Kernel** and **AutoGen** have a direct successor in Agent Framework, built by the same teams. **Think of it like a company's org chart**: A2A is calling a colleague in another department, a workflow is the standard operating procedure, and Agent Framework is designing the department yourself.
 
 ### In Practice
 
-**What breaks without this**: a team builds a four-agent pipeline for a task that's really just "one agent needs two more tools" — adding orchestration overhead, more places for something to fail silently, and added latency, for a problem that never needed decomposing in the first place.
+**What breaks without this**: a team builds a four-agent pipeline for a task that's really just "one agent needs two more tools" — adding orchestration overhead, more places for something to fail silently, and added latency, for a problem that never needed decomposing in the first place. A second failure is migrating a classic agent and assuming its Connected Agents tool carries over; it doesn't, so the handoff silently disappears until someone rebuilds it with A2A or a workflow.
 
-**Decision trigger**: ask *"would two different people on my team need genuinely different instructions, tools, and guardrails to do these two parts of the job?"* If yes, that's a real specialist split — reach for connected agents. If it's really the same job just using two tools, stay single-agent.
+**Decision trigger**: ask *"would two different people on my team need genuinely different instructions, tools, and guardrails to do these two parts of the job?"* If yes, that's a real specialist split. Bounded handoff to one specialist → A2A tool. Fixed sequence of agent steps → workflow. Orchestration logic you need to own in code → Agent Framework. If it's really the same job just using two tools, stay single-agent.
 
 **When you'd choose differently**: even a decomposable-looking problem can sometimes stay single-agent if the "specialist roles" are simple enough that separate sections of one system prompt handle the distinction fine — every additional agent is additional infrastructure to maintain and monitor.
 
@@ -63,7 +65,7 @@ A *custom* RAG pipeline (outside the File search tool) requires **chunking** doc
 
 **Streaming is a UX decision, not a capability decision — the model produces the same output either way.**
 
-Streaming delivers run output incrementally (token-by-token / event-by-event) to the client, enabling a typewriter-style UI instead of waiting for the full completion. It's a delivery-layer concern entirely separate from tools or safety — it changes how quickly something *feels* to arrive, not what arrives.
+Streaming delivers a response's output incrementally (token-by-token / event-by-event) to the client, enabling a typewriter-style UI instead of waiting for the full completion. It's a delivery-layer concern entirely separate from tools or safety — it changes how quickly something *feels* to arrive, not what arrives.
 
 ### In Practice
 
@@ -79,15 +81,15 @@ Walking the tool/pattern choice for each requirement:
 
 1. **(a) Policy Q&A over an uploaded PDF → File search.** This is grounded retrieval with citations over a document the team controls — exactly File search's job. Bing grounding would be wrong here (it searches the live web, not your own uploaded document), and Code interpreter would be wrong too (it executes Python, it doesn't retrieve text).
 2. **(b) Order lookup via an existing REST API → OpenAPI tool, not Function calling.** The distinguishing detail is that a spec *already exists* — the OpenAPI tool consumes it directly with no per-endpoint wrapper code. Function calling would require hand-writing a JSON-schema function definition for this one action; reach for it when there's no existing spec, or the "function" is really custom logic (e.g., a calculation) rather than a real HTTP endpoint.
-3. **(c) Escalate to a billing specialist → Connected agents, not AutoGen.** This is a coordinator delegating one specific, bounded task to a specialist with different instructions/guardrails — precisely the connected-agents pattern (register the billing agent as a callable tool on the coordinator). AutoGen is for open-ended, multi-round conversations *among* peer autonomous agents (e.g., a planner/researcher/critic loop) — reaching for it here would be over-engineering a simple delegation.
+3. **(c) Escalate to a billing specialist → the A2A tool, not a hand-coded multi-agent framework.** This is a coordinator delegating one specific, bounded task to a specialist with different instructions/guardrails. Expose the billing agent as an A2A endpoint and give the coordinator an A2A tool that calls it. Building the same handoff in Agent Framework code would work, but it's over-engineering a simple delegation; that framework earns its place for open-ended, multi-round orchestration (e.g., a planner/researcher/critic loop).
 4. **Streaming, layered on top**: since customers are watching the chat live, every one of these responses — the File search answer, the order-status lookup, the specialist's reply — streams token-by-token rather than arriving as one delayed block.
 
 ```json
-// Simplified agent definition showing tool composition for requirements (a) and (b)
+// Illustrative agent definition (simplified, not the exact wire format) showing tool composition for requirements (a) and (b)
 {
   "name": "SupportCoordinator",
   "instructions": "Answer policy questions from the knowledge base. For order status, call the Orders API. Escalate billing disputes to BillingSpecialistAgent.",
-  "model": "gpt-4o",
+  "model": "gpt-5.4-mini",
   "tools": [
     { "type": "file_search", "vector_store_ids": ["vs_policy_docs"] },
     { "type": "openapi", "spec_url": "https://internal.contoso.com/orders/openapi.json", "auth": "managed_identity" }
@@ -100,7 +102,7 @@ flowchart TD
   U[Customer Question] --> C[SupportCoordinator Agent]
   C -->|policy question| FS[File Search Tool]
   C -->|order status| OA[OpenAPI Tool]
-  C -->|billing dispute| BA[BillingSpecialist Agent]
+  C -->|billing dispute via A2A| BA[BillingSpecialist Agent]
   FS -->|cites| ANS[Streamed Answer]
   OA -->|returns status| ANS
   BA -->|resolves| ANS
@@ -113,7 +115,7 @@ flowchart TD
 ```
 *SupportCoordinator routing three request types to three tools.*
 
-**Common gotcha to notice**: nothing above required AutoGen or Semantic Kernel — most real support-bot scenarios resolve with File search + OpenAPI tool + (at most) connected agents. Reach for the heavier orchestration frameworks only when the scenario actually describes autonomous multi-agent reasoning, not just "the agent uses several tools."
+**Common gotcha to notice**: nothing above required a code-first orchestration framework — most real support-bot scenarios resolve with File search + OpenAPI tool + (at most) one A2A handoff. Reach for Agent Framework only when the scenario actually describes multi-round or branching multi-agent orchestration, not just "the agent uses several tools."
 
 ## Deep Dive: Making Multi-Agent Orchestration & RAG Click
 
@@ -123,27 +125,30 @@ These three topics are the three axes along which a single working agent scales 
 
 ### 2. Worked scenario
 
-See the **Worked Example** above — it's deliberately placed inline with the topic bodies (rather than only here) because it's the connective thread through this entire lesson: one support assistant, three tool/pattern decisions, one streaming decision layered on top. The scenario earns its place precisely because none of its four decisions were interchangeable — swap in the wrong pattern for any one of them (AutoGen for a bounded handoff, Bing grounding for an internal PDF, no streaming for a live chat UI) and the system either over-engineers or under-delivers.
+See the **Worked Example** above — it's deliberately placed inline with the topic bodies (rather than only here) because it's the connective thread through this entire lesson: one support assistant, three tool/pattern decisions, one streaming decision layered on top. The scenario earns its place precisely because none of its four decisions were interchangeable — swap in the wrong pattern for any one of them (a hand-coded framework for a bounded handoff, Bing grounding for an internal PDF, no streaming for a live chat UI) and the system either over-engineers or under-delivers.
 
 ### 3. Memory aid
 
 For multi-agent pattern choice specifically:
 
-- **One coordinator delegating ONE bounded task** → Connected agents
-- **Existing app code you want the model to call as plugins** → Semantic Kernel
-- **Open-ended, multi-round conversation among peer agents** → AutoGen
+- **One coordinator delegating ONE bounded task** → A2A tool
+- **A fixed, repeatable sequence of agent steps** → Workflow (preview)
+- **Multi-round or branching orchestration you control in code** → Microsoft Agent Framework
 
 ### 4. Applying this in real projects
 
-- Most real support-bot-shaped problems resolve with File search + OpenAPI tool +, at most, connected agents. Reach for AutoGen or Semantic Kernel only when the scenario genuinely describes autonomous multi-round reasoning among peers — not just "the agent happens to use several tools."
+- Most real support-bot-shaped problems resolve with File search + OpenAPI tool +, at most, one A2A handoff. Reach for Agent Framework only when the scenario genuinely describes multi-round or branching orchestration — not just "the agent happens to use several tools."
+- When migrating a classic agent, inventory its tools against Microsoft's tool-availability table first. Connected Agents and the Deep Research tool, for example, don't carry over, and each needs a planned replacement.
+- If you have Semantic Kernel or AutoGen code, Microsoft publishes migration guides to Agent Framework; plan the move rather than starting new work on the older frameworks.
 - Streaming is close to a free UX win for anything with a human watching live — there's rarely a good reason to skip it for a chat interface, and it costs little beyond wiring the frontend to actually consume the stream.
 
 ## Cheat Sheet 📋
 
 | Concept | Key Rule |
 |---|---|
-| Connected agents | Agent-as-a-tool-for-another-agent, bounded handoff |
-| Semantic Kernel | Plugin-style code integration, DI-friendly |
-| AutoGen | Multi-agent conversational orchestration among peers |
+| A2A tool | Call another agent's A2A endpoint; bounded handoff (A2A v1.0 GA) |
+| Workflows | Declarative multi-agent orchestration: sequential, group chat, human-in-the-loop (preview) |
+| Microsoft Agent Framework | Code-first agents + graph workflows; successor to Semantic Kernel and AutoGen |
+| Connected Agents | Classic only; not in the new Agent Service |
 | Custom RAG steps | Chunk → embed → index (Azure AI Search) |
 | Streaming | UX/delivery decision, not a capability change |

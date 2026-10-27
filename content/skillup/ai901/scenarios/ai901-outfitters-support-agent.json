@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ai901-scenario-002",
+  "title": "Contoso Outfitters Builds Its First Foundry Agent",
+  "description": "An outdoor-gear retailer builds a support agent in Microsoft Foundry that answers from product manuals, reads photos of damaged gear and runs on the website. The team must ground the agent properly, choose its tools, write a working client, and meet transparency and inclusiveness expectations before launch.",
+  "examId": "ai901",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [1, 2],
+  "scenario": {
+    "background": "Contoso Outfitters' prototype support chatbot confidently told a customer that a tent was rated for winter storms, which it is not, and the customer's complaint went viral, so the next version must answer only from the company's own product manuals. Contoso sells camping and climbing gear online and has a Microsoft Foundry resource with a new project for customer support. The team has 60 PDF manuals and warranty guides, a vision-capable chat model deployed as 'support-chat', and six weeks before the summer season. Customers also want to upload photos of damaged gear and ask whether it is covered by the warranty.",
+    "characters": [
+      {
+        "name": "Maya Chen",
+        "role": "Product Owner, Digital Support",
+        "concern": "She wants the agent live before summer and is worried that every extra review step will push the launch back."
+      },
+      {
+        "name": "Sam Okoye",
+        "role": "Developer",
+        "concern": "He has to wire the agent into the website and wants a client pattern that will not break when Foundry's SDK changes."
+      },
+      {
+        "name": "Ines Duarte",
+        "role": "Customer Experience and Accessibility Lead",
+        "concern": "After the viral complaint she wants customers to know they are talking to AI and what it cannot do, and she wants the agent to work for customers who use screen readers or prefer to speak."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ai901-scenario-002-q1",
+      "stem": "Which tool should Sam add to the agent in the Foundry portal so it answers from the 60 manuals and warranty guides?",
+      "options": [
+        "Web search, so the agent can find the manuals on Contoso's public website",
+        "Code interpreter, so the agent can parse the PDFs with Python",
+        "File search, with the manuals uploaded so they are indexed and cited",
+        "Image generation, so the agent can show diagrams from the manuals"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: file search indexes uploaded files into a vector store so the agent can retrieve the relevant passages, ground its answers in them and cite them. A is wrong because web search pulls in public web content, including third-party claims, which is how the prototype went wrong; the manuals are the authority. B is wrong because code interpreter runs code for calculations and data analysis rather than grounding answers in a document collection. D is wrong because image generation creates new images and does nothing for factual answers."
+    },
+    {
+      "id": "ai901-scenario-002-q2",
+      "stem": "Maya asks how to stop the agent from inventing product ratings like the prototype did. Which instruction design is most effective?",
+      "options": [
+        "Answer only from the retrieved manual content, cite the manual, and say you don't know when it isn't covered",
+        "Tell the agent it is a world-class outdoor-gear expert with 20 years of experience",
+        "Add 'always be accurate' to the instructions and raise the temperature for richer answers",
+        "Remove the instructions so the model uses its full general knowledge"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: grounding the agent in retrieved content, requiring citations and giving it an 'out' when the answer is not there are documented techniques that reduce fabricated answers. B is wrong because a persona changes tone, not the facts available, and can make the agent sound even more confident. C is wrong because asking for accuracy does not supply facts, and a higher temperature makes invention more likely. D is wrong because general knowledge is exactly where the false winter-storm rating came from."
+    },
+    {
+      "id": "ai901-scenario-002-q3",
+      "stem": "Customers upload photos of damaged gear from their phones. How should the website's client send a photo to the agent with the customer's question?",
+      "options": [
+        "Put the photo's file name in the system prompt",
+        "Send the photo as an input_audio part so the model processes the raw bytes",
+        "Upload each photo to file search so the agent can index it",
+        "Base64-encode the photo and send it as an input_image part with the question"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: in the Responses API, an image is sent as an input_image content part alongside the input_text question, and images that are not publicly reachable are sent as base64 data. A is wrong because the model cannot open a file named in text. B is wrong because input_audio is for audio. C is wrong because file search indexes documents for retrieval; it does not pass the customer's photo to the model as part of their question."
+    },
+    {
+      "id": "ai901-scenario-002-q4",
+      "stem": "Sam's website code uses AIProjectClient with DefaultAzureCredential and get_openai_client(). Which approach calls the published agent and keeps follow-up questions in context?",
+      "options": [
+        "Create a thread, add a message, and start a run with the agent's assistant ID",
+        "Create a conversation, then call responses.create with an agent reference and the conversation ID",
+        "Call responses.create with model='support-chat' and resend the manuals in every request",
+        "Call images.generate with the agent name and the customer's question"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the Foundry Agent Service is called through the Responses API with an agent reference, and a conversation keeps the history so follow-up questions have context. A is wrong because threads, messages and runs belong to the retired Assistants API. C is wrong because calling the model deployment directly bypasses the agent's instructions and file search tool, and resending 60 manuals would waste tokens and exceed context limits. D is wrong because images.generate is for image models."
+    },
+    {
+      "id": "ai901-scenario-002-q5",
+      "stem": "Ines wants two changes before launch: a clear statement that customers are talking to AI that can make mistakes, with links to the manual sections used, and support for customers who use screen readers or prefer to speak. Which principles do these changes support?",
+      "options": [
+        "The statement supports accountability; the accessibility support supports fairness",
+        "Both changes support reliability and safety",
+        "The statement supports transparency; the accessibility support supports inclusiveness",
+        "The statement supports privacy and security; the accessibility support supports transparency"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: telling users they are dealing with AI, stating its limitations and showing sources is transparency, and making sure people who use screen readers or voice are not excluded is inclusiveness. A is wrong because a disclosure tells users something, while accountability is about people owning and governing the system; accessibility is about being usable by all rather than equal outcomes. B is wrong because neither change alters how the agent behaves when it is wrong. D is wrong because the statement does not protect data, and accessibility is not transparency."
+    }
+  ],
+  "keyLearnings": [
+    "Ground an agent in the organisation's own documents with file search, and tell it to answer only from them and to say when it doesn't know.",
+    "Images travel inside the user message as input_image parts, base64-encoded when they are not publicly reachable.",
+    "Apps call Foundry agents through the Responses API with an agent reference and a conversation, not the retired threads-and-runs pattern.",
+    "Disclosure and citations are transparency; designing for screen-reader and voice users is inclusiveness. Name the principle each measure serves."
+  ]
+}

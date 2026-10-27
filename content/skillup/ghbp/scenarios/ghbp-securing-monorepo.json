@@ -1,18 +1,127 @@
 {
+  "schemaVersion": "2.0",
   "id": "ghbp-securing-monorepo",
   "title": "Securing a Large Monorepo",
-  "officialDescription": "Your organization has migrated 30 microservices into a single GitHub monorepo shared by 5 teams. You need to enforce per-service ownership, prevent unauthorized changes to production-critical paths, detect secrets before they land in main, and gate all merges on passing security checks — without slowing down individual teams.",
-  "primaryDomains": ["Branch Management & Protection", "Repository Security & Governance"],
-  "description": "A fintech company runs payment-service, fraud-service, and compliance-service in one monorepo alongside 27 other microservices. Each service has its own team. The compliance team must approve every change to /services/compliance/. The platform team owns all GitHub Actions workflows. Secret scanning has flagged 3 historical leaks; the CISO wants zero-tolerance push protection enabled. All merges to main must pass a dependency vulnerability scan and a status check named 'security/snyk'. Deleted tags must be recoverable to support audit requirements.",
-  "architecture_notes": "Use GitHub Rulesets at the organization level (not legacy Branch Protection Rules) to apply consistent enforcement across all repositories without per-repo configuration. A single 'monorepo-main' ruleset targets the main branch across all repos matching the pattern 'services-*'. CODEOWNERS uses last-match-wins: place the catch-all (*) at the top and service-specific entries below — the last matching rule wins, so /services/compliance/ @compliance-team at the bottom correctly overrides the global catch-all. Enable GHAS Secret Scanning Push Protection on the org level so pushes containing known secrets are blocked at the client before they reach the server; this is not caught by pull request checks. Add a 'dependency-review' GitHub Actions workflow triggered on pull_request that uses the actions/dependency-review-action to gate on CVSS score > 7. Register 'security/snyk' as a required status check in the Ruleset, not as a branch protection rule, so it scales org-wide. Use Rulesets 'restrict deletions' to protect tags matching 'v*' — this satisfies the audit-trail requirement without using the deprecated Tag Protection Rules API.",
-  "key_patterns": [
-    "Organization-level Rulesets over per-repo Branch Protection Rules",
-    "CODEOWNERS last-match-wins: catch-all (*) at top, specific paths below",
-    "GHAS Secret Scanning Push Protection blocks at push time (not PR time)",
-    "dependency-review-action as required PR gate for CVEs",
-    "Required status check 'security/snyk' registered in Ruleset",
-    "Tag deletion protection via Rulesets 'restrict deletions' on v* pattern",
-    "Required status checks fail open by default if no CI run triggered"
+  "description": "A fintech's 30-service monorepo needs per-service ownership, merge gates that work with path-filtered CI, zero tolerance for newly pushed secrets, an org-enforced dependency gate and immutable release tags, without slowing five teams down. The walkthrough tests how rulesets layer with branch protection, how CODEOWNERS ordering works, why path filters and required checks collide, and where push protection, dependency review and tag rulesets fit.",
+  "examId": "ghbp",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [
+    1,
+    2,
+    3
   ],
-  "questionIds": ["d1-001", "d1-011", "d1-013", "d1-019", "d1-020", "d1-024", "d3-011", "d3-012", "d3-020", "d3-023"]
+  "officialDescription": "Your organization has migrated 30 microservices into a single GitHub monorepo shared by 5 teams. You need to enforce per-service ownership, prevent unauthorized changes to production-critical paths, detect secrets before they land in main, and gate all merges on passing security checks — without slowing down individual teams.",
+  "scenario": {
+    "background": "One repository now holds the code for every payment, fraud and compliance service the company runs, so a single misconfigured rule can let an unreviewed change, a leaked credential or a vulnerable dependency reach production for all of them at once. Larchmont Pay, a fintech on GitHub Enterprise Cloud, consolidated 30 microservices into one monorepo used by five teams; payment-service, fraud-service and compliance-service live under /services/ alongside 27 others, and each service team runs its own path-filtered CI workflow. The payment team set up a classic branch protection rule on main before the consolidation, and the platform team now wants to manage protection with rulesets. The compliance team must approve every change under /services/compliance/, and the platform team owns everything under .github/workflows/. Secret scanning has already raised alerts for three credentials committed in the past, and the CISO wants pushes containing secrets blocked from now on. Every pull request to main must pass a dependency vulnerability check that individual teams can't remove, and release tags matching v* must stay intact for audit.",
+    "characters": [
+      {
+        "name": "Elena Varga",
+        "role": "Chief Information Security Officer",
+        "concern": "She wants no new secret or known-vulnerable dependency to reach main, and she doesn't trust controls that a service team could quietly switch off."
+      },
+      {
+        "name": "Raj Malhotra",
+        "role": "Platform Engineering Lead",
+        "concern": "He has to keep five teams shipping quickly, so he wants each service's CI to run only when that service changes and no gate that blocks unrelated pull requests."
+      },
+      {
+        "name": "Grace Okafor",
+        "role": "Head of Compliance Engineering",
+        "concern": "She needs proof that every compliance-service change was approved by her team and that release tags used as audit evidence can't be deleted or moved."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ghbp-securing-monorepo-q1",
+      "stem": "The payment team's classic branch protection rule on main requires one approval. Raj creates an active repository ruleset on main requiring two approvals plus the required status checks. A payment PR has one approval and green checks. What happens?",
+      "options": [
+        "The PR can merge, because the classic rule was created first and the earliest rule targeting a branch takes priority",
+        "The PR can merge, because classic branch protection always overrides rulesets on any branch where both are configured",
+        "The ruleset is rejected when saved, because a branch can't have a ruleset while a classic protection rule targets it",
+        "The PR is blocked: rules from the ruleset and the classic rule are combined and the most restrictive version applies"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: rulesets have no priority order; GitHub combines the rules from every ruleset and any branch protection rule targeting the same branch, and where the same rule is defined differently the most restrictive version applies, so the PR needs two approvals. A is wrong because neither creation order nor age decides anything; all applicable rules are aggregated. B is wrong because classic protection doesn't override rulesets; the two layer, which is what lets teams add rulesets gradually alongside existing rules. C is wrong because a branch can be targeted by a ruleset and a classic rule at the same time; GitHub doesn't reject the overlap, it combines them."
+    },
+    {
+      "id": "ghbp-securing-monorepo-q2",
+      "stem": "Grace finds a merged compliance-service PR that only the platform team approved. The CODEOWNERS file on main lists /services/compliance/ @larchmont/compliance-team first and * @larchmont/platform-team on the last line, and Require review from Code Owners is enabled. What fixes it?",
+      "options": [
+        "Nothing in the file: the first matching line wins, so give the compliance team read access so its review requests can be sent",
+        "Move the * catch-all line to the top so the later compliance line wins, and merge that change to main before it takes effect",
+        "Repeat the /services/compliance/ line at the bottom of the PR branch's copy of CODEOWNERS so it applies to that one PR",
+        "List compliance-team as reviewers in the PR template, because templates are what GitHub reads to choose required owners"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: in CODEOWNERS the last matching pattern takes precedence, so the trailing * line made the platform team the owner of everything, including /services/compliance/. Putting the catch-all first and specific paths below it restores compliance ownership, and because GitHub uses the CODEOWNERS file on the pull request's base branch, the fix only takes effect once it is on main. A is wrong because matching is last-wins, not first-wins, and code owners need write access to the repository, not read access, to be requested. C is wrong because the copy on the PR's head branch is ignored for review requests; the base branch's file decides, which is also what stops an author from rewriting their own owners. D is wrong because PR templates only pre-fill the description; they have no effect on who is requested or required to review."
+    },
+    {
+      "id": "ghbp-securing-monorepo-q3",
+      "stem": "Raj's payment-ci.yml triggers on pull_request with paths: ['services/payment/**'], and its payment-tests check is required on main. A docs-only PR has been stuck for a day on \"Waiting for status to be reported\". Why, and what is the fix that keeps path-based CI?",
+      "options": [
+        "A path-filter skip leaves the required check pending; trigger on every PR and skip the job with if so it reports success",
+        "A required check with no run fails open after a timeout, so the PR is stuck only because the merge queue hasn't retried it yet",
+        "Strict mode is the cause; turning off Require branches to be up to date lets path-filtered required checks be treated as passed",
+        "Adding paths-ignore: ['docs/**'] to payment-ci.yml makes GitHub mark payment-tests as passed whenever only docs are changed"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: GitHub documents that when a workflow is skipped by path filtering, branch filtering or a commit message, its required checks stay Pending and block merging, whereas a job skipped by an if conditional reports Success. Triggering the workflow on every pull request and deciding inside it (for example with a changed-files step feeding a job-level if) keeps per-service CI while satisfying the required check. B is wrong because required checks never fail open; a check that never reports keeps the PR blocked indefinitely. C is wrong because strict mode only requires the branch to be up to date with the base; it doesn't turn a missing check into a passing one. D is wrong because paths-ignore is just another trigger filter, so the workflow is still skipped and the required check still sits pending."
+    },
+    {
+      "id": "ghbp-securing-monorepo-q4",
+      "stem": "Elena wants zero tolerance for secrets from now on, and three historical leaks are already flagged by secret scanning. Which plan addresses both the existing leaks and future pushes?",
+      "options": [
+        "Turn on push protection, which rescans history and removes the three committed secrets, so no rotation is required afterwards",
+        "Rely on secret scanning alerts in pull requests as the gate, since alerts block merging until each finding is dismissed",
+        "Revoke and rotate the three credentials, enable push protection via a security configuration, and turn on delegated bypass",
+        "Rewrite history with git-filter-repo to delete the three secrets, which fully resolves them, then enable push protection"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: a leaked credential must be treated as compromised, so the three are revoked and rotated first. Push protection (part of GitHub Secret Protection) then blocks supported secrets at push time across command-line pushes, web commits, uploads and API requests; applying it through a security configuration keeps teams from switching it off, and delegated bypass turns self-service bypass into a request that designated reviewers must approve, which matches Elena's zero-tolerance stance. A is wrong because push protection checks new pushes; it doesn't remove anything from history, and rotation is still required. B is wrong because secret scanning alerts are detective, not a merge gate, and by then the secret is already in the repository. D is wrong because rewriting history is clean-up only; the credentials were exposed the moment they were pushed and stay valid until rotated."
+    },
+    {
+      "id": "ghbp-securing-monorepo-q5",
+      "stem": "Elena requires every PR to main to fail on newly introduced high or critical vulnerabilities, and the check must survive a service team editing files under .github/workflows/. Which control meets both conditions?",
+      "options": [
+        "Enable Dependabot alerts and security updates on the monorepo, because an open alert blocks merging the pull request that caused it",
+        "Add CodeQL code scanning with the default setup, because CodeQL compares dependency manifests against the GitHub Advisory Database",
+        "Commit a dependency-review workflow with fail-on-severity: high to the monorepo and leave its check optional so teams can see results",
+        "Use an org ruleset's Require workflows to pass rule pointing at a central dependency-review workflow with fail-on-severity: high"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: the dependency review action fails a pull request that introduces a vulnerable dependency at or above fail-on-severity, and GitHub documents enforcing it across an organization with a branch ruleset's Require workflows to pass before merging rule that points at the workflow file in a central repository, so a team editing its own .github/workflows/ can't remove the gate. A is wrong because Dependabot alerts and security updates report and fix vulnerabilities already in the default branch; they don't block the PR that adds one. B is wrong because code scanning analyses your own source code; dependency manifests are what dependency review checks. C is wrong because a check that isn't required is only advice, and a workflow living in the monorepo can be changed or deleted by anyone who can edit that directory."
+    },
+    {
+      "id": "ghbp-securing-monorepo-q6",
+      "stem": "Grace needs release tags matching v* to stay exactly as published for audit: no deletions and no re-pointing to a different commit, except by one release-admin team in an emergency. How should the platform team implement this?",
+      "options": [
+        "Create classic tag protection rules for v*, the dedicated feature GitHub still keeps for tags alongside branch rulesets",
+        "Create a tag ruleset on v* with Restrict deletions, Restrict updates, Block force pushes and a release-admin bypass",
+        "Create a classic branch protection rule with the pattern v*, which applies to tags and branches sharing that name",
+        "Create a push ruleset restricting the file path v*, so no push can change anything associated with a release tag"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: tag rulesets target tags with fnmatch patterns; Restrict deletions and Restrict updates allow only actors with bypass permission to delete or push to matching tags, Block force pushes stops a tag being forced to another commit, and the bypass list names the one release-admin team. This prevents deletion rather than making deleted tags recoverable, which is the stronger audit control. A is wrong because tag protection rules were sunset in 2024 and replaced by tag rulesets. C is wrong because branch protection rules apply to branches, not tags, so a v* branch pattern leaves release tags unprotected. D is wrong because push rulesets restrict file paths, extensions and sizes in commits; they don't target tag refs at all."
+    }
+  ],
+  "keyLearnings": [
+    "Rulesets and classic branch protection layer instead of overriding each other: every applicable rule is combined and the most restrictive version wins, so rulesets can be introduced gradually.",
+    "CODEOWNERS is last-match-wins and read from the pull request's base branch, and it only becomes a gate when Require review from Code Owners is enabled for owners with write access.",
+    "A required check whose workflow is skipped by a path filter stays pending and blocks merging; in a monorepo, trigger on every PR and skip jobs with if conditions, which report success.",
+    "Push protection stops new secrets but doesn't fix old ones, which need rotation, and centrally owned gates such as dependency review belong in organization rulesets that teams can't edit away."
+  ],
+  "questionIds": [
+    "d1-001",
+    "d1-011",
+    "d1-013",
+    "d1-019",
+    "d1-020",
+    "d1-024",
+    "d3-011",
+    "d3-012",
+    "d3-020",
+    "d3-023"
+  ]
 }

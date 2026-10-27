@@ -8,7 +8,7 @@
   "estimatedMinutes": 13,
   "domains": [5],
   "scenario": {
-    "background": "A platform team migrates an internal service's error-response format to a consistent structured schema, split across payments, notifications, and auth modules. A coordinator decomposes the migration into three parallel subtasks, each dispatched to its own coding-agent session on its own branch, in its own isolated ephemeral environment.",
+    "background": "A platform team migrates an internal service's error-response format to a consistent structured schema, split across payments, notifications, and auth modules. A coordinator decomposes the migration into three parallel subtasks, each dispatched to its own cloud agent session on its own branch, in its own isolated ephemeral environment.",
     "characters": [
       {
         "name": "Wei Zhang",
@@ -52,24 +52,24 @@
       "stem": "The auth session hasn't finished yet when the conflict is discovered. What is the correct response?",
       "options": [
         "Let the auth session finish and lock in its own independent guess before addressing anything",
-        "Pause the auth session before it locks in a third independent guess, have a human resolve the target shape directly, and update the coordinator's subtask template to include that shape explicitly for all three modules",
+        "Ignore the auth session entirely and only fix payments and notifications",
         "Immediately terminate all three sessions and start the entire migration over from scratch",
-        "Ignore the auth session entirely and only fix payments and notifications"
+        "Pause the auth session before it locks in a third independent guess, have a human resolve the target shape directly, and update the coordinator's subtask template to include that shape explicitly for all three modules"
       ],
-      "correct": 1,
-      "explanation": "B is correct because pausing the still-running session prevents a third independently-guessed shape from compounding the same ambiguity, and resolving the target shape with a human decision — then fixing the coordinator's template so the ambiguity doesn't recur — addresses the problem at the layer it actually originated from. A lets a third guess lock in before the ambiguity is even resolved. C is a wasteful overcorrection when only the decomposition instructions need fixing, not the entire migration approach. D leaves the auth module's error-format decision unresolved and eventually facing the same gap."
+      "correct": 3,
+      "explanation": "D is correct because pausing the still-running session prevents a third independently-guessed shape from compounding the same ambiguity, and resolving the target shape with a human decision — then fixing the coordinator's template so the ambiguity doesn't recur — addresses the problem at the layer it actually originated from. A lets a third guess lock in before the ambiguity is even resolved. C is a wasteful overcorrection when only the decomposition instructions need fixing, not the entire migration approach. B leaves the auth module's error-format decision unresolved and eventually facing the same gap."
     },
     {
       "id": "gh600-scenario-011-q4",
       "stem": "Why is rolling back and simply re-running payments and notifications alone, without changing anything else, not a sufficient fix?",
       "options": [
         "Because rollback is never appropriate in a multi-agent system",
-        "Because retried against the same underlying, still-ambiguous coordinator instructions, the same ambiguity would reproduce — the fix has to happen at the decomposition layer before re-running either session makes sense",
         "Because the unrelated refactoring changes bundled into each session's diff should also be discarded, not preserved",
+        "Because retried against the same underlying, still-ambiguous coordinator instructions, the same ambiguity would reproduce — the fix has to happen at the decomposition layer before re-running either session makes sense",
         "Because rollback would erase the audit trail needed to reconstruct what happened"
       ],
-      "correct": 1,
-      "explanation": "B is correct because re-running either session against the same, still-underspecified coordinator instructions would reproduce the exact same kind of independently-reasonable-but-divergent choice — the fix has to happen at the decomposition layer (specifying the target shape) before a re-run can actually resolve the conflict. A is an overgeneralization the scenario doesn't support — rollback is used here, just not in isolation from fixing the actual cause. C is incorrect — the scenario specifically preserves the still-valid, unrelated parts of each session's diff rather than discarding them wholesale. D is unsupported — the audit artifact recording the decision and rollback is explicitly preserved."
+      "correct": 2,
+      "explanation": "C is correct because re-running either session against the same, still-underspecified coordinator instructions would reproduce the exact same kind of independently-reasonable-but-divergent choice — the fix has to happen at the decomposition layer (specifying the target shape) before a re-run can actually resolve the conflict. A is an overgeneralization the scenario doesn't support — rollback is used here, just not in isolation from fixing the actual cause. B is incorrect — the scenario specifically preserves the still-valid, unrelated parts of each session's diff rather than discarding them wholesale. D is unsupported — the audit artifact recording the decision and rollback is explicitly preserved."
     }
   ],
   "keyLearnings": [

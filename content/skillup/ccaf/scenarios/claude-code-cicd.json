@@ -1,19 +1,125 @@
 {
+  "schemaVersion": "2.0",
   "id": "claude-code-cicd",
-  "title": "Claude Code for CI/CD",
-  "officialDescription": "You are integrating Claude Code into your Continuous Integration/Continuous Deployment (CI/CD) pipeline. The system runs automated code reviews, generates test cases, and provides feedback on pull requests. You need to design prompts that provide actionable feedback and minimise false positives.",
-  "primaryDomains": ["Claude Code Configuration & Workflows", "Prompt Engineering & Structured Output"],
-  "description": "Integrate Claude Code into a GitHub Actions CI/CD pipeline. On every PR, Claude must: (1) review code for security vulnerabilities, (2) check that new code has corresponding tests, (3) validate that Terraform changes follow naming conventions. The pipeline is fully automated — no human interaction during CI runs. Results must be structured so the pipeline can parse them and post comments to the PR.",
-  "architecture_notes": "Use Claude Code in headless mode with the -p flag for all CI/CD steps. Each step is a separate claude -p invocation with a specific prompt. Output is captured and parsed by the pipeline. Use scoped rule files (.claude/rules/) with path globs to apply security-specific rules for src/ and terraform-specific rules for infra/. Configure permissions in .claude/settings.json to read-only mode in CI (no writes, no execution) to prevent accidental side effects. Use structured JSON output (tool_use with forced tool_choice) so the pipeline can reliably parse results without regex hacks. Use the Message Batches API for overnight technical debt reports (50% cost savings); keep real-time for blocking pre-merge checks.",
-  "key_patterns": [
-    "headless mode with -p flag",
-    "structured JSON output for pipeline parsing",
-    "read-only permissions in CI environment",
-    "scoped rules for directory-specific checks",
-    "exit code handling (0 = pass, 1 = fail/error)",
-    "tool_choice forced for reliable structured output",
-    "Message Batches API for async overnight jobs (not blocking checks)",
-    "multi-pass review to avoid attention dilution across many files"
+  "title": "Claude Code Reviews Every PR in CI",
+  "description": "A payments company is wiring Claude Code into GitHub Actions so every pull request gets an automated security, test-coverage and Terraform-convention review with no human at the console. The scenario tests headless invocation and machine-parseable output, locking down permissions for unattended runs, scoping rules by directory, the trade-offs of bare mode, splitting large reviews into focused passes, and when the Message Batches API fits a CI workload.",
+  "examId": "ccaf",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    2,
+    3,
+    5
   ],
-  "questionIds": ["d2-003", "d2-009", "d2-010", "d3-003", "d3-010", "d2-017", "d5-016", "d1-018"]
+  "scenario": {
+    "background": "Last quarter a home-grown review bot posted dozens of vague, unparseable comments per pull request, and developers learned to ignore it. Leadership wants a replacement that runs unattended in CI and posts findings the pipeline can parse reliably, without ever changing the repository. Larkspur Payments runs a GitHub monorepo with application code in src/ and Terraform in infra/. On every PR the pipeline must check for security vulnerabilities, check that new code has tests, and check that Terraform resources follow the team's naming convention, then post the results as PR comments. A nightly job should also produce a repository-wide technical-debt report.",
+    "characters": [
+      {
+        "name": "Dana Okafor",
+        "role": "Platform Engineering Lead",
+        "concern": "She owns the pipeline and needs every Claude step to be non-interactive, reproducible and unable to modify the repo, with output her scripts can parse without regex."
+      },
+      {
+        "name": "Rahul Mehta",
+        "role": "Staff Security Engineer",
+        "concern": "He wants the deepest possible security review on every PR and is pushing to give Claude broad shell access so it can run any scanner it decides it needs."
+      },
+      {
+        "name": "Elena Petrova",
+        "role": "Engineering Manager, Developer Experience",
+        "concern": "She is accountable for the API bill and for developer trust, so she wants lower cost and far fewer false-positive comments than the old bot produced."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "claude-code-cicd-q1",
+      "stem": "Dana needs each CI step to run Claude Code without a terminal and hand her script a JSON object that matches a fixed findings schema (file, line, severity, message). Which invocation should she use?",
+      "options": [
+        "`claude -p \"<review prompt>\" --output-format json --json-schema '<findings schema>'`, then read the `structured_output` field after checking it is present",
+        "Start an interactive `claude` session and drive it with an expect-style script that types the prompt and scrapes the terminal output",
+        "`claude -p \"<review prompt>\"` with the default text output, and parse the findings with a regular expression",
+        "`claude -p \"<review prompt>\" --output-format stream-json`, and parse the first assistant message in the stream as the findings"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: `-p` (print) mode runs Claude Code non-interactively, and combining `--output-format json` with `--json-schema` returns the schema-conforming result in the `structured_output` field alongside session metadata. The docs warn that a run that ends without valid structured output omits the field, so the script should check for it before use. B is wrong because scripting an interactive TUI is brittle and unnecessary when headless mode exists for exactly this purpose. C is wrong because the default `text` output is free prose; regex parsing is the fragile approach Dana is trying to escape, and nothing enforces the schema. D is wrong because `stream-json` is newline-delimited events for real-time streaming; the first assistant message is not the final answer (the final `result` message is the last line), and no schema is enforced without `--json-schema`."
+    },
+    {
+      "id": "claude-code-cicd-q2",
+      "stem": "Rahul wants Claude to be able to run the team's Semgrep scan. Dana insists that no CI run can edit files or run arbitrary commands, and that nothing may hang waiting for an approval prompt. Which configuration meets both requirements?",
+      "options": [
+        "`--permission-mode bypassPermissions` so nothing ever prompts, plus a line in CLAUDE.md saying \"never modify files in CI\"",
+        "`--permission-mode acceptEdits` with `--allowedTools \"Bash\"`, so Claude can run any scanner Rahul wants without prompting",
+        "`--permission-mode dontAsk` with `--allowedTools \"Read,Grep,Glob,Bash(semgrep *)\"`, plus `permissions.deny` rules for Edit and Write in the committed project settings",
+        "No permission flags at all; instead, put the read-only requirement at the top of the review prompt so Claude knows not to edit"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: `dontAsk` denies every call that would otherwise prompt, which the docs describe as useful for locked-down CI runs. `--allowedTools` pre-approves only the read tools and the one scanner command prefix. Deny rules are evaluated before allow rules, so an allow added later can't re-enable Edit or Write. A is wrong because `bypassPermissions` removes the guardrails entirely, and the memory docs state that CLAUDE.md is context, not enforced configuration. B is wrong because `acceptEdits` auto-approves file writes, the exact side effect Dana must prevent, and a bare `Bash` allow permits arbitrary commands. D is wrong because a prompt instruction is not an enforcement mechanism, and without explicit approvals a Manual-mode `-p` run simply denies the calls that need approval, so the Semgrep step would never run reliably."
+    },
+    {
+      "id": "claude-code-cicd-q3",
+      "stem": "The security checklist should apply only to files under src/, and the Terraform naming rules only to files under infra/. Elena wants to stop backend reviews from being cluttered with Terraform guidance. Where should the team put these instructions?",
+      "options": [
+        "Two files in `.claude/rules/`, each with YAML frontmatter whose `paths` field lists globs such as `src/**/*.ts` or `infra/**/*.tf`, committed to the repository",
+        "One large root CLAUDE.md that contains both checklists, so every review always sees every rule",
+        "The CI runner's `~/.claude/CLAUDE.md`, installed by a setup step before Claude runs",
+        "A `CLAUDE.local.md` at the repository root, so the rules stay out of developers' normal sessions"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: rule files in `.claude/rules/` can be scoped with a `paths` frontmatter field, and they load into context only when Claude works with matching files. That keeps Terraform guidance out of src/ reviews, saves context, and versions the rules with the code. B is wrong because a single file loads everything on every run; the docs recommend moving instructions that matter for only part of the codebase into path-scoped rules, because longer files reduce adherence. C is wrong because user-level memory applies to every path, so it isn't scoped, and it lives outside version control on an ephemeral runner. D is wrong because `CLAUDE.local.md` is intended for personal preferences and should be gitignored, so it wouldn't exist in the CI checkout, and it isn't path-scoped either."
+    },
+    {
+      "id": "claude-code-cicd-q4",
+      "stem": "For reproducibility, Dana adds `--bare` to every Claude step. The rule files are unchanged, but reviews immediately stop applying the project's CLAUDE.md and rule-file conventions. What explains this, and what is the fix?",
+      "options": [
+        "Path-scoped rules load only in interactive sessions, so the team should remove the `paths` frontmatter",
+        "Bare mode removes the file read tools, so Claude can no longer open the .tf files it is reviewing",
+        "Bare mode skips auto-discovery of CLAUDE.md and other project configuration, so the conventions never load; pass them explicitly, for example with `--append-system-prompt-file`, or drop `--bare` for that step",
+        "Bare mode requires absolute paths in `paths` globs, so the rule files must be rewritten with the runner's checkout path"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: the headless docs say `--bare` skips auto-discovery of hooks, skills, plugins, MCP servers, auto memory and CLAUDE.md, which makes runs identical across machines. The trade-off is that nothing from the repository loads unless you pass it with a flag such as `--append-system-prompt-file`, `--settings` or `--mcp-config`. A is wrong because CLAUDE.md and rules load in `-p` sessions just as they do interactively when bare mode is off. B is wrong because bare mode keeps the Bash, file read and file edit tools. D is wrong because rule globs are project-relative patterns, and the cause is that the files are never discovered, not that the patterns fail to match."
+    },
+    {
+      "id": "claude-code-cicd-q5",
+      "stem": "A 60-file PR produced a review that caught issues in the first few files and said almost nothing about the rest. Elena wants better coverage without more noise. Which design should the team adopt?",
+      "options": [
+        "Keep one pass over the whole diff, but switch to a larger model so it can hold all 60 files at once",
+        "Raise `--max-turns` so the single review has more turns to work through the files",
+        "Ask the same session to re-read its own review and add anything it missed",
+        "Run focused per-file (or per-module) review passes, then a separate integration pass that sees only the changed interfaces and the per-file findings, to catch cross-file issues"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: splitting the work into focused passes means each pass gives its full attention to a small amount of code. A dedicated integration pass then looks for problems that only appear across files, such as a changed function signature with stale callers. A is wrong because fitting the diff in the context window doesn't guarantee even attention across it; the problem is attention diluted across too much material, not capacity. B is wrong because more turns lets one long conversation keep going but doesn't restructure the review, and context keeps accumulating. C is wrong because a session reviewing its own output tends to confirm what it already concluded; an independent pass is more reliable than self-review in the same context."
+    },
+    {
+      "id": "claude-code-cicd-q6",
+      "stem": "To cut spend, Elena proposes sending every review step through the Message Batches API for its 50% discount. Which plan should the architect recommend?",
+      "options": [
+        "Move all steps, including the blocking pre-merge checks, to batches, because most batches finish in under an hour",
+        "Submit the pre-merge checks as batches and poll every few seconds so results arrive quickly enough to gate the merge",
+        "Keep everything synchronous, because the Message Batches API doesn't support tool use or system prompts",
+        "Keep the blocking pre-merge checks synchronous, and send the nightly repository-wide technical-debt report through the Message Batches API"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: batches cost 50% less, and most finish within an hour, but processing can take up to 24 hours before a batch expires. That suits latency-tolerant overnight work but not a check that blocks a merge. A is wrong because 'most batches' is not a latency guarantee, and a PR could sit blocked for hours. B is wrong because polling frequency doesn't change how fast the batch is processed; results become available when processing ends. C is wrong because the batch docs list tool use, system messages and multi-turn conversations among the features you can batch."
+    }
+  ],
+  "keyLearnings": [
+    "Use `claude -p` with `--output-format json` and `--json-schema` for CI: the pipeline reads `structured_output`, which it should check for, instead of regex-parsing prose.",
+    "Enforce CI safety with permission configuration, such as `dontAsk`, a narrow `--allowedTools` list and deny rules, never with CLAUDE.md or prompt text, because memory files are context and not enforcement.",
+    "Path-scoped `.claude/rules/` files with a `paths` frontmatter field keep directory-specific standards versioned and out of unrelated reviews; remember that `--bare` skips CLAUDE.md discovery, so pass instructions explicitly when you use it.",
+    "Match the API to the latency need: blocking checks stay synchronous, overnight reports go to the Message Batches API, and large reviews are split into focused passes plus an integration pass."
+  ],
+  "officialDescription": "You are integrating Claude Code into your Continuous Integration/Continuous Deployment (CI/CD) pipeline. The system runs automated code reviews, generates test cases, and provides feedback on pull requests. You need to design prompts that provide actionable feedback and minimise false positives.",
+  "questionIds": [
+    "d2-003",
+    "d2-009",
+    "d2-010",
+    "d3-003",
+    "d3-010",
+    "d2-017",
+    "d5-016",
+    "d1-018"
+  ]
 }

@@ -6,12 +6,12 @@
     "question": "Which Microsoft AI product is designed for this use case?",
     "options": [
       "Microsoft Copilot (free) — use Bing to search for pipeline information",
-      "Microsoft 365 Copilot — grounded in Microsoft Graph, it can access SharePoint and internal data",
-      "Azure AI Foundry — build a custom RAG solution connected to SharePoint",
-      "Copilot Studio — build a SharePoint Q&A agent"
+      "Copilot Studio — build a SharePoint Q&A agent",
+      "Microsoft Foundry — build a custom RAG solution connected to SharePoint",
+      "Microsoft 365 Copilot — grounded in Microsoft Graph, it can access SharePoint and internal data"
     ],
-    "correct": 1,
-    "explanation": "Microsoft 365 Copilot is purpose-built for this scenario. It connects to your organisation's Microsoft 365 data (SharePoint, Teams, Outlook, OneDrive) through Microsoft Graph and can answer natural language questions about internal data. The free Microsoft Copilot (A) only searches the public web — it cannot access private SharePoint. Azure AI Foundry (C) and Copilot Studio (D) would work but are overkill for a standard business user scenario and require technical setup.",
+    "correct": 3,
+    "explanation": "Microsoft 365 Copilot is purpose-built for this scenario. It connects to your organisation's Microsoft 365 data (SharePoint, Teams, Outlook, OneDrive) through Microsoft Graph and can answer natural language questions about internal data. The free Microsoft Copilot (A) only searches the public web — it cannot access private SharePoint. Microsoft Foundry (C) and Copilot Studio (B) would work but are overkill for a standard business user scenario and require technical setup.",
     "tags": [
       "m365-copilot",
       "microsoft-graph",
@@ -26,13 +26,13 @@
     "scenario": "An executive missed a 90-minute board meeting that was held in Microsoft Teams. She needs a concise summary of decisions made and action items assigned to her.",
     "question": "Which Microsoft 365 Copilot capability should she use?",
     "options": [
-      "Copilot in Word — paste the transcript and ask for a summary",
       "Copilot in Teams — view the AI-generated meeting recap with decisions and action items",
+      "Copilot in Word — paste the transcript and ask for a summary",
       "Copilot in Outlook — search her emails for meeting follow-ups",
       "Microsoft Copilot Chat — upload the meeting recording and ask for a summary"
     ],
-    "correct": 1,
-    "explanation": "Copilot in Teams automatically generates meeting recaps for recorded/transcribed meetings, including a summary, key decisions, and action items attributed to specific people — directly within the Teams interface. Copilot in Word (A) requires manually exporting the transcript. Outlook (C) only sees email, not meeting content. Copilot Chat (D) requires the user to manually upload the recording, which is cumbersome.",
+    "correct": 0,
+    "explanation": "Copilot in Teams automatically generates meeting recaps for recorded/transcribed meetings, including a summary, key decisions, and action items attributed to specific people — directly within the Teams interface. Copilot in Word (B) requires manually exporting the transcript. Outlook (C) only sees email, not meeting content. Copilot Chat (D) requires the user to manually upload the recording, which is cumbersome.",
     "tags": [
       "copilot-teams",
       "meeting-recap",
@@ -47,11 +47,11 @@
     "question": "Which specialised Copilot capability is most appropriate?",
     "options": [
       "Researcher in Copilot — research industry benchmarks for comparison",
-      "Analyst in Copilot — analyse the spreadsheet data and generate visualisations using code",
       "Copilot in PowerPoint — generate a presentation from the data",
+      "Analyst in Copilot — analyse the spreadsheet data and generate visualisations using code",
       "Copilot in Excel — use standard Excel Copilot to analyse the data"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "Analyst in Copilot is specifically designed for complex data analysis — it can run Python code to process large datasets, perform statistical analysis, and generate visualisations. It's significantly more powerful than standard Copilot in Excel for complex analytical tasks. Researcher (A) is for web/document research, not data analysis. Copilot in Excel (D) handles simpler analysis; Analyst handles complex programmatic analysis at scale.",
     "tags": [
       "analyst-copilot",
@@ -67,18 +67,18 @@
     "question": "Which Copilot capability is designed for this task?",
     "options": [
       "Analyst in Copilot — analyse structured data from competitor datasets",
-      "Researcher in Copilot — deep research combining web sources and internal org data",
+      "Copilot in Teams — search Teams messages for competitive intelligence",
       "Copilot in Word — draft a report based on a brief outline",
-      "Copilot in Teams — search Teams messages for competitive intelligence"
+      "Researcher in Copilot — deep research combining web sources and internal org data"
     ],
-    "correct": 1,
-    "explanation": "Researcher in Copilot is designed for deep research tasks — it combines Bing web search with your organisation's internal data (via Microsoft Graph) to produce comprehensive, cited research reports. This is exactly the multi-source research + internal context scenario. Analyst (A) is for data analysis, not research synthesis. Copilot in Word (C) drafts documents but doesn't do research. Teams search (D) only covers Teams messages.",
+    "correct": 3,
+    "explanation": "Researcher in Copilot is designed for deep research tasks — it combines Bing web search with your organisation's internal data (via Microsoft Graph) to produce comprehensive, cited research reports. This is exactly the multi-source research + internal context scenario. Analyst (A) is for data analysis, not research synthesis. Copilot in Word (C) drafts documents but doesn't do research. Teams search (B) only covers Teams messages.",
     "tags": [
       "researcher-copilot",
       "researcher-vs-analyst",
       "deep-research"
     ],
-    "difficulty": "medium"
+    "difficulty": "easy"
   },
   {
     "domain": 2,
@@ -107,13 +107,13 @@
     "scenario": "A financial services company wants to extend Microsoft 365 Copilot to answer questions from their internal compliance knowledge base hosted in a legacy system, without rebuilding the whole AI stack.",
     "question": "What is the most appropriate approach using the M365 extensibility framework?",
     "options": [
-      "Fine-tune GPT-4 on the compliance knowledge base documents",
       "Build a declarative agent in Copilot Studio that uses a connector to the compliance system as its knowledge source",
+      "Fine-tune GPT-4 on the compliance knowledge base documents",
       "Ask employees to copy compliance content into SharePoint so Copilot can find it",
-      "Deploy Azure AI Foundry and build a completely separate AI application"
+      "Deploy Microsoft Foundry and build a completely separate AI application"
     ],
-    "correct": 1,
-    "explanation": "Copilot Studio's declarative agents are designed exactly for this scenario — they extend M365 Copilot with a custom knowledge source (the legacy compliance system via a connector), scoped to specific topics. This is the 'Extend' option in the Build/Buy/Extend framework. Fine-tuning (A) doesn't help with dynamic, query-time knowledge retrieval. Copying to SharePoint (C) is a data management workaround, not a sustainable solution. Building a separate application (D) is overkill when extending Copilot is available.",
+    "correct": 0,
+    "explanation": "Copilot Studio's declarative agents are designed exactly for this scenario — they extend M365 Copilot with a custom knowledge source (the legacy compliance system via a connector), scoped to specific topics. This is the 'Extend' option in the Build/Buy/Extend framework. Fine-tuning (B) doesn't help with dynamic, query-time knowledge retrieval. Copying to SharePoint (C) is a data management workaround, not a sustainable solution. Building a separate application (D) is overkill when extending Copilot is available.",
     "tags": [
       "copilot-studio",
       "extensibility",
@@ -129,12 +129,12 @@
     "question": "Which combination of Foundry Tools is most appropriate?",
     "options": [
       "Microsoft 365 Copilot + Microsoft Graph",
-      "Azure Vision in Foundry Tools (image analysis) + Azure AI Search (catalogue retrieval)",
       "Copilot Studio + SharePoint connector",
+      "Azure Vision in Foundry Tools (image analysis) + Azure AI Search (catalogue retrieval)",
       "Azure AI Search alone (search the catalogue by product name)"
     ],
-    "correct": 1,
-    "explanation": "This requires two capabilities: (1) Understanding what's in the uploaded image (Azure Vision in Foundry Tools — computer vision), and (2) Finding matching/compatible accessories in the catalogue (Azure AI Search — vector/semantic search for retrieval). M365 Copilot (A) doesn't process customer-uploaded images in e-commerce flows. Copilot Studio (C) doesn't handle image analysis. Azure AI Search alone (D) requires text input — it can't analyse an image.",
+    "correct": 2,
+    "explanation": "This requires two capabilities: (1) Understanding what's in the uploaded image (Azure Vision in Foundry Tools — computer vision), and (2) Finding matching/compatible accessories in the catalogue (Azure AI Search — vector/semantic search for retrieval). M365 Copilot (A) doesn't process customer-uploaded images in e-commerce flows. Copilot Studio (B) doesn't handle image analysis. Azure AI Search alone (D) requires text input — it can't analyse an image.",
     "tags": [
       "foundry-tools",
       "azure-vision",
@@ -150,12 +150,12 @@
     "question": "Which model selection approach is most appropriate?",
     "options": [
       "Use GPT-4o — it's the most capable model so it will produce the best answers",
-      "Use a smaller, faster, cost-efficient model (such as Phi) — the task is simple and doesn't require large model reasoning",
+      "Use Azure Vision in Foundry Tools — it can process customer queries as visual inputs",
       "Use fine-tuned GPT-4 on the FAQ dataset to maximise accuracy",
-      "Use Azure Vision in Foundry Tools — it can process customer queries as visual inputs"
+      "Use a smaller, faster, cost-efficient model (such as Phi) — the task is simple and doesn't require large model reasoning"
     ],
-    "correct": 1,
-    "explanation": "For simple FAQ retrieval with strict latency and cost requirements, a small, fast model is the right choice. GPT-4o (A) is optimised for complex reasoning — it's significantly more expensive and slower for simple FAQ tasks. Fine-tuning GPT-4 (C) compounds the cost problem. Azure Vision (D) is for image analysis, not text FAQ. The key exam principle: match model capability to task complexity — don't over-engineer.",
+    "correct": 3,
+    "explanation": "For simple FAQ retrieval with strict latency and cost requirements, a small, fast model is the right choice. GPT-4o (A) is optimised for complex reasoning — it's significantly more expensive and slower for simple FAQ tasks. Fine-tuning GPT-4 (C) compounds the cost problem. Azure Vision (B) is for image analysis, not text FAQ. The key exam principle: match model capability to task complexity — don't over-engineer.",
     "tags": [
       "model-selection",
       "cost-optimisation",
@@ -170,13 +170,13 @@
     "scenario": "A company wants to build a customer-facing helpdesk agent that can: (1) answer questions from a knowledge base, (2) look up order status via an API, and (3) escalate unresolved issues to a human agent in Dynamics 365. No developer coding budget.",
     "question": "Which Microsoft tool is most appropriate?",
     "options": [
-      "Azure AI Foundry — build a custom AI application with all integrations",
       "Microsoft Copilot Studio — low-code agent builder with connectors to external systems and human handoff",
+      "Microsoft Foundry — build a custom AI application with all integrations",
       "Microsoft 365 Copilot — configure it for customer-facing use",
       "Power BI — create dashboards showing common customer questions"
     ],
-    "correct": 1,
-    "explanation": "Copilot Studio is the low-code/no-code platform for building conversational agents with knowledge sources, API connectors (for order status), and human escalation (Dynamics 365 handoff). All three requirements can be met without developer coding. Azure AI Foundry (A) requires developers and is appropriate for more complex custom solutions. M365 Copilot (C) is internal-facing productivity, not customer-facing agent building. Power BI (D) is business intelligence, not agent building.",
+    "correct": 0,
+    "explanation": "Copilot Studio is the low-code/no-code platform for building conversational agents with knowledge sources, API connectors (for order status), and human escalation (Dynamics 365 handoff). All three requirements can be met without developer coding. Microsoft Foundry (B) requires developers and is appropriate for more complex custom solutions. M365 Copilot (C) is internal-facing productivity, not customer-facing agent building. Power BI (D) is business intelligence, not agent building.",
     "tags": [
       "copilot-studio",
       "no-code",
@@ -192,12 +192,12 @@
     "question": "What is the correct approach?",
     "options": [
       "Disable Copilot for all users until SharePoint permissions are audited and corrected",
-      "Review and correct SharePoint permissions BEFORE deploying Copilot — Copilot inherits existing M365 permissions, so over-permissioned data will be accessible via Copilot",
       "Configure Copilot to exclude financial SharePoint sites",
+      "Review and correct SharePoint permissions BEFORE deploying Copilot — Copilot inherits existing M365 permissions, so over-permissioned data will be accessible via Copilot",
       "Deploy Copilot first, then audit permissions reactively as issues arise"
     ],
-    "correct": 1,
-    "explanation": "Since Copilot respects and enforces existing M365 permissions, any SharePoint data that is over-permissioned (shared more broadly than intended) will be accessible via Copilot to those over-permissioned users. The correct pre-deployment step is to audit and fix SharePoint permissions. Disabling Copilot entirely (A) blocks all value. Copilot doesn't have a separate content exclusion per-site configuration (C) — it works through M365 permissions. Reactively fixing (D) means sensitive data exposure has already occurred.",
+    "correct": 2,
+    "explanation": "Since Copilot respects and enforces existing M365 permissions, any SharePoint data that is over-permissioned (shared more broadly than intended) will be accessible via Copilot to those over-permissioned users. The correct pre-deployment step is to audit and fix SharePoint permissions. Disabling Copilot entirely (A) blocks all value. Copilot doesn't have a separate content exclusion per-site configuration (B) — it works through M365 permissions. Reactively fixing (D) means sensitive data exposure has already occurred.",
     "tags": [
       "m365-copilot",
       "permissions",
@@ -213,12 +213,12 @@
     "question": "Which Foundry Tool is purpose-built for this retrieval requirement?",
     "options": [
       "Microsoft Foundry — use its model catalog to run queries",
-      "Azure AI Search — provides vector and semantic search over large document collections",
+      "Copilot Studio — connect to the ticket database via a connector",
       "Azure Vision in Foundry Tools — analyse the visual content of support tickets",
-      "Copilot Studio — connect to the ticket database via a connector"
+      "Azure AI Search — provides vector and semantic search over large document collections"
     ],
-    "correct": 1,
-    "explanation": "Azure AI Search is Microsoft's enterprise search service with vector and semantic search capabilities — it's the purpose-built retrieval layer for RAG architectures. It can index millions of documents and return semantically similar results, not just keyword matches. Microsoft Foundry (A) is the project management hub, not a search tool. Azure Vision (C) handles images, not text retrieval. Copilot Studio (D) can surface individual records via connectors but isn't designed for 10M-document semantic search.",
+    "correct": 3,
+    "explanation": "Azure AI Search is Microsoft's enterprise search service with vector and semantic search capabilities — it's the purpose-built retrieval layer for RAG architectures. It can index millions of documents and return semantically similar results, not just keyword matches. Microsoft Foundry (A) is the project management hub, not a search tool. Azure Vision (C) handles images, not text retrieval. Copilot Studio (B) can surface individual records via connectors but isn't designed for 10M-document semantic search.",
     "tags": [
       "azure-ai-search",
       "rag",
@@ -230,21 +230,20 @@
   {
     "domain": 2,
     "id": "ab731-d2-012",
-    "scenario": "A business leader wants to understand the difference between building a custom AI solution vs simply using Microsoft 365 Copilot out of the box. Their use case is generating weekly status reports from project management data in Microsoft Project.",
+    "scenario": "A business leader wants to understand the difference between building a custom AI solution vs simply using Microsoft 365 Copilot out of the box. Their use case is generating weekly project status reports from the project's Teams channel conversations, meeting recaps, status emails and the tracker workbook stored in SharePoint.",
     "question": "What is the most appropriate recommendation?",
     "options": [
-      "Build a custom AI solution using Azure AI Foundry — for full control over the output format",
-      "Use M365 Copilot with Copilot in Microsoft 365 apps — it can access Microsoft Project data via Microsoft Graph without custom development",
+      "Use Microsoft 365 Copilot as-is — it can reason over the user's Teams chats, meetings, emails and SharePoint files via Microsoft Graph without custom development",
+      "Build a custom AI solution using Microsoft Foundry — for full control over the output format",
       "Fine-tune a custom model on historical status report examples",
       "Hire a developer to build a dedicated reporting tool"
     ],
-    "correct": 1,
-    "explanation": "Microsoft Project is part of the Microsoft 365 ecosystem. M365 Copilot, via Microsoft Graph, can access Project data and generate status summaries without any custom development. This is the 'Buy' option in the Build/Buy/Extend framework — use the product as-is first. Custom development (A, D) is expensive, slower, and unnecessary when the out-of-box product covers the scenario. Fine-tuning (C) doesn't help with data access.",
+    "correct": 0,
+    "explanation": "A is correct: every source in this scenario (Teams conversations, meeting recaps, emails and a SharePoint workbook) is Microsoft 365 content that Microsoft 365 Copilot already reaches through Microsoft Graph, within the user's existing permissions, so it can draft the weekly report with no custom development. This is the 'Buy' option in the Build/Buy/Extend framework: use the product as-is first. B is wrong because a custom Foundry build is slower and costlier, and isn't needed when the out-of-box product already covers the data. C is wrong because fine-tuning changes style, not data access; the model still couldn't see this week's updates. D is wrong for the same reason as B: custom development is unnecessary when Copilot already reaches the data.",
     "tags": [
       "build-buy-extend",
       "m365-copilot",
-      "microsoft-graph",
-      "microsoft-project"
+      "microsoft-graph"
     ],
     "difficulty": "medium"
   },
@@ -255,12 +254,12 @@
     "question": "Which Microsoft 365 Copilot feature is most suitable?",
     "options": [
       "Copilot in Word — each member creates their own Word document and shares it",
-      "Copilot Pages — a persistent, collaborative AI canvas that multiple users can populate and edit together",
       "Copilot in Teams — use the meeting summary feature to capture research discussions",
+      "Copilot Pages — a persistent, collaborative AI canvas that multiple users can populate and edit together",
       "Copilot Chat with the web toggle — each member uses their own chat session"
     ],
-    "correct": 1,
-    "explanation": "Copilot Pages is designed exactly for this scenario: a persistent, shareable AI-populated canvas that multiple team members can contribute to, edit, and extend with additional Copilot-generated content throughout the sprint. Word (A) creates isolated documents that require manual merging. Teams meeting summaries (C) capture spoken discussions, not asynchronous research. Individual Copilot Chat sessions (D) are not shared and produce isolated outputs with no collaboration capability.",
+    "correct": 2,
+    "explanation": "Copilot Pages is designed exactly for this scenario: a persistent, shareable AI-populated canvas that multiple team members can contribute to, edit, and extend with additional Copilot-generated content throughout the sprint. Word (A) creates isolated documents that require manual merging. Teams meeting summaries (B) capture spoken discussions, not asynchronous research. Individual Copilot Chat sessions (D) are not shared and produce isolated outputs with no collaboration capability.",
     "tags": [
       "copilot-pages",
       "collaboration",
@@ -289,12 +288,12 @@
       "copilot-roi",
       "business-process"
     ],
-    "difficulty": "hard"
+    "difficulty": "medium"
   },
   {
     "domain": 2,
     "id": "ab731-d2-015",
-    "scenario": "A company has been running a custom AI solution on Azure AI Foundry for 4 months. Their monthly token consumption has stabilised at 300 million tokens. The head of engineering presents two options to the CFO: (A) continue pay-as-you-go, or (B) move to a provisioned throughput unit (PTU) commitment.",
+    "scenario": "A company has been running a custom AI solution on Microsoft Foundry for 4 months. Their monthly token consumption has stabilised at 300 million tokens. The head of engineering presents two options to the CFO: (A) continue pay-as-you-go, or (B) move to a provisioned throughput unit (PTU) commitment.",
     "question": "What is the primary reason to switch from pay-as-you-go to provisioned throughput (PTU)?",
     "options": [
       "PTU provides access to newer, more capable models not available on pay-as-you-go",
@@ -320,12 +319,12 @@
     "question": "Beyond relying on the fact that Copilot inherits existing permissions, what proactive governance action should the security team take BEFORE the broad rollout?",
     "options": [
       "Nothing further is required — since Copilot only surfaces content a user is already authorised to see, permission inheritance alone is a sufficient control regardless of how the environment has been shared historically",
-      "Use SharePoint Advanced Management to identify and remediate oversharing, restrict content discoverability for sensitive or high-risk sites, and apply sensitivity labels — actively shrinking the pool of content Copilot and Graph-connected agents can retrieve before the broad rollout begins",
+      "Require every employee to individually re-request access to each SharePoint site they currently use, so Copilot has a completely fresh permission baseline to work from",
       "Disable Microsoft Graph connectivity for Copilot entirely so it cannot query any SharePoint content until every one of the organisation's sites has been manually reviewed one by one",
-      "Require every employee to individually re-request access to each SharePoint site they currently use, so Copilot has a completely fresh permission baseline to work from"
+      "Use SharePoint Advanced Management to identify and remediate oversharing, restrict content discoverability for sensitive or high-risk sites, and apply sensitivity labels — actively shrinking the pool of content Copilot and Graph-connected agents can retrieve before the broad rollout begins"
     ],
-    "correct": 1,
-    "explanation": "Permission inheritance is a passive control — it stops Copilot from bypassing security, but it does nothing to fix an environment where access was already granted more broadly than intended. At Copilot scale, content that was technically accessible but practically hard to find (buried in a site nobody actively searched) becomes trivially discoverable through natural-language queries, which is exactly the risk the security team has identified. The proactive step is to actively reduce the exposed surface area before rollout: SharePoint Advanced Management tooling can surface and help remediate overshared sites, content discoverability restrictions can hide sensitive sites from org-wide search and Copilot retrieval even when technically shared, and sensitivity labels add classification and protection that travels with the content. This is an active governance step, distinct from simply trusting that permissions already exist. Option A repeats the passive-inheritance misconception directly — it is true that Copilot respects existing permissions, but 'existing' is precisely the problem when those permissions were never properly governed; inheritance is necessary but not sufficient. Option C solves the problem by eliminating Copilot's core value (Graph-grounded answers over internal data) rather than fixing the underlying oversharing, and a full manual site-by-site review before any rollout is not a scalable or realistic proactive control at 5,000-user scale. Option D is operationally impractical and doesn't address the real issue — the problem isn't that access grants are stale from an authentication standpoint, it's that they were too broad in the first place; re-requesting access to the same overshared sites would simply recreate the same exposure.",
+    "correct": 3,
+    "explanation": "Permission inheritance is a passive control — it stops Copilot from bypassing security, but it does nothing to fix an environment where access was already granted more broadly than intended. At Copilot scale, content that was technically accessible but practically hard to find (buried in a site nobody actively searched) becomes trivially discoverable through natural-language queries, which is exactly the risk the security team has identified. The proactive step is to actively reduce the exposed surface area before rollout: SharePoint Advanced Management tooling can surface and help remediate overshared sites, content discoverability restrictions can hide sensitive sites from org-wide search and Copilot retrieval even when technically shared, and sensitivity labels add classification and protection that travels with the content. This is an active governance step, distinct from simply trusting that permissions already exist. Option A repeats the passive-inheritance misconception directly — it is true that Copilot respects existing permissions, but 'existing' is precisely the problem when those permissions were never properly governed; inheritance is necessary but not sufficient. Option C solves the problem by eliminating Copilot's core value (Graph-grounded answers over internal data) rather than fixing the underlying oversharing, and a full manual site-by-site review before any rollout is not a scalable or realistic proactive control at 5,000-user scale. Option B is operationally impractical and doesn't address the real issue — the problem isn't that access grants are stale from an authentication standpoint, it's that they were too broad in the first place; re-requesting access to the same overshared sites would simply recreate the same exposure.",
     "tags": [
       "microsoft-graph",
       "governance",
@@ -340,13 +339,13 @@
     "scenario": "An HR shared-services team currently handles new-hire onboarding by having each hiring manager individually chat with Copilot in Outlook to draft a welcome email, an IT ticket, and an access request — one interaction at a time. Nothing connects these steps together: the manager must remember to trigger each request separately across payroll, IT provisioning, and facilities, and there is no automatic handoff or status tracking between systems.",
     "question": "The HR director wants to move from ad hoc Copilot chat assistance to a genuinely automated onboarding process. Which approach best achieves this?",
     "options": [
-      "Keep using Copilot in Outlook, but give managers a more detailed prompt template that covers all onboarding steps in a single chat message",
       "Build an agent in Copilot Studio that triggers automatically when a new hire is added to the HR system, and orchestrates the multi-step workflow end-to-end — creating the IT ticket, initiating system access provisioning, and notifying facilities — with status tracked across steps and human approval inserted only where required",
+      "Keep using Copilot in Outlook, but give managers a more detailed prompt template that covers all onboarding steps in a single chat message",
       "Ask each system owner (IT, payroll, facilities) to separately pilot their own individual Copilot chat sessions for their portion of the onboarding process",
       "Use Researcher in Copilot to compile a weekly report of that week's new hires so managers can manually action any outstanding onboarding tasks themselves"
     ],
-    "correct": 1,
-    "explanation": "Genuine business process automation means a defined workflow runs end-to-end across systems in response to a trigger, with the person only needing to intervene at defined checkpoints — not that a human has a slightly better single chat interaction. A Copilot Studio agent triggered by a new-hire event and connected to the HR system, ticketing system, and facilities system can carry out the full multi-step sequence itself, tracking status and routing only the necessary approvals to a human, which is what genuinely automating (rather than just assisting) the process looks like. Option A improves the quality of a single manual chat interaction but still requires the manager to remember to open Copilot and trigger every step themselves each time — it doesn't remove the manual, disconnected nature of the process, it just makes one message more thorough. Option C actually makes the fragmentation worse: three separate, uncoordinated Copilot chat efforts by three different teams still leave no single orchestrated workflow and no automatic handoff between IT, payroll, and facilities — it multiplies isolated assistance rather than creating one connected process. Option D produces a helpful report but is fundamentally a summarisation/reporting capability, not automation — the manager still has to read the report and manually go trigger each onboarding action across each system, which is exactly the bottleneck the HR director wants removed.",
+    "correct": 0,
+    "explanation": "Genuine business process automation means a defined workflow runs end-to-end across systems in response to a trigger, with the person only needing to intervene at defined checkpoints — not that a human has a slightly better single chat interaction. B Copilot Studio agent triggered by a new-hire event and connected to the HR system, ticketing system, and facilities system can carry out the full multi-step sequence itself, tracking status and routing only the necessary approvals to a human, which is what genuinely automating (rather than just assisting) the process looks like. Option A improves the quality of a single manual chat interaction but still requires the manager to remember to open Copilot and trigger every step themselves each time — it doesn't remove the manual, disconnected nature of the process, it just makes one message more thorough. Option C actually makes the fragmentation worse: three separate, uncoordinated Copilot chat efforts by three different teams still leave no single orchestrated workflow and no automatic handoff between IT, payroll, and facilities — it multiplies isolated assistance rather than creating one connected process. Option D produces a helpful report but is fundamentally a summarisation/reporting capability, not automation — the manager still has to read the report and manually go trigger each onboarding action across each system, which is exactly the bottleneck the HR director wants removed.",
     "tags": [
       "process-automation",
       "copilot-studio",
@@ -358,16 +357,16 @@
   {
     "domain": 2,
     "id": "ab731-d2-018",
-    "scenario": "A national-security contractor must deploy a document-analysis model entirely within its own accredited, air-gapped facility — contractual and regulatory terms prohibit sending data to, or running inference through, any externally hosted or vendor-managed API, no matter how the endpoint is licensed. Leadership also does not want to commit to an ongoing per-token licence fee for a workload the team expects to run heavily once live. The AI lead is choosing a model from the Foundry Model Catalog for this document-analysis workload.",
+    "scenario": "A national-security contractor must deploy a document-analysis model entirely within its own accredited, air-gapped facility — contractual and regulatory terms prohibit sending data to, or running inference through, any externally hosted or vendor-managed API, no matter how the endpoint is licensed. Leadership also does not want to commit to an ongoing per-token licence fee for a workload the team expects to run heavily once live. The AI lead is choosing a model from the Foundry Models catalog for this document-analysis workload.",
     "question": "Which model choice best satisfies both the air-gapped deployment constraint and the cost/licensing preference, and what trade-off should the team accept in return?",
     "options": [
-      "GPT-4o, accessed through Azure OpenAI Service — it is the most capable model in the catalog, and its managed hosting means the team never has to worry about infrastructure",
+      "GPT-4o, accessed through Azure OpenAI in Foundry Models — it is the most capable model in the catalog, and its managed hosting means the team never has to worry about infrastructure",
       "Phi-3 mini, accessed via a Foundry Tools managed endpoint — its small footprint keeps inference costs low even at high query volume",
       "An open-source model such as Llama or Mistral, deployed entirely on the organisation's own infrastructure — published weights mean no per-token licence fee and the model can run fully inside the accredited facility, at the cost of the organisation now owning the hosting, scaling, and security work itself",
       "A fine-tuned version of GPT-4o, trained on the contractor's own classified documents to improve domain accuracy — fine-tuning gives the organisation ownership of the resulting model"
     ],
     "correct": 2,
-    "explanation": "Llama and Mistral are open source, which means their weights are published rather than only reachable through a vendor's hosted API — the organisation can download and run them entirely inside its own accredited, air-gapped facility, satisfying the contractual requirement that no inference call ever leave infrastructure the organisation controls, and it pays no per-token licence fee for however heavily the workload runs. The trade-off the notes call out explicitly is that this shifts hosting, scaling, and security work from the vendor onto the organisation itself — there is no managed service to fall back on if the deployment needs to scale or gets attacked. Option A fails immediately on the deployment constraint: GPT-4o is only available through Azure OpenAI Service's managed, cloud-hosted endpoint, which by definition cannot run inside an air-gapped facility, and the per-token fee continues regardless of how capable the model is. Option B makes the same mistake in a cheaper wrapper — Phi-3 mini's small footprint lowers cost, but accessing it 'via a Foundry Tools managed endpoint' still routes inference through a Microsoft-hosted service, which is exactly the dependency the regulatory requirement rules out; being lightweight doesn't make an endpoint self-hostable. Option D misreads what fine-tuning changes: fine-tuning GPT-4o still means running inference against a vendor-hosted model at query time (and, worse, would require sending classified documents into that tuning job in the first place), so it neither moves the workload inside the air-gapped facility nor removes the ongoing per-token cost — 'ownership' of a fine-tuned variant is not the same as owning the deployment infrastructure the requirement actually demands.",
+    "explanation": "Llama and Mistral are open source, which means their weights are published rather than only reachable through a vendor's hosted API — the organisation can download and run them entirely inside its own accredited, air-gapped facility, satisfying the contractual requirement that no inference call ever leave infrastructure the organisation controls, and it pays no per-token licence fee for however heavily the workload runs. The trade-off the notes call out explicitly is that this shifts hosting, scaling, and security work from the vendor onto the organisation itself — there is no managed service to fall back on if the deployment needs to scale or gets attacked. Option A fails immediately on the deployment constraint: GPT-4o is only available through Azure OpenAI in Foundry Models's managed, cloud-hosted endpoint, which by definition cannot run inside an air-gapped facility, and the per-token fee continues regardless of how capable the model is. Option B makes the same mistake in a cheaper wrapper — Phi-3 mini's small footprint lowers cost, but accessing it 'via a Foundry Tools managed endpoint' still routes inference through a Microsoft-hosted service, which is exactly the dependency the regulatory requirement rules out; being lightweight doesn't make an endpoint self-hostable. Option D misreads what fine-tuning changes: fine-tuning GPT-4o still means running inference against a vendor-hosted model at query time (and, worse, would require sending classified documents into that tuning job in the first place), so it neither moves the workload inside the air-gapped facility nor removes the ongoing per-token cost — 'ownership' of a fine-tuned variant is not the same as owning the deployment infrastructure the requirement actually demands.",
     "tags": [
       "model-selection",
       "foundry-models",
@@ -379,16 +378,16 @@
   {
     "domain": 2,
     "id": "ab731-d2-019",
-    "scenario": "A logistics company wants roughly 500 warehouse staff to be able to ask ad hoc natural-language questions against a custom shipment-tracking database that lives entirely outside Microsoft 365 — it isn't stored in SharePoint, Exchange, or Teams, so Microsoft Graph has no visibility into it. Two technically workable delivery options are on the table. Option one: build it as a Copilot Studio agent inside Microsoft 365 Copilot, which would require all 500 staff to hold the paid Microsoft 365 Copilot add-on licence at roughly $30/user/month — about $15,000/month, fixed, regardless of how often any individual actually uses it. Option two: build a standalone Azure AI Foundry-based chat agent embedded in Teams that queries the shipment database directly, billed through Azure pay-as-you-go metered consumption with no per-user licence at all. A four-week trial shows usage is rare and unpredictable — about two queries per person per month at roughly $0.50 per query — projecting close to $500/month if extended to all 500 staff.",
+    "scenario": "A logistics company wants roughly 500 warehouse staff to be able to ask ad hoc natural-language questions against a custom shipment-tracking database that lives entirely outside Microsoft 365. Two technically workable delivery options are on the table. Option one: give all 500 staff the Microsoft 365 Copilot licence at roughly $30/user/month — about $15,000/month, fixed, regardless of how often anyone uses it — and expose the database to Copilot through a connector. Option two: build a standalone Microsoft Foundry-based chat agent, published in Teams, that queries the shipment database directly and is billed through Azure pay-as-you-go consumption, with no per-user licence. A four-week trial shows usage is rare and unpredictable — about two queries per person per month at roughly $0.50 per query — projecting close to $500/month if extended to all 500 staff.",
     "question": "Extending the trial to all 500 staff, which approach minimises total monthly cost for this usage pattern?",
     "options": [
-      "Purchase the Microsoft 365 Copilot add-on licence for all 500 staff, so the shipment-tracking capability sits inside their existing Teams and Outlook experience",
-      "Build the capability as a standalone Azure AI Foundry-based agent billed through pay-as-you-go metered consumption, so cost tracks the small, unpredictable query volume the trial observed",
-      "Reserve a Foundry Tools provisioned throughput (PTU) commitment tier sized for the warehouse's theoretical peak query volume, to lock in a discounted rate",
-      "Rely on Copilot Chat, which is already included with the staff's existing Microsoft 365 subscription at no additional licence cost"
+      "Purchase the Microsoft 365 Copilot licence for all 500 staff, so the shipment-tracking capability sits inside their existing Teams and Outlook experience",
+      "Buy provisioned throughput (PTU) capacity sized for the warehouse's theoretical peak query volume, to lock in a discounted rate",
+      "Build the capability as a standalone Microsoft Foundry-based agent billed through pay-as-you-go consumption, so cost tracks the small, unpredictable query volume the trial observed",
+      "Rely on Copilot Chat alone, which is already included with the staff's existing Microsoft 365 subscription at no additional licence cost"
     ],
-    "correct": 1,
-    "explanation": "At roughly two queries per person per month, the trial's projected pay-as-you-go cost (~$500/month across all 500 staff) is dramatically lower than the ~$15,000/month a fixed per-user Copilot add-on licence would cost regardless of actual usage — for infrequent, unpredictable demand, a metered model tracks the real, low volume instead of paying for standing capacity nobody is using most days. Building the capability as a standalone Foundry-based agent also sidesteps the Graph limitation entirely, since it queries the shipment database directly rather than depending on Microsoft 365's data connectivity. Option A commits to the full per-user fee for all 500 people every month specifically to reach a database Copilot's own Graph grounding cannot see, so the company would be paying a large fixed licence cost for capability the licence doesn't even deliver on its own — Copilot Studio could technically reach the database via a connector, but that still requires the same $15,000/month base of Copilot seats this scenario is trying to avoid. Option C misapplies the commitment-tier logic from §3.8: provisioned throughput earns back its discount only when usage is high and predictable enough to make a capacity reservation worth it; reserving capacity for peak volume on a workload the trial just showed is low and irregular means paying for throughput that sits idle most of the time, the same overpayment problem as option A in a different Foundry product. Option D is tempting because it is genuinely free, but Copilot Chat is grounded in Microsoft Graph and, like the paid add-on, has no visibility into a database that was never part of Microsoft 365 — it doesn't satisfy the requirement at all, regardless of its zero incremental cost.",
+    "correct": 2,
+    "explanation": "C is correct: at about two queries per person per month, the projected pay-as-you-go cost (~$500/month for all 500 staff) is far lower than the ~$15,000/month that a fixed per-user licence costs regardless of use. For infrequent, unpredictable demand, a metered model tracks the real volume instead of paying for standing capacity, and the agent queries the database directly. A is wrong because it pays the full per-user fee for 500 people whose usage the trial showed is rare; the licence's value (Copilot across each user's own Microsoft 365 data and apps) isn't what these staff need. B is wrong because provisioned throughput only pays back when usage is high and predictable; reserving capacity for peak volume on a low, irregular workload means paying for idle throughput. D is wrong because Copilot Chat is primarily web-grounded and has no access to a database outside Microsoft 365. Reaching it would still need an agent, which is the metered cost option C already accounts for.",
     "tags": [
       "licensing",
       "cost-optimisation",
@@ -400,16 +399,16 @@
   {
     "domain": 2,
     "id": "ab731-d2-020",
-    "scenario": "A financial services firm's compliance team uses AI to review complex, multi-document loan agreements for regulatory conflicts before submission to a regulator. An incorrect determination — missing a conflict that should have been flagged — triggers costly manual rework, potential regulatory penalties, and deal delays worth far more than the AI's running cost. Trying to 'optimise AI costs' for this workload, a junior analyst proposes routing every agreement through Phi-3 mini, the cheapest and fastest model in the Foundry Model Catalog, instead of GPT-4o.",
+    "scenario": "A financial services firm's compliance team uses AI to review complex, multi-document loan agreements for regulatory conflicts before submission to a regulator. An incorrect determination — missing a conflict that should have been flagged — triggers costly manual rework, potential regulatory penalties, and deal delays worth far more than the AI's running cost. Trying to 'optimise AI costs' for this workload, a junior analyst proposes routing every agreement through Phi-3 mini, the cheapest and fastest model in the Foundry Models catalog, instead of GPT-4o.",
     "question": "Which model strategy actually optimises total cost for this compliance-review task?",
     "options": [
       "Use Phi-3 mini for every agreement, since it has the lowest per-token cost and optimising AI cost means minimising per-token spend on every task",
-      "Use GPT-4o for this task — its higher accuracy and larger context window on complex, multi-document reasoning reduce the far larger downstream cost of a missed regulatory conflict, even though its per-token price is higher than Phi-3 mini's",
+      "Fine-tune Phi-3 mini on the firm's historical loan agreements so it can match GPT-4o's accuracy on regulatory conflicts while keeping Phi-3 mini's low per-token cost",
       "Route every agreement through Phi-3 mini first, and only escalate to GPT-4o when Phi-3 mini reports low confidence in its own determination",
-      "Fine-tune Phi-3 mini on the firm's historical loan agreements so it can match GPT-4o's accuracy on regulatory conflicts while keeping Phi-3 mini's low per-token cost"
+      "Use GPT-4o for this task — its higher accuracy and larger context window on complex, multi-document reasoning reduce the far larger downstream cost of a missed regulatory conflict, even though its per-token price is higher than Phi-3 mini's"
     ],
-    "correct": 1,
-    "explanation": "Optimising AI cost means minimising total cost, not per-token price — and for a task where a wrong output triggers rework, regulatory penalties, and deal delays worth far more than the model's running cost, the model with high accuracy and a large context window over complex, multi-document reasoning (GPT-4o, per the notes' own match for complex legal document analysis) is the cost-optimal choice even though it costs more per token than Phi-3 mini. Option A applies the 'smaller model = cheaper = better' shortcut the domain explicitly warns against: Phi-3 mini is built for simple, low-latency tasks, and its higher error rate on complex multi-document contract analysis means the per-token savings are dwarfed by the cost of the regulatory conflicts it misses. Option C sounds like a reasonable cost-saving compromise, but it assumes Phi-3 mini can reliably tell when it has missed something — the actual failure mode in complex regulatory analysis is a model confidently producing a wrong determination, not a model that flags its own uncertainty, so a confidence-gated handoff doesn't catch the errors that matter most here. Option D confuses fine-tuning with capability: fine-tuning can teach a small model the firm's specific wording and patterns, but it doesn't give a smaller model architecture the general reasoning depth and context window needed to reliably catch conflicts across long, complex, multi-document agreements — that gap is exactly why the notes reserve GPT-4o for this category of task rather than treating model choice as something fine-tuning can always compensate for.",
+    "correct": 3,
+    "explanation": "Optimising AI cost means minimising total cost, not per-token price — and for a task where a wrong output triggers rework, regulatory penalties, and deal delays worth far more than the model's running cost, the model with high accuracy and a large context window over complex, multi-document reasoning (GPT-4o, per the notes' own match for complex legal document analysis) is the cost-optimal choice even though it costs more per token than Phi-3 mini. Option A applies the 'smaller model = cheaper = better' shortcut the domain explicitly warns against: Phi-3 mini is built for simple, low-latency tasks, and its higher error rate on complex multi-document contract analysis means the per-token savings are dwarfed by the cost of the regulatory conflicts it misses. Option C sounds like a reasonable cost-saving compromise, but it assumes Phi-3 mini can reliably tell when it has missed something — the actual failure mode in complex regulatory analysis is a model confidently producing a wrong determination, not a model that flags its own uncertainty, so a confidence-gated handoff doesn't catch the errors that matter most here. Option B confuses fine-tuning with capability: fine-tuning can teach a small model the firm's specific wording and patterns, but it doesn't give a smaller model architecture the general reasoning depth and context window needed to reliably catch conflicts across long, complex, multi-document agreements — that gap is exactly why the notes reserve GPT-4o for this category of task rather than treating model choice as something fine-tuning can always compensate for.",
     "tags": [
       "model-selection",
       "cost-optimisation",

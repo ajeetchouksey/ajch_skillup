@@ -1,6 +1,6 @@
 # D6: Implement Guardrails and Accountability
 
-> **Exam weight**: 12% · **Questions**: ~14 of 120
+> **Exam weight**: 12% · **Questions**: ~16 of 133
 
 ## Overview
 
@@ -134,6 +134,22 @@ A guardrail system earns trust (and gets followed) only if every gate in it corr
 
 **When you'd choose differently**: for a newly introduced agent role or a newly automated action type with no track record yet, keeping a lightweight approval gate in place even for classified-low-risk actions can be a reasonable transitional measure — the case for removing it strengthens once there's evidence the classification holds in practice, not on day one.
 
+### Key Concept
+
+**Copilot cloud agent ships with structural guardrails already on; your job is to keep them on, not rebuild them.**
+
+GitHub's documented mitigations for Copilot cloud agent are mostly the patterns this domain describes, built into the platform. Only users with write access to the repository can trigger the agent, and comments from users without write access are never passed to it. GitHub also filters hidden characters before passing user input on, so text hidden in an HTML comment in an issue or PR comment never reaches the agent. These are blocks against prompt injection from untrusted contributors.
+
+On the output side, the agent pushes only to its own `copilot/` branch (or the branch of the PR it was asked to work on). It can't mark its draft ready for review, and it can't approve or merge pull requests. The developer who asked Copilot to create a PR can't approve that PR, so a "Required approvals" rule still means a second person reviewed it. Its commits are co-authored by the requesting developer, which keeps accountability with a named person. **Think of it like a dual-control vault**: the person who requested the withdrawal can't also be the one who signs it off.
+
+### In Practice
+
+**What breaks without this**: teams that don't know these controls exist tend to undo them for speed. They turn off workflow-run approval for every repository, or plan on the requesting developer approving the PR and are surprised when GitHub blocks it. Each change removes a separation of duties GitHub put there on purpose.
+
+**Decision trigger**: before adding a custom guardrail, ask "does the platform already enforce this structurally?" If it does, document it and leave it on, and spend your effort on what it doesn't cover, such as classifying which of the agent's changes need explicit authorization.
+
+**When you'd choose differently**: the defaults don't know your compliance classes. A change to a regulated data path may still need a code owner from a specific team, or a standalone authorization step, on top of the built-in second-reviewer rule.
+
 ### Exam Trap ⚠️
 
 <div class="note-trap">
@@ -184,6 +200,7 @@ A guardrail set is CRISP when every gate in it traces back to one of these five 
 | Least-privilege scoping | Grant the smallest execution context (credential, network, tools) a role needs — start from nothing, add with justification |
 | Explicit authorization | A standalone, affirmative decision tied to the specific irreversible/compliance-sensitive consequence — not a bundled PR approval |
 | Trimming approvals | Remove any gate that doesn't correspond to a classified risk — it costs latency and attention with no risk reduction |
+| Cloud agent built-ins | Write-access-only triggers; hidden characters filtered; `copilot/` branch only; can't approve or merge; requester can't approve its own Copilot PR |
 
 ## What to Remember
 

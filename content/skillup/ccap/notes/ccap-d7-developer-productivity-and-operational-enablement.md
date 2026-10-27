@@ -1,6 +1,6 @@
 # D7: Developer Productivity & Operational Enablement
 
-> **Exam weight**: 7% · **Questions**: ~8 of 120
+> **Exam weight**: 7% · **Questions**: ~14 of 139
 
 ## Overview
 
@@ -17,7 +17,7 @@ Developer Productivity & Operational Enablement is the smallest domain on the ex
 Team-level configuration operates at layered scopes, and an architect needs to know which layer a given setting belongs in:
 
 - **`CLAUDE.md` (project memory)** — a file checked into the repository root (and optionally nested in subdirectories for module-specific context) that documents project conventions: coding standards, build/test commands, architecture notes, and things Claude should always or never do in this codebase. Because it's committed to version control, it's reviewed in pull requests the same as code — the team's shared understanding of "how we work here" becomes a living document instead of tribal knowledge held by whoever's been on the team longest.
-- **Settings hierarchy** — Claude Code resolves configuration from multiple `settings.json` locations with a defined precedence: enterprise-managed policy settings (deployed by IT/platform teams, not overridable by individual developers) sit above project-level settings (checked into the repo, shared by the team), which sit above user-level settings (personal preferences on a single machine). An architect designing team enablement decides *which settings belong at which layer* — a security-relevant permission belongs in managed policy, a personal keybinding preference belongs at the user level.
+- **Settings hierarchy** — Claude Code resolves configuration from several sources with a defined precedence, highest first: managed settings (a `managed-settings.json` file, an MDM policy, or server-managed settings from the admin console; nothing a developer sets overrides them), command-line `--settings` for a single session, project-local `.claude/settings.local.json` (personal, kept out of git), shared project `.claude/settings.json` (committed, team-wide), and user `~/.claude/settings.json` (personal, every project). List keys such as `permissions.allow` merge across files instead of overriding. An architect designing team enablement decides *which settings belong at which layer* — a security-relevant permission belongs in managed policy, a personal keybinding preference belongs at the user level.
 - **Permissions configuration** — `allow`, `deny`, and `ask` rules that govern which tools and commands Claude Code can execute without prompting, which it can never execute, and which require explicit human confirmation each time. Team-wide permission defaults (e.g., allow read-only git commands and test runners, deny destructive shell commands like `rm -rf` or force-pushes, ask before any network call) reduce both friction (fewer needless confirmation prompts for safe actions) and risk (no developer accidentally grants blanket trust to a destructive action).
 - **Shared MCP server configuration (`.mcp.json`)** — connections to internal tools (ticketing systems, internal APIs, databases) that the whole team should have consistent access to, checked into the repo rather than configured ad hoc per developer, so onboarding a new engineer means cloning the repo, not manually wiring up five integrations from memory (cross-linking D3's integration patterns and D5's least-privilege scoping — the same permission-scoping discipline used for production agents applies to what a developer's local Claude Code session is allowed to touch).
 
@@ -55,10 +55,10 @@ Common distractor: a scenario framing a well-written `CLAUDE.md` file alone as s
 
 The core mechanisms:
 
-- **Custom slash commands** — team-defined, reusable prompts (stored as markdown files in the repo, e.g., `.claude/commands/review.md`) that codify a specific repeatable workflow — a PR-review checklist, a test-scaffolding routine, a release-notes generator. Because they're checked into the repo, the whole team invokes the same well-tuned workflow instead of everyone reinventing (and inconsistently tuning) their own prompt for the same task.
+- **Skills and custom slash commands** — team-defined, reusable workflows stored in the repo. Custom commands have been merged into skills: `.claude/skills/review/SKILL.md` and the older `.claude/commands/review.md` both create `/review`, and skills add supporting files plus frontmatter such as `disable-model-invocation: true` to keep a workflow human-triggered. Each one codifies a specific repeatable workflow — a PR-review checklist, a test-scaffolding routine, a release-notes generator. Because they're checked into the repo, the whole team invokes the same well-tuned workflow instead of everyone reinventing (and inconsistently tuning) their own prompt for the same task.
 - **Subagents for delegated, specialized work** — a subagent scoped to a narrow task (a code-review subagent with read-only tool access, a test-writing subagent with access only to the test directory) lets a developer delegate a bounded piece of work without the primary session's context getting cluttered by that work's intermediate steps (cross-linking D1's orchestration patterns and D4's context-window discipline — the same reasons a production multi-agent system isolates subtask context apply to a developer's own working session).
 - **Hooks for workflow automation** — deterministic scripts triggered at defined points in a Claude Code session (e.g., a `PostToolUse` hook that runs a linter or formatter automatically after any file edit, a pre-commit hook that blocks a commit if tests fail) enforce standards mechanically rather than relying on Claude — or the developer — to remember to do it every time.
-- **CI/CD integration via headless mode** — Claude Code can run non-interactively in automated pipelines (`claude -p "<prompt>" --output-format json`), enabling automated PR summarization, changelog generation, or first-pass code review as part of a CI job rather than a manual developer step — turning an interactive productivity tool into an automated pipeline stage.
+- **CI/CD integration via non-interactive mode** — Claude Code runs programmatically through the Agent SDK CLI (`claude -p "<prompt>" --output-format json`, or `stream-json`), enabling automated PR summarization, changelog generation, or first-pass code review as part of a CI job rather than a manual developer step. Anthropic recommends adding `--bare` for scripted runs: without it, a `-p` session loads the repository's hooks, `.mcp.json` servers, and `CLAUDE.md` even in an untrusted folder, with no trust dialog.
 
 ### In Practice
 
@@ -71,7 +71,7 @@ The core mechanisms:
 ### Exam Trap ⚠️
 
 <div class="note-trap">
-Common distractor: presenting a hook and a slash command as interchangeable ways to enforce a standard. The correct answer distinguishes them by control: a slash command is a prompt a developer chooses to invoke — it improves consistency only when used, and a developer can simply not run it. A hook is a deterministic script that fires automatically at a defined trigger point regardless of whether anyone remembers to ask for it. If a standard *must* hold every time (e.g., "always run the linter after an edit"), only a hook actually guarantees it — a slash command is a convenience, not an enforcement mechanism.
+Common distractor: presenting a hook and a slash command as interchangeable ways to enforce a standard. The correct answer distinguishes them by control: a slash command is a prompt a developer chooses to invoke — it improves consistency only when used, and a developer can simply not run it. A skill that Claude loads on its own is still the model's choice, not a guarantee. A hook is a deterministic script that fires automatically at a defined trigger point regardless of whether anyone remembers to ask for it. If a standard *must* hold every time (e.g., "always run the linter after an edit"), only a hook actually guarantees it — a slash command is a convenience, not an enforcement mechanism.
 </div>
 
 ## Supporting Debugging and Operational Issue Resolution
@@ -133,7 +133,7 @@ The reason this domain sits last and smallest isn't that it matters least — it
 ### 3. Memory aid
 
 **CAR** — the three load-bearing pillars of this domain, in the order they build on each other:
-- **C**onfigure — `CLAUDE.md`, the settings hierarchy (managed → project → user), permissions, and shared MCP config — the governed foundation every developer inherits
+- **C**onfigure — `CLAUDE.md`, the settings hierarchy (managed → command line → local → project → user), permissions, and shared MCP config — the governed foundation every developer inherits
 - **A**utomate — slash commands, subagents, hooks, and CI/headless integration — turning repeated tasks into shared, versioned team assets instead of reinvented prompts
 - **R**esolve — check permissions, then tool/MCP connectivity, then context saturation, then telemetry, then the transcript — in that order, before assuming the model reasoned badly
 
@@ -149,13 +149,13 @@ The reason this domain sits last and smallest isn't that it matters least — it
 | Concept | Key Rule |
 |---------|----------|
 | `CLAUDE.md` | Project-level (and nested) conventions doc, committed to the repo, reviewed like code — documents behavior, does **not** enforce it |
-| Settings hierarchy | Enterprise managed policy (non-overridable) > project settings (team-shared, committed) > user settings (personal only) |
+| Settings hierarchy | Managed (non-overridable) > command line `--settings` > project local `.claude/settings.local.json` > shared project `.claude/settings.json` > user `~/.claude/settings.json` |
 | Permissions (`allow`/`deny`/`ask`) | The actual enforcement layer — security-relevant boundaries belong here, not only in `CLAUDE.md` |
 | `.mcp.json` | Shared team tool/integration config, checked into the repo, so onboarding doesn't mean manually rewiring integrations |
-| Slash commands | Reusable, developer-invoked prompts for repeatable workflows — consistency only when actually used |
+| Skills / slash commands | Reusable workflows in `.claude/skills/<name>/SKILL.md` (older `.claude/commands/` files still work) — consistency only when actually used |
 | Subagents (dev use) | Delegate bounded, specialized work to keep the primary session's context clean |
 | Hooks | Deterministic scripts fired automatically at defined trigger points — the only mechanism that *guarantees* a standard holds every time |
-| CI/headless integration | `claude -p "<prompt>" --output-format json` in pipelines — automated PR review, summaries, changelogs as a pipeline stage |
+| CI/headless integration | `claude --bare -p "<prompt>" --output-format json` in pipelines — automated PR review, summaries, changelogs; `--bare` stops repo hooks and MCP servers loading |
 | Debugging order | Permissions → tool/MCP connectivity → context saturation → usage/cost telemetry → session transcript — mechanical layers before blaming model reasoning |
 | Telemetry & audit logs | Usage/cost anomalies diagnosed via Console/OpenTelemetry export; audit logs reconstruct governed-environment incidents after the fact |
 

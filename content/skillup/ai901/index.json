@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "1.0.0",
+  "contentUpdatedAt": "2026-10-27",
+  "provider": "Microsoft",
+  "palette": {
+    "color": "#60a5fa",
+    "bg": "rgba(59,130,246,0.10)",
+    "border": "rgba(59,130,246,0.38)",
+    "glow": "rgba(59,130,246,0.18)",
+    "btn": "linear-gradient(135deg, #2563eb, #1d4ed8)"
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-10-27",
+      "type": "major",
+      "summary": "Initial release: AI-901 (replaces AI-900), aligned to the study guide's skills measured as of April 15, 2026. 2 domains, 112 questions (53 D1, 59 D2) mapped to all 29 official objectives, 2 domain notes, 2 RichScenarios, 2 diagrams."
+    }
+  ],
+  "id": "ai901",
+  "examCode": "AI-901",
+  "title": "Microsoft Certified: Azure AI Fundamentals",
+  "shortTitle": "AI-901",
+  "contentLevel": "101",
+  "description": "For people starting a career in AI solution development. Covers responsible AI, how generative AI models work and are deployed, common AI workloads, and building lightweight generative AI, agent, text, speech, vision and information-extraction apps with Microsoft Foundry. Replaces AI-900; aligned to the April 15, 2026 skills outline.",
+  "questions": 112,
+  "duration": "45 min",
+  "passScore": "700/1000",
+  "passThreshold": 70,
+  "examFee": "",
+  "available": true,
+  "contentTypes": ["mcq", "notes", "scenario"],
+  "prerequisites": [],
+  "accentColor": "#0078d4",
+  "colorScheme": "blue",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Identify AI concepts and capabilities",
+      "weight": 42,
+      "color": "bg-blue-600",
+      "notesFile": "content/skillup/ai901/notes/ai901-d1-ai-concepts.md"
+    },
+    {
+      "id": 2,
+      "title": "Implement AI solutions by using Microsoft Foundry",
+      "weight": 58,
+      "color": "bg-cyan-600",
+      "notesFile": "content/skillup/ai901/notes/ai901-d2-microsoft-foundry.md"
+    }
+  ],
+  "questionFiles": [
+    "content/skillup/ai901/questions/ai901-domain1.json",
+    "content/skillup/ai901/questions/ai901-domain2.json"
+  ],
+  "scenarioFiles": [
+    "content/skillup/ai901/scenarios/ai901-clinic-voicemail-extraction.json",
+    "content/skillup/ai901/scenarios/ai901-outfitters-support-agent.json"
+  ],
+  "resources": [
+    {
+      "label": "AI-901 Study Guide",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901"
+    },
+    {
+      "label": "Exam AI-901: Microsoft Azure AI Fundamentals",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-901/"
+    },
+    {
+      "label": "Microsoft Certified: Azure AI Fundamentals",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/"
+    },
+    {
+      "label": "AI-901 Practice Assessment (AI Skills Navigator)",
+      "url": "https://aiskillsnavigator.microsoft.com/credentials/cert-83587e0a0754cfee561ade3e27d9fa1cdaf15ae03be52d2413b2b858d1b4eda4"
+    },
+    {
+      "label": "Learning path: Get started with AI applications and agents on Azure",
+      "url": "https://learn.microsoft.com/en-us/training/paths/get-started-ai-apps-agents/"
+    },
+    {
+      "label": "Course AI-901T00: Introduction to AI in Azure",
+      "url": "https://learn.microsoft.com/en-us/training/courses/ai-901t00"
+    },
+    {
+      "label": "Microsoft Foundry documentation",
+      "url": "https://learn.microsoft.com/en-us/azure/foundry/"
+    },
+    {
+      "label": "Exam sandbox",
+      "url": "https://aka.ms/examdemo"
+    }
+  ],
+  "taskStatementsFile": "content/skillup/ai901/task-statements.json"
+}

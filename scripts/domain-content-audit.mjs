@@ -56,6 +56,13 @@ if (!existsSync(idxPath)) {
 const idx = loadJson(idxPath);
 if (!idx) { console.error('Failed to parse index.json'); process.exit(1); }
 
+// Skill tracks (kind: "skill-track") have modules[], not exam domains[] —
+// the per-domain standard doesn't apply, so report and exit cleanly.
+if (idx.kind === 'skill-track') {
+  console.log(`\n  ${examId} is a skill track (${idx.modules?.length ?? 0} modules) — domain audit applies to exams only. Skipping.\n`);
+  process.exit(0);
+}
+
 console.log(`\n  Domain Content Audit — ${examId.toUpperCase()} (v${idx.contentVersion ?? '?'}) — ${new Date().toISOString().slice(0, 10)}\n`);
 console.log(`  Exam: ${idx.title}`);
 console.log(`  Total declared questions: ${idx.questions} · Domains: ${idx.domains.length}\n`);

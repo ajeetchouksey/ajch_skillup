@@ -6,11 +6,35 @@
 
 ## Overview
 
-This domain covers the practical productivity applications of GitHub Copilot — from accelerating code generation and documentation to improving test coverage, security posture, and code quality.
+This domain covers the practical productivity applications of GitHub Copilot — from accelerating code generation and documentation to improving test coverage, security posture, and code quality. The skills measured (as of August 7, 2026) split into two tasks: **enhance productivity and code quality** (generation, refactoring, documentation, learning, sample data, legacy modernization) and **support testing and security** (unit and integration tests, edge cases and assertions, security and performance improvements).
+
+> 💡 **Human Angle**: *"Measure twice, cut once"* still applies. Copilot makes the cutting faster, so the measuring matters more.
 
 ---
 
 ## 1. Accelerating Code Generation
+
+### Key Concept
+
+**Copilot's biggest generation win is predictable code: boilerplate, scaffolding, and patterns you could write but shouldn't have to.**
+
+Code generation works best when the shape of the answer is well known and your prompt pins down the specifics. A comment that names the framework, the types, the validation rules and the error behaviour gives Copilot everything it needs to draft an endpoint, model or schema in seconds.
+
+The quality of the draft tracks the quality of the specification, not the size of the task. Vague intent produces generic code; precise intent produces code that fits your project. **Think of Copilot as a fast typist taking dictation**: it writes exactly as well as you speak.
+
+### In Practice
+
+**What breaks without this**: Developers accept a generic scaffold that ignores the project's ORM, error format or auth middleware, then spend longer retrofitting it than writing it would have taken.
+
+**Decision trigger**: Ask: is this code mostly structure I have written before, with a few project-specific details? If yes, write a precise comment or Chat prompt and let Copilot draft it.
+
+**When you'd choose differently**: For novel algorithms or security-critical logic, where the hard part is the thinking rather than the typing, design it yourself first and use Copilot for the surrounding plumbing and tests.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Distractors claim Copilot "generates production-ready code" or "removes the need for review" because it produced something that compiles. Generation speed is the benefit; correctness is still your job. Think of it as a first draft from a quick colleague, never a signed-off pull request.
+</div>
 
 ### Boilerplate and Scaffolding
 
@@ -50,6 +74,28 @@ pattern = r'...'  # Copilot generates the correct pattern
 ---
 
 ## 2. Refactoring and Code Modernization
+
+### Key Concept
+
+**Copilot refactors and modernizes code when you state the target pattern and keep each change small enough to verify.**
+
+Refactoring with Copilot means selecting code and describing the transformation: callbacks to async/await, Python 2 to Python 3, class components to hooks, or a long method split into smaller ones. Agent mode in Copilot Chat can carry the same change across several files and run the build or tests as it goes.
+
+The behaviour must stay the same while the structure changes, so the existing test suite is the safety net. A refactor you can't test is a rewrite in disguise. **Treat it like renovating a house with people still living in it**: change one room at a time and check the lights still work.
+
+### In Practice
+
+**What breaks without this**: A "modernized" module silently changes semantics, such as Python 3 integer division or an awaited call that used to run in parallel, and the regression only shows up in production.
+
+**Decision trigger**: Ask: do I have tests that pin the current behaviour? If yes, refactor in small Copilot-assisted steps and run them after each one. If no, have Copilot write characterization tests first.
+
+**When you'd choose differently**: For large migrations across a whole repository, a planned approach (codemods, or an issue handed to Copilot cloud agent so the change arrives as a reviewable pull request) beats ad-hoc inline edits.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Watch for answers that treat modernization as "just syntax". Legacy upgrades change behaviour (division, string encoding, async ordering), so the right answer pairs the Copilot refactor with running or adding tests. Copilot proposes the new shape; your tests prove nothing broke.
+</div>
 
 ### Common Refactoring Use Cases
 
@@ -93,6 +139,28 @@ Common patterns Copilot handles:
 
 ## 3. Documentation Generation
 
+### Key Concept
+
+**Copilot drafts documentation from the code itself, so it documents what the code does, not what you intended.**
+
+Copilot can generate docstrings, inline comments, README sections, API descriptions and changelog entries by reading the selected code and its surrounding context. In VS Code you ask in Chat or inline chat (for example, "add Google-style docstrings to this function"); Visual Studio and Xcode also offer a `/doc` slash command.
+
+Because the draft comes from the implementation, a bug in the code gets described as intended behaviour. Reviewing generated docs is therefore a cheap second code review. **Generated documentation is a mirror, not a spec**: it shows you what is there, flaws included.
+
+### In Practice
+
+**What breaks without this**: Teams skip docs because writing them is tedious, so onboarding depends on tribal knowledge; or they accept generated docs that confidently describe a wrong edge case.
+
+**Decision trigger**: Ask: does this public function, module or API lack a description a new teammate could use? If yes, generate a draft and correct it against the real requirements.
+
+**When you'd choose differently**: Architecture decisions, the "why" behind a design, and guides for non-technical audiences need human authorship. Copilot can polish the prose but can't know the reasoning.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+A tempting distractor says generated documentation "is guaranteed accurate because it is derived from the code". Derived from the code means it inherits the code's mistakes. The correct answer reviews docs against requirements, the same way you would review the code.
+</div>
+
 ### What Copilot Can Generate
 
 - **Docstrings** (Python, Java, C#, TypeScript JSDoc)
@@ -124,11 +192,33 @@ def calculate_mortgage_payment(principal: float, annual_rate: float, years: int)
     """
 ```
 
-**Workflow:** Select the function → `/doc` in Copilot Chat → review → apply.
+**Workflow:** Select the function → ask Copilot Chat or inline chat to "add docstrings" (Visual Studio and Xcode also offer `/doc`) → review against requirements → apply.
 
 ---
 
 ## 4. Accelerating Learning and Reducing Context Switching
+
+### Key Concept
+
+**Copilot keeps learning and lookups inside the editor, which protects focus more than it saves typing.**
+
+Asking Copilot to explain a framework concept, a regex, an unfamiliar function or a shell command gives an answer in context, grounded in the code you have open. `/explain` on a selection, a question to `@terminal`, or a Copilot CLI session in the terminal all avoid a trip to the browser.
+
+The gain is fewer flow breaks: every jump to documentation or a forum costs minutes of re-orientation. Copilot reduces that cost but doesn't remove the need to check authoritative docs for version-specific details. **It is like having a senior colleague at the next desk**: quicker than the library, but you still check the reference before you quote it.
+
+### In Practice
+
+**What breaks without this**: A developer new to a codebase spends their first week bouncing between tabs, and either interrupts teammates constantly or guesses at what legacy code does.
+
+**Decision trigger**: Ask: is my question about code I have open, or a common API pattern? If yes, ask Copilot in the IDE or terminal first. If it depends on a specific library version or a recent release, confirm in the official docs.
+
+**When you'd choose differently**: For library releases newer than the model's training data, or policy questions specific to your organization, primary sources (release notes, internal wikis) are faster and safer than an AI explanation.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+The exam rewards "reduces context switching", not "eliminates" it. Answers saying Copilot makes documentation or teammates unnecessary are distractors: the model has a training cutoff and can be wrong, so authoritative sources stay part of the loop.
+</div>
 
 ### Learning with Copilot
 
@@ -160,6 +250,28 @@ With Copilot: IDE → Ask Copilot → Stay in IDE (flow maintained)
 
 ## 5. Generating Sample and Test Data
 
+### Key Concept
+
+**Copilot generates realistic sample data fast, but only your prompt keeps it fictional and safe.**
+
+Copilot can produce fixtures, factories, JSON payloads and SQL seed scripts from a described structure: field names, types, ranges and counts. Describing the shape precisely (for example, "50 users, UUID ids, role in admin/editor/viewer, emails on example.com") gives data that exercises your code the way real data would.
+
+Copilot does not automatically avoid personal-data patterns, so you must ask for clearly fictional values or use a library such as Faker. Never paste real customer records into a prompt to "make more like these". **Treat sample data like stage money**: real enough for the scene, obviously fake to anyone who checks.
+
+### In Practice
+
+**What breaks without this**: Test databases fill up with realistic-looking SSNs, card numbers or copied customer rows, which turns every developer laptop and CI log into a compliance incident.
+
+**Decision trigger**: Ask: could this data be mistaken for, or derived from, a real person's information? If so, constrain the prompt (reserved domains such as `example.com`, obviously fake names, generator libraries) before you generate.
+
+**When you'd choose differently**: When you need statistically faithful data for performance or ML testing, use approved anonymization or synthetic-data tooling governed by your data team, not ad-hoc prompts.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+The distractor is "Copilot automatically avoids PII in generated data." It doesn't. The responsible answer has the developer instruct fictional values and keep real records out of prompts. The human sets the guardrail; Copilot follows it.
+</div>
+
 ### Mock Data Generation
 
 ```python
@@ -188,6 +300,28 @@ def generate_test_users(count: int = 50) -> list[dict]:
 ---
 
 ## 6. Testing with GitHub Copilot
+
+### Key Concept
+
+**Copilot drafts unit and integration tests in seconds; you decide whether they test the right things.**
+
+Use `/tests` on a selection or file, or describe the cases you want in Chat. Keeping the implementation and an existing test file open gives Copilot your framework and conventions. For integration tests, ask for mocks of external systems and assertions on how components interact, and ask "what tests am I missing?"
+
+Generated tests tend to cover the happy path and obvious failures but miss domain-specific edges such as leap days, half-hour time zones and boundary amounts. A test that asserts the current buggy behaviour also passes. **Copilot writes the exam paper; you still have to judge whether the questions are any good.**
+
+### In Practice
+
+**What breaks without this**: Teams celebrate higher coverage numbers while the tests assert whatever the code currently returns, so real regressions sail through CI.
+
+**Decision trigger**: Ask: for each generated test, what bug would make this fail? If you can't name one, strengthen the assertion or delete the test. Then prompt for edge cases and error paths explicitly.
+
+**When you'd choose differently**: When a whole suite needs creating or fixing across a repository, agent mode can write tests, run them and iterate, and Copilot cloud agent can return the work as a pull request. You still review the assertions before merge.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+"Copilot-generated tests are always correct" and "Copilot guarantees 100% coverage" are classic distractors. Even when agent mode runs the tests and they pass, passing only proves the tests agree with the code, not that the code meets the requirement.
+</div>
 
 ### Unit Test Generation Workflow
 
@@ -233,6 +367,28 @@ Copilot suggests:
 ---
 
 ## 7. Security and Performance Improvements
+
+### Key Concept
+
+**Copilot can spot and fix common security and performance problems when asked, but it is a reviewer's aid, not a scanner.**
+
+Ask Copilot to review a selection for specific risks (SQL injection, hard-coded secrets, missing input validation, weak password hashing) and it will explain the issue and propose a fix such as parameterized queries or environment-based secrets. For performance, share the slow code or query with its context (row counts, timings) and ask for optimizations like indexes, batching or a better algorithm.
+
+These suggestions are probabilistic and depend on what you show Copilot. They complement dedicated tools such as code scanning, secret scanning and profilers rather than replacing them. **Copilot is a sharp-eyed colleague doing a desk check; your security tooling is the building inspector.**
+
+### In Practice
+
+**What breaks without this**: Teams either never ask for a security pass, or trust a single "looks fine" from Chat and skip static analysis, letting an injection flaw reach production.
+
+**Decision trigger**: Ask: does this code handle untrusted input, credentials or a hot path? If yes, ask Copilot for a targeted review, apply the fixes, then confirm with code scanning and a benchmark.
+
+**When you'd choose differently**: For compliance-mandated assurance (penetration tests, certified scanners, regulated audits), Copilot's review is supporting evidence at most; the formal process decides.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Distractors say Copilot "guarantees secure code" or "replaces static analysis". Copilot can also suggest insecure patterns it learned from public code. Choose answers that pair Copilot's suggestion with verification: tests, code scanning and human review.
+</div>
 
 ### Security Improvement Use Cases
 
@@ -283,8 +439,8 @@ Domain 5 questions usually pair a **productivity gain** with a **necessary cauti
 
 Copilot instantly produces the *happy path* (`"2024-01-15T10:30:00Z"` → correct datetime) and a few obvious failures (empty string, malformed input). This is the productivity win: the tedious scaffolding is done in seconds.
 
-But here's the exam's point — **Copilot tends to under-test the tricky edges** because it can't run the code or reason about your domain. A careful engineer *adds* what it missed:
-- Leap-second and leap-day dates (`2024-02-29`)
+But here's the exam's point — **Copilot tends to under-test the tricky edges** because it doesn't know your domain rules. In Ask mode it never runs the code; in agent mode it can run the suite, but a green run only proves the tests agree with the code. A careful engineer *adds* what it missed:
+- Leap-day dates (`2024-02-29`)
 - DST transition timestamps
 - The Year-2038 boundary
 - Timezone offsets like `+05:30` (half-hour zones)
@@ -299,10 +455,20 @@ Copilot will happily generate realistic-looking test data — *including* patter
 
 The hidden cost in software work isn't typing — it's the **flow break** every time you leave the editor for docs or Stack Overflow. Copilot's biggest measured productivity effect comes from *keeping you in the IDE*: "what's the `reduce` signature again?" gets answered inline instead of via a five-minute browser detour. The exam frames this as **reducing** context switching — not *eliminating* it (some lookups still need a browser), so beware absolute-language answers.
 
+### Memory aid: the SPEED loop
+
+Run every productivity task through **SPEED**:
+
+- **S — Specify**: state types, constraints, framework and error behaviour in the prompt.
+- **P — Provide context**: open the related implementation, tests and config files (or reference them in Chat).
+- **E — Examine**: read the output; you own it once you accept it.
+- **E — Exercise**: run the tests, then add the edge cases Copilot missed.
+- **D — Data stays fictional**: no real PII in prompts or generated fixtures.
+
 ### Exam Strategy for Domain 5
 
 - Every productivity claim has a **caution twin**: fast tests → review coverage; instant sample data → enforce fictional PII; quick refactor → still run the suite. Pick answers that hold both.
-- Copilot **cannot execute code** — it can't verify its own output at runtime. Reject any answer implying it runs or proves correctness.
+- Inline suggestions and Ask-mode Chat **don't execute code**. Agent mode and Copilot cloud agent *can* run builds and tests, but a passing run is not proof of correctness. Reject any answer claiming Copilot proves its own output correct.
 - "Reduces" beats "eliminates" for context switching, coverage, and manual effort — absolute claims are usually the distractor.
 
 ---
@@ -312,7 +478,7 @@ The hidden cost in software work isn't typing — it's the **flow break** every 
 | Trap | Correct Answer |
 |------|---------------|
 | "Copilot-generated tests are always accurate" | **FALSE** — review and validate; edge cases may be missed |
-| "Copilot can run the code to verify suggestions" | **FALSE** — Copilot cannot execute code |
+| "Copilot verifies its own suggestions are correct" | **FALSE** — inline suggestions are never executed; agent mode can run tests, but passing tests don't prove the requirement is met |
 | "Sample data generation automatically avoids PII" | **FALSE** — you must instruct Copilot to use fictional values |
 | "Copilot provides 100% code coverage automatically" | **FALSE** — coverage depends on tests written |
 | "Context switching is eliminated entirely" | **FALSE** — reduced significantly, but some lookups still needed |
@@ -325,11 +491,11 @@ The hidden cost in software work isn't typing — it's the **flow break** every 
 |----------|-------------------|
 | Boilerplate generation | Descriptive comment above function → accept inline suggestion |
 | Code explanation | Select code → `/explain` in Chat |
-| Refactoring | Select code → describe transformation in Chat |
-| Documentation | Select function → `/doc` in Chat |
+| Refactoring | Select code → describe transformation in Chat; agent mode for multi-file changes |
+| Documentation | Select function → ask Chat or inline chat for docstrings (`/doc` in Visual Studio and Xcode) |
 | Unit tests | Open implementation + test file → `/tests` in Chat |
 | Edge case discovery | Ask "What edge cases should I test for X?" |
 | Security review | Select code → "Review for OWASP Top 10 vulnerabilities" |
 | Performance optimization | Paste code/query → "Suggest performance improvements" |
-| CLI help | `gh copilot explain "command"` or `gh copilot suggest "task"` |
+| CLI help | Run `copilot` for an interactive terminal session, or `copilot -p "task"` for a one-shot prompt (the old `gh copilot suggest`/`explain` extension was retired on October 25, 2025) |
 | Sample data | Describe structure + explicitly request fictional values |

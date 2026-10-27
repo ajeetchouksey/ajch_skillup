@@ -1,0 +1,1014 @@
+[
+  {
+    "domain": 1,
+    "id": "ai901-d1-001",
+    "scenario": "A bank's loan-approval model approves applicants from one postal-code area at a much lower rate than equally qualified applicants who live elsewhere.",
+    "question": "Which responsible AI principle is most directly at risk?",
+    "options": [
+      "Fairness",
+      "Transparency",
+      "Inclusiveness",
+      "Reliability and safety"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: fairness means an AI system should treat people equally, and a model that gives equally qualified people different outcomes because of where they live is showing bias, often learned from historical data. B is wrong because transparency is about telling users how the system works and what its limits are; disclosing the model would not remove the unequal outcomes. C is wrong because inclusiveness is about making sure nobody is excluded from using the solution (for example through accessibility), not about unequal decisions for people who do use it. D is wrong because reliability and safety concern consistent, safe behaviour under expected and unexpected conditions; the model here behaves consistently, it is just consistently biased.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-002",
+    "scenario": "A university is building a model to shortlist applicants. It plans to train the model on ten years of past admissions decisions made by human reviewers.",
+    "question": "Which action most directly addresses the fairness principle before the model is used?",
+    "options": [
+      "Publish a notice on the application portal that an AI model helps with shortlisting",
+      "Add captions and screen-reader support to the online application form",
+      "Check the training data for historical bias and test outcomes across applicant groups",
+      "Encrypt the applicant dataset at rest and restrict who can read it"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: past human decisions can carry unconscious bias, and a model trained on them learns it. Microsoft's guidance for fairness is to minimise bias in the training data and test the system's outcomes across groups before release. A is wrong because a disclosure supports transparency, but it does not stop a biased model from making biased decisions. B is wrong because accessibility features support inclusiveness for people using the portal, not the fairness of the shortlist. D is wrong because encryption and access control address privacy and security; a perfectly protected dataset can still be biased.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-003",
+    "scenario": "A hiring team removes the gender column from its training data and declares the resulting screening model fair, so no further testing is planned.",
+    "question": "What is the main flaw in this reasoning?",
+    "options": [
+      "Fairness only applies to generative AI models, so a screening classifier needs no fairness review",
+      "Other features, such as career gaps or certain clubs, can act as proxies, so outcomes must still be tested across groups",
+      "Removing columns is a privacy violation, because the deleted data can no longer be audited later",
+      "A fair model must give every candidate the same score, so the model should ignore all personal data"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: deleting a sensitive attribute does not remove bias when other features correlate with it. The only way to know whether the model treats groups fairly is to test its outcomes across those groups. A is wrong because the responsible AI principles apply to every AI system, and screening models are a classic fairness risk. C is wrong because dropping a column is not a privacy violation; if anything it reduces the personal data held. D is wrong because fairness means equal treatment of people with equal qualifications, not identical scores for everyone; a model that ignored all inputs would be useless.",
+    "tags": [
+      "anti-pattern",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-004",
+    "scenario": "An autonomous warehouse robot only moves a pallet when its model's confidence that the path is clear is above a set threshold; otherwise it stops and waits for an operator.",
+    "question": "Which responsible AI principle does this design mainly support?",
+    "options": [
+      "Transparency",
+      "Accountability",
+      "Fairness",
+      "Reliability and safety"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: AI models are probabilistic and not infallible, so reliable and safe systems act only when confidence is high enough and fall back to a safe state otherwise. Microsoft's own example of this principle is a confidence threshold before a machine acts. A is wrong because transparency is about explaining to people how the system works; the threshold controls behaviour rather than explaining it. B is wrong because accountability is about people owning the system through governance; the operator fallback helps, but the threshold itself is a safety control. C is wrong because fairness is about equal treatment of people, which is not what a path-clearance threshold decides.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-005",
+    "scenario": "A pharmacy is building a chat assistant that answers questions about over-the-counter medicines.",
+    "question": "Which measure most directly supports the reliability and safety principle?",
+    "options": [
+      "Test the assistant on expected and unusual questions, and route low-confidence or risky questions to a pharmacist",
+      "Display a banner telling customers that answers are generated by an AI model",
+      "Offer the assistant in several languages so more customers can use it",
+      "Create a review board that signs off on each new version of the assistant"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: reliability and safety means the system behaves as intended under normal and unexpected conditions. That comes from rigorous testing and a safe fallback when the model is unsure or the request is risky. B is wrong because a disclosure supports transparency; users knowing it is AI does not make a wrong dosage answer safe. C is wrong because language coverage supports inclusiveness, not safe behaviour. D is wrong because a sign-off board is an accountability mechanism; it governs releases but does not by itself make the assistant behave safely at runtime.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-006",
+    "question": "Because generative AI models are probabilistic, which statement best describes how a team should manage reliability and safety?",
+    "options": [
+      "Set the temperature to 0, which guarantees factually correct output, so testing can be skipped",
+      "Choose the largest model in the catalog, because larger models cannot produce harmful output",
+      "Test with expected and edge-case inputs, apply content guardrails, and keep monitoring in production",
+      "Evaluate once before release; a deployed model's outputs do not change, so monitoring is optional"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: probabilistic models can be wrong or harmful in ways that only show up with real inputs, so reliability comes from testing (including edge cases), guardrails such as content filters, and ongoing monitoring. A is wrong because a low temperature makes output more focused and repeatable, not more truthful; a model can repeat the same wrong answer every time. B is wrong because model size does not remove the risk of harmful or incorrect output. D is wrong because user inputs keep changing after release, so issues appear in production that pre-release evaluation never saw.",
+    "tags": [
+      "concept",
+      "evaluation",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-007",
+    "scenario": "An airport uses facial recognition at boarding gates and deletes each traveller's face image as soon as identity has been verified.",
+    "question": "Which responsible AI principle does deleting the images support?",
+    "options": [
+      "Inclusiveness",
+      "Privacy and security",
+      "Transparency",
+      "Fairness"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: privacy and security means personal data used by an AI system is protected and kept no longer than needed. Deleting face images after verification is Microsoft's own example of this principle. A is wrong because inclusiveness is about not excluding users, for example travellers who cannot use the camera. C is wrong because transparency would be telling travellers how the system works, not deleting their data. D is wrong because fairness concerns whether the system works equally well for different groups, which deletion does not change.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-008",
+    "scenario": "A contact centre wants to use thousands of recorded call transcripts to build a support assistant. The transcripts contain customer names, phone numbers and card numbers.",
+    "question": "Which step most directly addresses the privacy and security principle?",
+    "options": [
+      "Ask a second model to check each assistant answer for factual errors",
+      "Translate the transcripts into every language the assistant will support",
+      "Add a disclaimer that the assistant's answers are AI-generated",
+      "Detect and redact personal data in the transcripts and restrict who can access them"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: privacy and security is about protecting personal data throughout the AI lifecycle. Redacting personal information before the data is used, and limiting access to it, stops the assistant from learning or exposing customer details. A is wrong because a fact-checking pass supports reliability; it does nothing about card numbers sitting in the data. B is wrong because translation supports inclusiveness and actually spreads the personal data further. C is wrong because a disclaimer supports transparency, not data protection.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-009",
+    "scenario": "After a model is customised with internal HR records, a tester finds that a cleverly worded prompt makes it reveal a named employee's salary.",
+    "question": "Which principle is violated, and which response best fits it?",
+    "options": [
+      "Transparency; publish documentation explaining that the model was trained on HR data",
+      "Fairness; rebalance the training data so every department is equally represented",
+      "Privacy and security; remove or anonymise the sensitive records and add output filtering for personal data",
+      "Accountability; name an owner for the model so complaints have somewhere to go"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a model must not be usable to reveal private personal details, and that is the privacy and security principle. The fix is to keep sensitive records out of the data (or anonymise them) and to filter personal data in outputs. A is wrong because explaining what the model was trained on does not stop it leaking a salary; it may even advertise the weakness. B is wrong because the problem is disclosure of one person's data, not unequal treatment of groups. D is wrong because an owner is useful for governance, but naming one does not stop the leak.",
+    "tags": [
+      "scenario-based",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-010",
+    "scenario": "A voice-based assistant also shows live text captions of everything it says.",
+    "question": "Which responsible AI principle do the captions mainly support?",
+    "options": [
+      "Accountability",
+      "Reliability and safety",
+      "Privacy and security",
+      "Inclusiveness"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: inclusiveness means an AI solution should not exclude anyone, and captions let people who are deaf or hard of hearing use a voice assistant. This is Microsoft's own example of the principle. A is wrong because accountability is about people and organisations owning the AI system through governance. B is wrong because captions do not change whether the assistant behaves safely or consistently. C is wrong because captions do not protect any personal data.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-011",
+    "scenario": "A city plans a voice-only AI kiosk at train stations that answers timetable questions.",
+    "question": "Which change best addresses the inclusiveness principle?",
+    "options": [
+      "Log every conversation so the transport authority can audit answers later",
+      "Show the model's confidence score next to each spoken answer",
+      "Add touch and text input with on-screen answers alongside the voice interface",
+      "Require travellers to sign in before they can ask a question"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a voice-only kiosk excludes people who cannot hear or speak clearly, and offering text input and on-screen answers removes that barrier. Inclusiveness is about designing so that nobody is shut out. A is wrong because audit logs support accountability, not access for more people. B is wrong because showing confidence supports transparency, and a spoken confidence score still excludes users who cannot hear it. D is wrong because a sign-in step adds a barrier, so it works against inclusiveness.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-012",
+    "scenario": "A team tested its speech-recognition app only with native speakers in a quiet office. After launch, people with strong regional accents and older users report far more recognition errors.",
+    "question": "Which statement best describes the issue?",
+    "options": [
+      "It is only a transparency problem; users should be told the app was tested in an office",
+      "It is an inclusiveness problem: the test group left people out, so testing should cover diverse speakers and settings",
+      "It is a privacy problem: recording accented speakers needs separate consent, so they were rightly excluded",
+      "It is not a responsible AI issue; accuracy differences are only a model-quality bug"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: when a system is designed and tested with a narrow group, it fails for the people who were left out. Inclusiveness asks teams to involve diverse users in design and testing so the solution works for everyone; the unequal error rates are also a fairness signal. A is wrong because disclosure does not fix the exclusion; users would still be unable to use the app. C is wrong because consent applies to everyone equally and is not a reason to exclude whole groups from testing. D is wrong because systematic accuracy gaps for groups of people are exactly what the inclusiveness and fairness principles exist to catch.",
+    "tags": [
+      "scenario-based",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-013",
+    "scenario": "A bank tells loan applicants that an AI model is used in assessing their application and explains which factors the model considers.",
+    "question": "Which responsible AI principle does this support?",
+    "options": [
+      "Transparency",
+      "Fairness",
+      "Inclusiveness",
+      "Privacy and security"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: transparency means people should know how an AI system works, what it is used for and what its limits are. Telling applicants that AI is involved and what it considers is Microsoft's own example of this principle. B is wrong because fairness concerns whether the decisions are unbiased; disclosure does not test or fix bias. C is wrong because inclusiveness is about not excluding users from the solution. D is wrong because explaining the factors does not protect the applicants' data.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-014",
+    "scenario": "A retailer is launching a generative AI chat assistant on its website.",
+    "question": "Which set of measures best supports transparency?",
+    "options": [
+      "Apply content filters to block hateful or violent responses",
+      "Store chat logs in an encrypted, access-controlled database",
+      "Tell users they are chatting with AI, state its limitations, and show sources for answers",
+      "Set up a governance board that reviews incidents every month"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: transparency is about users understanding what they are dealing with. Disclosing that it is AI, saying it can make mistakes, and showing where answers come from all help users judge the output. A is wrong because content filters support reliability and safety. B is wrong because encrypted storage supports privacy and security. D is wrong because an incident review board is an accountability mechanism; users would never see it.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-015",
+    "scenario": "A company publishes documentation describing its AI system's intended uses, known limitations and how it was evaluated. Separately, it creates a review board with authority to pause the system if harm is found.",
+    "question": "Which mapping of these two measures to responsible AI principles is correct?",
+    "options": [
+      "Documentation supports accountability; the review board supports transparency",
+      "Both measures support reliability and safety",
+      "Documentation supports fairness; the review board supports privacy and security",
+      "Documentation supports transparency; the review board supports accountability"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: explaining how a system works and where it falls short is transparency, while giving named people the authority and responsibility to act on harm is accountability. A is wrong because it swaps the two; this is the most common mix-up between these principles. B is wrong because neither measure changes how the system behaves at runtime, which is what reliability and safety covers. C is wrong because documentation does not test for bias, and a review board does not protect data.",
+    "tags": [
+      "comparison",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-016",
+    "question": "Which responsible AI principle says that the people and organisations who build and deploy AI solutions are responsible for them and should apply a governance framework?",
+    "options": [
+      "Transparency",
+      "Accountability",
+      "Reliability and safety",
+      "Inclusiveness"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: accountability means humans remain answerable for how an AI system operates, and organisations should define and apply a governance framework for it. A is wrong because transparency is about explaining how the system works, not about who answers for it. C is wrong because reliability and safety concerns how the system behaves, not who is responsible for it. D is wrong because inclusiveness is about designing for all users.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-017",
+    "scenario": "After a customer-service bot gives a customer harmful advice, the product team responds that 'the model generated it, so it isn't our decision'.",
+    "question": "Which principle does this response ignore, and what does that principle require?",
+    "options": [
+      "Accountability; the organisation remains responsible and needs owners, oversight and an escalation process",
+      "Transparency; the team must publish the model's training data in full",
+      "Fairness; the team must retrain the model on a demographically balanced dataset",
+      "Inclusiveness; the bot must be made available in more languages"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: accountability means responsibility stays with the people and organisation that deploy the AI, never with the model. That calls for named owners, human oversight and a way to escalate and fix problems. B is wrong because publishing training data is not required by transparency and would not assign responsibility. C is wrong because nothing in the scenario points to biased treatment of groups. D is wrong because language coverage does not address who is answerable for harmful advice.",
+    "tags": [
+      "anti-pattern",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-018",
+    "scenario": "A startup plans to rely entirely on its model provider's built-in content filters as its responsible AI process.",
+    "question": "Which critique of this plan is most accurate?",
+    "options": [
+      "The plan is sufficient, because the model provider is accountable for every output its models produce",
+      "Content filters satisfy all six principles, including fairness and inclusiveness",
+      "Accountability only applies to fine-tuned models, so a prebuilt model needs no governance",
+      "Accountability cannot be outsourced; the startup must govern and monitor its own use case"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the organisation deploying the solution is accountable for how it is used. Provider safeguards help, but they cannot know the startup's users, data or use-case risks, so the startup still needs its own governance, review and monitoring. A is wrong because responsibility for a deployed solution stays with the deployer. B is wrong because content filters address harmful content (reliability and safety); they do not test fairness or make a solution accessible. C is wrong because the principles apply to every AI solution, whether the model is prebuilt or customised.",
+    "tags": [
+      "anti-pattern",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-019",
+    "question": "In a generative AI language model, what is a token?",
+    "options": [
+      "An API key used to authenticate calls to the model endpoint",
+      "A small unit of text, such as a word, part of a word or punctuation",
+      "A complete sentence stored as a single vector",
+      "A saved conversation that the model can reload later"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: models break text into tokens, which can be whole words, sub-words or punctuation, and each token gets a numeric ID. A token is the smallest unit of text the model processes, which is why usage and limits are measured in tokens. A is wrong because an access token or key is an authentication concept, not a unit of model input. C is wrong because an embedding is a vector for a token or text, but a token itself is not a sentence. D is wrong because conversation state is managed by the application or service, not stored as a token.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-020",
+    "question": "How does a large language model produce a response to a prompt?",
+    "options": [
+      "It looks up the closest stored answer in a database of past responses",
+      "It fills in a fixed response template chosen by keyword matching",
+      "It predicts the next most likely token, adds it, and repeats until it predicts the end",
+      "It converts the prompt into a database query and returns the query results"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an LLM is trained to generate completions. At each step it predicts the most probable next token given everything so far, appends it, and repeats until it predicts that the sequence has ended. A is wrong because the model generates new text rather than retrieving stored answers; that is why it can be fluent yet wrong. B is wrong because template-and-keyword matching describes older rule-based bots, not generative models. D is wrong because a language model does not query a database unless an application or tool does that for it.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-021",
+    "scenario": "In a language model's embedding space, the words 'dog', 'puppy' and 'skateboard' are each represented as vectors.",
+    "question": "Which statement about these embeddings is correct?",
+    "options": [
+      "'Dog' and 'puppy' point in similar directions, while 'skateboard' points elsewhere",
+      "'Dog' and 'puppy' have identical vectors because they mean the same thing",
+      "'Dog' and 'skateboard' are closest, because both words are common nouns",
+      "Embeddings store dictionary definitions, so their direction carries no meaning"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: embeddings are vectors that capture semantic meaning, so words used in similar contexts point in similar directions. Similarity is commonly measured with cosine similarity. B is wrong because related words are close, not identical; 'dog' and 'puppy' still differ in meaning. C is wrong because grammatical category does not make words semantically close. D is wrong because embeddings are numeric vectors, and their direction is exactly what encodes meaning.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-022",
+    "scenario": "In the sentences 'She sat on the river bank' and 'She opened a bank account', a transformer model gives the word 'bank' a different representation.",
+    "question": "Which part of the transformer architecture makes this possible?",
+    "options": [
+      "Positional encoding, which records where each token appears in the sequence",
+      "Attention, which weighs how strongly each token relates to the other tokens in its context",
+      "Tokenization, which assigns 'bank' a different ID in each sentence",
+      "Masked attention, which hides the word 'bank' from the model during prediction"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: attention lets the model consider the surrounding tokens ('river' versus 'account') when building each token's representation, so the same word gets a context-specific meaning. A is wrong because positional encoding only tells the model the order of tokens; it does not use the meaning of neighbouring words. C is wrong because tokenization gives the same text the same token ID every time; context is applied later. D is wrong because masked attention stops the model looking at later tokens during training; it does not hide the word being represented.",
+    "tags": [
+      "concept",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-023",
+    "scenario": "A developer is building a mobile app that must run a language model on the phone, with limited memory and compute and no cloud connection.",
+    "question": "Which kind of model is the best fit?",
+    "options": [
+      "The largest available large language model, for the best possible answers",
+      "A text-embedding model, because embeddings are cheaper than text generation",
+      "An image-generation model with a text prompt as input",
+      "A small language model (SLM), such as a model from the Phi family"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: small language models trade some capability for a much smaller size, which makes them practical on constrained devices. Microsoft's guidance gives a lightweight phone app as the example where an SLM runs best. A is wrong because a very large model needs far more memory and compute than a phone provides. B is wrong because an embedding model turns text into vectors; it cannot generate replies. C is wrong because an image-generation model produces images, not text answers.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-024",
+    "scenario": "A team wants to store its documents as vectors so that a search can find passages with similar meaning, even when the wording differs.",
+    "question": "Which type of model should it deploy for this step?",
+    "options": [
+      "A chat model such as gpt-4.1-mini",
+      "A text-to-speech model",
+      "An embeddings model such as text-embedding-3-small",
+      "An image-generation model"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: embeddings models turn text into vectors that capture meaning, which is what semantic (vector) search compares. A is wrong because a chat model generates text; it is used after retrieval to write an answer, not to create the vectors. B is wrong because a text-to-speech model produces audio. D is wrong because an image-generation model produces images.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-025",
+    "scenario": "An insurer wants an assistant that can take a photo of vehicle damage together with a typed question, and reply in text.",
+    "question": "Which model capability is required?",
+    "options": [
+      "A multimodal model that accepts image and text input",
+      "A text-only small language model",
+      "An embeddings model",
+      "A speech-to-text model"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a multimodal model can work with more than one type of data, here an image and text in the same prompt. Examples in the Foundry catalog include vision-enabled GPT models and Phi-4-multimodal-instruct. B is wrong because a text-only model cannot see the photo. C is wrong because an embeddings model produces vectors, not answers. D is wrong because speech-to-text converts audio to text and does not interpret images.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-026",
+    "scenario": "A compliance app must detect the language of each message and redact personal data. The results feed an automated workflow that needs the same structured output, including a language code and confidence score, every time.",
+    "question": "Which option is the best fit?",
+    "options": [
+      "Prompt a general-purpose chat model to return the language and a redacted copy",
+      "Use Azure Language in Foundry Tools for language detection and PII detection",
+      "Use an image-generation model to render a redacted version of each message",
+      "Use a text-embedding model and compare vectors to known languages"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Azure Language is a purpose-built tool that returns structured, deterministic results such as a language code, confidence score and redacted text. For a well-defined task that feeds automation, Microsoft recommends a Foundry tool over a general-purpose model. A is wrong because a chat model generates text probabilistically, so its format and values can vary between calls, which is risky for automation. C is wrong because image generation has nothing to do with text analysis. D is wrong because embeddings alone do not give a language code with a confidence score or produce redacted text.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-027",
+    "scenario": "A developer must choose between several chat models in the Foundry model catalog for a customer-support app.",
+    "question": "Which approach best supports the choice?",
+    "options": [
+      "Pick the model with the most parameters, because it will always perform best",
+      "Pick the cheapest model per token, because price is the only real difference",
+      "Deploy every candidate to production and see which one customers complain about least",
+      "Compare models on the leaderboards, then try the shortlist with the app's own prompts"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Foundry model leaderboards compare models on quality, safety and throughput, and you can then test the shortlist with your own data, because benchmark scores do not always match a specific use case. A is wrong because size does not guarantee the best fit, and larger models usually cost more and respond more slowly. B is wrong because the cheapest model can cost more overall if its answers are poor. C is wrong because experimenting on real customers exposes them to poor answers; evaluation should happen before release.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-028",
+    "scenario": "A developer wants a model's answers to be more focused and repeatable for a factual FAQ assistant.",
+    "question": "How should the temperature parameter be changed?",
+    "options": [
+      "Raise it, which makes output more random",
+      "Lower it, which makes output more focused and deterministic",
+      "Set it to the model's context length",
+      "Leave it unchanged and raise max tokens instead"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: temperature controls randomness. Lower values make the model pick the most likely tokens, so answers are more focused and repeatable; higher values make output more varied and creative. A is wrong because a higher temperature increases randomness. C is wrong because temperature is a small number (0 to 2 in Azure OpenAI), not a token count. D is wrong because max tokens limits response length; it does not affect how random the output is.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-029",
+    "scenario": "A new app has no data-residency requirement. The team wants pay-per-token billing, the widest choice of new models and the lowest price.",
+    "question": "Which deployment type should it choose?",
+    "options": [
+      "Global Standard",
+      "Regional Provisioned",
+      "Developer",
+      "Global Batch"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Global Standard routes requests to any Azure region with capacity, bills per token, gets new models first and is Microsoft's recommended starting point for most workloads. B is wrong because provisioned deployments reserve capacity in throughput units, which is a commitment rather than pay-per-token. C is wrong because the Developer type is for evaluating fine-tuned models; deployments are short-lived and have no SLA. D is wrong because Global Batch is for large asynchronous jobs with a 24-hour target, not interactive apps.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-030",
+    "scenario": "A European company requires that its prompts and responses are processed only within the EU. It wants pay-per-token billing.",
+    "question": "Which deployment type meets the requirement?",
+    "options": [
+      "Global Standard",
+      "Global Batch",
+      "Data Zone Standard",
+      "Developer"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Data Zone deployments process data only within a defined zone (such as the EU or US), and Data Zone Standard bills per token. A is wrong because Global Standard may process data in any Azure region worldwide. B is wrong because Global Batch also processes data globally and is meant for asynchronous jobs. D is wrong because the Developer type is for evaluating fine-tuned models and gives no data-residency guarantee.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-031",
+    "scenario": "Each night a team must classify two million product descriptions. Results are needed by the next day, and cost matters more than speed.",
+    "question": "Which deployment type is the best fit?",
+    "options": [
+      "Regional Provisioned",
+      "Global Batch",
+      "Standard",
+      "Developer"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Batch deployments process large asynchronous jobs at a discount (50% compared with Global Standard) with a 24-hour target turnaround, which fits an overnight job. A is wrong because reserving provisioned capacity for a once-a-day job is expensive. C is wrong because Standard bills at the normal per-token price and would also mean sending two million real-time requests. D is wrong because the Developer type is only for evaluating fine-tuned models.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-032",
+    "scenario": "A high-volume, customer-facing app needs predictable latency, and the team can forecast its traffic accurately.",
+    "question": "Which deployment option best fits, and why?",
+    "options": [
+      "Global Standard, because pay-per-token deployments guarantee a fixed response time",
+      "Global Batch, because batch jobs are processed with the highest priority",
+      "Developer, because it gives dedicated capacity for production apps",
+      "A provisioned deployment, because reserved throughput units give lower latency variance"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: provisioned deployments reserve model processing capacity (provisioned throughput units), which gives more predictable latency for steady, forecastable workloads. A is wrong because Standard deployments are best-effort; they are cheap and flexible but latency can vary with demand. B is wrong because batch jobs have no real-time SLA and target completion within 24 hours. C is wrong because Developer deployments are short-lived, have no SLA and are meant for evaluating fine-tuned models.",
+    "tags": [
+      "comparison",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-033",
+    "scenario": "A summarisation app often returns summaries that stop mid-sentence. The API response shows a finish reason of 'length'.",
+    "question": "Which change is most likely to fix this?",
+    "options": [
+      "Increase the maximum output tokens for the request",
+      "Increase the temperature",
+      "Lower top_p to 0.1",
+      "Add a stop sequence at the end of the prompt"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a finish reason of 'length' means the model hit the token limit set for the response. Raising the maximum output tokens (within the model's context length) lets it finish. B is wrong because temperature changes randomness, not response length. C is wrong because top_p narrows which tokens can be chosen; it does not extend the response. D is wrong because a stop sequence makes the model stop earlier, the opposite of what is needed.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-034",
+    "scenario": "A developer sets temperature to 1.5 and top_p to 0.1 at the same time and finds the model's behaviour hard to predict and tune.",
+    "question": "What does Microsoft's guidance recommend?",
+    "options": [
+      "Set both parameters to their maximum so their effects cancel out",
+      "Adjust either temperature or top_p, but not both",
+      "Replace both with presence_penalty, which controls randomness more precisely",
+      "Keep both, but raise max tokens so the model has more room"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: temperature and top_p both control how the next token is sampled, and the Azure OpenAI reference recommends changing one or the other, not both, so the effect of each change is clear. A is wrong because the effects do not cancel out; maximum values make output very random. C is wrong because presence_penalty encourages new topics; it does not replace sampling controls. D is wrong because max tokens limits length and has no effect on sampling.",
+    "tags": [
+      "best-practice",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-035",
+    "scenario": "A product-description generator keeps repeating the same phrase verbatim several times in one response.",
+    "question": "Which parameter is designed to reduce this?",
+    "options": [
+      "presence_penalty",
+      "stop",
+      "frequency_penalty",
+      "top_p"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: frequency_penalty penalises tokens in proportion to how often they have already appeared, which lowers the chance of the model repeating the same line verbatim. A is wrong because presence_penalty penalises any token that has appeared at all, to push the model towards new topics; it is close, but it targets topic variety rather than repeated wording. B is wrong because stop sequences only end generation when a given string appears. D is wrong because top_p limits the candidate tokens by probability mass and does not track repetition.",
+    "tags": [
+      "comparison",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-036",
+    "scenario": "A marketing team wants to turn a list of bullet points into a polished draft email.",
+    "question": "Which AI workload does this describe?",
+    "options": [
+      "Computer vision",
+      "Information extraction",
+      "Speech recognition",
+      "Generative AI"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: generative AI creates new content, such as text, from a prompt. Drafting an email from bullet points is a typical generative AI task. A is wrong because computer vision interprets images and video. B is wrong because information extraction pulls existing data out of content rather than writing new content. C is wrong because speech recognition converts spoken audio to text.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-037",
+    "scenario": "A retailer wants an AI solution that reads a customer's request, looks up the order in the order system, decides whether a return is allowed and, if so, starts the return.",
+    "question": "Which AI workload best describes this solution?",
+    "options": [
+      "Agentic AI",
+      "Text analysis",
+      "Computer vision",
+      "Speech synthesis"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: an agent combines a model, instructions and tools so it can reason about a request and take actions, here looking up an order and starting a return. That is agentic AI. B is wrong because text analysis returns insights such as sentiment or entities; it does not take actions in other systems. C is wrong because there is no image or video input. D is wrong because speech synthesis converts text to audio.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-038",
+    "scenario": "A city wants to count how many cars are in each frame of its car-park camera feeds.",
+    "question": "Which AI workload is required?",
+    "options": [
+      "Text analysis",
+      "Computer vision",
+      "Information extraction from documents",
+      "Speech recognition"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: computer vision lets software interpret images and video, and counting cars means detecting each car in the frame (object detection). A is wrong because there is no text to analyse. C is wrong because document extraction works on forms and documents, not live camera frames. D is wrong because there is no audio.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-039",
+    "scenario": "An insurer receives scanned claim forms and needs the policy number, incident date and claimed amount from each form stored as fields in its claims database.",
+    "question": "Which AI workload fits best?",
+    "options": [
+      "Text analysis, because the forms contain text that can be scored for sentiment",
+      "Generative AI chat, because a chatbot can talk to claimants about their forms",
+      "Information extraction, because specific fields must be pulled into structured output",
+      "Speech recognition, because claim details are often phoned in"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: information extraction turns unstructured content, such as scanned forms, into structured fields that can be stored and processed. In Foundry this is the job of Azure Content Understanding in Foundry Tools. A is wrong because text analysis (sentiment, key phrases, entities) gives insights about text, not values mapped to named form fields. B is wrong because a chatbot converses; it does not populate the claims database from the scanned forms. D is wrong because the input here is scanned forms, not audio.",
+    "tags": [
+      "comparison",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-040",
+    "scenario": "From the sentence 'Contoso opened an office in Seattle on 3 March', an app returns 'Contoso' as an Organization, 'Seattle' as a Location and '3 March' as a DateTime.",
+    "question": "Which text analysis technique is this?",
+    "options": [
+      "Key phrase extraction",
+      "Sentiment analysis",
+      "Named entity recognition",
+      "Summarization"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: named entity recognition (NER) finds entities in text and assigns each one a category such as person, location, organisation or date and time. A is wrong because key phrase extraction returns the main concepts without assigning types. B is wrong because sentiment analysis scores how positive or negative text is. D is wrong because summarization shortens text.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-041",
+    "scenario": "A hotel group wants a quick list of the main things guests talk about in each review, such as 'wonderful staff' or 'slow check-in'. It does not need the items categorised.",
+    "question": "Which technique fits best?",
+    "options": [
+      "Named entity recognition",
+      "Key phrase extraction",
+      "Language detection",
+      "PII detection"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: key phrase extraction returns the main concepts in a text, such as 'wonderful staff', with no category attached, which is exactly a list of talking points. A is wrong because NER returns typed entities (people, places, organisations); 'slow check-in' is not a named entity. C is wrong because language detection only identifies the language. D is wrong because PII detection finds personal data to protect or redact.",
+    "tags": [
+      "comparison",
+      "application",
+      "exam-trap"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-042",
+    "scenario": "A review says: 'Breakfast was excellent, but parking was a nightmare.' The hotel wants to know which specific aspects guests liked and disliked.",
+    "question": "Which capability gives this result?",
+    "options": [
+      "Document-level sentiment analysis",
+      "Key phrase extraction",
+      "Language detection",
+      "Opinion mining (aspect-based sentiment analysis)"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: opinion mining links sentiment to specific aspects of the text, so it can report positive sentiment for 'breakfast' and negative sentiment for 'parking' in the same sentence. A is wrong because document-level sentiment would give one overall label, likely 'mixed', and lose which aspect was which. B is wrong because key phrase extraction lists 'breakfast' and 'parking' but gives no sentiment. C is wrong because language detection only identifies the language.",
+    "tags": [
+      "comparison",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-043",
+    "scenario": "A legal team wants summaries made up only of sentences copied word-for-word from each original document, so nothing is reworded.",
+    "question": "Which type of summarization should it use?",
+    "options": [
+      "Extractive summarization",
+      "Abstractive summarization",
+      "Key phrase extraction",
+      "Named entity recognition"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: extractive summarization selects the most important sentences from the original text and returns them unchanged. B is wrong because abstractive summarization writes new sentences, which is the rewording the team wants to avoid. C is wrong because key phrases are short concepts, not a readable summary. D is wrong because NER lists entities rather than summarising.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-044",
+    "scenario": "A contact centre wants written transcripts of its recorded customer calls.",
+    "question": "Which speech capability does it need?",
+    "options": [
+      "Speech synthesis (text to speech)",
+      "Speech recognition (speech to text)",
+      "Custom voice",
+      "Pronunciation assessment"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: speech recognition converts spoken audio into text. A is wrong because speech synthesis does the reverse, turning text into spoken audio. C is wrong because custom voice creates a branded synthetic voice for speech output. D is wrong because pronunciation assessment scores how well someone speaks, for example in language learning.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-045",
+    "scenario": "An e-learning company wants its synthesized narration to pause after headings, speak more slowly in key passages and pronounce product names correctly.",
+    "question": "What should it use to control these details?",
+    "options": [
+      "A higher temperature on the speech model",
+      "Speech translation",
+      "Speech Synthesis Markup Language (SSML)",
+      "Speaker diarization"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: SSML is an XML-based markup that controls how text is spoken, including pauses, speaking rate, pitch, volume and pronunciation. A is wrong because temperature is a parameter for generative language models, not for text-to-speech prosody. B is wrong because speech translation converts speech from one language to another. D is wrong because diarization identifies who is speaking in recorded audio.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-046",
+    "scenario": "A team needs a transcript of a recorded meeting that labels which parts were said by which person, for example Guest-1 and Guest-2.",
+    "question": "Which capability does this require?",
+    "options": [
+      "Speech translation",
+      "Speaker diarization",
+      "Custom voice",
+      "Text to speech with neural voices"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: diarization distinguishes and separates different speakers in audio, so the transcript can label each segment with a speaker. A is wrong because speech translation changes the language; it does not separate speakers. C is wrong because custom voice is for generating speech in a particular voice. D is wrong because text to speech produces audio, not transcripts.",
+    "tags": [
+      "comparison",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-047",
+    "scenario": "A factory needs to know not only that a circuit-board photo contains a defect, but where each defect is in the image.",
+    "question": "Which computer vision task provides this?",
+    "options": [
+      "Image classification",
+      "Image captioning",
+      "Object detection",
+      "Optical character recognition (OCR)"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: object detection identifies objects in an image and returns the coordinates (a bounding box) of each one. A is wrong because image classification applies labels to the whole image without saying where the object is. B is wrong because captioning describes the image in a sentence. D is wrong because OCR reads text in images.",
+    "tags": [
+      "comparison",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-048",
+    "scenario": "A furniture retailer wants to create new lifestyle images of a sofa in different room styles from text descriptions, without a photo shoot.",
+    "question": "Which type of model is needed?",
+    "options": [
+      "An image-generation model, such as a GPT-image model",
+      "An image-analysis model that returns tags and captions",
+      "An OCR model that reads text in images",
+      "An object-detection model"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: image-generation models create new images from a text prompt (and can edit existing images). In Foundry these include the GPT-image family. B is wrong because image analysis describes images that already exist; it does not create new ones. C is wrong because OCR only reads text. D is wrong because object detection finds objects in existing images.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-049",
+    "scenario": "For each catalog photo, a retailer wants (1) a one-sentence description of the scene and (2) the exact text printed on the product label.",
+    "question": "Which pair of vision capabilities matches these two needs?",
+    "options": [
+      "(1) object detection and (2) image classification",
+      "(1) image generation and (2) captioning",
+      "(1) OCR and (2) captioning",
+      "(1) captioning and (2) optical character recognition (OCR)"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: captioning produces a human-readable sentence describing the image, and OCR reads printed or handwritten text in the image. A is wrong because object detection gives boxes and labels rather than a sentence, and classification gives labels rather than the label text. B is wrong because image generation creates new images; it does not describe existing ones. C is wrong because it reverses the two tasks.",
+    "tags": [
+      "scenario-based",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-050",
+    "scenario": "Supplier invoices label the same value differently: 'Invoice No.', 'Invoice #', or a number with no label at all.",
+    "question": "What lets a schema-based extraction service, such as Azure Content Understanding, return all of these as a single InvoiceNumber field?",
+    "options": [
+      "It runs basic OCR and copies the text that follows the word 'Invoice'",
+      "It applies the schema by meaning, so differently labelled values map to the same field",
+      "It requires every supplier to switch to one invoice template first",
+      "It converts each invoice into an image and classifies the whole image"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Content Understanding applies a field schema semantically, using AI to understand the content, so differently labelled or unlabelled values can map to the same field. That is what sets it apart from basic OCR. A is wrong because basic OCR reads text but does not understand meaning or context, so it fails on unlabelled or differently labelled values. C is wrong because schema-based extraction is designed to handle varied layouts without a fixed template. D is wrong because whole-image classification gives a label for the document, not field values.",
+    "tags": [
+      "comparison",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-051",
+    "scenario": "A training department wants to make its recorded training videos searchable and wants structured information from each one.",
+    "question": "Which output can Azure Content Understanding produce from video?",
+    "options": [
+      "Only the background music and sound effects, as labelled events",
+      "A rewritten version of the video with new scenes",
+      "A transcript of spoken words, key frames, and descriptions or fields for each segment",
+      "Only the file name, duration and frame rate"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: for video, Content Understanding produces a transcript of the spoken words, key frames, and segment-level descriptions or custom fields defined in the analyzer. A is wrong because only spoken words are transcribed; music and sound effects are ignored. B is wrong because Content Understanding extracts information; creating new video is a generation task. D is wrong because it goes well beyond file metadata and analyses the content itself.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-052",
+    "scenario": "A clinic wants each voicemail turned into structured data: caller name, callback number and the action requested, ready to load into its scheduling system.",
+    "question": "Which approach fits best?",
+    "options": [
+      "Use speech to text only and store the raw transcript",
+      "Use text to speech to read each voicemail back to staff",
+      "Use speech translation to convert each voicemail into English",
+      "Use a Content Understanding audio analyzer with fields for name, number and action"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Content Understanding can analyse audio and return both a transcript and schema fields, so the clinic gets named values it can load directly. Microsoft's own example is extracting caller, callback number and requested actions from a voicemail. A is wrong because a raw transcript is unstructured; someone would still have to find the name and number in it. B is wrong because text to speech produces audio, which is the reverse of what is needed. C is wrong because translation changes the language but still produces unstructured text.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-053",
+    "scenario": "An events company wants each photo from a hybrid meeting room returned as JSON with the number of people in the room, the number of remote attendees shown on screen, and a short description of the setting.",
+    "question": "Which approach fits best?",
+    "options": [
+      "An image-generation model prompted with the photo",
+      "A Content Understanding image analyzer with a schema for those fields",
+      "Language detection on the photo's file name",
+      "Text to speech, so the description can be read aloud"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Content Understanding can apply a field schema to images and return structured JSON, for example counts of in-person and remote attendees and a description. Microsoft's training uses this very example. A is wrong because image generation creates new images; it does not return structured data about an existing photo. C is wrong because language detection works on text and the file name holds none of this information. D is wrong because text to speech only voices text that already exists.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  }
+]

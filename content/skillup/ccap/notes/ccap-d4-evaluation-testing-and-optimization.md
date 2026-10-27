@@ -1,6 +1,6 @@
 # D4: Evaluation, Testing & Optimization
 
-> **Exam weight**: 16% · **Questions**: ~19 of 120
+> **Exam weight**: 16% · **Questions**: ~21 of 139
 
 ## Overview
 
@@ -49,7 +49,7 @@ A single evaluation dataset or grading method cannot cover both breadth and dept
 - **Golden datasets** — a curated, human-verified set of representative input/expected-output pairs, used as a stable regression baseline across model or prompt changes. Small, high-trust, expensive to build, and must be refreshed as real usage patterns drift from what it originally captured.
 - **Synthetic/generated datasets** — Claude-generated variations (paraphrases, edge cases, adversarial phrasings) that scale coverage cheaply but require human spot-checking, because a model-generated test set can inherit the same blind spots as the model being tested.
 - **Adversarial / red-team sets** — deliberately hostile or ambiguous inputs designed to probe safety and security failure modes (prompt injection payloads, jailbreak attempts, contradictory instructions), distinct in purpose from accuracy datasets.
-- **Grading methods, mixed**: rule-based checks (exact match, regex, schema validation) for deterministic tasks; **LLM-as-judge** (a separate Claude call scoring output against a rubric) for open-ended quality where no single correct string exists; human review for the highest-stakes or most ambiguous cases, sampled continuously rather than exhaustively at scale.
+- **Grading methods, mixed**: rule-based checks (exact match, regex, schema validation) for deterministic tasks; **LLM-as-judge** (a separate Claude call scoring output against a rubric) for open-ended quality where no single correct string exists; human review for the highest-stakes or most ambiguous cases, sampled continuously rather than exhaustively at scale. Anthropic's eval guidance leans the same way: make cases task-specific (including edge cases), automate grading where possible, and prefer more automatically graded cases over a few hand-graded ones.
 
 **A single measurement method will systematically miss whatever it wasn't designed to catch** — golden + rule-based covers the deterministic core, synthetic + LLM-as-judge covers breadth on open-ended behavior, and adversarial + human review concentrates on the highest-consequence failure modes.
 
@@ -116,7 +116,7 @@ Common distractor: a scenario where a team bundles several changes into one rele
 The exam expects candidates to systematically distinguish between root causes that look identical to an end user but require entirely different fixes:
 
 - **Prompt failure**: the instructions were ambiguous, underspecified, contradictory, or missing a needed constraint — the model did what it was plausibly told to do, just not what was intended. Fix: clarify or restructure the prompt (explicit constraints, examples, structured output format).
-- **Hallucination**: the model generated a confident, fluent, but factually ungrounded claim — a fabricated citation, a nonexistent API parameter, a wrong number stated with full confidence. Fix: grounding (RAG with citation requirements), lower temperature for factual tasks, explicit "say you don't know" instructions, and output verification steps.
+- **Hallucination**: the model generated a confident, fluent, but factually ungrounded claim — a fabricated citation, a nonexistent API parameter, a wrong number stated with full confidence. Fix: grounding (RAG with citation requirements), explicit "say you don't know" instructions, and output verification steps. Lowering temperature is not a lever on current models: Claude 4.7 and later accept only the default sampling values.
 - **Model mismatch**: the task's complexity exceeds what the selected model tier can reliably handle (e.g., multi-step quantitative reasoning routed to a fast/small model chosen for cost), or conversely the task is over-served by a large model that adds latency/cost with no accuracy benefit. Fix: route to a different model tier — this is a routing/architecture fix, not a prompt fix.
 - **Retrieval issue** (RAG-backed systems, cross-linking D3): the model reasoned correctly over the context it was given, but the context itself was wrong, incomplete, or stale — a chunking, indexing, or retrieval-ranking failure upstream of generation. Fix: inspect retrieval logs directly; if the wrong or no chunks were retrieved, the fix is in the retrieval pipeline, not the prompt or the model.
 
@@ -127,7 +127,7 @@ flowchart TD
   Start([Wrong or unexpected output]) --> Q1{Was the correct grounding<br/>context retrieved and<br/>present in the prompt?}
   Q1 -->|No / missing / stale context| Retrieval[Retrieval Issue<br/>fix: chunking, indexing,<br/>ranking, metadata filters]
   Q1 -->|Yes, correct context was present| Q2{Did the model contradict<br/>or ignore the provided context?}
-  Q2 -->|Yes, fabricated beyond given context| Halluc[Hallucination<br/>fix: grounding constraints,<br/>citation requirements,<br/>lower temperature]
+  Q2 -->|Yes, fabricated beyond given context| Halluc[Hallucination<br/>fix: grounding constraints,<br/>citation requirements,<br/>verification step]
   Q2 -->|No, it used the context faithfully| Q3{Were the instructions<br/>ambiguous, contradictory,<br/>or missing a constraint?}
   Q3 -->|Yes| Prompt[Prompt Failure<br/>fix: clarify instructions,<br/>add constraints/examples,<br/>structured output]
   Q3 -->|No, instructions were clear| Q4{Does the task require<br/>reasoning beyond the<br/>selected model's tier?}
@@ -160,9 +160,9 @@ Optimization in production is a set of independent techniques, each addressing a
 - **Prompt caching** — caching stable prefix content (system prompts, tool definitions, retrieved reference documents that don't change per-request) cuts both cost and latency on repeated calls sharing that prefix, because cached input tokens are billed and processed at a fraction of the cost of fresh tokens.
 - **Context trimming / compression** — removing stale conversation turns, summarizing long histories, or dropping unused tool definitions from the active context reduces token count directly; this is the token-usage side of the capability-bloat and progressive-discovery principles from D3.
 - **Model routing** — sending simple/high-volume requests to a smaller, faster, cheaper model tier and reserving the largest model for genuinely complex reasoning steps, rather than routing all traffic through one model uniformly. This requires a triage step (often a cheap classifier or a small model itself) to route correctly.
-- **Batch processing** — for non-real-time workloads, batching requests trades latency for substantial cost reduction, since batch APIs are typically priced well below synchronous real-time calls.
+- **Batch processing** — for non-real-time workloads, batching requests trades latency for substantial cost reduction, since the Message Batches API is priced at 50% of standard synchronous calls.
 - **Streaming** — doesn't reduce total tokens or cost, but improves *perceived* latency by returning tokens as they're generated instead of waiting for the full completion — the correct fix when the metric that matters is time-to-first-token, not total completion time.
-- **Extended thinking budget tuning** — allocating more reasoning tokens improves accuracy on hard problems but adds real cost and latency; the budget should be sized to task difficulty, not maxed by default (echoes D3's accuracy-latency frontier).
+- **Effort tuning** — raising the `effort` level lets adaptive thinking spend more reasoning tokens, which improves accuracy on hard problems but adds real cost and latency; set it per task from an effort sweep on your evals, not maxed by default (echoes D3's accuracy-latency frontier). Changing top-level effort between requests also invalidates the prompt cache, so hold it steady within a cached conversation.
 
 ### In Practice
 
@@ -240,7 +240,7 @@ Optimization and monitoring are the domain's feedback mechanism. A/B testing pro
 | A/B testing | Randomized control/treatment split, pre-registered primary metric, one isolated variable per test, sample size adequate for the traffic volume; watch for novelty effect and selection bias |
 | Diagnosis order | Check retrieval context first, then model faithfulness to that context, then prompt clarity, then model-tier capability — in that order, before proposing a fix |
 | Prompt failure vs. hallucination vs. model mismatch vs. retrieval issue | Prompt failure = ambiguous instructions; hallucination = model contradicts/exceeds given context; model mismatch = task exceeds/underuses selected model tier; retrieval issue = wrong/stale/missing context upstream of generation |
-| Token/latency/cost optimization | Prompt caching for repeated stable content; context trimming for bloat; model routing for uniform overpay; batching for non-real-time cost; streaming for perceived (not actual) latency |
+| Token/latency/cost optimization | Prompt caching for repeated stable content; context trimming for bloat; model routing or lower effort for uniform overpay; batching (50% off) for non-real-time cost; streaming for perceived (not actual) latency |
 | Production monitoring | Structured per-request logs, distributed tracing across multi-step flows, continuous sampled quality grading, alerting on drift (error rate, retrieval hit rate, escalation rate, p99 latency) — a pre-launch score is a snapshot, not a guarantee |
 
 ## What to Remember

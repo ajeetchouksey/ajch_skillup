@@ -162,7 +162,7 @@
   {
     "domain": 3,
     "id": "gh600-d3-011",
-    "scenario": "A task at Kestrel Aerospace involves an interactive coding-agent session that calls a built-in edit tool, queries an MCP-connected requirements-tracking server, and later triggers a separate CI environment that runs after the PR opens. None of these three exchange an in-memory conversation with each other.",
+    "scenario": "A task at Kestrel Aerospace involves an interactive cloud agent session that calls a built-in edit tool, queries an MCP-connected requirements-tracking server, and later triggers a separate CI environment that runs after the PR opens. None of these three exchange an in-memory conversation with each other.",
     "question": "How should information one of these needs to remain consistent with what another produced actually be made available to it?",
     "options": [
       "It should be inferred automatically, since all tools invoked within the same overall task share a common in-memory conversation by default",
@@ -194,7 +194,7 @@
   {
     "domain": 3,
     "id": "gh600-d3-013",
-    "scenario": "A long-running session at Northwind Traders has its environment seeded once, at the start, by a `copilot-setup-steps` workflow. Several hours into the session, a colleague's unrelated PR merges a breaking change to a shared dependency the session's code depends on. The session's own environment has no mechanism to notice this and continues running against its original snapshot. Its internal test suite continues to pass throughout.",
+    "scenario": "A long-running session at Northwind Traders has its environment seeded once, at the start, by a `copilot-setup-steps` workflow. About forty minutes into the session (cloud agent sessions can run for up to 59 minutes), a colleague's unrelated PR merges a breaking change to a shared dependency the session's code depends on. The session's own environment has no mechanism to notice this and continues running against its original snapshot. Its internal test suite continues to pass throughout.",
     "question": "What is the correct way to interpret the session's continued internal test passes given this situation?",
     "options": [
       "They confirm the change is fully safe against the current repository state, since a coding agent's own test runs are equivalent to CI",
@@ -222,5 +222,53 @@
     "explanation": "**The principle**: the real CI run that fires on the PR, executing against the current target branch, is the check that actually matters — a session's own internal test pass only confirms consistency with whatever the session's environment snapshot happened to contain, which can be stale relative to the repository's actual current state by the time a PR is reviewed.\n\n**Why option B is correct**: CI running against current `main` after the PR opens validates the change against reality as it exists at review time, independent of whatever the session's own environment snapshot did or didn't capture — this is the deciding signal precisely because it isn't subject to the staleness risk a long-running session's internal environment carries.\n\n**Why the distractors fail**:\n- Treating the session's internal log as final and authoritative: this repeats the exact trap the domain calls out — internal passes reflect the session's own snapshot, not necessarily the branch's current, real state.\n- Skipping validation for agent-authored PRs with reported passes: this discards the one check (real CI) specifically designed to catch staleness or drift the session's own internal view couldn't detect — the opposite of the correct response.\n- Commit count as evidence of correctness: the number of commits says nothing about whether the change is actually valid against current `main`; it's an unrelated proxy with no bearing on the actual safety question.\n\n**In practice**: before merging any agent-authored change — especially from a long-running session — treat the real CI run against the current target branch as the deciding signal, and treat the session's own reported internal passes as informative but not sufficient on their own.",
     "tags": ["CI-validation", "stale-context", "environment-snapshot", "continuity"],
     "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-015",
+    "scenario": "A team lead at Quarry Lane asks what happens to repository facts that Copilot Memory stored about their repository if Copilot never uses them again.",
+    "question": "How does Copilot Memory handle unused entries?",
+    "options": [
+      "They're kept indefinitely until a repository owner reviews them and deletes them by hand",
+      "They're deleted automatically after 28 days without use; validating and using an entry can reset the timer",
+      "They're moved into the repository's .github/copilot-instructions.md file once 28 days have passed",
+      "They expire when the session that created them ends, in the same way as the agent's context window"
+    ],
+    "correct": 1,
+    "explanation": "The principle: long-lived agent memory needs an expiry rule, or old facts pile up and start steering sessions after the code has changed.\n\nWhy B is correct: GitHub's docs say any stored fact or preference that goes unused is deleted automatically after 28 days, and the timer may reset whenever Copilot successfully validates and uses the entry.\n\nWhy the distractors fail:\n- A: repository owners can delete facts manually, but expiry doesn't depend on them.\n- C: Copilot Memory never writes into custom instructions; those stay under the team's control in version control.\n- D: that describes short-term memory. Copilot Memory exists precisely to outlive a single session.\n\nIn practice: rules that must always apply belong in custom instructions, which don't expire. Copilot Memory suits knowledge that's fine to lose once it stops being useful.",
+    "tags": ["memory", "concept", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-016",
+    "scenario": "Copilot Memory at Larkhill Media stored a repository fact that API handlers live in `src/handlers/`. A later refactor moved them to `src/api/`. A developer worries Copilot cloud agent will keep acting on the outdated fact.",
+    "question": "What does Copilot Memory do before using a stored repository fact?",
+    "options": [
+      "Uses it as written, because stored facts are trusted until they reach their expiry date",
+      "Asks the developer to confirm the fact at the start of any session that might rely on it",
+      "Checks the fact's citations against code on the current branch and uses it only if they still validate",
+      "Rewrites the repository's custom instructions so they match the new folder structure automatically"
+    ],
+    "correct": 2,
+    "explanation": "The principle: remembered context must be re-checked against the current source of truth before it's acted on. Otherwise memory becomes a source of drift instead of a defence against it.\n\nWhy C is correct: repository facts are stored with citations to the code that supports them. Copilot checks those citations against the current branch, and only validated facts are used, so a fact pointing at code that has moved fails validation.\n\nWhy the distractors fail:\n- A: expiry handles unused facts; validation is what protects against outdated ones, and it happens before every use.\n- B: validation is automatic, with no per-session confirmation step.\n- D: Copilot Memory doesn't edit custom instructions, which remain version-controlled and human-owned.\n\nIn practice: a repository owner can also delete a fact they know is wrong instead of waiting for validation or expiry to remove it.",
+    "tags": ["memory", "context-drift", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "gh600-d3-017",
+    "scenario": "While fixing a bug, Copilot cloud agent learns a repository fact about Brindle Labs' payment-service conventions. A week later, Copilot code review reviews one PR in that same repository and another PR in a different repository.",
+    "question": "Which statement about how that fact can be used is accurate?",
+    "options": [
+      "Code review can use it in the same repository, since Copilot features share memory, but not in the other repository",
+      "Only cloud agent can use it, because each Copilot feature keeps its own separate memory store for the facts it learns",
+      "Code review can use it in both repositories, because repository facts follow the user who triggered the original session",
+      "Neither review can use it, because code review uses only user-level preferences and never repository-level facts"
+    ],
+    "correct": 0,
+    "explanation": "The principle: shared memory needs a clear scope. Sharing state across tools is useful only if the boundary of what's shared is predictable.\n\nWhy A is correct: GitHub's docs say facts and preferences captured by one Copilot feature can be used by another, and that repository facts can only be used in operations on the same repository. Code review in Brindle Labs' repository can benefit; code review elsewhere can't.\n\nWhy the distractors fail:\n- B: Copilot Memory is shared across cloud agent, code review, Copilot CLI and agentic autofix.\n- C: that describes user preferences, which apply to one user across repositories. Repository facts stay in their repository.\n- D: it's reversed. Code review uses repository facts only, not user preferences.\n\nIn practice: shared repository memory means one agent's learning reaches others in the same repository, so a wrong fact spreads too. Repository owners should review stored facts when agents start behaving oddly.",
+    "tags": ["memory", "state-sharing", "edge-case", "analysis"],
+    "difficulty": "hard"
   }
 ]

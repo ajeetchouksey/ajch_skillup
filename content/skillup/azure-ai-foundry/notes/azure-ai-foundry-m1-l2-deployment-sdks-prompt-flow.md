@@ -1,7 +1,7 @@
 # Deployment Options, SDKs & Prompt Flow
 
-> **Skill track**: Azure AI Foundry Practitioner — Module 1, Lesson 2
-> **Try it**: pairs with the hands-on mission "Deploy Your First Prompt Flow in Azure AI Foundry"
+> **Skill track**: Microsoft Foundry Practitioner — Module 1, Lesson 2
+> **Try it**: pairs with the hands-on mission "Deploy Your First Prompt Flow in Azure AI Foundry" (Prompt flow is a Foundry (classic) feature that retires on April 20, 2027; see the Playground & Prompt Flow section before building anything new on it)
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@
 
 ## Overview
 
-Picking a model is only half the job — you also have to decide *how it's hosted*, *how your code talks to it*, and *how you iterate on the prompt in front of it* before anything reaches production. This lesson covers all three, because in practice they're one decision, not three: the deployment option you pick constrains which SDK calls make sense, and Prompt Flow only pays off once you've settled on a deployment stable enough to bulk-test against.
+Picking a model is only half the job — you also have to decide *how it's hosted*, *how your code talks to it*, and *how you prove the prompt in front of it works* before anything reaches production. This lesson covers all three, because in practice they're one decision, not three: the deployment option you pick constrains which SDK calls make sense, and bulk evaluation only pays off once you've settled on a deployment stable enough to test against.
 
 > 💡 **Human Angle**: *Think of the model catalog as a car showroom and the deployment type as how you pay for the car — lease it by the mile (serverless/pay-per-token), buy it outright and park it in your garage (managed compute), or reserve a dedicated lane on the highway (provisioned throughput).*
 
@@ -21,67 +21,70 @@ Picking a model is only half the job — you also have to decide *how it's hoste
 
 **The deployment option you pick is a bet on your traffic shape, not a technology preference.**
 
-Azure AI Foundry gives you five ways to put a model behind an endpoint, and they differ on exactly one axis that matters day-to-day: who pays for idle capacity. Serverless API and Azure OpenAI Standard both let Microsoft absorb the cost of idle compute — you pay per token, so a quiet Tuesday costs you nothing. Managed compute and Provisioned Throughput (PTU) do the opposite: you reserve capacity up front, so a quiet Tuesday still costs the same as a busy Friday, but in exchange you get either hardware control or *guaranteed* latency that shared capacity can't promise.
+Microsoft Foundry gives you two ways to host a catalog model: a **serverless deployment**, where Microsoft hosts the model and you call an API, or **managed compute**, where the model weights run on dedicated VMs. Within serverless there are three billing families: **Standard** (pay-per-token), **Provisioned** (hourly reserved capacity), and **Batch** (discounted, asynchronous).
 
-Global Batch is the odd one out — it isn't really competing on latency at all. **It trades an immediate answer for a steep discount**, processing a large job asynchronously within a 24-hour window instead of responding in real time.
+These options differ on one axis that matters day to day: who pays for idle capacity. With Standard, Microsoft absorbs it, so a quiet Tuesday costs you nothing. With Provisioned or managed compute you reserve capacity up front, so a quiet Tuesday costs the same as a busy Friday, but you get *guaranteed* throughput or hardware control in return.
+
+Each billing family also comes in **Global**, **Data Zone**, or regional flavours, which decide where prompts are processed: global might route to any Azure region, data zone stays within a boundary such as the EU or US, and regional stays in one region. Batch is the odd one out. **It trades an immediate answer for a steep discount**, queuing a large job asynchronously instead of responding in real time.
 
 | Option | Compute model | Billing | Best for |
 |---|---|---|---|
-| Serverless API (MaaS) | Microsoft-managed, no customer infra | Pay-per-token | Fast start, variable/low volume, many catalog models (Meta, Mistral, Cohere, etc.) |
-| Managed compute | Dedicated VM-backed online endpoint | Pay for VM regardless of usage | Need more control over hardware; broader open-model support |
-| Azure OpenAI — Standard / Global Standard | Shared, pay-as-you-go capacity | Per-token, variable latency under load | General-purpose Azure OpenAI usage |
-| Azure OpenAI — Provisioned (PTU) | Reserved, dedicated capacity | Reserved-unit commitment | Latency-sensitive production workloads needing predictable throughput |
-| Azure OpenAI — Global Batch | Asynchronous, 24-hour window | Discounted per-token | Large, non-latency-sensitive batch jobs |
+| Standard (Global / Data Zone / regional) | Serverless, Microsoft-managed | Pay-per-token, variable latency under load | Fast start, variable or unknown volume |
+| Provisioned (Global / Data Zone / Regional) | Serverless, reserved capacity | Hourly reserved capacity | Latency-sensitive production workloads needing predictable throughput |
+| Batch (Global / Data Zone) | Serverless, asynchronous queue | Discounted batch token pricing | Large, non-latency-sensitive jobs |
+| Managed compute | Dedicated VM-backed endpoint | VM core hours regardless of usage | Open models (for example Hugging Face) that need their own hardware |
+
+Managed compute deployments of open models have historically required a hub-based project in the Foundry (classic) portal; check the current docs before planning around them on a Foundry resource. Availability of every option varies by model and region.
 
 ```mermaid
 flowchart TD
   A{Urgent response needed?}
-  A -->|no, can wait 24h| B[Global Batch]
+  A -->|no, can wait| B[Batch]
   A -->|yes| C{Traffic shape?}
-  C -->|flat and predictable| D{Need hardware control?}
-  C -->|spiky or unknown| E[Serverless API]
+  C -->|flat and predictable| D{Need own hardware?}
+  C -->|spiky or unknown| E[Standard]
   D -->|yes| F[Managed Compute]
   D -->|no| G{Need guaranteed latency?}
-  G -->|yes| H[Provisioned Throughput]
-  G -->|no| I[Azure OpenAI Standard]
+  G -->|yes| H[Provisioned]
+  G -->|no| E
   classDef decision fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
   classDef outcome fill:#1a2a12,stroke:#34d399,color:#e2e8f0
   class A,C,D,G decision
-  class B,E,F,H,I outcome
+  class B,E,F,H outcome
 ```
-*Which of the five deployment options fits your traffic.*
+*Match your traffic to a deployment family, then pick the processing scope.*
 
 ### In Practice
 
-**What breaks without this**: a team that defaults to managed compute "because that's what we did before Foundry" ends up paying for a VM that sits at 8% utilization overnight — real money for capacity nobody's using, when a serverless deployment would have cost near-zero during those same idle hours.
+**What breaks without this**: a team that defaults to managed compute "because that's what we did before" ends up paying for a VM that sits at 8% utilization overnight — real money for capacity nobody's using, when a Standard (pay-per-token) deployment would have cost near-zero during those same idle hours.
 
-**Decision trigger**: ask *"if I plotted my requests-per-minute over a week, would the line be flat or spiky?"* Flat and predictable → PTU is worth the commitment. Spiky or unknown → start serverless, because you can always move to PTU later once you have real traffic data, but you can't easily walk back an over-provisioned reserved-capacity contract.
+**Decision trigger**: ask *"if I plotted my requests-per-minute over a week, would the line be flat or spiky?"* Flat and predictable → Provisioned is worth the commitment. Spiky or unknown → start with Standard, because you can move to Provisioned later once you have real traffic data, but you can't easily walk back an over-provisioned reservation. Then ask *"where may prompts be processed?"* to choose Global, Data Zone, or regional.
 
-**When you'd choose differently**: a spiky-traffic team would normally reach for serverless, but if that spike happens to be a hard latency-SLA workload (a trading desk, a live support handoff) where *variable* latency under load is itself unacceptable — not just average latency — PTU's predictability can be worth paying for headroom you don't always use.
+**When you'd choose differently**: a spiky-traffic team would normally reach for Standard, but if that spike happens to be a hard latency-SLA workload (a trading desk, a live support handoff) where *variable* latency under load is itself unacceptable — not just average latency — Provisioned's predictability can be worth paying for headroom you don't always use.
 
 ### Common Pitfall ⚠️
 
 <div class="note-trap">
-Serverless API availability is *region- and model-specific* — a newly released catalog model may only support managed compute at first, or only be available in a subset of regions. "It's in the catalog" doesn't mean "it's deployable everywhere, every way, immediately." Always check the model card before committing to an architecture around a specific deployment type.
+Deployment options are *region- and model-specific*. A newly released catalog model may only support some deployment types at first, or only be available in a subset of regions. "It's in the catalog" doesn't mean "it's deployable everywhere, every way, immediately." Always check the model card before committing to an architecture around a specific deployment type.
 </div>
 
 ## Connections & SDKs
 
 ### Key Concept
 
-**Two SDKs exist because managing a project and calling a model are different jobs done by different people at different times.**
+**Two clients exist because configuring a project and calling a model are different jobs done at different times.**
 
-`azure-ai-projects` is the *management-plane* SDK — it lists connections, deployments, agents, and datasets, the kind of thing a platform engineer runs from a setup script or an internal admin tool. `azure-ai-inference` (or the OpenAI SDK pointed at a Foundry endpoint) is the *data-plane* SDK — the one your application actually calls on every user request to get a completion back.
+The **project client** in `azure-ai-projects` (version 2.x targets the current Foundry portal; 1.x targets classic) handles Foundry-native operations with no OpenAI equivalent: listing connections, reading project properties, enabling tracing. The **OpenAI-compatible client** from the `openai` package is what your application calls on every user request for chat completions, embeddings, or the Responses API. The project client can hand you one already pointed at your project endpoint. The older `azure-ai-inference` package was retired on August 26, 2026; Microsoft's migration path is the `openai` package.
 
-**Connections** are what tie a project to the outside resources it needs — most commonly an Azure AI Search index for RAG, plus Storage, Key Vault, and Application Insights. Get the connection wrong and neither SDK will save you: the inference call will succeed, but retrieval will come back empty because the project was never pointed at the search index in the first place.
+**Connections** are what tie a project to the outside resources it needs — most commonly an Azure AI Search index for RAG, plus Storage, Key Vault, and Application Insights. Get the connection wrong and neither client will save you. **It's like wiring a new office**: the phone line works perfectly, but if nobody plugged in the filing cabinet, every lookup comes back empty.
 
 ### In Practice
 
-**What breaks without this**: pulling in `azure-ai-projects` just to make a chat completion call — the management SDK doesn't expose a completions method the way you'd expect, so a developer who reaches for the wrong SDK burns time discovering that before finding the right one.
+**What breaks without this**: copying a 2024-era sample that builds a `ChatCompletionsClient` from `azure-ai-inference` — the package is retired, so new code built on it is migration debt on day one. The same goes for mixing SDK generations: a 2.x `azure-ai-projects` sample run against a classic (1.x) setup, or the other way round, fails with confusing errors.
 
-**Decision trigger**: ask *"is this code running once, from my machine or a CI job, to set something up — or is it running per user-request, in the hot path of my app?"* Setup-time and infrequent → management plane. Every request → data plane.
+**Decision trigger**: ask *"is this code configuring the project (connections, tracing, project properties), or is it running per user request to get model output?"* Configuring → project client. Model output → OpenAI-compatible client.
 
-**When you'd choose differently**: a background job that periodically audits which deployments exist across a project (a cost-governance script, say) legitimately uses the management-plane SDK even though it runs on a schedule "like" a hot-path job — the distinguishing factor is *what it's asking for* (deployment metadata vs. a model's output), not how often it runs.
+**When you'd choose differently**: a background job that periodically audits a project's connections (a governance script, say) legitimately uses the project client even though it runs on a schedule "like" a hot-path job — the distinguishing factor is *what it's asking for* (project metadata vs. a model's output), not how often it runs.
 
 ## Fine-Tuning
 
@@ -128,76 +131,83 @@ Azure OpenAI tracks tokens-per-minute (TPM) and requests-per-minute (RPM) separa
 
 ### Key Concept
 
-**The playground is for exploring a prompt; Prompt Flow is for proving it works before you ship it.**
+**The playground is for exploring a prompt; a batch evaluation is for proving it works before you ship it.**
 
-The chat playground gives fast, code-free iteration on a system message, parameters, and a couple of few-shot examples — ideal for the first hour of figuring out what you even want the model to do. Prompt Flow is a different tool for a different stage: a visual, DAG-based canvas for chaining retrieval, prompt, and code/LLM nodes together, then bulk-testing the whole chain against a real dataset before deploying it as its own managed endpoint.
+The playground gives fast, code-free iteration on a system message, parameters, and a couple of few-shot examples. It's ideal for the first hour of figuring out what you even want the model to do. Proving the prompt is a different stage: you run it against a real dataset and score the results with built-in evaluators (groundedness, relevance, coherence, and others), the same way every time.
+
+For years the Foundry tool for that second stage was **Prompt flow**, a visual, DAG-based canvas for chaining retrieval, prompt, and LLM nodes and bulk-testing the chain. Prompt flow is now a classic-only feature: it's no longer recommended for new development, its container images no longer get security or package updates, and it retires on **April 20, 2027**. Microsoft's replacement is **Microsoft Agent Framework**, which is code-first. A flow becomes a `WorkflowBuilder` graph of executors, and its evaluation flow becomes evaluators from the Azure AI Evaluation SDK. **Think of Prompt flow as scaffolding**: useful while the building went up, but you take it down before you move in.
 
 ### In Practice
 
-**What breaks without this**: a team ships a prompt that looked great for the five examples they tried by hand in the playground, then discovers in production that it fails on a whole category of inputs nobody happened to try — bulk-testing against a real dataset (Prompt Flow's job, not the playground's) is exactly what would have caught that before launch.
+**What breaks without this**: a team ships a prompt that looked great for the five examples they tried by hand in the playground, then discovers in production that it fails on a whole category of inputs nobody happened to try. A scored batch evaluation against a real dataset is exactly what would have caught that before launch. A second failure: a team starts a new project on Prompt flow in 2026 because an old tutorial used it, and inherits a forced migration within a year.
 
-**Decision trigger**: ask *"have I tried this prompt against more than a handful of hand-picked inputs?"* If no, you're still in playground territory. If you need a repeatable, scored answer across dozens or hundreds of inputs, move to Prompt Flow.
+**Decision trigger**: ask *"have I tried this prompt against more than a handful of hand-picked inputs?"* If no, you're still in playground territory. If you need a repeatable, scored answer across dozens or hundreds of inputs, run a batch evaluation. If you also need multi-step orchestration, build it in Agent Framework, not Prompt flow.
 
-**When you'd choose differently**: for a genuinely one-off exploration — a prompt you'll run once, by hand, and never productionize — building a full Prompt Flow is overkill; the playground alone is the right-sized tool.
+**When you'd choose differently**: if you already run production Prompt flows, keep them running while you migrate. Microsoft's guide suggests auditing every node, rebuilding in Agent Framework, then running both side by side and scoring output parity with `SimilarityEvaluator` before cutting over.
 
 ### Common Pitfall ⚠️
 
 <div class="note-trap">
-Content filters on Azure OpenAI deployments are **on by default** and are *not* a self-service toggle to disable — modifying or disabling them (e.g., for an approved red-teaming exercise) requires applying through Microsoft's **Limited Access** review process.
+Two things trip teams up here. First, Prompt flow isn't "the low-code way to build in the new Foundry": it lives only in the classic portal and retires on April 20, 2027. Second, guardrails (content filters) on Foundry Models sold by Azure are **on by default**. Every customer can pick a Low, Medium, or High blocking level and can turn filtering off for *inputs*, but turning it off for *outputs* requires approval through Microsoft's Limited Access Review for modified guardrails.
 </div>
 
 ## Deep Dive: Making Deployment, SDKs & Prompt Flow Click
 
 ### 1. The connective narrative
 
-These three topics look separate but resolve into one pipeline. You start by choosing a deployment option — a bet on your traffic shape — because that decision determines what "calling the model" even looks like: a serverless endpoint you hit with the data-plane SDK, or a PTU endpoint your finance team signed off on for guaranteed latency. Once you have a stable endpoint, the SDK split (`azure-ai-projects` vs. `azure-ai-inference`) reflects the two different jobs people do against it: a platform engineer sets it up and manages it, while your application calls it constantly. And once you're iterating on *what you send* to that endpoint — the actual prompt — Prompt Flow is where you stop trusting your own five hand-picked test inputs and start proving the prompt holds up across a real dataset before it goes anywhere near production traffic.
+These three topics look separate but resolve into one pipeline. You start by choosing a deployment option — a bet on your traffic shape — because that decision determines what "calling the model" even looks like: a pay-per-token Standard deployment, or a Provisioned one your finance team signed off on for guaranteed latency. Once you have a stable endpoint, the client split (the `azure-ai-projects` project client vs. the `openai` client) reflects the two different jobs done against it: setting the project up, and calling the model constantly. And once you're iterating on *what you send* to that endpoint — the actual prompt — a batch evaluation is where you stop trusting your own five hand-picked test inputs and start proving the prompt holds up across a real dataset before it goes anywhere near production traffic. (That used to be Prompt flow's job; it's retiring, so new work belongs in evaluations and Agent Framework.)
 
 Fine-tuning and quota sit slightly to the side of that main pipeline, but they answer the two questions that come up the moment the pipeline is live: "what if prompting alone isn't enough?" (fine-tune, but only after prompting has genuinely plateaued) and "what happens when real traffic arrives?" (quota, on two independent axes that traffic can hit separately).
 
 ### 2. Worked scenario
 
-> **Scenario.** Contoso Retail wants to add an AI support chatbot backed by Llama-3.1-70B from the catalog. Traffic is spiky — quiet most of the day, then a burst up to ~50 requests/minute during evening promos — and the team has no infrastructure headcount to manage VMs.
+> **Scenario.** Contoso Retail wants to add an AI support chatbot backed by DeepSeek-V3.2 from the catalog. Traffic is spiky — quiet most of the day, then a burst up to ~50 requests/minute during evening promos — and the team has no infrastructure headcount to manage VMs.
 >
 > Walking the decision end to end:
 >
-> 1. **Check the model card first.** Not every catalog model supports every deployment type, and support is region-specific — Llama-3.1-70B's card confirms Serverless API availability in Contoso's region. Skipping this step is the single most common way teams pick an option that turns out to be unavailable.
-> 2. **Match the traffic pattern to a billing model.** Spiky, unpredictable volume with no infrastructure team is the textbook case for **Serverless API (MaaS)** — pay-per-token, Microsoft-managed compute, scales with demand automatically. Managed compute would mean paying for a dedicated VM around the clock even during the quiet hours; PTU's reserved-capacity commitment doesn't fit unpredictable spiky load either.
-> 3. **Wire up the right SDK for the job.** The actual chat-completion calls at runtime go through the **data-plane** SDK:
+> 1. **Check the model card first.** Not every catalog model supports every deployment type, support is region-specific, and models retire (the catalog's lifecycle filter and the model retirement schedule show dates). The card confirms a pay-per-token Standard deployment type in Contoso's region. Skipping this step is the single most common way teams pick an option that turns out to be unavailable.
+> 2. **Match the traffic pattern to a billing model.** Spiky, unpredictable volume with no infrastructure team is the textbook case for a **Standard (pay-per-token) serverless deployment** — Microsoft-managed, billed per token, nothing to run. Contoso's customers are all in the EU and legal wants prompts processed there, so they choose **Data Zone Standard** over Global Standard. Managed compute would mean paying for a dedicated VM around the clock even during the quiet hours; Provisioned's reserved capacity doesn't fit unpredictable spiky load either.
+> 3. **Wire up the right client for the job.** The actual chat-completion calls at runtime go through the **OpenAI-compatible client** from the `openai` package, authenticated with Microsoft Entra ID rather than a stored key:
 >
 > ```python
-> from azure.ai.inference import ChatCompletionsClient
-> from azure.core.credentials import AzureKeyCredential
+> from openai import OpenAI
+> from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 >
-> client = ChatCompletionsClient(
->     endpoint="https://contoso-foundry.services.ai.azure.com/models",
->     credential=AzureKeyCredential("<key>"),
+> token_provider = get_bearer_token_provider(
+>     DefaultAzureCredential(), "https://ai.azure.com/.default"
 > )
-> response = client.complete(
->     model="Llama-3.1-70B-Instruct",
+> client = OpenAI(
+>     base_url="https://contoso-foundry.openai.azure.com/openai/v1/",
+>     api_key=token_provider,
+> )
+> response = client.chat.completions.create(
+>     model="DeepSeek-V3.2",  # your deployment name
 >     messages=[{"role": "user", "content": "Where is my order #4821?"}],
 > )
 > ```
 >
-> If Contoso later needs an internal admin dashboard to list or manage deployments and connections, that's the **management-plane** SDK (`azure-ai-projects`) instead — a different job entirely, not a fallback for the same job.
-> 4. **Before launch, bulk-test the actual support prompt in Prompt Flow** against a few hundred real historical support questions, not the handful the team tried by hand — this is what catches a category of question the prompt silently mishandles before a customer finds it in production.
+> If Contoso later needs a setup script that lists the project's connections or turns on tracing, that's the **project client** in `azure-ai-projects` instead — a different job entirely, not a fallback for the same job.
+> 4. **Before launch, run a batch evaluation of the actual support prompt** against a few hundred real historical support questions, not the handful the team tried by hand — this is what catches a category of question the prompt silently mishandles before a customer finds it in production.
 > 5. **Load-test against both quota dimensions**, not just one: a 50 requests/minute promo burst with moderately long support responses could plausibly hit either the RPM or the TPM ceiling first, and only measuring one gives a false sense of headroom.
 >
-> **Contrast case**: if Contoso instead ran a trading-desk assistant needing guaranteed, consistent sub-second latency regardless of load, the right call flips to **Provisioned throughput (PTU)** — the deciding factor is a *predictability* requirement, not raw volume.
+> **Contrast case**: if Contoso instead ran a trading-desk assistant needing guaranteed, consistent sub-second latency regardless of load, the right call flips to a **Provisioned** deployment — the deciding factor is a *predictability* requirement, not raw volume.
 
 ### 3. Memory aid
 
 Before picking a deployment option, run through this checklist in order:
 
 1. **Shape** — flat or spiky traffic?
-2. **Control** — do I need to touch the hardware, or is "just give me an endpoint" fine?
+2. **Control** — do I need my own hardware, or is "just give me an endpoint" fine?
 3. **Latency guarantee** — does *variability* under load break something, not just average speed?
-4. **Urgency** — does this need to answer right now, or can it run overnight for a discount?
+4. **Urgency** — does this need to answer right now, or can it run as a batch for a discount?
+5. **Scope** — may prompts be processed anywhere (Global), within a boundary (Data Zone), or only in one region?
 
-Answering these four, in order, resolves to one of the five deployment options almost every time.
+The first four pick the family (Standard, Provisioned, Batch, or managed compute); the fifth picks the processing scope.
 
 ### 4. Applying this in real projects
 
-- The most common real-world mistake isn't picking the wrong deployment option — it's picking a *reasonable* one and never revisiting it once real traffic data exists. A serverless deployment chosen for an unknown launch-day traffic shape should be reassessed against PTU once you have a month of real RPM/TPM data.
+- The most common real-world mistake isn't picking the wrong deployment option — it's picking a *reasonable* one and never revisiting it once real traffic data exists. A Standard deployment chosen for an unknown launch-day traffic shape should be reassessed against Provisioned once you have a month of real RPM/TPM data.
+- Put the model's retirement date in your plan on day one. Catalog models deprecate and retire on a published schedule, and a migration is cheaper when it's planned than when it's forced.
 - Teams reach for fine-tuning far earlier than they should. If you haven't tried a longer, more structured system prompt with a few strong few-shot examples first, you don't yet know whether you actually need fine-tuning.
 - Quota throttling in production is almost always a "we tested the wrong dimension" problem, not a "we needed more quota" problem — check which axis your real traffic actually stresses before requesting an increase.
 
@@ -205,13 +215,16 @@ Answering these four, in order, resolves to one of the five deployment options a
 
 | Concept | Key Rule |
 |---|---|
-| Serverless API | Pay-per-token, no customer-managed compute |
+| Standard (serverless) | Pay-per-token, no customer-managed compute |
 | Managed compute | Dedicated VM, pay regardless of usage |
-| PTU | Reserved capacity, predictable latency |
-| Global Batch | Async, 24-hour window, discounted |
-| azure-ai-projects | Management plane (connections, deployments, agents) |
-| azure-ai-inference | Data plane (chat/embeddings calls) |
+| Provisioned | Hourly reserved capacity, predictable latency |
+| Batch | Async, discounted |
+| Global / Data Zone / regional | Where prompts may be processed |
+| azure-ai-projects (2.x) | Project client: connections, project properties, tracing |
+| openai | Model calls: chat completions, embeddings, Responses API |
+| azure-ai-inference | Retired August 26, 2026; migrate to `openai` |
 | Fine-tune data format | JSONL, `messages` array matching production shape |
 | Quota dimensions | TPM + RPM — enforced independently |
-| Content filters | On by default; disabling needs Limited Access approval |
-| Playground vs. Prompt Flow | Explore by hand vs. prove at scale before shipping |
+| Guardrails (content filters) | On by default; turning off output filtering needs modified-guardrails approval |
+| Playground vs. batch evaluation | Explore by hand vs. prove at scale before shipping |
+| Prompt flow | Classic-only, retires April 20, 2027; migrate to Microsoft Agent Framework |

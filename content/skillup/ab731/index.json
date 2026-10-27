@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.5.1",
-  "contentUpdatedAt": "2026-10-26",
+  "contentVersion": "1.6.0",
+  "contentUpdatedAt": "2026-10-27",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -76,6 +76,12 @@
       "date": "2026-10-26",
       "type": "patch",
       "summary": "Replaced all 19 diagram PNGs across d1–d3 notes with AaryaAI-branded SVGs (680px, embedded Barlow fonts) and replaced the generic 'Diagram N' alt text with descriptions of what each shows; old PNGs removed. The Responsible AI principles diagram now shows all six principles (the PNG omitted Privacy & Security)."
+    },
+    {
+      "version": "1.6.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Syllabus check against the AB-731 study guide (skills measured as of July 22, 2026): no change to domains, weights or objectives. Restructured all three domain notes to the house standard: every numbered section (D1 13, D2 16, D3 16) now has Key Concept, In Practice and Exam Trap blocks, with complete Deep Dives and traps tables moved after them. Added explicit coverage of when traditional ML adds value, why secure AI matters, a 3-way Copilot versions comparison and integrated-solution risk/safety benefits. Scale AI framework is now four phases (unlock AI value, organise for AI success, empower business users, empower subject matter experts) in both the D3 note and the ab731-d3-scale-framework diagram, matching Microsoft Learn's Scale AI module. Fact fixes: Microsoft 365 Copilot base-licence eligibility includes Business Basic/Standard/Premium and more (not E3/E5 only); Copilot Chat URL and grounding; Copilot Studio bills in Copilot Credits; Foundry Tools commitment tiers are fixed monthly quotas for single-service resources, distinct from PTU; Microsoft Foundry/Foundry Tools renames (Ignite Nov 2025); Copilot connectors and the new plugin meaning; open models are only free of per-token fees when self-hosted. Rewrote ab731-d2-012, d2-019, d3-006, d3-007 and the explanations of d3-010 and d3-017; renamed Azure AI Foundry to Microsoft Foundry across questions and a scenario; re-graded difficulty on d1-010, d2-004, d3-003 (easy) and d2-014 (medium). Correct-answer positions rebalanced across questions and scenarios (B had been correct in 85%)."
     }
   ],
   "id": "ab731",
