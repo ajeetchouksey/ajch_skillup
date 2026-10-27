@@ -43,7 +43,7 @@ Every production Claude system decomposes into four stages: **Input** (ingestion
 The loop closes the gap between "the model got it right in testing" and "we know when it's wrong in production, and can fix it" — whether that's a human review queue, an automated eval harness re-scoring live traffic, or a corrected retrieval index. **A system with no feedback loop is a car with no rearview mirror**: it drives fine on a straight road, with no way to know something's wrong until after it's already crashed.
 
 
-![Feedback Loop](../images/feedbackloop.png)
+![Production architecture: Input, Processing, Output and Delivery in sequence, with Output feeding a feedback loop that sends corrections back to Input and retraining or prompt updates back to Processing](/content/skillup/ccap/images/ccap-d1-feedback-loop.svg)
 
 ### In Practice
 
@@ -73,7 +73,7 @@ Anthropic's own guidance (*Building Effective Agents*) draws a clear line betwee
 
 Workflows are predictable, auditable, and cheaper because you can reason about exactly what will execute; agentic systems trade that predictability for handling tasks whose steps can't be fully specified in advance. **Anthropic's own guidance is blunt**: find the simplest solution possible, and add complexity only when it demonstrably improves outcomes — agentic complexity is a cost to justify, not a default.
 
-![Selecting Architectural Patterns](../images/selectingarchpatterns.png)
+![Decision on whether the steps can be fully specified in advance: a single step leads to an Augmented LLM, a fixed multi-step sequence to a Workflow, and discovery-dependent steps to an Agentic System](/content/skillup/ccap/images/ccap-d1-architecture-patterns.svg)
 ### In Practice
 
 **What breaks without this**: Deploying an agentic loop for a task that fits a workflow means every run has non-deterministic step count and cost — production runbooks can't set reliable SLAs, and debugging a failure means reconstructing an arbitrary trajectory instead of checking a known sequence of five steps.
@@ -104,7 +104,7 @@ Three orchestration topologies recur in practice:
 
 The orchestration choice has a direct cost: Anthropic's own data shows multi-agent architectures can consume roughly 15x the tokens of a single-agent chat interaction. **Think of it like hiring a project team instead of one generalist** — you get parallelism and specialization, but you're paying for coordination overhead on every task, whether or not that task actually needed it.
 
-![Three orchestration topologies](../images/three_orch_topologies.png)
+![Orchestrator and subagents: a lead agent receives the user query, dispatches three subagents with their own context and scoped tools, their results feed synthesis, and the lead agent delivers the final output](/content/skillup/ccap/images/ccap-d1-orchestrator-subagents.svg)
 
 ### In Practice
 

@@ -30,7 +30,7 @@ This layering exists because each layer trades flexibility for speed. A business
 
 **Responsible AI spans all layers** — Microsoft's six principles (Fairness, Reliability, Privacy, Inclusiveness, Transparency, Accountability) are applied at every level, from model training to end-user UI.
 
-![Diagram 1](/content/skillup/ab731/images/d2-microsoft-ai-services-01.png)
+![Business users reach Microsoft 365 Copilot, Microsoft Copilot and Copilot Studio, with Microsoft Graph as the org data connector, while developers and IT build on Azure AI Foundry with Azure AI Search and Azure Vision.](/content/skillup/ab731/images/ab731-d2-ai-products-by-audience.svg)
 
 ---
 
@@ -54,7 +54,7 @@ This layering exists because each layer trades flexibility for speed. A business
 
 Microsoft Graph is the **API layer that connects Copilot to your organisation's data** stored in Microsoft 365 services.
 
-![Diagram 2](/content/skillup/ab731/images/d2-microsoft-ai-services-02.png)
+![Microsoft 365 Copilot reaches Outlook, Teams, SharePoint, OneDrive and the Microsoft 365 apps through the Microsoft Graph API.](/content/skillup/ab731/images/ab731-d2-graph-data-connector.svg)
 
 **Why it matters for Copilot:**
 - When you ask Copilot "What are my action items from today's meetings?" — Graph pulls your Teams transcripts and calendar
@@ -122,7 +122,7 @@ Two specialised **Copilot agents** available in Microsoft 365:
 - Connect to third-party systems via connectors
 - Create custom agents for specific business functions (HR bot, IT helpdesk, sales assistant)
 
-![Diagram 3](/content/skillup/ab731/images/d2-microsoft-ai-services-03.png)
+![Copilot Studio connects to a knowledge base, Power Automate actions and connectors to other systems.](/content/skillup/ab731/images/ab731-d2-copilot-studio-building-blocks.svg)
 
 <div class="note-important"><strong>Build vs Buy vs Extend:</strong><br/><strong>Buy</strong> = Use M365 Copilot out-of-the-box (no customisation)<br/><strong>Extend</strong> = Use Copilot Studio to customise/extend M365 Copilot<br/><strong>Build</strong> = Use Azure AI Foundry to build a custom AI application from scratch</div>
 
@@ -214,7 +214,7 @@ Beyond per-app Copilot features, M365 Copilot includes cross-app experiences:
 | **Copilot Pages** | Collaborative AI canvas — Copilot populates it, multiple users can continue editing | Persistent, shareable AI-generated artifact (unlike a single-session chat) |
 | **Work / Web toggle** | In Copilot Chat, switch between your org data (Microsoft Graph) and Bing web search | Explicitly controls whether the AI searches your internal data or the public web |
 
-![Diagram 4](/content/skillup/ab731/images/d2-microsoft-ai-services-04.png)
+![Copilot Chat's Work toggle searches Microsoft Graph org data while the Web toggle searches Bing.](/content/skillup/ab731/images/ab731-d2-copilot-chat-work-web-toggle.svg)
 
 <div class="note-trap"><strong>Exam trap — Pages vs Word:</strong> "A team needs a shared AI-populated document where multiple members can continue adding Copilot-generated research" → <strong>Copilot Pages</strong> (multi-user, persistent, AI-populated). NOT Word Copilot (single session, single user).</div>
 
@@ -235,7 +235,7 @@ Not every task benefits equally from AI. Map each task type to the right Copilot
 
 ### The mapping process
 
-![Diagram 5](/content/skillup/ab731/images/d2-microsoft-ai-services-05.png)
+![Four steps to map a business process to Copilot: list tasks, classify them, prioritise automatable and augmentable work, then map to a Copilot feature.](/content/skillup/ab731/images/ab731-d2-process-to-copilot-mapping.svg)
 
 <div class="note-important"><strong>Exam pattern:</strong> "Which tasks should be prioritised for Copilot deployment?" → Automatable tasks first (meeting summaries, email drafts, document extraction) — fastest, clearest ROI. Augmentable tasks (analysis, writing) second. Never start with judgment-heavy or relationship tasks.</div>
 
@@ -256,7 +256,7 @@ The Foundry Model Catalog contains hundreds of models. The exam tests your abili
 
 Open-source models like Llama and Mistral earn their place in this table for a different reason than raw capability: because their weights are published, an organisation can run them without per-token licensing fees, fine-tune them without vendor lock-in, or deploy them entirely on-premises for a regulatory reason a closed API can't satisfy. The trade-off is that the organisation now owns the hosting, scaling, and security work a managed API would otherwise handle.
 
-![Diagram 6](/content/skillup/ab731/images/d2-microsoft-ai-services-06.png)
+![Decision tree for choosing a Foundry model: proprietary for complex reasoning, Phi-3 for budget or edge, open source for cost control.](/content/skillup/ab731/images/ab731-d2-foundry-model-choice.svg)
 
 <div class="note-trap"><strong>Exam trap:</strong> "Bigger model = always better" is WRONG. The exam tests that you match model capability to task complexity. Using GPT-4o for a simple FAQ chatbot is expensive overkill. Using Phi-3 for complex multi-document contract analysis will produce poor results.</div>
 

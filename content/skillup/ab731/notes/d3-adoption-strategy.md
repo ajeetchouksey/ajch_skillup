@@ -17,7 +17,7 @@
 
 Microsoft defines **6 guiding principles**. The exam tests all 6:
 
-![Diagram 1](/content/skillup/ab731/images/d3-adoption-strategy-01.png)
+![Responsible AI at the centre of six principles: fairness, reliability and safety, privacy and security, inclusiveness, transparency and accountability, each with a one-line meaning](/content/skillup/ab731/images/ab731-d3-responsible-ai-principles.svg)
 
 | Principle | What it means for the exam |
 |---|---|
@@ -65,7 +65,7 @@ An **AI Council** (sometimes called an AI steering committee or AI governance bo
 
 ### Composition of an AI Council
 
-![Diagram 2](/content/skillup/ab731/images/d3-adoption-strategy-02.png)
+![The AI Council draws on five functions: business leadership, IT and technology, legal and compliance, HR and people, and business functions, each with its own remit](/content/skillup/ab731/images/ab731-d3-ai-council.svg)
 
 <div class="note-scribble">Exam trick: the AI Council is cross-functional — it's NOT just IT. A council that's only IT misses the business, legal, and HR perspectives. The exam will make a "wrong" answer where the council is only technical people.</div>
 
@@ -101,7 +101,7 @@ An **AI champions programme** identifies enthusiastic early adopters in each bus
 - **Demonstrate** real use cases in their own work
 - Drive grassroots adoption bottom-up
 
-![Diagram 3](/content/skillup/ab731/images/d3-adoption-strategy-03.png)
+![AI champions sit between two loops: the adoption team trains champions and receives best practices back, while champions coach peers and collect their questions and feedback](/content/skillup/ab731/images/ab731-d3-champions-network.svg)
 
 <div class="note-scribble">Champions are peers, not managers. People learn from their colleagues more readily than from top-down mandates. This is the single most effective adoption lever the exam tests.</div>
 
@@ -180,7 +180,7 @@ The exam tests **three distinct Copilot licence models** — don't collapse thes
 
 Before deploying any AI solution, a leader should verify:
 
-![Diagram 4](/content/skillup/ab731/images/d3-adoption-strategy-04.png)
+![Checklist flow: identify the use case, add human review and compliance sign-off if it is high risk, then define governance policy, document usage, set up a feedback channel and review quarterly at the AI council](/content/skillup/ab731/images/ab731-d3-implementation-checklist.svg)
 
 ---
 
@@ -216,7 +216,7 @@ The four business value categories AI should connect to:
 
 ### How to align AI to business strategy
 
-![Diagram 5](/content/skillup/ab731/images/d3-adoption-strategy-05.png)
+![Four steps from business strategy to AI: top priorities, map to an AI opportunity, set KPIs, secure an executive sponsor](/content/skillup/ab731/images/ab731-d3-strategy-alignment.svg)
 
 <div class="note-trap"><strong>Exam trap:</strong> "Which AI use case should be prioritised?" → Always the one that directly maps to a stated business priority with measurable outcomes. NOT the most technically impressive use case, and NOT the one IT finds most interesting.</div>
 
@@ -237,7 +237,7 @@ The four business value categories AI should connect to:
 | **Data governance** | Classify data by sensitivity; know what can enter AI systems; enforce access controls |
 | **AI-ready infrastructure** | Azure cloud provides scalable compute, storage, and networking for enterprise AI |
 
-![Diagram 6](/content/skillup/ab731/images/d3-adoption-strategy-06.png)
+![CRM, ERP, HR and other data flow into Microsoft Fabric as one unified layer, which feeds analytics and reporting and AI and advanced analytics](/content/skillup/ab731/images/ab731-d3-unified-data-estate.svg)
 
 <div class="note-important"><strong>Exam pattern:</strong> "A company's AI keeps producing wrong answers about inventory. What should be investigated first?" → Data quality and data connectivity. Blame the data pipeline before blaming the model.</div>
 
@@ -258,7 +258,7 @@ The four business value categories AI should connect to:
 
 ### Adoption curve for AI
 
-![Diagram 7](/content/skillup/ab731/images/d3-adoption-strategy-07.png)
+![AI adoption curve in four stages: awareness through leadership comms, interest through demos and pilots, trial through champions, adoption through training and support](/content/skillup/ab731/images/ab731-d3-adoption-curve.svg)
 
 <div class="note-important"><strong>Exam pattern:</strong> "What is the #1 risk for a company-wide AI rollout?" → Change management and employee adoption — NOT technical issues. The Microsoft Learn content explicitly states AI adoption failures are caused by culture and governance, not technology.</div>
 
@@ -270,7 +270,7 @@ The four business value categories AI should connect to:
 
 Microsoft's framework for scaling AI across an organisation follows four phases:
 
-![Diagram 8](/content/skillup/ab731/images/d3-adoption-strategy-08.png)
+![Scale AI framework in three phases: unlock value with pilots, organise for success with council, CoE and BU leads, then empower business users](/content/skillup/ab731/images/ab731-d3-scale-framework.svg)
 
 ### Governance structure at scale
 

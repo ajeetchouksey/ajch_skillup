@@ -98,7 +98,7 @@ The context window is a finite, shared budget across system prompt, conversation
 
 Optimization techniques include summarizing or compacting older conversation turns instead of retaining full history, retrieving only relevant document chunks instead of stuffing entire corpora into context, pruning tool definitions to only what's needed for the current task, and placing important instructions near the start or end of the prompt (edges are attended to more reliably than the middle). **A wider highway doesn't fix a traffic jam caused by badly placed signs** — window size and context quality are separate problems, and upgrading capacity only solves one of them. Token usage is tracked via the `usage` object on every API response, the primary signal for cost and budget tracking in production.
 
-![Context Window](../images/ContextWindow.png)
+![Context window budget split across system prompt, tools, few-shot examples, retrieved context, conversation history and reserved output; retrieve relevant chunks rather than the full corpus, and compact history when it grows too large](/content/skillup/ccap/images/ccap-d2-context-window-budget.svg)
 
 ### In Practice
 
@@ -126,7 +126,7 @@ Three complementary mechanisms let architects avoid re-sending and re-processing
 - **Modular prompts** — decomposing a prompt into reusable components (a persona block, a task-instruction block, a formatting-rules block, an examples block) assembled per use case rather than duplicating near-identical prompt text across many call sites. This is a maintainability and consistency strategy as much as a token strategy: a policy change updates one module instead of every prompt that used it.
 - **Skills** — packaged, reusable capability bundles (instructions, optionally scripts and reference resources) that Claude loads *progressively* — only a short name/description is in context by default, with the full instructions and resources loaded on demand when the task actually needs that capability. This keeps a large library of specialized capabilities available to an agent without permanently consuming context budget for capabilities that aren't relevant to the current task.
 
-![Prompt Reuse Strategies](../images/PromptReuseStrategies.png)
+![Prompt caching sequence: a static prefix ends at a cache_control breakpoint; the first request misses and writes the cache, later requests with different user queries hit the cached prefix within the TTL](/content/skillup/ccap/images/ccap-d2-prompt-caching.svg)
 
 ### In Practice
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.18",
-  "contentUpdatedAt": "2026-09-02",
+  "contentVersion": "0.1.19",
+  "contentUpdatedAt": "2026-10-26",
   "provider": "Anthropic",
   "palette": {
     "color": "#a78bfa",
@@ -124,6 +124,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Added taxonomyIds to 7 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    },
+    {
+      "version": "0.1.19",
+      "date": "2026-10-26",
+      "type": "patch",
+      "summary": "Replaced 5 diagram PNGs in d1–d2 notes with AaryaAI-branded SVGs (feedback loop, architecture patterns, orchestrator + subagents, prompt caching, context window budget) with descriptive alt text; switched references to absolute /content paths; old PNGs removed."
     }
   ],
   "id": "ccap",

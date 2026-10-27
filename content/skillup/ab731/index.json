@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.5.0",
-  "contentUpdatedAt": "2026-09-11",
+  "contentVersion": "1.5.1",
+  "contentUpdatedAt": "2026-10-26",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -70,6 +70,12 @@
       "date": "2026-09-11",
       "type": "minor",
       "summary": "Added 2 new scenarios closing Domain 2's zero-scenario gap and reinforcing Domain 3's governance-council/scaling coverage. ab731-scenario-002 (\"Solstice Retail Sorts Three AI Requests Into Buy, Extend, Build\", domains 1+2) is built on the D2 notes' own retailer worked example — Copilot vs Copilot Studio vs Azure AI Foundry for three simultaneous requests, plus the §2.15 SharePoint oversharing pre-rollout governance check and a model-latency selection question. ab731-scenario-003 (\"Calderwood & Finch Builds Its First AI Council\", domains 2+3) targets task-statement gaps 3.2 (AI governance structures/councils) and 3.6 (scaling with governance frameworks) — AI Council composition, Council-vs-CoE approval scope, data classification as a pre-approval gate, and the dual governance gate (CoE technical + Council strategic) a pilot must clear before enterprise-wide scale. Also cross-links to the new ajch_hol_labs lab \"Build the AI Council Governance Gate\" (domain ai-strategy-and-governance), which picks up exactly at this scenario's governance decision point and has the learner produce the actual council roster/checklist artifacts."
+    },
+    {
+      "version": "1.5.1",
+      "date": "2026-10-26",
+      "type": "patch",
+      "summary": "Replaced all 19 diagram PNGs across d1–d3 notes with AaryaAI-branded SVGs (680px, embedded Barlow fonts) and replaced the generic 'Diagram N' alt text with descriptions of what each shows; old PNGs removed. The Responsible AI principles diagram now shows all six principles (the PNG omitted Privacy & Security)."
     }
   ],
   "id": "ab731",
