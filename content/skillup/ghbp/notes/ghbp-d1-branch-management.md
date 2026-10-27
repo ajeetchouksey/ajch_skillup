@@ -122,6 +122,7 @@ Organization rulesets (GitHub Team and GitHub Enterprise plans) let one configur
 | Push rules (file path, extension, size) | No | Yes, push rulesets for private and internal repos and their forks |
 | Commit metadata and branch name patterns | No | Yes, metadata restrictions ("Restrict commit metadata", "Restrict branch names") |
 | Code scanning / secret scanning merge gates | Via required checks only | "Require code scanning results" rule; secret scanning rule in preview |
+| Centrally owned required workflow | No, required checks come from the repo's own workflows | "Require workflows to pass before merging" (organization or enterprise rulesets) |
 | Required reviewers by path | No | Yes, required reviewers by path (team-based, not for user-owned repos) |
 | Bypass model | Admin on/off switch | Bypass list, "Always allow" or "For pull requests only" |
 
@@ -229,7 +230,35 @@ Auto-merge is the author-side convenience: enable it on a PR and GitHub merges o
 
 ---
 
-## 1.6 Branching Strategies and Merge Methods
+## 1.6 Required Workflows: "Require workflows to pass before merging"
+
+### Key Concept
+
+**A required status check accepts any workflow that reports the right name; a required workflow makes GitHub run one centrally owned workflow file itself.**
+
+"Require workflows to pass before merging" is a branch ruleset rule configured in an **organization or enterprise ruleset**. It replaces the old Actions "required workflows" feature. You choose a source repository, a branch and a workflow file in its `.github/workflows`, and GitHub runs that file on pull requests in every targeted repository. A PR can't merge until the workflow passes. Required status checks (section 1.5) work differently, whether you set them in a classic rule or a ruleset. They name a check, and the workflow that produces the check lives in the target repository, so anyone who can edit its `.github/workflows/` can weaken or delete it. Classic branch protection has no equivalent of this rule.
+
+The source repository must be at least as visible as the repositories it runs in. A public workflow can run on any repository in the organization, an internal one on internal and private repositories, and a private one on private repositories only. An internal or private source repository must also have its Actions access set to "Accessible from repositories in the organization". **Think of it like a building inspector the city sends**: the contractor can fire an inspector they hired themselves, but not the city's.
+
+<div class="note-important"><strong>Ruleset workflows ignore event filters.</strong> They support only <code>pull_request</code>, <code>pull_request_target</code> and <code>merge_group</code>, and always run on those events' default activity types. Any <code>paths:</code> or <code>branches:</code> filter is ignored. An ordinary required check behaves differently. When its workflow is skipped by a path, branch or commit-message filter, the check stays <strong>Pending</strong> and blocks merging, whereas a job skipped by an <code>if:</code> condition reports Success. Add <code>merge_group</code> if you use a merge queue, or the check is never reported there. Because the rule also blocks direct pushes, target only branches where every change arrives through a PR.</div>
+
+### In Practice
+
+**What breaks without this**: A security team makes dependency review a required status check in 30 repositories, with a copy of the workflow in each one. One team adds `continue-on-error: true` to its copy, and from then on the check passes regardless of what dependency review finds. In a monorepo with path-filtered CI, a docs-only PR waits indefinitely on a Pending required check.
+
+**Decision trigger**: Ask: "Must this gate keep working even if the target repository's own maintainers change their workflows?" If yes, create an organization ruleset with this rule pointing at a workflow in a central repository. Roll it out in **Evaluate** mode first. The workflow runs but isn't required to pass, and once it has passed you can switch the ruleset to Active without a new run. PRs that are already open when you create the rule don't run the workflow until they get a new commit, an updated branch, or are closed and reopened.
+
+**When you'd choose differently**: Use ordinary required status checks for CI that each team owns and that varies by repository, such as unit tests and per-service builds. In a monorepo, skip jobs with a job-level `if:` rather than a trigger path filter, so skipped work reports Success. Ruleset workflows also have limits. They can't use CodeQL actions other than `upload-sarif` (for code scanning, use the "Require code scanning results" rule), they don't run on events triggered by `GITHUB_TOKEN`, and they shouldn't use `cancel-in-progress` concurrency.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+When a scenario says teams must not be able to remove or edit the gate, "make it a required status check" is the distractor, because the workflow behind a status check lives in the team's own repository. The answer is an organization ruleset's <strong>Require workflows to pass before merging</strong>. Second trap: adding <code>paths:</code> to a ruleset workflow doesn't skip it, because its filters are ignored. Adding <code>paths:</code> to the workflow behind an ordinary required check leaves the check Pending, and the PR can't merge. Third trap: a workflow in a private repository can't be required on internal or public repositories.
+</div>
+
+---
+
+## 1.7 Branching Strategies and Merge Methods
 
 ### Key Concept
 
@@ -261,7 +290,7 @@ Merge method shapes history. A merge commit keeps every commit plus a merge bubb
 
 ---
 
-## 1.7 Branch Naming Conventions
+## 1.8 Branch Naming Conventions
 
 ### Key Concept
 
@@ -323,7 +352,7 @@ Classic branch protection patterns choose <em>which</em> branches are protected;
 
 ---
 
-## 1.8 Branch Lifecycle and Read-Only Branches
+## 1.9 Branch Lifecycle and Read-Only Branches
 
 ### Key Concept
 
@@ -392,7 +421,7 @@ jobs:
 
 ---
 
-## 1.9 Signed Commits and the Risk Matrix
+## 1.10 Signed Commits and the Risk Matrix
 
 ### Key Concept
 
@@ -466,14 +495,14 @@ CODEOWNERS and branching strategy are what make the controls sustainable. CODEOW
 - **P**ull request required: no direct pushes
 - **R**eviews: approvals, stale dismissal, most-recent-push approval
 - **O**wners: CODEOWNERS, with code owner review required
-- **T**ests: required status checks (strict or merge queue) and deployments
+- **T**ests: required status checks (strict or merge queue), required workflows and deployments
 - **E**veryone bound: no admin bypass; explicit ruleset bypass list
 - **C**an't rewrite: force pushes and deletions blocked, signed commits, tag rulesets
 - **T**argeted at scale: org rulesets by name or custom property
 
 ### 4. Exam strategy for this domain
 
-- **Look-alike settings** are the main trap: stale dismissal vs most-recent-push approval; required checks vs required deployments; lock branch vs archive; classic "do not allow bypassing" vs ruleset bypass list.
+- **Look-alike settings** are the main trap: stale dismissal vs most-recent-push approval; required checks vs required deployments; required status checks vs ruleset required workflows; lock branch vs archive; classic "do not allow bypassing" vs ruleset bypass list.
 - **"Overrides" language is usually wrong** for rulesets. They aggregate, and the most restrictive rule wins.
 - **Native beats custom.** When a native setting exists (auto-merge, team review assignment, require signed commits), the exam prefers it over webhooks or homemade workflows. The exception is branch-name validation, where a required check is a legitimate answer alongside ruleset metadata restrictions.
 - **Watch scope words**: "all 200 repositories" points to an organization ruleset; "this one branch must never change" points to lock branch; "tags" points to a tag ruleset.
@@ -490,6 +519,7 @@ CODEOWNERS and branching strategy are what make the controls sustainable. CODEOW
 | Dismiss stale approvals | Branch rule / ruleset | New commits that change the diff dismiss approvals |
 | Most recent push approval | Branch rule / ruleset | Approver must differ from the last pusher |
 | Required status checks | Branch rule / ruleset | Strict = must be up to date; check must run on `pull_request` |
+| Required workflows | Org/enterprise ruleset: "Require workflows to pass before merging" | Central workflow file; event filters ignored; source repo at least as visible as targets |
 | Require deployments | Branch rule / ruleset | Gate merge on environment deployment |
 | Admin bypass disabled | "Do not allow bypassing the above settings" | Admins bypass classic rules by default |
 | Ruleset bypass | Bypass list | "Always allow" vs "For pull requests only" |

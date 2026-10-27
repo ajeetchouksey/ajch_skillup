@@ -113,15 +113,15 @@
     "Push protection stops new secrets but doesn't fix old ones, which need rotation, and centrally owned gates such as dependency review belong in organization rulesets that teams can't edit away."
   ],
   "questionIds": [
-    "d1-001",
-    "d1-011",
-    "d1-013",
-    "d1-019",
-    "d1-020",
-    "d1-024",
-    "d3-011",
-    "d3-012",
-    "d3-020",
-    "d3-023"
+    "ghbp-d1-001",
+    "ghbp-d1-011",
+    "ghbp-d1-013",
+    "ghbp-d1-019",
+    "ghbp-d1-020",
+    "ghbp-d1-024",
+    "ghbp-d3-011",
+    "ghbp-d3-012",
+    "ghbp-d3-020",
+    "ghbp-d3-023"
   ]
 }

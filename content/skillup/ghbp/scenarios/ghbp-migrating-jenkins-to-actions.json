@@ -112,17 +112,17 @@
     "Self-hosted runners for special hardware should be ephemeral, grouped and limited to private repositories, and production deploys should share a concurrency group without cancel-in-progress so they never race."
   ],
   "questionIds": [
-    "d2-012",
-    "d2-013",
-    "d2-014",
-    "d2-015",
-    "d2-018",
-    "d2-019",
-    "d2-020",
-    "d2-021",
-    "d2-022",
-    "d2-024",
-    "d3-016",
-    "d3-018"
+    "ghbp-d2-012",
+    "ghbp-d2-013",
+    "ghbp-d2-014",
+    "ghbp-d2-015",
+    "ghbp-d2-018",
+    "ghbp-d2-019",
+    "ghbp-d2-020",
+    "ghbp-d2-021",
+    "ghbp-d2-022",
+    "ghbp-d2-024",
+    "ghbp-d3-016",
+    "ghbp-d3-018"
   ]
 }

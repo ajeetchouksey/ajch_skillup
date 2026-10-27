@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.2.0",
+  "contentVersion": "1.2.1",
   "contentUpdatedAt": "2026-10-27",
   "provider": "GitHub",
   "palette": {
@@ -34,6 +34,12 @@
       "date": "2026-10-27",
       "type": "minor",
       "summary": "Converted the 2 legacy scenarios to RichScenario v2.0 walkthroughs (Migrating Jenkins Pipelines to GitHub Actions: 6 questions on GitHub Actions Importer audit/forecast/dry-run/migrate, Jenkinsfile-to-workflow syntax mapping, OIDC to AWS, reusable workflows with environments, ephemeral ARC runners and deploy concurrency; Securing a Large Monorepo: 6 questions on ruleset and branch protection layering, CODEOWNERS ordering, path-filtered required checks, push protection with delegated bypass, org-required dependency review and tag rulesets). Corrected legacy claims: required checks do not fail open (skipped path-filtered workflows leave them pending), push protection rejects pushes when they are attempted rather than at the client, dependency review gates on fail-on-severity rather than a CVSS score, and tag rulesets prevent deletion rather than making tags recoverable."
+    },
+    {
+      "version": "1.2.1",
+      "date": "2026-10-27",
+      "type": "patch",
+      "summary": "D1 notes: added section 1.6 on the ruleset rule \"Require workflows to pass before merging\" (central workflow file, visibility and access requirements, ignored event filters vs Pending path-filtered checks, Evaluate mode) with matching cheat-sheet, rulesets-table and Deep Dive entries; former 1.6-1.9 renumbered 1.7-1.10. Scenario questionIds now use full bank ids (ghbp-dN-NNN) so all 22 links resolve."
     }
   ],
   "id": "ghbp",
