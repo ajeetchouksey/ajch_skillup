@@ -8,7 +8,7 @@
   "estimatedMinutes": 13,
   "domains": [3],
   "scenario": {
-    "background": "Maya files an issue: the /export endpoint times out on large datasets, so it should be batched into chunks of 500 rows, touching only export/service.py and its tests. A coding-agent session picks it up, and a second session later needs to add a follow-up fix while an unrelated PR merges a change to a shared dependency in between.",
+    "background": "Maya files an issue: the /export endpoint times out on large datasets, so it should be batched into chunks of 500 rows, touching only export/service.py and its tests. A cloud agent session picks it up, and a second session later needs to add a follow-up fix while an unrelated PR merges a change to a shared dependency in between.",
     "characters": [
       {
         "name": "Maya Torres",
@@ -51,13 +51,13 @@
       "id": "gh600-scenario-009-q3",
       "stem": "Because session 2 gets a freshly-seeded environment (not a reused one from session 1), what does this correctly ensure regarding the unrelated db/connection.py change merged in between sessions?",
       "options": [
-        "Session 2's test run reflects current reality, picking up the db/connection.py change now merged into the base branch, rather than testing against session 1's now-stale snapshot",
+        "Fresh environment seeding has no bearing on which changes a session's test run reflects",
         "Session 2 ignores the db/connection.py change entirely, since it's unrelated to the export fix",
         "Session 2 reverts the db/connection.py change to avoid any interference",
-        "Fresh environment seeding has no bearing on which changes a session's test run reflects"
+        "Session 2's test run reflects current reality, picking up the db/connection.py change now merged into the base branch, rather than testing against session 1's now-stale snapshot"
       ],
-      "correct": 0,
-      "explanation": "A is correct because a fresh environment snapshot at the start of session 2 picks up whatever is currently on the base branch, including the unrelated db/connection.py change — meaning session 2's own test pass reflects current reality rather than a stale view from session 1's earlier snapshot. B is wrong because the change, while unrelated in origin, still affects the same dependency the export service uses, and a correct test run needs to reflect it. C is an unjustified and unrelated action outside the scope of this task. D is wrong — fresh seeding is precisely what determines whether a session's internal test results are trustworthy against the current base branch."
+      "correct": 3,
+      "explanation": "D is correct because a fresh environment snapshot at the start of session 2 picks up whatever is currently on the base branch, including the unrelated db/connection.py change — meaning session 2's own test pass reflects current reality rather than a stale view from session 1's earlier snapshot. B is wrong because the change, while unrelated in origin, still affects the same dependency the export service uses, and a correct test run needs to reflect it. C is an unjustified and unrelated action outside the scope of this task. A is wrong — fresh seeding is precisely what determines whether a session's internal test results are trustworthy against the current base branch."
     },
     {
       "id": "gh600-scenario-009-q4",

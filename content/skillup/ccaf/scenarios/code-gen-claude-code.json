@@ -1,17 +1,124 @@
 {
+  "schemaVersion": "2.0",
   "id": "code-gen-claude-code",
-  "title": "Code Generation with Claude Code",
-  "description": "Configure Claude Code for a large TypeScript monorepo with frontend (React), backend (Node.js/Express), and infrastructure (Terraform) directories. Different teams have different coding standards. The setup must enforce ESLint rules for frontend, strict error handling for backend, and Terraform naming conventions for infra — all automatically, not as suggestions.",
-  "architecture_notes": "Use the 3-level CLAUDE.md hierarchy: global ~/.claude/CLAUDE.md for universal preferences, project CLAUDE.md for shared conventions, and .claude/rules/ scoped files with path globs for per-directory standards. Use PostToolUse hooks to automatically run the relevant linter after each file write (ESLint for .tsx files, custom validation for .tf files). Configure MCP servers in .claude/settings.json for database access during development. Define slash commands for common workflows: /review, /test, /commit.",
-  "key_patterns": [
-    "3-level CLAUDE.md hierarchy",
-    "scoped rules with path: glob frontmatter",
-    "PostToolUse hook for automatic linting",
-    "skills for schema/context, tools for actions",
-    "MCP server with stdio transport",
-    "slash commands for repeated workflows"
+  "title": "Configuring Claude Code for a Monorepo",
+  "description": "A logistics company is standardising Claude Code across a TypeScript monorepo whose frontend, backend and infrastructure teams follow different standards. The scenario tests the CLAUDE.md hierarchy, path-scoped rules, using hooks to enforce standards deterministically, sharing MCP servers safely, choosing plan mode or direct execution, and packaging team workflows as skills.",
+  "examId": "ccaf",
+  "difficulty": "medium",
+  "estimatedMinutes": 18,
+  "domains": [
+    2,
+    4,
+    5
   ],
-  "questionIds": ["d2-001", "d2-002", "d2-005", "d2-006", "d2-014", "d2-015", "d2-016"],
+  "scenario": {
+    "background": "Three teams share one repository, and their standards are being applied inconsistently: Claude-generated React code ships with lint errors, backend handlers swallow exceptions, and Terraform names drift. The new setup must enforce each team's standards automatically rather than relying on developers to remember them. Tidewater Logistics' TypeScript monorepo has apps/web (React), services/api (Node.js/Express) and infra/ (Terraform). Forty engineers use Claude Code daily for generation, refactoring, debugging and documentation, and the platform team wants a single committed configuration that works for everyone.",
+    "characters": [
+      {
+        "name": "Maya Lindqvist",
+        "role": "Frontend Tech Lead",
+        "concern": "She wants ESLint enforced automatically on every file Claude writes in apps/web, because suggestions in a document have not worked."
+      },
+      {
+        "name": "Jorge Alvarez",
+        "role": "Principal Backend Engineer",
+        "concern": "He wants strict error-handling rules applied in services/api, but doesn't want frontend and Terraform guidance crowding the context of backend sessions."
+      },
+      {
+        "name": "Sam Whitfield",
+        "role": "Developer Experience Engineer",
+        "concern": "He needs everything shared through version control, including a development-database MCP server, without any credentials committed to the repository."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "code-gen-claude-code-q1",
+      "stem": "Jorge personally prefers terse, bullet-point explanations. The whole team shares conventions such as the package manager and commit format, and each directory has its own coding standards. Where should each kind of instruction live?",
+      "options": [
+        "Everything in the root CLAUDE.md, so there is one source of truth",
+        "Team conventions in `CLAUDE.local.md`, and personal preferences in the root CLAUDE.md",
+        "Personal preferences in `~/.claude/CLAUDE.md`, team conventions in the committed project CLAUDE.md, and directory-specific standards in `.claude/rules/` files scoped with `paths`",
+        "Everything in each developer's `~/.claude/CLAUDE.md`, distributed through an onboarding document"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: user memory (`~/.claude/CLAUDE.md`) is for preferences that apply to you across projects. The project CLAUDE.md is committed and shared with the team, and path-scoped rules load only when Claude works with matching files. A is wrong because it forces one person's preferences on everyone and loads every directory's standards into every session. B is wrong because `CLAUDE.local.md` is for personal, gitignored notes, so team conventions placed there would never reach teammates. D is wrong because user-level files aren't version-controlled, so they drift between machines and can't be reviewed in a PR."
+    },
+    {
+      "id": "code-gen-claude-code-q2",
+      "stem": "Maya wants ESLint to run on every .tsx file Claude edits, and she wants Claude to fix any errors before moving on, with no reliance on Claude remembering an instruction. What should Sam configure?",
+      "options": [
+        "A `PostToolUse` hook with matcher `Edit|Write` in `.claude/settings.json` that runs ESLint on the edited file and, on failure, exits with code 2 so stderr is fed back to Claude",
+        "A line in the project CLAUDE.md: \"Always run ESLint after editing any .tsx file and fix all errors.\"",
+        "A `PreToolUse` hook with matcher `Edit|Write` that runs ESLint on the file before the edit is applied",
+        "A `/lint` skill that developers invoke after Claude finishes a task"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: hooks run deterministically, regardless of what the model decides. `PostToolUse` fires after the tool succeeds, which is where the docs recommend reacting to results, such as running a linter after an edit. For `PostToolUse`, exit code 2 shows stderr to Claude, so the lint errors arrive as feedback it can act on. The hook script can check the file extension and skip files that aren't .tsx. B is wrong because CLAUDE.md is context, not enforced configuration, and it fails silently whenever Claude doesn't follow it. C is wrong because a `PreToolUse` hook runs before the change exists, so it would lint the old content; PreToolUse is for gating calls, not validating results. D is wrong because a manually invoked skill depends on a human remembering to run it, which is the reliability gap Maya is trying to close."
+    },
+    {
+      "id": "code-gen-claude-code-q3",
+      "stem": "Jorge's error-handling standard should load only when Claude works on backend code and stay out of apps/web sessions. Which file achieves this?",
+      "options": [
+        "`.claude/rules/backend-errors.md` with no frontmatter",
+        "`.claude/rules/backend-errors.md` with frontmatter `paths:` listing `services/api/**/*.ts`",
+        "An `@services/api/ERRORS.md` import line in the root CLAUDE.md",
+        "A skill in `.claude/skills/backend-errors/` with `disable-model-invocation: true`"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: a `paths` field in a rule's frontmatter scopes it, so it loads only when Claude works with files matching the glob. Jorge's standard applies to backend work and costs nothing in frontend sessions. A is wrong because a rule file without `paths` loads unconditionally, like the rest of the project instructions. C is wrong because imported files load together with the CLAUDE.md that imports them; the docs note that imports help organise a long file but don't reduce its context cost. D is wrong because `disable-model-invocation: true` stops Claude from loading the skill on its own, so the standard would apply only when someone types the command."
+    },
+    {
+      "id": "code-gen-claude-code-q4",
+      "stem": "Sam wants every developer to get the same development-database MCP server automatically, with each person using their own credentials and nothing secret in git. What should he commit?",
+      "options": [
+        "An `mcpServers` block in `.claude/settings.json` that contains the shared connection string",
+        "Nothing; each developer should run `claude mcp add` with the default local scope",
+        "A `.mcp.json` file with the database password inline, in a private repository",
+        "A project-scoped `.mcp.json` at the repo root whose server config references `${DEV_DB_URL}`, which each developer sets in their own environment"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: project-scoped MCP servers live in `.mcp.json` at the project root and are meant to be checked in, and `.mcp.json` supports `${VAR}` and `${VAR:-default}` expansion, so credentials stay in each developer's environment. In interactive sessions, Claude Code also asks each user to approve project servers before using them. A is wrong because MCP servers aren't defined in `.claude/settings.json`; the MCP docs list `.mcp.json` for project scope and `~/.claude.json` for local and user scope, and a committed connection string would leak the secret anyway. B is wrong because local scope is stored in `~/.claude.json` and isn't shared, which defeats the goal of a shared setup. C is wrong because a private repository is still not a secrets store; anyone with read access, including any CI job, gets the password."
+    },
+    {
+      "id": "code-gen-claude-code-q5",
+      "stem": "This week the team must (1) refactor the shared error-handling middleware that 40 backend files depend on, and (2) fix a typo in a React button label. How should they use Claude Code for each task?",
+      "options": [
+        "Use plan mode for the middleware refactor, so Claude analyses the code read-only and proposes a plan for approval before any edits, and use direct execution for the typo fix",
+        "Use plan mode for both tasks, because planning first is always safer",
+        "Use direct execution with `acceptEdits` for the refactor and rely on `git revert` if it goes wrong; use plan mode for the typo",
+        "Use direct execution for both tasks, but ask Claude to be careful in the refactor prompt"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: plan mode lets Claude explore and propose an approach without editing, which pays off when a change is wide-reaching, has several valid designs, or touches code many files depend on. A single-line, well-understood fix gains nothing from a planning round-trip. B is wrong because planning a typo fix adds latency and review overhead with no reduction in risk. C is wrong because it inverts the risk: letting a 40-file refactor run unreviewed with auto-approved edits makes `git revert` the safety net for a design mistake that plan mode would have caught before any change was made. D is wrong because 'be careful' gives Claude no structural checkpoint; the team gets no chance to review the approach before files change."
+    },
+    {
+      "id": "code-gen-claude-code-q6",
+      "stem": "The team wants shared `/review`, `/test` and `/commit` workflows. Because `/commit` has side effects, it must run only when a developer explicitly asks for it. How should the workflows be packaged?",
+      "options": [
+        "Write the three workflows as prose in CLAUDE.md under a heading such as \"When the user types /commit…\"",
+        "Put them in each developer's `~/.claude/commands/` folder so people can customise them",
+        "Use a `UserPromptSubmit` hook that pattern-matches the text \"/commit\" and injects the workflow steps",
+        "Commit them as skills under `.claude/skills/<name>/SKILL.md`, and set `disable-model-invocation: true` on the commit skill"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: custom commands have been merged into skills, so a committed `.claude/skills/commit/SKILL.md` creates `/commit` for everyone, and existing `.claude/commands/` files still work. The docs recommend `disable-model-invocation: true` for workflows with side effects, such as `/commit` or `/deploy`, so Claude never triggers them on its own. A is wrong because text in CLAUDE.md doesn't register a command, and it loads into every session whether or not it is used. B is wrong because user-level commands aren't shared or version-controlled, so the team's workflows would diverge. C is wrong because it rebuilds a command system out of a hook that inspects every prompt, which is fragile and duplicates a built-in feature."
+    }
+  ],
+  "keyLearnings": [
+    "Use the hierarchy deliberately: `~/.claude/CLAUDE.md` for personal preferences, the committed project CLAUDE.md for team conventions, and path-scoped `.claude/rules/` files for directory-specific standards.",
+    "When a standard must always apply, enforce it with a hook: a `PostToolUse` hook on `Edit|Write` that exits with code 2 feeds linter errors back to Claude, whereas CLAUDE.md text is only guidance.",
+    "Share MCP servers through a project-scoped `.mcp.json` that uses `${VAR}` expansion for credentials; `.claude/settings.json` doesn't hold MCP server definitions.",
+    "Use plan mode for wide-reaching or ambiguous changes and direct execution for small, well-scoped ones, and package repeatable workflows as skills, with `disable-model-invocation: true` on those that have side effects."
+  ],
   "officialDescription": "You are using Claude Code to accelerate software development. Your team uses it for code generation, refactoring, debugging, and documentation. You need to integrate it into your development workflow with custom slash commands, CLAUDE.md configurations, and understand when to use plan mode vs direct execution.",
-  "primaryDomains": ["Claude Code Configuration & Workflows", "Context Management & Reliability"]
+  "questionIds": [
+    "d2-001",
+    "d2-002",
+    "d2-005",
+    "d2-006",
+    "d2-014",
+    "d2-015",
+    "d2-016"
+  ]
 }

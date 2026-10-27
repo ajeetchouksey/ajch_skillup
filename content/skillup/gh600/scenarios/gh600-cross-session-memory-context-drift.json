@@ -2,7 +2,7 @@
   "schemaVersion": "2.0",
   "id": "gh600-scenario-003",
   "title": "Resuming a Multi-Day Migration Without Losing the Thread",
-  "description": "Greywick Systems runs a legacy-monolith migration across multiple coding-agent sessions spanning several days. The scenario tests durable-artifact memory strategy, resuming work across sessions without repeating it, detecting and correcting context drift mid-task, and scoping the work so it fits within session limits in the first place.",
+  "description": "Greywick Systems runs a legacy-monolith migration across multiple cloud agent sessions spanning several days. The scenario tests durable-artifact memory strategy, resuming work across sessions without repeating it, detecting and correcting context drift mid-task, and scoping the work so it fits within session limits in the first place.",
   "examId": "gh600",
   "difficulty": "medium",
   "estimatedMinutes": 15,

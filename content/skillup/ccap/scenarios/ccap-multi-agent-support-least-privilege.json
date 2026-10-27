@@ -40,36 +40,36 @@
       "stem": "During a permissions audit, Om finds that the Inquiry Agent's tool schema includes delete_account, described in comments as 'not currently used but may be needed later.' The agent has never invoked it. What is the correct action?",
       "options": [
         "Leave it in place since it has never been invoked, and simply monitor logs for any future call to it",
-        "Remove delete_account from the Inquiry Agent's tool schema entirely; if account deletion is needed later, add it to a role that requires it, scoped and reviewed at that time",
         "Add a stronger system-prompt warning telling the agent never to call delete_account under any circumstances",
+        "Remove delete_account from the Inquiry Agent's tool schema entirely; if account deletion is needed later, add it to a role that requires it, scoped and reviewed at that time",
         "Rename the tool to something less obvious, like manage_account_state, so it is harder for a malicious prompt to reference"
       ],
-      "correct": 1,
-      "explanation": "B is correct because a tool the agent's role does not need should not be present in its schema, regardless of whether it has been called yet — the risk is that a crafted or injected input could induce the model to call it, and the only reliable control is that the capability doesn't exist for that agent. A fails because 'no calls yet' is not evidence of safety; it only means no one has successfully triggered it yet, which is exactly the scenario the prior incident illustrates. C fails for the same reason as relying on instructions generally: a system-prompt warning is not enforcement and can be overridden by injected or adversarial input. D fails because obscuring a tool's name is security by obscurity — the tool is still callable, and the mitigation does nothing to change that."
+      "correct": 2,
+      "explanation": "C is correct because a tool the agent's role does not need should not be present in its schema, regardless of whether it has been called yet — the risk is that a crafted or injected input could induce the model to call it, and the only reliable control is that the capability doesn't exist for that agent. A fails because 'no calls yet' is not evidence of safety; it only means no one has successfully triggered it yet, which is exactly the scenario the prior incident illustrates. B fails for the same reason as relying on instructions generally: a system-prompt warning is not enforcement and can be overridden by injected or adversarial input. D fails because obscuring a tool's name is security by obscurity — the tool is still callable, and the mitigation does nothing to change that."
     },
     {
       "id": "ccap-scenario-002-q3",
       "stem": "The Resolution Agent is being designed to issue refunds up to $50 without human approval, escalating anything larger. Where should the $50 cap be enforced?",
       "options": [
         "In the system prompt, instructing the agent to never approve a refund above $50",
-        "In the refund_customer tool/API itself, which validates the requested amount server-side and rejects or requires additional approval for any call above $50, independent of what the agent's reasoning concluded",
+        "Nowhere explicit — trust the model's training to avoid issuing large refunds without authorization",
         "In a post-hoc weekly report that flags refunds over $50 for review after they've already been processed",
-        "Nowhere explicit — trust the model's training to avoid issuing large refunds without authorization"
+        "In the refund_customer tool/API itself, which validates the requested amount server-side and rejects or requires additional approval for any call above $50, independent of what the agent's reasoning concluded"
       ],
-      "correct": 1,
-      "explanation": "B is correct because a limit that matters for financial exposure needs to be enforced at the tool/API boundary, where it is checked independent of the model's reasoning — this holds even if the agent is manipulated by an injected instruction or simply reasons incorrectly about the amount. A fails because a system-prompt cap is advisory; if the model is convinced (by a crafted customer message, for instance) that $200 is appropriate, there is nothing stopping it from calling the tool with that value. C fails because post-hoc detection doesn't prevent the unauthorized refund from being issued — the money is already gone by the time the report runs. D fails because relying on the model's general training as a control gives no guarantee and is not an auditable, testable enforcement mechanism."
+      "correct": 3,
+      "explanation": "D is correct because a limit that matters for financial exposure needs to be enforced at the tool/API boundary, where it is checked independent of the model's reasoning — this holds even if the agent is manipulated by an injected instruction or simply reasons incorrectly about the amount. A fails because a system-prompt cap is advisory; if the model is convinced (by a crafted customer message, for instance) that $200 is appropriate, there is nothing stopping it from calling the tool with that value. C fails because post-hoc detection doesn't prevent the unauthorized refund from being issued — the money is already gone by the time the report runs. B fails because relying on the model's general training as a control gives no guarantee and is not an auditable, testable enforcement mechanism."
     },
     {
       "id": "ccap-scenario-002-q4",
       "stem": "A customer asks the Resolution Agent for a $300 refund and an account deletion, both above what it's authorized to execute unilaterally. Which handoff design correctly routes this to a human?",
       "options": [
-        "The Resolution Agent asks the customer to confirm the request twice, and if they confirm, executes the refund and deletion directly since repeated confirmation demonstrates intent",
         "The Resolution Agent generates a structured escalation request (customer ID, requested action, amount, justification) and routes it to a human agent's approval queue; the human independently authenticates the request and executes the action through their own authorized access — the agent never gains the ability to execute it itself",
+        "The Resolution Agent asks the customer to confirm the request twice, and if they confirm, executes the refund and deletion directly since repeated confirmation demonstrates intent",
         "The Resolution Agent is granted a higher refund limit ($500) so it can handle this case without escalating, reducing the customer's wait time",
         "The Resolution Agent tells the customer to call back later, with no structured handoff to a human agent"
       ],
-      "correct": 1,
-      "explanation": "B is correct because escalation should hand off a structured request to a human who independently authenticates and executes the action through their own authorized access — the agent's role stops at proposing, and it never gains the capability to execute above its scope. A fails because repeated confirmation from the same conversation is not an authorization control; it doesn't change who is executing the action or verify it through an independent channel, and it effectively lets the agent self-approve. C fails because raising the agent's limit to avoid escalation defeats the purpose of tiering by risk — it just moves the least-privilege violation to a higher dollar amount instead of fixing the design. D fails because it drops the request without a structured escalation path, creating a poor customer experience and losing the information needed for a human to act efficiently."
+      "correct": 0,
+      "explanation": "A is correct because escalation should hand off a structured request to a human who independently authenticates and executes the action through their own authorized access — the agent's role stops at proposing, and it never gains the capability to execute above its scope. A fails because repeated confirmation from the same conversation is not an authorization control; it doesn't change who is executing the action or verify it through an independent channel, and it effectively lets the agent self-approve. C fails because raising the agent's limit to avoid escalation defeats the purpose of tiering by risk — it just moves the least-privilege violation to a higher dollar amount instead of fixing the design. D fails because it drops the request without a structured escalation path, creating a poor customer experience and losing the information needed for a human to act efficiently."
     }
   ],
   "keyLearnings": [

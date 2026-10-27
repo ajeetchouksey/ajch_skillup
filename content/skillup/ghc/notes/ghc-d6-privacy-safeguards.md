@@ -6,15 +6,39 @@
 
 ## Overview
 
-This domain covers how to protect sensitive code and data through content exclusions, how to manage Copilot's public code filter, and the privacy and IP considerations organizations must understand when deploying Copilot.
+This domain covers how to protect sensitive code and data through content exclusions, how to manage the "suggestions matching public code" policy, and the privacy and IP considerations organizations must understand when deploying Copilot. The skills measured (as of August 7, 2026) are: configure content exclusions and editor settings; describe ownership and limitations of outputs; enable suggestions-matching-public-code filtering; and resolve issues with suggestions and content exclusions.
+
+> 💡 **Human Angle**: *"Lock the filing cabinet, check what leaves the building, and know whose name is on the letterhead."* Exclusions, the public code filter and ownership terms are three different locks.
 
 ---
 
 ## 1. Content Exclusions
 
+### Key Concept
+
+**Content exclusions stop Copilot from reading chosen files, so their content never informs suggestions or chat answers.**
+
+Content exclusion is a Copilot Business and Copilot Enterprise feature. Repository administrators set rules for their own repositories, organization owners set rules for users who get a Copilot seat from that organization, and enterprise owners set rules that apply to every Copilot user in the enterprise. In an excluded file, inline suggestions are unavailable, its content doesn't inform suggestions in other files or Chat responses, and Copilot code review on GitHub.com skips it.
+
+Coverage varies by surface. Exclusions apply to inline suggestions in all major IDEs and to Chat in VS Code, Visual Studio and JetBrains, the GitHub website and Copilot CLI, but are **not supported in Edit and Agent modes of Copilot Chat in VS Code**. Rules from the levels add together; there is no individual or IDE-level setting that can loosen them. **Think of exclusions as a "do not read" stamp on a folder**: it only works where the reader honours the stamp, so you must know which readers do.
+
+### In Practice
+
+**What breaks without this**: Secrets in `.env` files, proprietary pricing logic or PII-laden seed files get pulled into prompts as context and can resurface in suggestions to other developers.
+
+**Decision trigger**: Ask: would it be a problem if this file's content appeared in a prompt or a suggestion? If yes, exclude it at the highest level that covers every repository where it appears (enterprise or organization rather than repo-by-repo).
+
+**When you'd choose differently**: Exclusions are not a secrets-management strategy. Secrets shouldn't be committed at all; use secret scanning, push protection and a vault, and treat exclusions as a backstop. Also, if the work happens in VS Code agent or edit mode, exclusions won't protect the file, so restrict access some other way.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Two favourite distractors: "an individual developer can override the organization's exclusions in their IDE" (there is no such setting; the levels add together) and "content exclusion works on every Copilot plan" (Business and Enterprise only). Remember too that VS Code's Edit and Agent modes ignore exclusions.
+</div>
+
 ### What Are Content Exclusions?
 
-Content exclusions prevent GitHub Copilot from **reading and using specific files, directories, or repositories** as context when generating suggestions. This is critical for protecting:
+Content exclusions prevent GitHub Copilot from **reading and using specific files, directories, or repositories** as context. Typical candidates:
 
 - Credentials, API keys, and secrets
 - Proprietary algorithms and business logic
@@ -23,257 +47,348 @@ Content exclusions prevent GitHub Copilot from **reading and using specific file
 
 ### Configuration Levels
 
-Content exclusions can be configured at three levels (listed in priority order):
+| Level | Who configures | Applies to | Where |
+|-------|---------------|-----------|-------|
+| **Repository** | Repository administrators | Copilot users working in that repository | Repo → Settings → Code, planning, and automation → Copilot → Content exclusion |
+| **Organization** | Organization owners | Users assigned a Copilot seat by that organization | Org → Settings → Copilot → Content exclusion |
+| **Enterprise** | Enterprise owners | All Copilot users in the enterprise | Enterprise → AI controls → Copilot → Content exclusion |
 
-```
-Organization Level (highest priority — overrides repo and IDE)
-    ↓ applies to all repos in the org
-Repository Level (overrides IDE-level settings)
-    ↓ applies to all developers using Copilot on that repo
-Individual IDE Level (lowest priority — can be overridden by org/repo)
-```
+A repository's Content exclusion page also shows, in grey read-only boxes, rules it inherits from its organization or from other organizations in the same enterprise. Rules **combine**; no level can switch off a rule set at another level.
 
 ### Configuring Repository-Level Exclusions
 
-**Location:** Repository → Settings → GitHub Copilot → Content Exclusion
+**Format:** a YAML list of quoted paths, one per line. Paths starting with `/` are relative to the repository root; paths without a leading `/` match anywhere in the repository.
 
-**Format:** Glob patterns, one per line
-
-```
-# Exclude all .env files recursively
-**/.env
-
-# Exclude the entire secrets directory
-secrets/**
-
-# Exclude all PEM certificate files
-**/*.pem
-
-# Exclude all private key files
-**/*.key
-
-# Exclude configuration files with sensitive data
-config/production.yml
-config/staging.yml
-
-# Exclude SQL seed files with PII test data
-database/seeds/users.sql
+```yaml
+# Ignore one specific file
+- "/src/some-dir/kernel.rs"
+# Ignore secrets.json anywhere in this repository
+- "secrets.json"
+# Ignore any file whose name starts with "secret", anywhere
+- "secret*"
+# Ignore any file whose name ends in ".cfg", anywhere
+- "*.cfg"
+# Ignore everything in or below the top-level /scripts directory
+- "/scripts/**"
 ```
 
 ### Configuring Organization-Level Exclusions
 
-**Location:** Organization → Settings → GitHub Copilot → Content Exclusion
+At organization (and enterprise) level, each rule is keyed by a **repository reference** and lists paths under it. Use `"*"` to match all repositories and non-Git files.
 
-Organization-level exclusions apply to ALL repositories in the organization automatically — the most scalable approach for consistent security policy.
+```yaml
+# .env files in all file system roots, Git and non-Git
+"*":
+  - "**/.env"
 
-**Recommended organization-level exclusions:**
+# A repository in this organization, by name
+octo-repo:
+  - "/src/some-dir/kernel.rs"
+
+# Any Git host, by URL (http[s]://, git://, ssh:// or user@host:path forms)
+https://github.com/primer/react.git:
+  - "secrets.json"
+  - "/src/**/temp.rb"
+
+git@gitlab.com:gitlab-org/gitlab-runner.git:
+  - "**/security/**"
 ```
-# Secret and credential files
-**/.env
-**/.env.*
-**/credentials.json
-**/secrets.yml
-**/secrets.yaml
 
-# Certificate and key files
-**/*.pem
-**/*.key
-**/*.p12
-**/*.pfx
-**/*.crt
-
-# Infrastructure as Code with secrets
-**/terraform.tfvars
-**/terraform.tfvars.json
-```
+The `user@` and `:port` parts of a repository reference are ignored when matching, and for Azure DevOps either the `dev.azure.com` or `visualstudio.com` host form works.
 
 ---
 
 ## 2. Glob Pattern Reference
 
+### Key Concept
+
+**Exclusion paths use fnmatch patterns, matched case-insensitively; a leading slash anchors the path to the repository root.**
+
+The pattern rules are short. `*` matches any characters within a name, `**` matches across directory levels, `?` matches one character, `[dk]` matches a character set and `{server,session}` matches alternatives. A path that starts with `/` is anchored to the repository root; a bare name such as `"secrets.json"` or `"*.cfg"` matches that file name anywhere in the repository.
+
+Most mistakes come from anchoring, not wildcards. `"/scripts/*"` covers only the direct contents of `/scripts`, while `"/scripts/**"` covers everything below it. **Read a pattern like a postal address**: a leading slash is a full street address, a bare name is "anyone called Smith in town".
+
+### In Practice
+
+**What breaks without this**: An admin writes `"/config/*"` expecting to exclude nested `config/prod/db.yml`, and the most sensitive file stays readable.
+
+**Decision trigger**: Ask: should this rule match one exact location, or a file name wherever it appears? Anchor with `/` for the first; use a bare name or `**/` for the second. Then test it with a real file.
+
+**When you'd choose differently**: If a whole repository is sensitive, don't enumerate file patterns one by one. Add an organization-level rule keyed to that repository's reference that covers all of its paths, or keep Copilot out of that work entirely.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Look out for options that treat patterns as case-sensitive (they are case-insensitive) or that confuse `/dir/*` (direct children only) with `/dir/**` (everything below). And remember the leading slash: `"/secrets.json"` is root-only, `"secrets.json"` is anywhere.
+</div>
+
 ### Glob Syntax for Content Exclusions
 
 | Pattern | What It Matches | Example Match |
 |---------|----------------|--------------|
-| `*.env` | `.env` files in root only | `.env` |
-| `**/.env` | `.env` files at any depth | `app/config/.env` |
-| `secrets/**` | Everything inside `secrets/` | `secrets/db.txt`, `secrets/api/keys.json` |
-| `**/*.pem` | All `.pem` files at any depth | `certs/server.pem`, `ssl/root.pem` |
-| `src/**/*.test.ts` | All `.test.ts` files inside `src/` | `src/utils/helper.test.ts` |
-| `config/production.yml` | Exact file at exact path | `config/production.yml` only |
+| `"secrets.json"` | A file with that name anywhere in the repo | `secrets.json`, `app/secrets.json` |
+| `"*.cfg"` | Any file name ending in `.cfg`, anywhere | `app.cfg`, `conf/db.cfg` |
+| `"secret*"` | Any file name starting with `secret`, anywhere | `secret.txt`, `lib/secrets.yml` |
+| `"/scripts/**"` | Everything in or below top-level `/scripts` | `/scripts/a.sh`, `/scripts/ci/b.sh` |
+| `"/scripts/*"` | Direct contents of `/scripts` only | `/scripts/a.sh` (not `/scripts/ci/b.sh`) |
+| `"**/.env"` | `.env` files at any depth | `/.env`, `services/api/.env` |
+| `"*.m[dk]"` | Names ending in `.md` or `.mk` | `README.md`, `build.mk` |
+| `"{server,session}*"` | Names starting with `server` or `session` | `server.go`, `session_test.go` |
 
 ### Common Pattern Mistakes
 
-```
-# ❌ WRONG — only excludes root-level .env
-*.env
+```yaml
+# ❌ Anchored to the root, so nested copies are NOT excluded
+- "/config/production.yml"
 
-# ✅ CORRECT — excludes .env at any directory depth
-**/.env
+# ✅ Matches the file name anywhere in the repository
+- "production.yml"
 
-# ❌ WRONG — syntax not supported in Copilot exclusions
+# ❌ Only the direct children of /secrets
+- "/secrets/*"
+
+# ✅ Everything in or below /secrets
+- "/secrets/**"
+
+# ❌ Unquoted or prefixed entries are not the documented syntax
 exclude: secrets/
 
-# ✅ CORRECT — use glob directly
-secrets/**
-
-# ❌ WRONG — using negation (not supported)
-!public/**
-
-# ✅ CORRECT — list what to exclude, not what to include
+# ✅ One quoted path per list item
+- "/secrets/**"
 ```
+
+The documentation describes no negation (`!pattern`) syntax: list what to exclude rather than what to include.
 
 ---
 
 ## 3. Public Code Filter (Duplication Detection)
 
-### What Is the Public Code Filter?
+### Key Concept
 
-The public code filter (also called the **duplication detection filter** or **suggestions matching public code filter**) prevents Copilot from suggesting code that closely matches publicly available open-source code.
+**The "suggestions matching public code" policy decides whether Copilot blocks matching suggestions or shows them with a code reference.**
 
-**How it works:**
-- Copilot compares generated suggestions against a database of publicly known code
-- If a suggestion closely matches (~150 characters) known public code, it is suppressed
-- A different, non-matching suggestion may be provided, or no suggestion if alternatives aren't available
+For inline suggestions, Copilot compares a potential suggestion plus about 150 characters of surrounding code against an index of public repositories on GitHub.com. Code in private repositories and code hosted outside GitHub isn't searched. When the policy is **Block**, matching suggestions aren't shown; when it's **Allow**, matches are shown with code-referencing details such as the matching repository files and any detected licences, and Copilot Chat responses link to information about the match.
 
-### Why Enable It?
+GitHub reports matches in under one percent of suggestions, so this is a narrow control for a narrow risk. It acts on Copilot's output, not on what Copilot reads. **The filter is a customs check at the exit door**: it inspects what leaves, while content exclusions guard what comes in.
 
-1. **IP protection**: Reduces risk of inadvertently including open-source code without proper attribution
-2. **License compliance**: Helps avoid copyleft-licensed code entering your proprietary codebase
-3. **GitHub Indemnification**: Required to qualify for GitHub's IP indemnification policy
+### In Practice
+
+**What breaks without this**: A suggestion reproduces a copyleft-licensed function verbatim, ships in a proprietary product, and nobody knows its origin until a licence audit.
+
+**Decision trigger**: Ask: do we need to avoid public-code matches entirely, or do we want to see them with attribution and decide? Block for strict avoidance; Allow with code referencing when your team is set up to review licences.
+
+**When you'd choose differently**: Teams that work heavily with open source and track licences carefully often prefer Allow, because code references surface the origin and licence instead of silently dropping a useful suggestion.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Two traps. First, the filter does not stop Copilot reading your files; that is content exclusion. Second, older material says Block is a prerequisite for IP indemnification. Microsoft's Customer Copyright Commitment page states that as of April 3, 2026 the duplicate detection filter is no longer required for CCC coverage of GitHub offerings; the filter remains available as an optional control.
+</div>
 
 ### Enabling the Public Code Filter
 
-**Location:** Organization → Settings → Copilot → Policies → "Suggestions matching public code"
+| Scope | Where | Notes |
+|-------|-------|------|
+| **Enterprise** | Enterprise → AI controls → Copilot → Privacy → "Suggestions matching public code" | Set it for all organizations or delegate to organization owners; Allowed by default for Copilot Business |
+| **Organization** | Org → Settings → Copilot → Policies → "Suggestions matching public code" | Applies to members who get Copilot through the organization |
+| **Individual** (Free, Pro, Pro+, Max) | Personal Settings → Copilot → "Suggestions matching public code" | **Allow** or **Block**; not configurable if your seat comes from an Enterprise Cloud organization |
 
-| Setting | Behavior |
+| Setting | Behaviour |
 |---------|---------|
-| **Allowed** (default) | Copilot suggestions may match public code |
-| **Blocked** | Suggestions matching public code are suppressed |
-
-> **Key Exam Fact:** Setting this to "Blocked" is a prerequisite for GitHub's IP indemnification coverage.
+| **Allow** | Matching suggestions can be shown, with code-referencing information |
+| **Block** | Matching suggestions are suppressed; Copilot may offer a different suggestion or none |
 
 ### Limitations
 
-- The filter is not 100% comprehensive — it doesn't catch all matching code
-- Some unique implementations in Copilot's training may not be in the public code database
-- It's a risk-reduction tool, not an absolute legal guarantee
+- Matching is based on an index of public GitHub.com code; it doesn't search private repositories or code hosted elsewhere
+- It is a risk-reduction tool, not a legal guarantee that output is free of third-party IP
+- It controls output only; it doesn't stop Copilot reading your files
 
 ---
 
 ## 4. Output Ownership and Intellectual Property
 
-### Who Owns Copilot-Generated Code?
+### Key Concept
 
-**You (the developer/organization) own the code you generate and accept.**
+**GitHub claims no ownership of Copilot inputs or outputs; responsibility for using the output stays with you.**
 
-Per GitHub's Terms of Service:
-- Generated code is assigned to the user who created it
-- GitHub does not claim ownership of Copilot outputs
-- The code you accept becomes your code — subject to applicable law
+GitHub's Generative AI Services Terms (March 2026, which replaced the earlier Copilot Product Specific Terms for Business and Enterprise customers buying directly from GitHub) state that "GitHub does not own Inputs or Outputs." GitHub's responsible-use documentation for code completion adds that users assume the risks of generated code, including security vulnerabilities, bugs and IP infringement.
+
+Defence against third-party IP claims is contractual, not automatic. The terms say that if your agreement provides for defence of third-party claims, that provision applies to Copilot outputs, subject to Microsoft's Customer Copyright Commitment required mitigations. **Ownership is the deed to the house; indemnity is the insurance policy**: you hold the first by default, and the second depends on what your contract says.
+
+### In Practice
+
+**What breaks without this**: Legal teams either block Copilot because they assume GitHub owns the output, or approve it on the false belief that any IP claim is automatically GitHub's problem.
+
+**Decision trigger**: Ask: which agreement covers our Copilot purchase (GitHub customer agreement, Microsoft agreement, or personal Terms of Service) and what does its defence-of-claims clause say? Answer that before promising developers protection.
+
+**When you'd choose differently**: In regulated industries or jurisdictions where copyright in AI-assisted work is unsettled, add internal controls (licence scanning, provenance review, the public code filter set to Block) regardless of what the contract offers.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+"GitHub owns code generated by Copilot" is false: GitHub does not own inputs or outputs. Equally false is "indemnification is automatic for every Copilot user". Personal plans are governed by the GitHub Terms of Service, and business defence of claims depends on the customer's agreement.
+</div>
 
 ### Limitations and Caveats
 
 | Topic | Reality |
 |-------|---------|
-| AI IP law | Still evolving globally — legal landscape is not fully settled |
+| AI IP law | Still evolving globally; the legal landscape isn't settled |
 | Copyright of AI output | Varies by jurisdiction; consult legal counsel for regulated industries |
-| Indemnification | Conditional — requires following GitHub's responsible use guidelines |
-| Public code filter | Required for indemnification; reduces but doesn't eliminate risk |
-
-### GitHub's IP Indemnification
-
-GitHub offers indemnification for Copilot-generated code **subject to conditions**:
-1. Use Copilot Business or Enterprise (not Individual)
-2. Public code filter must be enabled and set to "Blocked"
-3. Follow GitHub's responsible use guidelines
-4. Don't knowingly use Copilot to reproduce public code
+| Defence of IP claims | Comes from your agreement (and the Customer Copyright Commitment), not from a Copilot setting |
+| Public code filter | Optional risk reduction; as of April 3, 2026 not a required mitigation for CCC coverage of GitHub offerings |
 
 ---
 
 ## 5. Privacy Settings
 
-### Individual Privacy Controls
+### Key Concept
 
-Individual users (Copilot Individual subscriptions only) can control:
+**Business and Enterprise data isn't used for model training; personal plans train on interaction data unless the user opts out.**
 
-| Setting | What It Controls |
-|---------|----------------|
-| **Telemetry** | Whether usage data is sent to GitHub for product improvement |
-| **Code snippets for training** | Whether code snippets from suggestions are used to train future models |
+GitHub's Generative AI Services Terms state that GitHub "will not use Inputs or Outputs to train generative AI models" for covered business customers unless instructed. For Copilot Free, Pro, Pro+ and Max, GitHub announced that from April 24, 2026 interaction data (inputs, outputs, code snippets and associated context) is used to train and improve its models unless the user turns off **"Allow GitHub to use my data for AI model training"** in the Privacy section of their Copilot settings.
 
-**For Individual users:** Settings → GitHub Copilot → Opt out of telemetry and/or training data collection.
+Other editor-facing settings sit next to it. Users on personal plans choose Allow or Block for suggestions matching public code, and web search through Bing is disabled by default. For seats assigned by an organization or enterprise, administrators set these policies centrally. **Think of the plan as the lease**: on a business lease the landlord's rules are fixed in the contract; on a personal lease you have to tick the boxes yourself.
 
-### Organization Override
+### In Practice
 
-Organization admins can **lock** individual settings:
-- An org admin can prevent individual members from overriding certain privacy settings
-- Organization-level policy takes precedence over individual preferences
+**What breaks without this**: A contractor uses a personal Pro plan on client code with the training setting left at its default, breaching the client's data-handling terms.
 
-### Copilot Business / Enterprise Privacy Commitment
+**Decision trigger**: Ask: whose plan is this seat on? If personal, check the Privacy settings before touching sensitive code. If business, check the organization's policies and content exclusions instead.
 
-| Tier | Training on customer code | Telemetry |
-|------|--------------------------|-----------|
-| **Individual** | Opt-out available | Opt-out available |
-| **Business** | **NEVER used for training** | Limited; no code snippets |
-| **Enterprise** | **NEVER used for training** | Limited; no code snippets |
+**When you'd choose differently**: Where any data leaving the network is unacceptable, setting toggles isn't enough. Use Business or Enterprise with content exclusions, network allowlists, and policies that disable features (for example web search) you don't need.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Don't carry over the old "Copilot Individual" framing. The personal plans are now Free, Pro, Pro+ and Max (plus Student), and their training setting is opt-out, meaning on unless the user turns it off. Business and Enterprise are not affected by that change.
+</div>
+
+### Individual Settings (personal plans)
+
+| Setting | What It Controls | Notes |
+|---------|----------------|-------|
+| **Allow GitHub to use my data for AI model training** | Whether interaction data trains GitHub's models | Free, Pro, Pro+, Max; opt-out (from April 24, 2026). Earlier opt-outs were retained |
+| **Suggestions matching public code** | Allow or Block matches | Not configurable for seats from an Enterprise Cloud organization |
+| **Copilot access to Bing** | Web search in Copilot Chat | Disabled by default |
+
+### Organization Control
+
+- For seats assigned through an organization or enterprise, Copilot features and policies are set by owners in the organization or enterprise settings
+- An enterprise can set a policy for all organizations or let each organization choose
+- Changes to organization Copilot settings are recorded in the audit log (`copilot.cfb_org_settings_changed`)
+
+### Business / Enterprise vs. Personal Plans
+
+| Plan | Inputs/outputs used for model training | Content exclusion | Central policy management |
+|------|--------------------------------------|-------------------|---------------------------|
+| **Free / Pro / Pro+ / Max** | Yes, unless the user opts out | Not included | Not included |
+| **Business** | No | Included | Included |
+| **Enterprise** | No | Included | Included |
 
 ---
 
 ## 6. Troubleshooting Content Exclusions
 
+### Key Concept
+
+**Most "exclusion isn't working" reports are timing, surface or pattern problems, and each has a specific check.**
+
+After you add or change an exclusion, it can take up to 30 minutes to reach IDEs that already loaded the settings. To apply it sooner, reload: in VS Code run **Developer: Reload Window**; in JetBrains IDEs and Visual Studio close and reopen the application; Vim/Neovim fetch exclusions each time a file is opened. In the IDE, the Copilot status bar icon shows a diagonal line on an excluded file, and hovering over it tells you which setting applies.
+
+If timing isn't the cause, check the surface and the pattern. VS Code's Edit and Agent modes don't honour exclusions, symlinks and repositories on remote filesystems aren't covered, and the IDE can still pass semantic information from an excluded file (type information, hover definitions). **Debug exclusions like a leaking pipe**: check the valve was turned (reload), the right pipe was capped (surface), and the cap fits (pattern).
+
+### In Practice
+
+**What breaks without this**: An admin sees a secret file still feeding answers, assumes the feature is broken and escalates, when the developer was simply in agent mode or hadn't reloaded.
+
+**Decision trigger**: Ask, in order: has it been 30 minutes or has the IDE reloaded? Is the developer in a supported mode and client? Does the status bar icon show the exclusion? Does the pattern actually match the path?
+
+**When you'd choose differently**: If suggestions are missing everywhere (not just in excluded files), it isn't an exclusion problem. Check the extension is up to date, sign out and back in, look at the Copilot logs, and check githubstatus.com for incidents.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+The trap answer is "content exclusions take effect instantly". Changes can take up to 30 minutes in IDEs that already loaded settings, and reloading is the fix. A second trap: assuming exclusions apply in VS Code agent mode. They don't.
+</div>
+
 ### Common Issues and Solutions
 
 | Issue | Likely Cause | Solution |
 |-------|-------------|---------|
-| Excluded file still appears in suggestions | IDE not reloaded after config change | Reload/restart the IDE |
-| Exclusion pattern not working | Incorrect glob syntax | Verify pattern with glob tester; check `**` usage |
-| Org-level exclusions not applying | IDE extension version | Update Copilot extension to latest version |
-| Repo-level exclusions not applying | Permission issue | Verify you're a repo admin |
-| No suggestions in any file | Entire repo excluded at org level | Review org-level exclusion patterns |
+| Excluded file still informs suggestions | Settings not refreshed yet (up to 30 minutes) | Reload: VS Code **Developer: Reload Window**; JetBrains/Visual Studio restart |
+| Excluded file used in a VS Code chat | Developer is in Edit or Agent mode | Exclusions aren't supported there; use Ask mode or other controls |
+| Pattern not matching | Anchoring or wildcard mistake | Check leading `/`, `*` vs `**`; test with a real path |
+| Repo-level rule can't be saved | User isn't a repository administrator | Ask a repo admin, or set it at org level |
+| No suggestions in any file of a repo | The whole repository is excluded at org/enterprise level | Review the inherited rules shown on the repo's Content exclusion page |
+| Information still leaks via types/hover | IDE passes semantic info indirectly | Known limitation; exclude or isolate the source more broadly |
+| Copilot stops working entirely | Outdated extension, auth problem or service incident | Update the extension, sign out and in, check logs and githubstatus.com |
 
 ### Validation Workflow
 
 ```
-1. Configure exclusion pattern
+1. Configure the exclusion rule (repo, org or enterprise)
    ↓
-2. RELOAD the IDE (critical step many miss)
+2. Wait up to 30 minutes OR reload the IDE
    ↓
-3. Open a file that SHOULD be excluded
+3. Open a normal file and confirm a suggestion appears
    ↓
-4. Verify Copilot does NOT suggest content derived from that file
+4. Make the same edit in an excluded file — no suggestion should be offered
    ↓
-5. Open a file that should NOT be excluded
+5. Hover the Copilot status bar icon — it should show the exclusion and its source
    ↓
-6. Verify Copilot still provides normal suggestions
+6. In Copilot Chat (Ask mode), attach the excluded file and ask "explain this file"
    ↓
-7. Test Copilot Chat: ask about the excluded content
-   ↓
-8. Verify Copilot cannot surface information from excluded files
+7. Confirm the file is not used and is not listed as a reference in the response
 ```
 
 ---
 
 ## 7. Audit Log Events
 
-### Copilot-Related Audit Log Events
+### Key Concept
 
-Organization admins can monitor governance changes via:  
-**Organization → Settings → Audit Log → Filter by "copilot"**
+**The audit log records who changed Copilot settings, seats and policies, never what developers typed into Copilot.**
+
+Filter the organization or enterprise audit log with `action:copilot` to see Copilot plan events such as seat assignments, policy changes and content exclusion edits, and with `actor:Copilot` to see agent activity on GitHub.com. Events are kept for 180 days, so stream them to a SIEM for longer retention.
+
+The audit log doesn't include client session data such as the prompts a user sends to Copilot locally. Usage questions ("who is actually using Copilot?") belong to the Copilot usage metrics dashboards and API, not the audit log. **The audit log is the building's sign-in book, not a recording of the meetings.**
+
+### In Practice
+
+**What breaks without this**: After an exclusion rule disappears, nobody can say who removed it or when, and a compliance review fails for lack of evidence.
+
+**Decision trigger**: Ask: is my question "who changed what configuration, when?" Use the audit log. Is it "how much is Copilot used, and by whom?" Use usage metrics.
+
+**When you'd choose differently**: To capture prompts or agent actions for your own monitoring, you need a custom solution (for example hooks that send Copilot CLI events to your own logging service); the audit log won't provide them.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">
+Distractors claim the audit log stores prompts or suggestions for review. It doesn't. It records configuration and licensing events for 180 days. Also beware invented event names; the real ones look like `copilot.content_exclusion_changed` and `copilot.cfb_seat_added`.
+</div>
+
+### Copilot-Related Audit Log Events (selection)
+
+Organization admins can monitor governance changes via **Organization → Settings → Audit log**, filtered with `action:copilot`.
 
 | Event | Description |
 |-------|-------------|
-| `copilot.policy_change` | Admin changed a Copilot policy setting |
-| `copilot.seat_assigned` | A seat was assigned to a user |
-| `copilot.seat_removed` | A seat was revoked from a user |
-| `copilot.content_exclusion_created` | A new content exclusion rule was added |
-| `copilot.content_exclusion_updated` | An exclusion rule was modified |
+| `copilot.cfb_org_settings_changed` | An organization-level Copilot feature setting changed |
+| `copilot.cfb_seat_added` | A Business/Enterprise seat was added for a user |
+| `copilot.cfb_seat_assignment_created` | A seat assignment was created for a user or team |
+| `copilot.cfb_seat_assignment_unassigned` | A seat was unassigned; access ends at the end of the billing cycle |
+| `copilot.cfb_seat_cancelled` | A seat was cancelled, ending access |
+| `copilot.content_exclusion_changed` | The paths excluded from Copilot were updated |
+| `copilot.code_review_organization_settings_updated` | Copilot code review settings were updated for an organization |
+| `copilot.custom_instructions_updated` | Organization custom instructions were updated |
 
 ---
 
 ## Deep Dive: Exclusions, Filters, and Ownership Untangled
 
-Domain 6 blends three easily-confused ideas: **content exclusions** (what Copilot can *read*), the **public code filter** (what Copilot can *suggest*), and **output ownership/indemnification** (who is *liable*). Keeping them in separate mental boxes is most of the battle.
+Domain 6 blends three easily-confused ideas: **content exclusions** (what Copilot can *read*), the **public code filter** (what Copilot can *suggest*), and **output ownership and defence of claims** (who is *responsible*). Keeping them in separate mental boxes is most of the battle.
 
 ### Exclusions vs. the public code filter — opposite ends of the pipe
 
@@ -281,43 +396,42 @@ Domain 6 blends three easily-confused ideas: **content exclusions** (what Copilo
 |---|---|---|
 | **Controls** | What goes *into* the prompt | What comes *out* of the model |
 | **Stage** | Input / context collection | Output / post-processing |
-| **Protects against** | Leaking *your* secrets & IP into prompts | Emitting *others'* public/licensed code |
-| **Configured as** | Glob patterns (org/repo/IDE) | A policy toggle (Allowed / Blocked) |
+| **Protects against** | Leaking *your* secrets and IP into prompts | Emitting *others'* public or licensed code |
+| **Configured as** | fnmatch paths at repo, org or enterprise level | A policy: Allow or Block |
+| **Who sets it** | Repo admins, org owners, enterprise owners (Business/Enterprise only) | The user on personal plans; org or enterprise owners for assigned seats |
 
-A one-liner that resolves most questions: **exclusions guard your inputs; the public code filter guards your outputs.** If a scenario is about hiding `.env` secrets → exclusions. If it's about not reproducing open-source code → the filter.
+A one-liner that resolves most questions: **exclusions guard your inputs; the public code filter guards your outputs.** If a scenario is about hiding `.env` secrets, think exclusions. If it's about not reproducing open-source code, think the filter.
 
-### Precedence, with a conflict example
+### Levels add up; they don't override
 
-Exclusions resolve **Organization > Repository > IDE**. The higher level always wins. Concretely:
+Exclusion rules from the repository, organization and enterprise levels **combine**. A repository shows inherited organization and enterprise rules as read-only grey boxes, so a repo admin can add rules but can't delete inherited ones. There is no individual or IDE-level exclusion setting, which means a developer has no way to un-exclude a file their organization excluded. That is why enterprise- or organization-level rules are the scalable control: one policy covers every repository, and no single person can weaken it.
 
-> A developer adds an *IDE-level* rule to *allow* a folder that the **organization** has excluded. What happens? The org exclusion **wins** — the folder stays excluded. Individuals can make things *more* restrictive locally, but they can **never override an org-level exclusion to be less restrictive.**
+### Worked scenario: the file that wouldn't stay excluded
 
-This is why org-level exclusions are the recommended, scalable control: one policy protects every repo, and no individual can accidentally (or deliberately) weaken it.
+> **Scenario.** Contoso's org owner adds `"*": - "**/.env"` at 10:00. At 10:10 a developer in VS Code asks Chat in **Agent** mode to "fix the database connection" and the response quotes values from `services/api/.env`. The owner thinks the rule failed.
+>
+> **Reasoning.** Three independent causes are possible. (1) *Timing*: rules can take up to 30 minutes to reach an IDE that already loaded settings, and 10 minutes isn't enough. (2) *Surface*: content exclusion isn't supported in Edit and Agent modes of Copilot Chat in VS Code, so even a fully propagated rule wouldn't stop this. (3) *Pattern*: `**/.env` does match `services/api/.env`, so the pattern isn't the problem.
+>
+> **Outcome.** The developer runs **Developer: Reload Window**, sees the status bar icon with a diagonal line on `.env`, and switches to Ask mode, where attaching the file and asking "explain this file" shows it isn't used. The owner adds a policy note that agent-mode work must not happen in repos with live secrets, and opens a ticket to move those values to a secrets manager, since exclusion was only ever a backstop.
 
-### The `**/.env` glob trap, explained
+### Ownership and defence of claims — the contractual safety net
 
-`*.env` matches `.env` **only in the root directory**. Real projects nest config: `services/api/.env`, `apps/web/.env`. The recursive form **`**/.env`** matches at *any* depth — that's the one you want. The single most common Domain 6 mistake is choosing the non-recursive pattern. Also note Copilot exclusions use **plain globs** — there is no `!negation` and no `exclude:` prefix; you list what to *exclude*, period.
+You (or your organization) keep your code, and GitHub does not own inputs or outputs. But defence against a third-party IP claim is **not automatic**. Under the GitHub Generative AI Services Terms, it applies if your agreement provides for defence of third-party claims, subject to Microsoft's Customer Copyright Commitment required mitigations. As of April 3, 2026, those mitigations list nothing extra for GitHub offerings, and the duplicate detection filter is optional. On the exam, treat answers that make the filter a *hard prerequisite* for protection with suspicion unless the question is explicitly about the earlier policy, and reject any answer that calls indemnity automatic or universal.
 
-### The "reload" gotcha
+### Memory aid: R.E.A.C.H. when exclusions misbehave
 
-Exclusions (and many policy changes) take effect **only after the IDE is reloaded/restarted**. A scenario where "the excluded file still shows up in suggestions" almost always resolves to *the developer didn't reload the IDE.* This is the first thing to check and a frequent correct answer.
-
-### Ownership and indemnification — the conditional safety net
-
-You (or your org) **own** Copilot output per GitHub's ToS — GitHub claims nothing. But **indemnification** (GitHub defending you against an IP claim) is **not automatic**; it is a *conditional* offer requiring **all** of:
-
-1. Copilot **Business or Enterprise** (not Individual)
-2. Public code filter set to **Blocked**
-3. Following GitHub's **responsible use** guidelines
-4. Not *knowingly* reproducing public code
-
-Miss any one and the indemnification claim can fail. On the exam, "indemnification" should immediately trigger the mental checklist above — and the reminder that the public code filter being **Blocked** is a hard prerequisite.
+- **R — Reload or wait**: up to 30 minutes, or **Developer: Reload Window** / restart the IDE.
+- **E — Edit/Agent mode?** VS Code's Edit and Agent modes don't honour exclusions.
+- **A — Anchor and syntax**: leading `/` anchors to the root; `*` vs `**`; case-insensitive fnmatch.
+- **C — Coverage gaps**: symlinks, remote filesystems and IDE semantic info aren't covered.
+- **H — Hover the status icon**: a diagonal line confirms the exclusion and shows which setting applies.
 
 ### Exam Strategy for Domain 6
 
-- Sort every question into one box first: **inputs (exclusions)**, **outputs (filter)**, or **liability (ownership/indemnification)**.
-- Recursive glob = **`**/`**; org precedence always wins; reload the IDE after changes.
-- Business/Enterprise **never train** on customer code (shared with Domain 3) — and indemnification is **conditional**, never guaranteed by the filter alone.
+- Sort every question into one box first: **inputs (exclusions)**, **outputs (filter)**, or **responsibility (ownership and defence of claims)**.
+- Exclusion facts that decide answers: Business/Enterprise only; repo, org and enterprise levels that combine; up to 30 minutes or reload; not in VS Code Edit/Agent modes.
+- Business and Enterprise inputs and outputs are not used for training; personal plans are opt-out since April 24, 2026.
+- The sentence to remember: **exclusions control what Copilot reads, the filter controls what it shows, and your contract controls who is responsible.**
 
 ---
 
@@ -325,13 +439,16 @@ Miss any one and the indemnification claim can fail. On the exam, "indemnificati
 
 | Trap | Correct Answer |
 |------|---------------|
-| "Content exclusions automatically apply without IDE reload" | **FALSE** — IDE must be reloaded after configuration |
-| "Exclusions only affect inline suggestions, not Chat" | **FALSE** — exclusions apply to both features |
-| "The public code filter guarantees no IP issues" | **FALSE** — it reduces risk; it's not an absolute guarantee |
-| "Organization owns all Copilot-generated code" | Correct for Enterprise/Business tiers per GitHub ToS |
-| "Individual exclusions override organization exclusions" | **FALSE** — org-level takes precedence |
-| "`*.env` excludes all .env files" | **FALSE** — use `**/.env` for recursive matching |
-| "Enterprise tier data is used to train models" | **FALSE** — Business and Enterprise NEVER train on customer code |
+| "Content exclusions apply instantly" | **FALSE** — up to 30 minutes in IDEs that already loaded settings; reload to apply sooner |
+| "Exclusions only affect inline suggestions, not Chat" | **FALSE** — they cover inline suggestions and Chat on supported clients, and Copilot code review on GitHub.com |
+| "Exclusions also apply in VS Code Agent and Edit modes" | **FALSE** — not supported in those modes |
+| "The public code filter guarantees no IP issues" | **FALSE** — it reduces one risk; it isn't a legal guarantee |
+| "Blocking public code matches is required for indemnity" | **Outdated** — no longer a required CCC mitigation for GitHub offerings as of April 3, 2026 |
+| "GitHub owns code Copilot generates" | **FALSE** — GitHub does not own inputs or outputs |
+| "Developers can override org exclusions in their IDE" | **FALSE** — no individual/IDE level exists; levels combine |
+| "Content exclusion is available on Copilot Pro" | **FALSE** — Business and Enterprise only |
+| "Business/Enterprise data is used to train models" | **FALSE** — inputs and outputs aren't used for training |
+| "The audit log stores developers' prompts" | **FALSE** — no client session data; 180-day retention of configuration events |
 
 ---
 
@@ -339,11 +456,14 @@ Miss any one and the indemnification claim can fail. On the exam, "indemnificati
 
 | Topic | Key Fact |
 |-------|---------|
-| Exclusion levels | Org (highest) → Repo → IDE (lowest) |
-| Reload required | Always reload IDE after configuring exclusions |
-| Glob `**` | Matches any directory depth (recursive) |
-| Public code filter | Set to "Blocked" for GitHub indemnification eligibility |
-| Who owns output | Developer/organization (per GitHub ToS) |
-| Business/Enterprise training | NEVER use customer code for training |
-| Audit log | Monitor policy changes, seat assignments |
-| Validation | Open excluded file → verify no suggestions from it |
+| Exclusion plans | Copilot Business and Enterprise only |
+| Exclusion levels | Repository (repo admins), organization (org owners), enterprise (enterprise owners); rules combine |
+| Pattern syntax | fnmatch, case-insensitive; `/` anchors to repo root; `"*"` key = all repos at org/enterprise level |
+| Propagation | Up to 30 minutes; VS Code **Developer: Reload Window**, JetBrains/VS restart |
+| Unsupported surfaces | Edit and Agent modes of Copilot Chat in VS Code; symlinks; remote filesystems |
+| Public code filter | ~150 characters of context checked against public GitHub code; Block or Allow (with code references) |
+| Who owns output | GitHub does not own inputs or outputs |
+| Defence of IP claims | Per your agreement and Microsoft's Customer Copyright Commitment; filter optional since April 3, 2026 |
+| Training on data | Business/Enterprise: no. Free/Pro/Pro+/Max: yes unless opted out (from April 24, 2026) |
+| Audit log | `action:copilot`, `actor:Copilot`; 180 days; no prompts |
+| Validation | Status bar icon with diagonal line; "explain this file" in Chat shows no reference |

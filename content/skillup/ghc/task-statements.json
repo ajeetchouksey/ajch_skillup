@@ -2,7 +2,7 @@
   "schemaVersion": "1.0",
   "examId": "ghc",
   "examCode": "GH-300",
-  "lastUpdated": "2025-01-01",
+  "lastUpdated": "2026-10-27",
   "domains": [
     {
       "id": 1,
@@ -43,7 +43,7 @@
         },
         {
           "id": "d1-t2",
-          "title": "Validate and operate AI tools responsibly",
+          "title": "Validate and operate AI tools",
           "knowledge": [
             "Understand the necessity of validating AI-generated output before use",
             "Recognize that Copilot can produce hallucinations and incorrect suggestions",
@@ -80,104 +80,141 @@
       "tasks": [
         {
           "id": "d2-t1",
-          "title": "Use Copilot in the IDE",
+          "title": "Use GitHub Copilot in the IDE",
           "knowledge": [
-            "Know how to enable GitHub Copilot in VS Code, JetBrains IDEs, and other supported editors",
-            "Understand different trigger modes: inline suggestions, Copilot Chat, slash commands",
-            "Know how to use Copilot in Agent Mode for multi-step autonomous tasks",
-            "Understand how content exclusions are applied in the IDE context"
+            "Know how to enable GitHub Copilot in VS Code (Status Bar > Use AI Features and sign in), JetBrains IDEs, Visual Studio and other supported editors",
+            "Understand the ways to trigger Copilot: inline suggestions, Copilot Chat (Ask, Plan and Agent), inline chat, Copilot CLI and agent mode",
+            "Know how to use agent mode for multi-step tasks that edit files and run tools with approval",
+            "Understand how content exclusions behave in the IDE (supported for inline and chat; not supported in VS Code Edit and Agent modes)"
           ],
           "skills": [
-            "Enable and configure Copilot in supported IDEs",
-            "Use inline completions, ghost text, and next suggestion navigation",
-            "Interact with Copilot Chat using natural language and slash commands",
-            "Invoke Agent Mode for complex multi-file editing tasks"
+            "Enable and sign in to Copilot in supported IDEs",
+            "Use inline completions, ghost text, next-suggestion navigation and inline chat",
+            "Interact with Copilot Chat using natural language, # context and slash commands",
+            "Invoke agent mode for complex multi-file tasks and review its changes",
+            "Recognize when a file is excluded from Copilot in the IDE"
           ],
           "questionIds": [
             "ghc-d2-001",
             "ghc-d2-002",
             "ghc-d2-003",
             "ghc-d2-004",
-            "ghc-d2-005",
-            "ghc-d2-006",
-            "ghc-d2-007"
+            "ghc-d2-008",
+            "ghc-d2-017",
+            "ghc-d2-021",
+            "ghc-d2-024",
+            "ghc-d2-026",
+            "ghc-d2-028",
+            "ghc-d2-031"
           ]
         },
         {
           "id": "d2-t2",
           "title": "Use GitHub Copilot CLI",
           "knowledge": [
-            "Define what GitHub Copilot CLI is and its purpose for terminal productivity",
-            "Know how to install the CLI: `gh extension install github/gh-copilot`",
-            "Understand key CLI features: `gh copilot explain`, `gh copilot suggest`",
-            "Know how to use CLI sessions for multi-turn terminal assistance"
+            "Define GitHub Copilot CLI (the `copilot` command): an agent in the terminal that answers questions, writes and debugs code and works with GitHub.com",
+            "Know the install options: `npm install -g @github/copilot` (Node.js 22+), `winget install GitHub.Copilot`, `brew install --cask copilot-cli` or the install script; the old gh-copilot extension (`gh copilot suggest/explain`) was retired on October 25, 2025",
+            "Understand key features and commands: interactive vs programmatic mode (`copilot -p`), plan mode (Shift+Tab), slash commands such as `/model`, `/context`, `/compact`, `/mcp` and `/feedback`",
+            "Know tool approval and trust: per-tool approval, `--allow-tool`, `--allow-all-tools` and `--deny-tool` (deny wins), trusted directories",
+            "Know that organization policy can disable Copilot CLI for seat holders"
           ],
           "skills": [
-            "Install and configure the GitHub Copilot CLI extension",
-            "Use `gh copilot explain` to understand unfamiliar shell commands",
-            "Use `gh copilot suggest` to generate commands from natural language",
-            "Generate scripts and command sequences using CLI assistance"
+            "Install and sign in to GitHub Copilot CLI",
+            "Use Copilot CLI interactively and across sessions, steering it with plan mode and approvals",
+            "Run Copilot CLI programmatically in scripts with pre-approved tools",
+            "Generate scripts and manage files with Copilot CLI"
           ],
           "questionIds": [
-            "ghc-d2-008",
-            "ghc-d2-009",
-            "ghc-d2-010",
-            "ghc-d2-011"
+            "ghc-d2-005",
+            "ghc-d2-006",
+            "ghc-d2-007",
+            "ghc-d2-033",
+            "ghc-d2-036",
+            "ghc-d2-037",
+            "ghc-d2-038",
+            "ghc-d2-039",
+            "ghc-d2-040",
+            "ghc-d2-041",
+            "ghc-d2-042",
+            "ghc-d2-043"
           ]
         },
         {
           "id": "d2-t3",
-          "title": "Use Copilot features and capabilities",
+          "title": "Use GitHub Copilot features and capabilities",
           "knowledge": [
-            "Understand Agent Mode capabilities and when to use it",
-            "Know Copilot Edits for multi-file simultaneous editing",
-            "Understand Model Context Protocol (MCP) integration with Copilot",
-            "Know Copilot Sub-Agents, Extensions, and GitHub Copilot Spaces",
-            "Understand PR Summary generation and automatic code review",
-            "Know `.github/copilot-instructions.md` for repository-level customization",
-            "Understand GitHub Copilot Spark for web app creation"
+            "Understand agent mode, Copilot Edits (multi-file edits, now made in agent mode in VS Code) and MCP servers for tools and data",
+            "Know how to manage agent sessions and delegate tasks to subagents, which run in their own context and return a focused result",
+            "Know Copilot cloud agent (formerly coding agent) and Copilot code review on pull requests",
+            "Understand Copilot Spaces (which replaced knowledge bases), GitHub Spark (retired on github.com in August 2026) and pull request summaries",
+            "Know customizable review standards and behavior via instructions files: `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, AGENTS.md, personal and organization instructions",
+            "Understand Copilot Chat limits, options, feedback and commands, including reusable prompt files (`.github/prompts/*.prompt.md`)"
           ],
           "skills": [
-            "Use Agent Mode for autonomous multi-step development tasks",
-            "Apply Copilot Edits to refactor across multiple files",
-            "Configure and use MCP servers with Copilot",
-            "Set up copilot-instructions.md for team-wide context customization",
-            "Generate PR summaries and request Copilot code reviews"
+            "Use agent mode with MCP servers for multi-step development tasks",
+            "Delegate scoped work to subagents to keep the main context focused",
+            "Request Copilot code reviews and generate PR summaries",
+            "Set up instructions files and prompt files for consistent team-wide behavior",
+            "Use Copilot Spaces to ground answers in curated project context"
           ],
           "questionIds": [
+            "ghc-d2-009",
+            "ghc-d2-010",
+            "ghc-d2-011",
             "ghc-d2-012",
-            "ghc-d2-013",
             "ghc-d2-014",
             "ghc-d2-015",
-            "ghc-d2-016",
-            "ghc-d2-017",
             "ghc-d2-018",
-            "ghc-d2-019"
+            "ghc-d2-020",
+            "ghc-d2-023",
+            "ghc-d2-029",
+            "ghc-d2-044",
+            "ghc-d2-045",
+            "ghc-d2-046",
+            "ghc-d2-047",
+            "ghc-d2-048",
+            "ghc-d2-049",
+            "ghc-d2-050",
+            "ghc-d2-051",
+            "ghc-d2-052",
+            "ghc-d2-053",
+            "ghc-d2-054",
+            "ghc-d2-055",
+            "ghc-d2-056",
+            "ghc-d2-057",
+            "ghc-d2-058",
+            "ghc-d2-059"
           ]
         },
         {
           "id": "d2-t4",
           "title": "Manage organization-wide settings and policies",
           "knowledge": [
-            "Know how to manage Copilot policies across an organization in GitHub admin settings",
-            "Understand Code Review policy configuration for Copilot-automated reviews",
-            "Know IDE availability settings (VS Code, JetBrains, etc.) and github.com availability",
-            "Understand audit log events available for Copilot governance",
-            "Know how to use the REST API for managing Copilot seat subscriptions"
+            "Know how organization owners manage Copilot policies (Settings > Code, planning, and automation > Copilot > Policies) and which surfaces each policy covers (IDEs, Copilot CLI, github.com)",
+            "Understand Copilot code review policies and feature availability across IDEs and github.com, including 'Copilot in GitHub.com' and 'Opt in to preview features'",
+            "Understand Copilot audit log events (`action:copilot`, `actor:Copilot`), 180-day retention and that prompts are not logged",
+            "Know the REST API for seats (`/orgs/{org}/copilot/billing`, `.../billing/seats`, `.../selected_users`, `.../selected_teams`) and that removed seats stay active until the end of the billing cycle",
+            "Know the Copilot usage metrics report endpoints (`/copilot/metrics/reports/...`, `day` in YYYY-MM-DD) that replaced the legacy metrics API on April 2, 2026"
           ],
           "skills": [
-            "Configure organization-level Copilot policies in GitHub admin settings",
-            "Enable and configure Copilot Code Review for pull requests",
+            "Configure organization-level Copilot policies and model availability",
+            "Enable and configure Copilot code review policies for pull requests",
             "Assign and remove Copilot seats using the REST API or GitHub UI",
-            "Monitor Copilot usage via audit logs and admin dashboards"
+            "Monitor Copilot usage with audit logs and usage metrics reports"
           ],
           "questionIds": [
-            "ghc-d2-020",
-            "ghc-d2-021",
+            "ghc-d2-013",
+            "ghc-d2-016",
+            "ghc-d2-019",
             "ghc-d2-022",
-            "ghc-d2-023",
-            "ghc-d2-024",
-            "ghc-d2-025"
+            "ghc-d2-025",
+            "ghc-d2-027",
+            "ghc-d2-030",
+            "ghc-d2-032",
+            "ghc-d2-034",
+            "ghc-d2-035",
+            "ghc-d2-060",
+            "ghc-d2-061"
           ]
         }
       ]
@@ -217,12 +254,26 @@
             "ghc-d3-011",
             "ghc-d3-012",
             "ghc-d3-013",
-            "ghc-d3-030"
+            "ghc-d3-030",
+            "ghc-d3-034",
+            "ghc-d3-035",
+            "ghc-d3-036",
+            "ghc-d3-037",
+            "ghc-d3-038",
+            "ghc-d3-041",
+            "ghc-d3-042",
+            "ghc-d3-043",
+            "ghc-d3-044",
+            "ghc-d3-046",
+            "ghc-d3-048",
+            "ghc-d3-050",
+            "ghc-d3-053",
+            "ghc-d3-054"
           ]
         },
         {
           "id": "d3-t2",
-          "title": "Understand code suggestion lifecycle and LLM limitations",
+          "title": "Understand lifecycle and limitations",
           "knowledge": [
             "Understand the complete code suggestion lifecycle from trigger to display",
             "Know fundamental LLM limitations: context window, hallucinations, training data cutoff",
@@ -254,7 +305,14 @@
             "ghc-d3-029",
             "ghc-d3-031",
             "ghc-d3-032",
-            "ghc-d3-033"
+            "ghc-d3-033",
+            "ghc-d3-039",
+            "ghc-d3-040",
+            "ghc-d3-045",
+            "ghc-d3-047",
+            "ghc-d3-049",
+            "ghc-d3-051",
+            "ghc-d3-052"
           ]
         }
       ]
@@ -296,7 +354,27 @@
             "ghc-d4-013",
             "ghc-d4-035",
             "ghc-d4-036",
-            "ghc-d4-037"
+            "ghc-d4-037",
+            "ghc-d4-039",
+            "ghc-d4-041",
+            "ghc-d4-042",
+            "ghc-d4-044",
+            "ghc-d4-045",
+            "ghc-d4-046",
+            "ghc-d4-047",
+            "ghc-d4-048",
+            "ghc-d4-049",
+            "ghc-d4-050",
+            "ghc-d4-051",
+            "ghc-d4-052",
+            "ghc-d4-054",
+            "ghc-d4-055",
+            "ghc-d4-056",
+            "ghc-d4-061",
+            "ghc-d4-063",
+            "ghc-d4-064",
+            "ghc-d4-066",
+            "ghc-d4-067"
           ]
         },
         {
@@ -306,13 +384,13 @@
             "Understand prompt engineering principles: specificity, single responsibility, context richness",
             "Know the Copilot prompt process flow: user input → context → model → response",
             "Understand how chat history is used across a conversation session",
-            "Know when to use `#file:`, `@workspace`, and chat participants for context control"
+            "Know when to attach a specific file with `#`, search the workspace with `#codebase`, or use other context such as `#selection` (the `@workspace` participant is deprecated in VS Code)"
           ],
           "skills": [
             "Apply single-responsibility prompting for complex multi-step tasks",
             "Use prompt process flow knowledge to engineer higher-quality prompts",
             "Leverage chat history strategically within a Copilot Chat session",
-            "Reference specific files and workspace context using `#file:` and `@workspace`"
+            "Reference specific files, selections and workspace context with `#` references and `#codebase`"
           ],
           "questionIds": [
             "ghc-d4-014",
@@ -336,7 +414,17 @@
             "ghc-d4-032",
             "ghc-d4-033",
             "ghc-d4-034",
-            "ghc-d4-038"
+            "ghc-d4-038",
+            "ghc-d4-040",
+            "ghc-d4-043",
+            "ghc-d4-053",
+            "ghc-d4-057",
+            "ghc-d4-058",
+            "ghc-d4-059",
+            "ghc-d4-060",
+            "ghc-d4-062",
+            "ghc-d4-065",
+            "ghc-d4-068"
           ]
         }
       ]
@@ -378,7 +466,8 @@
             "ghc-d5-010",
             "ghc-d5-011",
             "ghc-d5-012",
-            "ghc-d5-013"
+            "ghc-d5-013",
+            "ghc-d5-026"
           ]
         },
         {
@@ -422,13 +511,13 @@
       "tasks": [
         {
           "id": "d6-t1",
-          "title": "Manage privacy settings and content exclusions",
+          "title": "Manage privacy settings and exclusions",
           "knowledge": [
-            "Know how to configure content exclusions at repository, organization, and IDE levels",
-            "Understand glob pattern syntax for content exclusion rules",
-            "Understand output ownership: who owns Copilot-generated code",
-            "Know the limitations around Copilot output IP and indemnification conditions",
-            "Understand individual user privacy controls vs. organizational policy controls"
+            "Know how to configure content exclusions at the repository, organization and enterprise levels (Copilot Business and Enterprise)",
+            "Understand content exclusion path syntax (fnmatch, case-insensitive; repository references or `\"*\"` at org level)",
+            "Understand output ownership: GitHub does not own inputs or outputs (Generative AI Services Terms)",
+            "Know the limits of outputs: possible public-code matches, defence of IP claims depending on your agreement, and that blocking public-code matches is no longer required for Microsoft's Customer Copyright Commitment (April 3, 2026)",
+            "Understand individual settings (such as 'Allow GitHub to use my data for AI model training' on Free, Pro, Pro+ and Max) versus organization policies"
           ],
           "skills": [
             "Configure repository-level and organization-level content exclusions",
@@ -456,24 +545,39 @@
             "ghc-d6-035",
             "ghc-d6-036",
             "ghc-d6-037",
-            "ghc-d6-039"
+            "ghc-d6-039",
+            "ghc-d6-041",
+            "ghc-d6-044",
+            "ghc-d6-045",
+            "ghc-d6-046",
+            "ghc-d6-050",
+            "ghc-d6-052",
+            "ghc-d6-053",
+            "ghc-d6-054",
+            "ghc-d6-056",
+            "ghc-d6-058",
+            "ghc-d6-059",
+            "ghc-d6-061",
+            "ghc-d6-064",
+            "ghc-d6-065",
+            "ghc-d6-066"
           ]
         },
         {
           "id": "d6-t2",
           "title": "Apply safeguards and troubleshoot",
           "knowledge": [
-            "Know how to enable the suggestions matching public code (duplication detection) filter",
-            "Understand what the public code filter does and its IP indemnification implications",
-            "Know how to troubleshoot issues with Copilot suggestions not appearing",
-            "Understand how to troubleshoot content exclusions not taking effect",
+            "Know how to enable 'Suggestions matching public code' (Allow or Block) for users, organizations and enterprises",
+            "Understand what public code matching does (about 150 characters compared with public GitHub code; block or show code references)",
+            "Know how to troubleshoot missing suggestions and connection errors (status, logs, network checks, proxy and certificate settings)",
+            "Understand how to troubleshoot content exclusions (up to 30 minutes to propagate, reload the IDE, check rules at every level, unsupported modes)",
             "Know audit log events related to Copilot for governance oversight"
           ],
           "skills": [
-            "Enable and configure the public code filter in organizational settings",
-            "Troubleshoot missing suggestions by checking exclusion settings at all levels",
-            "Resolve content exclusion issues (reload IDE, verify glob patterns, check org policy priority)",
-            "Monitor Copilot usage and policy changes using GitHub audit logs"
+            "Enable and configure the public code filter in organization or enterprise settings",
+            "Troubleshoot missing suggestions by checking exclusion rules at every level",
+            "Resolve content exclusion issues (reload the IDE, verify paths, allow for propagation)",
+            "Monitor Copilot policy changes using GitHub audit logs"
           ],
           "questionIds": [
             "ghc-d6-014",
@@ -495,7 +599,20 @@
             "ghc-d6-032",
             "ghc-d6-033",
             "ghc-d6-038",
-            "ghc-d6-040"
+            "ghc-d6-040",
+            "ghc-d6-042",
+            "ghc-d6-043",
+            "ghc-d6-047",
+            "ghc-d6-048",
+            "ghc-d6-049",
+            "ghc-d6-051",
+            "ghc-d6-055",
+            "ghc-d6-057",
+            "ghc-d6-060",
+            "ghc-d6-062",
+            "ghc-d6-063",
+            "ghc-d6-067",
+            "ghc-d6-068"
           ]
         }
       ]

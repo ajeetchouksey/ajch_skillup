@@ -2,7 +2,7 @@
   {
     "domain": 5,
     "id": "d5-001",
-    "scenario": "Your agent processes a 200,000 token context window. It must reference a critical constraint rule: 'Never approve requests from suspended accounts.' You are deciding where to place this rule in the context.",
+    "scenario": "Your agent works with roughly 200,000 tokens of context. It must reference a critical constraint rule: 'Never approve requests from suspended accounts.' You are deciding where to place this rule in the context.",
     "question": "Where should this critical constraint be placed for maximum reliability?",
     "options": [
       "In the middle of the system prompt, surrounded by other instructions",
@@ -16,7 +16,8 @@
       "lost-in-the-middle",
       "context-management",
       "large-context"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -35,7 +36,8 @@
       "progressive-summarization",
       "context-management",
       "long-running-agent"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -54,7 +56,8 @@
       "tool-result-trimming",
       "context-management",
       "token-efficiency"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -74,7 +77,8 @@
       "human-in-the-loop",
       "agent-behavior",
       "context-management"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -83,18 +87,19 @@
     "question": "How should you configure prompt caching for maximum savings?",
     "options": [
       "Don't cache — the TTL is too short to be useful",
-      "Place cache_control: {type: 'ephemeral'} at the end of the static preamble block. Cache lasts 5 minutes (or 1 hour at 2x write cost). Subsequent requests hitting the cache pay 0.1x input cost.",
+      "Put cache_control: {type: 'ephemeral'} at the end of the static preamble; the cache lives 5 minutes (refreshed on each hit) or 1 hour at a 2x write price, and hits cost a fraction of input price",
       "Store the preamble in a database and inject it fresh each request",
       "Compress the preamble to reduce token count instead of caching"
     ],
     "correct": 1,
-    "explanation": "Prompt caching is designed for exactly this pattern: static content shared across many requests. At 100,000 calls/day, you're making ~70 calls/minute — the 5-minute TTL cache will be continuously warm. Each cached request pays 0.1x the normal input cost for the 10,000 token preamble, reducing input costs by 90% for that section. You can extend TTL to 1 hour by paying 2x write cost, which is worthwhile at high volume. Injecting fresh each time (C) and compression (D) don't capture the caching benefit.",
+    "explanation": "B is correct: prompt caching is designed for static content shared across many requests. At 100,000 calls a day (about 70 a minute) the default 5-minute cache stays warm because every hit refreshes it. Cache writes cost 1.25x base input for the 5-minute lifetime or 2x for 1 hour, and hits cost 0.1x on most models (0.05x on Claude Opus 5.5 and Sonnet 5.5). A is wrong because constant traffic keeps the cache alive. C is wrong because re-injecting the preamble pays full input price every time. D is wrong because compression trims tokens but still reprocesses them on every call.",
     "tags": [
       "prompt-caching",
       "cache_control",
       "TTL",
       "cost-optimization"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -114,7 +119,8 @@
       "cost-optimization",
       "async-processing",
       "large-scale"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -123,18 +129,19 @@
     "question": "What happened and what should you do?",
     "options": [
       "The API is experiencing an outage — contact support",
-      "Batch results expire after 24 hours — requests that weren't completed within the window have expired; resubmit them in a new batch",
+      "Requests not processed within 24 hours of batch creation expired; find them by custom_id (result type 'expired') and resubmit them in a new batch",
       "The requests exceeded max_tokens — reduce the token limit and resubmit",
       "Batches over 50,000 requests are automatically split — check for a second batch ID"
     ],
     "correct": 1,
-    "explanation": "The Message Batches API has a 24-hour processing and expiry window. Requests submitted in a batch must be retrieved within 24 hours — after that, the results expire. If some of your 80,000 requests weren't completed and returned within 24 hours, those results are gone. The solution is to identify which custom_ids didn't return results and resubmit them in a new batch. Batches do support up to 100,000 requests (D is wrong). The issue is expiry timing, not capacity or outages.",
+    "explanation": "B is correct: a batch expires if processing doesn't finish within 24 hours, and requests that never ran come back with result type 'expired' and aren't billed. Completed results stay downloadable for 29 days, so nothing that finished is lost; resubmit only the expired custom_ids. A is wrong because expiry is documented behaviour, not an outage. C is wrong because max_tokens problems appear as per-request results, not missing ones. D is wrong because a batch can hold up to 100,000 requests (or 256 MB) and is never split automatically.",
     "tags": [
       "batch-API",
       "24-hour-expiry",
       "custom_id",
       "error-handling"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -143,18 +150,19 @@
     "question": "What is the problem?",
     "options": [
       "No problem — you can add unlimited cache_control markers",
-      "Only the last 4 cache_control markers are active at any time — the 5th marker exceeds the maximum of 4 breakpoints per request",
+      "A request can define at most 4 cache breakpoints, so the caching design must be reworked to fit within 4",
       "cache_control only works on system prompts, not conversation history",
       "You need to set cache_control on every message for it to work"
     ],
     "correct": 1,
-    "explanation": "Prompt caching supports a maximum of 4 cache_control breakpoints per API request. If you specify more than 4, only the last 4 are honored — earlier markers are ignored. This is a critical architectural constraint: you must design your caching strategy to use at most 4 breakpoints effectively. Common pattern: use 1 on the system prompt, 1-2 on stable few-shot examples, and leave 1 for dynamic content. Unlimited markers (A), restriction to system prompts (C), and per-message requirement (D) are all incorrect.",
+    "explanation": "B is correct: the prompt caching docs allow up to 4 cache breakpoints per request, and the system checks up to 20 block positions back from each breakpoint for a hit. Plan breakpoints around stable layers (tools, system prompt, reference documents, conversation history) instead of adding more markers; combining automatic caching with 4 explicit breakpoints is documented to return a 400 error. A is wrong because the limit is 4. C is wrong because cache_control works on tools, system, and message blocks. D is wrong because a breakpoint caches everything before it, so marking every message isn't required.",
     "tags": [
       "prompt-caching",
       "cache_control",
       "4-breakpoints",
       "limitations"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -174,7 +182,8 @@
       "exponential-backoff",
       "retry-strategy",
       "reliability"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -193,12 +202,13 @@
       "progressive-summarization",
       "numeric-data-preservation",
       "context-management"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
     "id": "d5-011",
-    "scenario": "You're sending a 180K token conversation to Claude (which has a 200K context window). Your critical instructions are in the system prompt, and key reference data is placed in the middle of the conversation history.",
+    "scenario": "You're sending a very long conversation (several hundred thousand tokens) to Claude. Your critical instructions are in the system prompt, and key reference data sits in the middle of the conversation history.",
     "question": "What cognitive bias affects Claude's attention to information placement within large contexts?",
     "options": [
       "Recency bias — Claude only processes the last 10 messages and ignores everything before",
@@ -213,7 +223,8 @@
       "context-window",
       "attention",
       "information-placement"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -222,18 +233,19 @@
     "question": "Which Anthropic API feature allows you to avoid re-processing identical prompt prefixes across calls?",
     "options": [
       "Set a 'cache_key' header on the HTTP request for CDN-level response caching",
-      "Use prompt caching with cache_control: {type: 'ephemeral'} on static content blocks, which caches the prefix server-side for 5 minutes",
+      "Use prompt caching with cache_control: {type: 'ephemeral'} on static content blocks, which caches the prefix server-side for 5 minutes, refreshed on each hit",
       "Store the prompt in a Claude Project to avoid re-sending it with each request",
       "Compress the prompt using gzip content-encoding before sending to reduce transfer size"
     ],
     "correct": 1,
-    "explanation": "Anthropic's prompt caching uses cache_control markers on content blocks. Cached prefixes are stored server-side for 5 minutes (refreshed on each hit), reducing cost by 90% for reads. CDN caching doesn't apply to inference API calls. Projects are a UI feature, not an API optimization. Gzip reduces transfer but not server-side processing time.",
+    "explanation": "B is correct: prompt caching uses cache_control markers on content blocks; the cached prefix lives server-side for 5 minutes by default (1 hour is available at a higher write price) and is refreshed each time it is used. Cache reads cost 0.1x base input on most models (0.05x on Claude Opus 5.5 and Sonnet 5.5) and cut latency for long prompts. A is wrong because CDN caching doesn't apply to inference calls. C is wrong because Projects are a claude.ai feature, not an API optimization. D is wrong because gzip reduces transfer size, not server-side processing.",
     "tags": [
       "prompt-caching",
       "cache-control",
       "cost-optimization",
       "latency"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -253,27 +265,29 @@
       "cost-optimization",
       "async-processing",
       "high-volume"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
     "id": "d5-014",
-    "scenario": "Your agentic loop has been running for 45 minutes and the conversation context is approaching the 200K token limit. The agent still has work to complete.",
+    "scenario": "Your agentic loop has been running for 45 minutes and the conversation is approaching the model's context window limit. The agent still has work to complete.",
     "question": "What is the recommended strategy to continue productive work when approaching context limits?",
     "options": [
-      "Increase max_tokens to extend the context window beyond 200K",
+      "Increase max_tokens to extend the context window",
       "Implement progressive summarization — compress older conversation turns into summaries while preserving recent context and critical state verbatim",
       "Start a brand new conversation and ask the user to re-explain the entire task from scratch",
       "Switch to a different model with a larger context window"
     ],
     "correct": 1,
-    "explanation": "Progressive summarization compresses older turns (preserving exact data like IDs, amounts, decisions) while retaining recent context, allowing the agent to continue within limits. max_tokens controls output length, not context window size. Starting fresh loses all accumulated state. No current Claude model exceeds 200K context.",
+    "explanation": "B is correct: progressive summarization compresses older turns while keeping IDs, amounts, and decisions verbatim and recent context intact, so the agent keeps working within the window (Claude Code's /compact and the API's server-side compaction automate this). A is wrong because max_tokens caps output length, not the context window. C is wrong because starting over discards accumulated state and pushes work back onto the user. D is wrong because current Claude models already share a 1M-token window, and a bigger window only postpones the problem while attention over very long contexts still degrades.",
     "tags": [
       "summarization",
       "context-window",
       "progressive-summarization",
       "agentic-loop"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -293,7 +307,8 @@
       "retry-strategy",
       "exponential-backoff",
       "error-handling"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -313,7 +328,8 @@
       "cost-optimisation",
       "latency",
       "batch-vs-realtime"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -333,7 +349,8 @@
       "summarization",
       "token-budget",
       "multi-turn"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -353,7 +370,8 @@
       "tool-output-trimming",
       "extraction",
       "token-budget"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -373,7 +391,8 @@
       "scratchpad",
       "state-persistence",
       "long-running"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -393,7 +412,8 @@
       "position-aware",
       "lost-in-the-middle",
       "ordering"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -413,7 +433,8 @@
       "confidence-scoring",
       "calibration",
       "validation-set"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -433,7 +454,8 @@
       "stratified-sampling",
       "error-rate",
       "human-review"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -453,7 +475,8 @@
       "human-review",
       "confidence",
       "calibration"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -473,7 +496,8 @@
       "accuracy-segmentation",
       "human-review",
       "monitoring"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -493,7 +517,8 @@
       "provenance",
       "claim-source-mapping",
       "citations"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -513,7 +538,8 @@
       "temporal-data",
       "provenance",
       "as-of-dates"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -533,7 +559,8 @@
       "conflict-annotation",
       "provenance",
       "sources"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -553,7 +580,8 @@
       "coverage-gaps",
       "provenance",
       "reporting"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -573,7 +601,8 @@
       "session-management",
       "stale-context",
       "resume"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -593,7 +622,8 @@
       "session-isolation",
       "independent-review",
       "context"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -613,7 +643,8 @@
       "session-management",
       "resume",
       "fresh-start"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -633,7 +664,8 @@
       "calibration",
       "confidence-scoring",
       "validation-set"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 5,
@@ -653,7 +685,8 @@
       "extraction",
       "summarization",
       "token-budget"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -673,7 +706,8 @@
       "stratified-sampling",
       "error-rate",
       "human-review"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 5,
@@ -693,7 +727,8 @@
       "context-passing",
       "provenance",
       "structured-data"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -713,7 +748,8 @@
       "explore-subagent",
       "context-fork",
       "discovery"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 5,
@@ -733,6 +769,238 @@
       "confidence-scoring",
       "provenance",
       "human-review"
-    ]
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "d5-038",
+    "scenario": "A customer writes: 'This is the third time I've asked about my late refund and I'm fed up!' The refund is approved and the agent can see its status and tracking details. The customer has not asked for a human.",
+    "question": "What should the agent do?",
+    "options": [
+      "Escalate immediately, because frustrated customers should always reach a human",
+      "Acknowledge the frustration and resolve it now with the refund status; escalate only if the customer then asks for a person",
+      "Ignore the emotional tone and reply with the refund status and nothing else",
+      "Ask the customer to rate their frustration from 1 to 10 before deciding"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the exam guide's pattern is to acknowledge frustration while offering a resolution when the issue is within the agent's capability, escalating only if the customer reiterates a preference for a human. A is wrong because sentiment is an unreliable proxy for case complexity, and escalating a case the agent can close drags down first-contact resolution. C is wrong because ignoring the frustration settles the facts but not the conversation, making a follow-up escalation more likely. D is wrong because a self-reported frustration score adds friction and still doesn't measure whether the agent can solve the problem.",
+    "tags": [
+      "escalation",
+      "customer-preference",
+      "sentiment",
+      "human-in-the-loop"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-039",
+    "scenario": "Your policy allows a price adjustment when your own site lowers a price within 14 days of purchase. A customer asks the support agent to match a competitor's lower price.",
+    "question": "How should the agent handle this request?",
+    "options": [
+      "Approve the match, since price adjustments are allowed by the policy",
+      "Deny the match, since competitor pricing is not mentioned in the policy",
+      "Escalate to a human, because the policy is silent on competitor matching and the agent shouldn't decide it",
+      "Offer a partial price match as a compromise both sides can accept"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: escalation triggers include policy exceptions and gaps, not just complex cases; when policy is ambiguous or silent on the specific request, the agent shouldn't make the call itself. A is wrong because it stretches an own-site rule into a commitment the business never made. B is wrong because silence isn't a prohibition, and a confident refusal can be just as wrong as an unapproved approval. D is wrong because an improvised compromise is still a policy decision the agent has no authority to make.",
+    "tags": [
+      "escalation",
+      "policy-gap",
+      "customer-support",
+      "human-in-the-loop"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-040",
+    "scenario": "get_customer returns three accounts named 'Maria Lopez' for the name the customer gave.",
+    "question": "What should the agent do next?",
+    "options": [
+      "Pick the account with the most recent order",
+      "Ask the customer for another identifier, such as email, phone, or order number",
+      "Proceed with the first account in the results",
+      "Escalate the conversation to a human immediately"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: multiple customer matches call for clarification by requesting additional identifiers, not heuristic selection. A and C are wrong because both are heuristics that can attach refunds or account changes to the wrong person. D is wrong because the agent can resolve the ambiguity itself with one question, and escalating wastes human capacity.",
+    "tags": [
+      "escalation",
+      "ambiguity",
+      "identity-verification",
+      "customer-support"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "d5-041",
+    "scenario": "To cut unnecessary escalations, a teammate proposes escalating whenever the agent's self-rated confidence is below 7/10 or the customer's sentiment score turns negative.",
+    "question": "What is the main flaw, and what should you do first instead?",
+    "options": [
+      "No flaw; combining two independent signals makes routing reliable",
+      "Self-rated confidence is poorly calibrated and sentiment doesn't track complexity; add explicit escalation criteria with few-shot examples",
+      "The thresholds are too strict; lower them to 5/10 and 'very negative'",
+      "Replace both signals with a classifier trained on historical tickets"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the exam guide calls sentiment-based escalation and self-reported confidence unreliable proxies for actual case complexity, so the proportionate first step is explicit criteria (the customer asks for a human, a policy exception or gap, no meaningful progress) demonstrated through few-shot examples of escalate versus resolve. A is wrong because combining two weak proxies doesn't produce a strong signal. C is wrong because retuning thresholds on the wrong signals moves the errors around without fixing them. D is wrong as a first step: a trained classifier needs labelled data and infrastructure before prompt-level criteria have even been tried.",
+    "tags": [
+      "escalation",
+      "confidence",
+      "sentiment",
+      "few-shot"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "d5-042",
+    "scenario": "Your research pipeline's patent-search source was down for the whole run. The other subagents completed, and the synthesis agent is about to write the final report.",
+    "question": "How should the report reflect the outage?",
+    "options": [
+      "Write the report as if coverage were complete, since the other sources were good",
+      "Add coverage annotations marking well-supported findings and the topic areas with gaps because the patent source was unavailable",
+      "Abort the report until every source is available again",
+      "Fill the patent section from the model's general knowledge"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: structuring synthesis output with coverage annotations tells readers which findings are well supported and where gaps exist due to unavailable sources, so they can judge the report and ask for a re-run. A is wrong because hiding the gap overstates confidence. C is wrong because terminating the whole workflow on one failure wastes the work that succeeded. D is wrong because filling the gap from model memory replaces a known gap with unsourced, possibly fabricated claims.",
+    "tags": [
+      "error-propagation",
+      "coverage-gaps",
+      "synthesis",
+      "multi-agent"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-043",
+    "scenario": "The web-search subagent catches a timeout and returns {\"results\": []} with status 'success'. The coordinator concludes that no published evidence exists on the topic and tells the user so.",
+    "question": "What went wrong, and what is the fix?",
+    "options": [
+      "Nothing went wrong; an empty result set is a valid answer",
+      "The coordinator should automatically retry every empty result three times",
+      "An access failure was disguised as a valid empty result; return structured error context (failure type, query, partial results, alternatives)",
+      "The subagent should raise an exception that ends the workflow so the user sees an error"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: silently suppressing errors by returning empty results as success is an anti-pattern, because it erases the difference between an access failure and a valid empty result and the coordinator then reasons from false data. Structured error context lets the coordinator retry, try another source, or proceed while flagging the gap. A is wrong because this empty result did not come from a successful query. B is wrong because blanket retries on every empty result waste calls on queries that genuinely have no matches. D is wrong because terminating the entire workflow on one failure is the opposite anti-pattern.",
+    "tags": [
+      "error-propagation",
+      "empty-results",
+      "structured-errors",
+      "multi-agent"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "d5-044",
+    "scenario": "One of five document-analysis subagents fails on a corrupted PDF after trying a local re-parse. The other four subagents succeeded.",
+    "question": "What should the failing subagent return to the coordinator?",
+    "options": [
+      "A structured error with the failure type, the re-parse it attempted, any partial extraction, and suggested alternatives",
+      "A generic 'analysis failed' string with no further detail",
+      "Nothing at all, so the coordinator times out and moves on",
+      "An exception that stops all five subagents immediately"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: subagents should handle what they can locally (here, the re-parse) and propagate only errors they cannot resolve, including what was attempted and any partial results, so the coordinator can request a clean copy, skip the document with a note, or escalate. B is wrong because a generic status hides the context the coordinator needs. C is wrong because silence forces a timeout and still gives no reason. D is wrong because one bad document shouldn't throw away four successful analyses.",
+    "tags": [
+      "error-propagation",
+      "local-recovery",
+      "partial-results",
+      "multi-agent"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-045",
+    "scenario": "Two hours into exploring a large legacy codebase, Claude starts answering with 'typical patterns' for payment services instead of naming the specific classes it found earlier, and its answers begin to contradict each other.",
+    "question": "What is happening, and which practice best counteracts it?",
+    "options": [
+      "The model is hallucinating at random, so lower the temperature",
+      "Context degradation in a long session; keep a scratchpad file of key findings and have the agent consult it",
+      "The codebase is too large for Claude, so split the repository",
+      "Claude lacks tools, so add another code-search MCP server"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: in extended sessions, inconsistent answers and references to 'typical patterns' instead of the specific classes discovered earlier are the signature of context degradation. A scratchpad file recording key findings (class names, call paths, decisions) persists them across context boundaries and gives the agent a reliable reference. A is wrong because temperature doesn't restore lost detail. C is wrong because splitting the repo is disproportionate and doesn't change how findings are retained. D is wrong because the problem is keeping what was already found, not finding more.",
+    "tags": [
+      "context-degradation",
+      "scratchpad",
+      "codebase-exploration",
+      "context-management"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-046",
+    "scenario": "A multi-agent migration analysis crashes halfway through. Each agent had been exporting its state to a known location, and the coordinator keeps a manifest of completed and pending work.",
+    "question": "How should the system recover?",
+    "options": [
+      "Rerun every agent from the beginning to be safe",
+      "On resume, the coordinator loads the manifest and injects each agent's exported state into its prompt, so only pending work runs",
+      "Resume the crashed session with --resume and trust that its context survived",
+      "Ask a human to reconstruct the progress from the logs"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: crash recovery with structured state means each agent exports state to a known location, and on resume the coordinator loads the manifest and injects that state into the agents' prompts. A is wrong because restarting discards completed work and multiplies cost. C is wrong because the crashed session may hold stale or partial tool results, and without the manifest the coordinator has no reliable picture of what finished. D is wrong because manual reconstruction is slow and error-prone when the data is already structured.",
+    "tags": [
+      "crash-recovery",
+      "manifest",
+      "state-persistence",
+      "multi-agent"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "d5-047",
+    "scenario": "Phase 1 of a large-codebase investigation (mapping modules and entry points) is done. You are about to spawn subagents for phase 2, tracing each payment flow in detail.",
+    "question": "What should the phase 2 subagents receive?",
+    "options": [
+      "Nothing extra, because subagents inherit the coordinator's phase 1 context",
+      "The full raw phase 1 transcript, so that nothing is lost",
+      "A concise summary of phase 1 findings (modules, entry points, open questions) in each subagent's initial prompt",
+      "Only the original user request, so each subagent re-explores independently"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: summarizing key findings from one exploration phase before spawning subagents for the next, and injecting that summary into their initial context, gives each subagent the map it needs without the verbose discovery output. A is wrong because subagents start with fresh context and see only the prompt they are given. B is wrong because dumping the raw transcript recreates the context bloat the subagents were meant to avoid. D is wrong because making every subagent re-explore wastes time and produces inconsistent maps.",
+    "tags": [
+      "subagents",
+      "context-passing",
+      "codebase-exploration",
+      "summarization"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "d5-048",
+    "scenario": "During a long Claude Code exploration session, the context fills with verbose search and file-listing output, and you want to keep working in the same session.",
+    "question": "Which built-in command reduces context usage while keeping the session going?",
+    "options": [
+      "/compact",
+      "/clear",
+      "/memory",
+      "/init"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: /compact summarizes the conversation so far to free context while you keep working, which is the exam guide's tool for sessions filled with verbose discovery output. B is wrong because /clear starts over with an empty context and loses the session's working state. C is wrong because /memory lists and opens CLAUDE.md and other memory files; it doesn't shrink context. D is wrong because /init generates a starter CLAUDE.md for the project.",
+    "tags": [
+      "compact",
+      "context-management",
+      "claude-code",
+      "codebase-exploration"
+    ],
+    "difficulty": "easy"
   }
 ]

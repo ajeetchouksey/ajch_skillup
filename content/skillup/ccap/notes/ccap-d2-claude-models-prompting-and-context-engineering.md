@@ -1,6 +1,6 @@
 # D2: Claude Models, Prompting & Context Engineering
 
-> **Exam weight**: 13% · **Questions**: ~16 of 120
+> **Exam weight**: 13% · **Questions**: ~20 of 139
 
 ## Overview
 
@@ -14,19 +14,22 @@ This domain covers the decisions an architect makes *before* a single line of or
 
 **Model selection is a portfolio decision, not a search for the single smartest model.**
 
-Claude ships as a family of models along a capability–cost–latency spectrum rather than a single model with settings. At a given point in time the family typically spans three tiers:
+Claude ships as a family of models along a capability–cost–latency spectrum, and each current model also has an **effort** setting that trades reasoning depth for speed and cost inside that one model. As of October 2026 the current lineup spans four tiers:
 
-- **Opus-class** — the most capable reasoning tier. Best for open-ended agentic tasks, multi-step planning, ambiguous instructions, and work where a wrong answer is expensive (legal analysis, complex code refactors, multi-agent orchestration/lead-agent roles). Highest cost per token and highest latency.
-- **Sonnet-class** — the balanced production workhorse. Strong reasoning at meaningfully lower cost and latency than Opus; the default choice for most customer-facing and production agentic workloads. Supports extended context (up to 1M tokens on some Sonnet versions via a beta header) and extended thinking.
-- **Haiku-class** — optimized for speed and cost at high volume. Best for classification, routing/triage, extraction, moderation, and other narrow, well-specified tasks where the acceptable error tolerance is symmetric with the cost savings.
+- **Fable-class** (Claude Fable 5.1) — Anthropic's most capable model open to all customers, for demanding reasoning and long-horizon agentic work such as agent sessions that run for hours and multistep deep research. Slowest and most expensive tier; Anthropic suggests moving to it when evals on Opus at `xhigh` or `max` effort still fall short.
+- **Opus-class** (Claude Opus 5.5) — Anthropic's recommended starting point for most workloads, built for long-running agentic coding and complex enterprise work. Moderate latency.
+- **Sonnet-class** (Claude Sonnet 5.5) — the best combination of speed and intelligence, for everyday coding, agent, and enterprise workloads. Fast.
+- **Haiku-class** (Claude Haiku 5.5) — the lowest latency and price, for high-volume, latency-sensitive tasks such as classification, extraction, routing, and subagent work.
 
-A production architecture commonly mixes tiers: Haiku for routing, Sonnet for the primary task, Opus reserved for escalation paths or a lead/orchestrator role that spawns cheaper subagents. **Extended thinking is a lever to pull on hard problems, not a default setting** — it trades latency and token spend for accuracy on multi-step reasoning, so save it for the calls that are actually struggling.
+All four have a 1M-token context window and use **adaptive thinking**: the model decides whether and how much to think, steered by the `effort` parameter (`low`, `medium`, `high`, `xhigh`, `max`). The older manual mode (`thinking.type: "enabled"` with `budget_tokens`) is rejected by Claude 4.7 and later models, and on Opus 5.5 thinking can't be switched off at all.
+
+A production architecture commonly mixes tiers and effort levels: Haiku at low effort for routing, a mid or top tier for the primary task, and the most capable tier for escalation paths or an orchestrator that delegates bulk work to cheaper workers. **Effort is often a better first lever than switching models** — tune it per call site against your evals before re-platforming a workload onto another tier.
 
 ### In Practice
 
 **What breaks without this**: The single biggest line item in a Claude bill is often a classification step routed through Opus instead of Haiku — defaulting every call to the top-tier model inflates cost and latency without a proportional accuracy gain, and at millions of calls the 10x+ cost multiplier compounds fast. The opposite mistake is just as real: defaulting to the cheapest tier for ambiguous, high-stakes reasoning produces silently wrong answers that pass a smoke test but fail in production edge cases.
 
-**Decision trigger**: Ask three questions per call site: (1) Is the task narrow and well-specified, or open-ended and ambiguous? (2) What is the cost of a wrong answer here — retry-able, or does it reach a customer/compliance boundary? (3) Is this call on a latency-sensitive path (user-facing, synchronous) or a batch/async path? Narrow + cheap-to-retry + latency-sensitive → Haiku. Ambiguous + high-stakes + can tolerate seconds of latency → Opus. Everything in the broad middle → Sonnet as the default, with extended thinking enabled only when a specific reasoning chain is failing.
+**Decision trigger**: Ask three questions per call site: (1) Is the task narrow and well-specified, or open-ended and ambiguous? (2) What is the cost of a wrong answer here — retry-able, or does it reach a customer/compliance boundary? (3) Is this call on a latency-sensitive path (user-facing, synchronous) or a batch/async path? Narrow + cheap-to-retry + latency-sensitive → Haiku at low effort. Ambiguous + high-stakes + can tolerate seconds of latency → Opus, or Fable when evals at Opus's top effort levels still fall short. Everything in the broad middle → Sonnet or Opus at a moderate effort level, raised only where a specific reasoning chain is failing.
 
 **When you'd choose differently**: A single-tier architecture (all Sonnet, for example) is the right call for early-stage products where engineering time to build a tiered router costs more than the token savings would recoup, or where request volume is too low for the cost delta to matter. Don't build a three-tier routing layer to save a few dollars a day.
 
@@ -69,8 +72,8 @@ Common distractor: treating the system prompt as sufficient for safety-critical 
 Three core techniques cover most production prompting decisions, and they are not mutually exclusive escalation tiers — they're tools matched to task shape:
 
 - **Zero-shot** — the model performs the task from instructions alone, no examples. Works well when the task is common, well-represented in training data, and the desired output format is simple or can be fully specified in words (e.g., "summarize in three bullet points").
-- **Few-shot** — the prompt includes 2-5+ input/output examples before the real task. This is the highest-leverage technique for *format precision and edge-case calibration* — when the desired output has a specific structure, tone, or handles ambiguous edge cases in a particular way, showing beats describing. Few-shot examples consume context window and, if long, are strong candidates for prompt caching (see below).
-- **Chain-of-thought (CoT)** — the model is instructed to reason step by step before producing a final answer ("think through this before answering"), or explicit extended thinking is enabled. This materially improves accuracy on multi-step reasoning, math, and tasks with several dependent sub-decisions, at the cost of additional output tokens and latency.
+- **Few-shot** — the prompt includes 2-5+ input/output examples before the real task. This is the highest-leverage technique for *format precision and edge-case calibration* — when the desired output has a specific structure, tone, or handles ambiguous edge cases in a particular way, showing beats describing. Anthropic's guidance: make examples relevant and diverse (cover edge cases so Claude doesn't learn an unintended shared pattern), wrap them in `<example>` tags, and use 3–5 for best results. Few-shot examples consume context window and, if long, are strong candidates for prompt caching (see below).
+- **Chain-of-thought (CoT)** — the model is instructed to reason step by step before producing a final answer ("think through this before answering"), or, on current models, adaptive thinking is given more room by raising the effort level. This materially improves accuracy on multi-step reasoning, math, and tasks with several dependent sub-decisions, at the cost of additional output tokens and latency.
 
 These compose: a production prompt commonly combines a small number of few-shot examples (to lock the output schema) with a chain-of-thought instruction (to get correct reasoning before that schema is populated). **The question is never "which technique is best"** — it's what the task is testing: format fidelity points to few-shot, reasoning correctness points to CoT, and a simple well-defined task needs neither.
 
@@ -122,9 +125,9 @@ Common distractor: "a bigger context window solves context management" — the e
 
 Three complementary mechanisms let architects avoid re-sending and re-processing the same content on every call:
 
-- **Prompt caching** — marking a stable prefix of the prompt (system prompt, tool definitions, few-shot examples, a large reference document) with a cache breakpoint so Claude reuses the already-processed representation on subsequent calls instead of reprocessing it from scratch. Cache reads are billed at a fraction of the base input token price and return with materially lower latency; cache writes carry a modest premium over standard input pricing. Caches expire on a short default TTL (minutes) with an extended-TTL option available for longer-lived sessions. The architectural implication: anything that changes per-request (the actual user query) belongs after the cache breakpoint, not mixed into it.
+- **Prompt caching** — marking a stable prefix of the prompt (system prompt, tool definitions, few-shot examples, a large reference document) with a cache breakpoint so Claude reuses the already-processed representation on subsequent calls instead of reprocessing it from scratch. Cache reads are billed at a fraction of the base input price (10% by default, less on some current models) and return with materially lower latency; cache writes cost 1.25x base input for the default 5-minute TTL or 2x for the optional 1-hour TTL, and every cache hit refreshes the TTL at no extra cost. Prompts shorter than the model's minimum cacheable length (512 to 4,096 tokens depending on the model) are processed without caching and without an error. The architectural implication: anything that changes per-request (the actual user query) belongs after the cache breakpoint, not mixed into it.
 - **Modular prompts** — decomposing a prompt into reusable components (a persona block, a task-instruction block, a formatting-rules block, an examples block) assembled per use case rather than duplicating near-identical prompt text across many call sites. This is a maintainability and consistency strategy as much as a token strategy: a policy change updates one module instead of every prompt that used it.
-- **Skills** — packaged, reusable capability bundles (instructions, optionally scripts and reference resources) that Claude loads *progressively* — only a short name/description is in context by default, with the full instructions and resources loaded on demand when the task actually needs that capability. This keeps a large library of specialized capabilities available to an agent without permanently consuming context budget for capabilities that aren't relevant to the current task.
+- **Skills** — packaged, reusable capability bundles (instructions, optionally scripts and reference resources) that Claude loads *progressively* — only a short name/description (about 100 tokens per skill) is in context by default, the `SKILL.md` body loads when a task triggers the skill, and bundled files load only when read (scripts run without their code entering context; only their output does). This keeps a large library of specialized capabilities available to an agent without permanently consuming context budget for capabilities that aren't relevant to the current task.
 
 ![Prompt caching sequence: a static prefix ends at a cache_control breakpoint; the first request misses and writes the cache, later requests with different user queries hit the cached prefix within the TTL](/content/skillup/ccap/images/ccap-d2-prompt-caching.svg)
 
@@ -172,8 +175,8 @@ Read top to bottom: pick the model, shape the prompt technique, back critical ru
 
 | Concept | Key Rule |
 |---------|----------|
-| Model selection | Match tier to task: Haiku = narrow/high-volume/cheap, Sonnet = balanced production default, Opus = ambiguous/high-stakes/orchestration |
-| Extended thinking | Enable selectively for hard multi-step reasoning, not as a default on every call — costs latency and tokens |
+| Model selection | Match tier to task: Haiku = narrow/high-volume/cheap, Sonnet = fast everyday workhorse, Opus = recommended start for complex agentic work, Fable = highest capability when Opus at top effort falls short |
+| Thinking & effort | Current models use adaptive thinking steered by `effort` (`low` → `max`); tune effort per call site before switching models. Manual `budget_tokens` is rejected on Claude 4.7+ |
 | System prompt structure | Layer role, scope, output format, and guardrails distinctly; don't blend into unstructured prose |
 | Guardrail placement | Prompt-level = shapes typical behavior; code-level = required for anything with real blast radius (money, PII, irreversible actions) |
 | Zero-shot | Use for simple, well-specified, common tasks — no examples needed |
@@ -181,7 +184,7 @@ Read top to bottom: pick the model, shape the prompt technique, back critical ru
 | Chain-of-thought | Use to fix *reasoning* correctness on multi-step problems — not a blanket accuracy booster |
 | Context window | Finite shared budget across system prompt, tools, examples, RAG, history, output — bigger window ≠ automatically better answers |
 | Context optimization | Summarize/compact aging history; retrieve relevant chunks, not whole corpora; prune unused tool defs |
-| Prompt caching | Cache the static prefix (system prompt, tool defs, examples, reference docs); put variable content after the breakpoint; cache reads are far cheaper and faster than reprocessing |
+| Prompt caching | Cache the static prefix (system prompt, tool defs, examples, reference docs); put variable content after the breakpoint; 5-minute default TTL (1-hour optional), reads ~10% of base input price, minimum cacheable length per model |
 | Modular prompts | Extract shared blocks (persona, format rules, guardrails) into reusable components to keep policy changes single-sourced |
 | Skills | Package occasional/specialized capabilities with progressive disclosure — full instructions load only when the task needs them, not permanently in context |
 

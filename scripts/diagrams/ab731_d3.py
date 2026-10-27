@@ -139,25 +139,30 @@ def register(api):
         return D
 
     def scale(f):
-        D = Diagram(f, 476, "Scale AI Framework: From Pilot to Enterprise",
-                    "Prove value first, then organise, then hand capability to business users.",
-                    "Three phases in sequence. Phase 1, unlock value: prove ROI with two to three pilots, secure "
-                    "executive sponsorship and define KPIs. Phase 2, organise for success: AI Council plus Centre of "
-                    "Excellence plus business unit leads, with clear roles to decide, build and govern. Phase 3, "
-                    "empower business users: broad Copilot rollout, self-service with Copilot Studio, and a champions "
-                    "programme plus training.")
+        D = Diagram(f, 588, "Scale AI Framework: From Pilot to Enterprise",
+                    "Prove value, organise for it, then put AI in the hands of users and experts.",
+                    "Four phases in sequence, following Microsoft Learn's Scale AI in your organization module. "
+                    "Phase 1, unlock AI value: align leaders on two or three strategic bets, prove ROI with focused "
+                    "pilots, secure executive sponsorship and define KPIs. Phase 2, organise for AI success: AI Council "
+                    "plus Centre of Excellence plus business unit leads, with clear roles to decide, build and govern. "
+                    "Phase 3, empower business users: broad Copilot rollout with AI in everyday apps, backed by a "
+                    "champions programme and training. Phase 4, empower subject matter experts: experts build their "
+                    "own agents and apps with no-code and low-code tools such as Copilot Studio, Power Platform and "
+                    "Microsoft Foundry, with the CoE mentoring and reviewing.")
         cx, w = 340, 480
-        p = [D.box(cx, 144, w, "Phase 1: Unlock value",
-                   "Prove ROI with 2–3 pilots\nSecure exec sponsorship\nDefine KPIs", h=88),
-             D.box(cx, 264, w, "Phase 2: Organise for success",
+        p = [D.box(cx, 144, w, "Phase 1: Unlock AI value",
+                   "Align leaders on 2–3 strategic bets\nProve ROI with focused pilots\nExec sponsorship + KPIs", h=88),
+             D.box(cx, 260, w, "Phase 2: Organise for AI success",
                    "AI Council + CoE + BU leads\nClear roles: decide, build, govern", h=72),
-             D.box(cx, 384, w, "Phase 3: Empower business users",
-                   "Broad Copilot rollout\nSelf-service with Copilot Studio\nChampions programme + training", h=88)]
+             D.box(cx, 376, w, "Phase 3: Empower business users",
+                   "Broad Copilot rollout: AI in everyday apps\nChampions programme + training", h=72),
+             D.box(cx, 492, w, "Phase 4: Empower subject matter experts",
+                   "Experts build their own agents and apps\nNo/low-code: Copilot Studio, Power Platform, Foundry\nCoE mentors and reviews", h=88)]
         for i, b in enumerate(p):
             D.badge(b["l"] + 22, b["t"] + 22, i + 1)
         for a, b in zip(p, p[1:]):
             D.edge([(cx, a["b"]), (cx, b["t"])])
-        D.legend(460, [("solid", "next phase")])
+        D.legend(570, [("solid", "next phase")])
         return D
 
     return {

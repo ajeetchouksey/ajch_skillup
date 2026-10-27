@@ -1,6 +1,6 @@
 # D1: Solution Design & Architecture
 
-> **Exam weight**: 17% · **Questions**: ~20 of 120
+> **Exam weight**: 17% · **Questions**: ~22 of 139
 
 ## Overview
 

@@ -1,0 +1,359 @@
+{
+  "schemaVersion": "1.0",
+  "examCode": "AI-901",
+  "source": "Study guide for Exam AI-901: Microsoft Azure AI Fundamentals (skills measured as of April 15, 2026)",
+  "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-901",
+  "skillsMeasuredAsOf": "2026-04-15",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Identify AI concepts and capabilities",
+      "weight": 42,
+      "officialWeight": "40–45%",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "Describe considerations for fairness in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-001",
+            "ai901-d1-002",
+            "ai901-d1-003",
+            "ai901-d1-012"
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Describe considerations for reliability and safety in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-004",
+            "ai901-d1-005",
+            "ai901-d1-006"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Describe considerations for privacy and security in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-007",
+            "ai901-d1-008",
+            "ai901-d1-009"
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Describe considerations for inclusiveness in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-010",
+            "ai901-d1-011",
+            "ai901-d1-012"
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Describe considerations for transparency in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-013",
+            "ai901-d1-014",
+            "ai901-d1-015"
+          ]
+        },
+        {
+          "id": "1.6",
+          "title": "Describe considerations for accountability in an AI solution",
+          "group": "Describe principles of responsible AI",
+          "questionIds": [
+            "ai901-d1-015",
+            "ai901-d1-016",
+            "ai901-d1-017",
+            "ai901-d1-018"
+          ]
+        },
+        {
+          "id": "1.7",
+          "title": "Describe how generative AI models work",
+          "group": "Identify AI model components and configurations",
+          "questionIds": [
+            "ai901-d1-006",
+            "ai901-d1-019",
+            "ai901-d1-020",
+            "ai901-d1-021",
+            "ai901-d1-022",
+            "ai901-d1-023"
+          ]
+        },
+        {
+          "id": "1.8",
+          "title": "Identify an appropriate AI model, based on capabilities",
+          "group": "Identify AI model components and configurations",
+          "questionIds": [
+            "ai901-d1-023",
+            "ai901-d1-024",
+            "ai901-d1-025",
+            "ai901-d1-026",
+            "ai901-d1-027",
+            "ai901-d2-008",
+            "ai901-d2-030"
+          ]
+        },
+        {
+          "id": "1.9",
+          "title": "Identify appropriate model deployment options and configuration parameters",
+          "group": "Identify AI model components and configurations",
+          "questionIds": [
+            "ai901-d1-028",
+            "ai901-d1-029",
+            "ai901-d1-030",
+            "ai901-d1-031",
+            "ai901-d1-032",
+            "ai901-d1-033",
+            "ai901-d1-034",
+            "ai901-d1-035",
+            "ai901-d2-009"
+          ]
+        },
+        {
+          "id": "1.10",
+          "title": "Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction",
+          "group": "Identify AI workloads",
+          "questionIds": [
+            "ai901-d1-036",
+            "ai901-d1-037",
+            "ai901-d1-038",
+            "ai901-d1-039"
+          ]
+        },
+        {
+          "id": "1.11",
+          "title": "Describe common text analysis techniques, including keyword extraction, entity detection, sentiment analysis, and summarization",
+          "group": "Identify AI workloads",
+          "questionIds": [
+            "ai901-d1-026",
+            "ai901-d1-040",
+            "ai901-d1-041",
+            "ai901-d1-042",
+            "ai901-d1-043",
+            "ai901-d2-026"
+          ]
+        },
+        {
+          "id": "1.12",
+          "title": "Identify features and capabilities of speech recognition and speech synthesis",
+          "group": "Identify AI workloads",
+          "questionIds": [
+            "ai901-d1-044",
+            "ai901-d1-045",
+            "ai901-d1-046",
+            "ai901-d1-052",
+            "ai901-d2-036"
+          ]
+        },
+        {
+          "id": "1.13",
+          "title": "Identify features and capabilities of computer vision and image-generation models",
+          "group": "Identify AI workloads",
+          "questionIds": [
+            "ai901-d1-038",
+            "ai901-d1-047",
+            "ai901-d1-048",
+            "ai901-d1-049",
+            "ai901-d1-053",
+            "ai901-d2-044"
+          ]
+        },
+        {
+          "id": "1.14",
+          "title": "Identify techniques to extract information from text, images, audio, and videos",
+          "group": "Identify AI workloads",
+          "questionIds": [
+            "ai901-d1-039",
+            "ai901-d1-050",
+            "ai901-d1-051",
+            "ai901-d1-052",
+            "ai901-d1-053"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement AI solutions by using Microsoft Foundry",
+      "weight": 58,
+      "officialWeight": "55–60%",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "Create effective system and user prompts for generative AI models",
+          "group": "Implement generative AI apps and agents by using Foundry",
+          "questionIds": [
+            "ai901-d2-001",
+            "ai901-d2-002",
+            "ai901-d2-003",
+            "ai901-d2-004",
+            "ai901-d2-005"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Deploy a model and interact with it in the Foundry portal",
+          "group": "Implement generative AI apps and agents by using Foundry",
+          "questionIds": [
+            "ai901-d2-006",
+            "ai901-d2-007",
+            "ai901-d2-008",
+            "ai901-d2-009",
+            "ai901-d2-010"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Create a lightweight chat client application by using the Foundry SDK",
+          "group": "Implement generative AI apps and agents by using Foundry",
+          "questionIds": [
+            "ai901-d2-005",
+            "ai901-d2-011",
+            "ai901-d2-012",
+            "ai901-d2-013",
+            "ai901-d2-014",
+            "ai901-d2-015"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Create and test a single-agent solution in the Foundry portal",
+          "group": "Implement generative AI apps and agents by using Foundry",
+          "questionIds": [
+            "ai901-d2-016",
+            "ai901-d2-017",
+            "ai901-d2-018",
+            "ai901-d2-019",
+            "ai901-d2-020",
+            "ai901-d2-021",
+            "ai901-d2-028"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Create a lightweight client application for an agent",
+          "group": "Implement generative AI apps and agents by using Foundry",
+          "questionIds": [
+            "ai901-d2-022",
+            "ai901-d2-023",
+            "ai901-d2-024"
+          ]
+        },
+        {
+          "id": "2.6",
+          "title": "Build a lightweight application that includes text analysis",
+          "group": "Implement AI solutions for text and speech by using Foundry",
+          "questionIds": [
+            "ai901-d2-025",
+            "ai901-d2-026",
+            "ai901-d2-027",
+            "ai901-d2-028"
+          ]
+        },
+        {
+          "id": "2.7",
+          "title": "Respond to spoken prompts by using a deployed multimodal model",
+          "group": "Implement AI solutions for text and speech by using Foundry",
+          "questionIds": [
+            "ai901-d2-029",
+            "ai901-d2-030",
+            "ai901-d2-031",
+            "ai901-d2-032"
+          ]
+        },
+        {
+          "id": "2.8",
+          "title": "Build a lightweight application by using Azure Speech in Foundry Tools",
+          "group": "Implement AI solutions for text and speech by using Foundry",
+          "questionIds": [
+            "ai901-d2-032",
+            "ai901-d2-033",
+            "ai901-d2-034",
+            "ai901-d2-035",
+            "ai901-d2-036"
+          ]
+        },
+        {
+          "id": "2.9",
+          "title": "Interpret visual input in prompts by using a deployed multimodal model",
+          "group": "Implement AI solutions with computer vision and image-generation capabilities by using Foundry",
+          "questionIds": [
+            "ai901-d2-037",
+            "ai901-d2-038",
+            "ai901-d2-039"
+          ]
+        },
+        {
+          "id": "2.10",
+          "title": "Create new visual outputs by using generative models",
+          "group": "Implement AI solutions with computer vision and image-generation capabilities by using Foundry",
+          "questionIds": [
+            "ai901-d2-040",
+            "ai901-d2-041",
+            "ai901-d2-042"
+          ]
+        },
+        {
+          "id": "2.11",
+          "title": "Build a lightweight application that includes vision capabilities",
+          "group": "Implement AI solutions with computer vision and image-generation capabilities by using Foundry",
+          "questionIds": [
+            "ai901-d2-043",
+            "ai901-d2-044",
+            "ai901-d2-045"
+          ]
+        },
+        {
+          "id": "2.12",
+          "title": "Extract information from documents and forms by using Azure Content Understanding in Foundry Tools",
+          "group": "Implement AI solutions for information extraction by using Foundry",
+          "questionIds": [
+            "ai901-d2-046",
+            "ai901-d2-047",
+            "ai901-d2-048",
+            "ai901-d2-049"
+          ]
+        },
+        {
+          "id": "2.13",
+          "title": "Extract information from images by using Content Understanding",
+          "group": "Implement AI solutions for information extraction by using Foundry",
+          "questionIds": [
+            "ai901-d2-050",
+            "ai901-d2-051",
+            "ai901-d2-052"
+          ]
+        },
+        {
+          "id": "2.14",
+          "title": "Extract information from audio and video by using Content Understanding",
+          "group": "Implement AI solutions for information extraction by using Foundry",
+          "questionIds": [
+            "ai901-d2-053",
+            "ai901-d2-054",
+            "ai901-d2-055",
+            "ai901-d2-056"
+          ]
+        },
+        {
+          "id": "2.15",
+          "title": "Build a lightweight application with information extraction capabilities by using Content Understanding",
+          "group": "Implement AI solutions for information extraction by using Foundry",
+          "questionIds": [
+            "ai901-d2-047",
+            "ai901-d2-057",
+            "ai901-d2-058",
+            "ai901-d2-059"
+          ]
+        }
+      ]
+    }
+  ]
+}

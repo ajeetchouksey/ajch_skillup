@@ -22,7 +22,7 @@
 
 Imagine you hired one intern and gave them 40 different responsibilities: answer billing questions, track shipments, debug API errors, reset passwords, process refunds, manage subscriptions... By week two, they're drowning. They confuse a refund request with a subscription cancellation. They accidentally use the "delete account" tool when the customer just wanted to track a package.
 
-This is exactly what happens when you give Claude 40+ tools in a single context. Tool selection accuracy degrades sharply above ~18 tools. The model starts picking the *almost right* tool — and "almost right" in production means a customer gets charged instead of refunded.
+This is what happens when you give one agent 40+ tools. The exam guide's principle is that too many tools on one agent (its example: 18 instead of 4-5) degrades selection reliability by increasing decision complexity. There's no magic cut-off number; the risk grows with the count and the overlap between tools. The model starts picking the *almost right* tool — and "almost right" in production means a customer gets charged instead of refunded.
 
 The fix is the same one any good engineering manager would use: **hire specialists**.
 
@@ -44,15 +44,15 @@ graph TD
 
 The coordinator is a **restaurant host**, not a chef. The host greets you, figures out what you need ("Anniversary dinner? Right this way to the private room"), and hands you off to the right specialist. The host never cooks your food. If the host tried to be waiter, chef, and sommelier simultaneously, every table would get cold food.
 
-<mark>The coordinator NEVER answers directly. It ALWAYS delegates.</mark>
+<mark>The coordinator routes, aggregates, and synthesizes. It doesn't do the specialists' work, and all inter-agent communication goes through it.</mark>
 
-<div class="note-scribble">Remember: if an exam answer has the coordinator "answering the user directly" — it's wrong. The coordinator's only job is routing.</div>
+<div class="note-scribble">The coordinator also decides <em>which</em> specialists a request needs. Running every query through the full pipeline is a distractor; dynamic selection based on query complexity is the exam answer.</div>
 
 ### Why This Pattern Exists
 
 | Problem Without It | How Coordinator-Subagent Solves It |
 |---------|----------|
-| >18 tools = wrong tool selection | Each subagent has 5-8 focused tools |
+| Too many tools on one agent = unreliable selection | Each subagent has a small, role-scoped tool set |
 | Single failure kills everything | Failure isolated to one subagent |
 | Impossible to debug "who did what" | Clear responsibility per agent |
 | Sequential bottleneck on complex requests | Coordinator dispatches in parallel |
@@ -75,7 +75,7 @@ NEVER answer directly. ALWAYS delegate to a specialist."""
 def run_subagent(agent_type: str, user_message: str) -> str:
     """Each subagent is a fresh Claude call with focused tools."""
     return client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5-5",
         system=AGENT_PROMPTS[agent_type],
         tools=AGENT_TOOLS[agent_type],  # Only 5-8 tools each
         messages=[{"role": "user", "content": user_message}],
@@ -116,12 +116,13 @@ graph LR
 
 ### 🧠 Mental Model: "The While Loop You Don't Write"
 
-You already know this pattern — it's a `while` loop. The exit condition is `stop_reason == "end_turn"`. Every other `stop_reason` means "keep going." If you hear "agentic loop" on the exam, think:
+You already know this pattern — it's a `while` loop. The loop **continues while `stop_reason == "tool_use"`** and terminates on `"end_turn"`. Other values (`max_tokens`, `refusal`, `stop_sequence`) aren't "keep going" signals: handle them explicitly. If you hear "agentic loop" on the exam, think:
 
 ```
-while stop_reason != "end_turn":
-    execute_tools()
-    feed_results_back()
+while response.stop_reason == "tool_use":
+    results = execute_tools(response)
+    response = call_claude(history + results)
+# end_turn → done; anything else → handle explicitly
 ```
 
 ### Loop Lifecycle
@@ -130,17 +131,20 @@ while stop_reason != "end_turn":
 def agentic_loop(user_message: str, tools: list, max_turns: int = 10) -> str:
     messages = [{"role": "user", "content": user_message}]
     
-    for turn in range(max_turns):
+    for turn in range(max_turns):  # safety net only, not the stopping mechanism
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-5-5",
+            max_tokens=4096,
             system=system_prompt,
             tools=tools,
             messages=messages,
         )
-        
-        # ✅ Check stop reason — this is how the loop knows to exit
+
+        # ✅ stop_reason drives control flow
         if response.stop_reason == "end_turn":
             return extract_text(response)
+        if response.stop_reason != "tool_use":
+            return handle_other_stop(response)  # max_tokens, refusal, ...
         
         # 🔧 Process tool calls
         tool_results = []
@@ -165,13 +169,14 @@ def agentic_loop(user_message: str, tools: list, max_turns: int = 10) -> str:
 |---|---|---|
 | `end_turn` | "I'm done, here's my answer" | Return the response to the user |
 | `tool_use` | "I need to do something first" | Execute the tool(s), feed results back |
-| `max_tokens` | "I ran out of space mid-sentence" | Increase max_tokens or ask Claude to summarize |
+| `max_tokens` | "I ran out of space mid-sentence" | Treat as truncated: raise max_tokens or continue, don't treat as done |
+| `refusal` | "I won't do this" | Surface or route; don't retry blindly |
 
 ### ⚠️ Exam Trap: "The Runaway Loop"
 
-<div class="note-trap"><strong>TRAP:</strong> No <code>max_turns</code> = infinite loop. If a tool keeps returning "inconclusive," Claude retries forever. Always have a safety valve + escalation path.</div>
+<div class="note-trap"><strong>TRAP:</strong> The exam guide lists three loop anti-patterns: parsing natural-language signals ("I'm done") to decide termination, using an arbitrary iteration cap as the <em>primary</em> stopping mechanism, and treating any assistant text as a completion signal. <code>stop_reason</code> is the control signal.</div>
 
-Always include a `max_turns` safety valve. Without it, a confused agent can loop forever (imagine a tool that always returns "inconclusive" — Claude will keep retrying indefinitely). The exam may ask about handling "non-terminating agentic sessions" — the answer involves max turns + escalation.
+A `max_turns` cap is still a sensible **safety net** for a confused agent (imagine a tool that always returns "inconclusive"), paired with an escalation path. Just don't let it be how the loop normally ends: a well-behaved loop ends on `end_turn`.
 
 ---
 
@@ -186,8 +191,11 @@ Your system prompt says "Never refund more than $500 without approval." But Clau
 Now imagine the same scenario, but with a **PreToolUse hook**. The hook doesn't read the conversation. It doesn't care about the user's claimed authority. It's a function that runs *outside the model*:
 
 ```python
-if tool_input["amount_cents"] > 50000:
-    return {"blocked": True, "reason": "Refund exceeds $500 limit"}
+if input_data["tool_input"]["amount_cents"] > 50000:
+    return {"hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "permissionDecision": "deny",
+        "permissionDecisionReason": "Refund exceeds $500 limit; escalate to a human"}}
 ```
 
 That social engineer gets stopped cold. **Every. Single. Time.** Not 99.7% of the time. 100%.
@@ -237,31 +245,34 @@ The key insight: **security doesn't read your diary to decide if you're dangerou
 
 | Hook | Fires When | Use For | Real Example |
 |------|-----------|---------|---------|
-| **PreToolUse** | Before ANY tool call | Block, modify, require approval | "Block refunds over $500 without human approval" |
-| **PostToolUse** | After tool returns | Log, sanitize, transform, validate | "Redact PII from database query results" |
-| **Stop** | Before final response | Quality check, force continuation | "Response must include code examples" |
+| **PreToolUse** | After Claude creates a tool call, before it runs | Allow, deny, ask the user, or rewrite input (`updatedInput`) | "Block refunds over $500 and redirect to escalation" |
+| **PostToolUse** | After the tool succeeds | Log, add context (`additionalContext`), replace output (`updatedToolOutput`) | "Normalize timestamps; redact PII from query results" |
+| **Stop** | When Claude finishes responding | `decision: "block"` with a reason keeps Claude working | "Don't stop until the tests pass" |
+
+Claude Code and the Agent SDK expose many more events (SessionStart, UserPromptSubmit, SubagentStop, PreCompact, and others), but these three carry most exam questions. In Claude Code shell hooks, **exit code 2 is the blocking signal**; other non-zero codes are non-blocking errors and the action proceeds.
 
 ### PreToolUse: The $500 Refund Gate
 
 This is the exact pattern tested in exam question d1-001. Memorize why each alternative fails:
 
 ```python
-def pre_tool_use(tool_name: str, tool_input: dict, context: dict) -> dict:
-    """Runs BEFORE every tool call. Return modified input or raise to block."""
-    
-    # Block file deletion in production
-    if tool_name == "delete_file" and context.get("environment") == "production":
-        return {"blocked": True, "reason": "File deletion disabled in production"}
-    
-    # Require approval for refunds over $500
-    if tool_name == "issue_refund" and tool_input.get("amount_cents", 0) > 50000:
-        approval = request_human_approval(
-            f"Refund ${tool_input['amount_cents']/100:.2f} for order {tool_input['order_id']}"
-        )
-        if not approval.granted:
-            return {"blocked": True, "reason": "Human denied refund"}
-    
-    return {"allowed": True, "input": tool_input}  # Pass through
+# Agent SDK (Python) hook callback — same JSON output format as Claude Code shell hooks
+from claude_agent_sdk import ClaudeAgentOptions, HookMatcher
+
+async def refund_gate(input_data, tool_use_id, context):
+    amount = input_data["tool_input"].get("amount_cents", 0)
+    if amount > 50000:
+        return {"hookSpecificOutput": {
+            "hookEventName": input_data["hook_event_name"],
+            "permissionDecision": "deny",            # or "ask" to require approval
+            "permissionDecisionReason": "Refunds over $500 need human approval; escalate.",
+        }}
+    return {}  # allow unchanged
+
+options = ClaudeAgentOptions(hooks={
+    # MCP tools are matched as mcp__<server>__<tool>
+    "PreToolUse": [HookMatcher(matcher="mcp__support__process_refund", hooks=[refund_gate])]
+})
 ```
 
 **Why the wrong answers fail:**
@@ -274,46 +285,29 @@ def pre_tool_use(tool_name: str, tool_input: dict, context: dict) -> dict:
 **Use case — "The SSN in the SELECT *":** Your agent queries a customer database. The raw result includes Social Security numbers. Without a PostToolUse hook, those SSNs land in Claude's context — and potentially in the response to the user.
 
 ```python
-def post_tool_use(tool_name: str, tool_result: dict, context: dict) -> dict:
-    """Runs AFTER every tool returns. Transform/filter before Claude sees it."""
-    
-    # Redact SSNs from database results
-    if tool_name == "query_database":
-        result_str = json.dumps(tool_result)
-        result_str = re.sub(r'\d{3}-\d{2}-\d{4}', '***-**-****', result_str)
-        return json.loads(result_str)
-    
-    # Trim oversized results
-    if len(json.dumps(tool_result)) > 10000:
-        return {"data": tool_result[:20], "truncated": True, "total": len(tool_result)}
-    
-    return tool_result
+async def redact_ssn(input_data, tool_use_id, context):
+    raw = json.dumps(input_data["tool_response"])
+    clean = re.sub(r'\d{3}-\d{2}-\d{4}', '***-**-****', raw)
+    if clean == raw:
+        return {}
+    return {"hookSpecificOutput": {
+        "hookEventName": "PostToolUse",
+        "updatedToolOutput": json.loads(clean),   # replaces what Claude sees
+    }}
 ```
+
+The same pattern normalizes heterogeneous formats (Unix epochs vs ISO 8601, numeric status codes) from different MCP tools before the model reasons over them. Remember: PostToolUse runs **after** the tool has executed, so it can transform the result but can never undo the action.
 
 ### Stop Hook: The Quality Bouncer
 
 **Use case — "The Lazy Answer":** A user asks a complex architecture question. Claude responds with two sentences and no code. The Stop hook catches this before the user ever sees it:
 
-```python
-def stop_hook(response_text: str, context: dict) -> dict:
-    """Runs before Claude's response reaches the user."""
-    
-    # Force code examples in technical responses
-    if context.get("domain") == "technical" and "```" not in response_text:
-        return {
-            "override": True,
-            "instruction": "Your response lacks code examples. Add a concrete code snippet."
-        }
-    
-    # Ensure response isn't too short for complex questions
-    if context.get("complexity") == "high" and len(response_text) < 200:
-        return {
-            "override": True,
-            "instruction": "Response too brief for a complex question. Elaborate with examples."
-        }
-    
-    return {"accepted": True}
+```json
+// Stop hook output (Claude Code JSON): keep Claude working instead of stopping
+{ "decision": "block", "reason": "Tests are still failing. Fix them before finishing." }
 ```
+
+A Stop hook fires when Claude finishes responding. Returning `decision: "block"` with a `reason` (or exiting 2) prevents the stop and continues the conversation; returning nothing lets Claude stop.
 
 ### 🎯 The Critical Distinction (Tested Heavily)
 
@@ -555,7 +549,7 @@ raise Exception("something went wrong")
 The exam tests error handling from TWO angles:
 
 1. **d1-002** — How should a SUBAGENT report errors to the coordinator? Answer: Structured JSON with `error`, `retryable`, and `suggestion` fields.
-2. **d1-004** — What should a HOOK do when its infrastructure (audit DB) is down? Answer: Return structured error with `retryable: true` so the system can decide — don't silently swallow AND don't crash the session.
+2. **d1-004 / d1-063** — What should a HOOK do when its audit database is down? If the rule is "no refund without an audit record", the PreToolUse hook must **fail closed**: exit 2 (or `permissionDecision: "deny"`) so the call is blocked and Claude sees why. Exit 1 is a non-blocking error and the refund would still run. A PostToolUse hook can't help here: the tool has already executed.
 
 <mark class="hi-green">**Key principle:** The `retryable` field is what separates expert error handling from amateur error handling.</mark> It tells the caller whether trying again might work (transient failure) or is guaranteed to fail again (data corruption, auth failure).
 
@@ -706,7 +700,7 @@ graph TD
     H --> W{Which hook?}
     W -->|"Before tool runs"| Pre[PreToolUse]
     W -->|"After tool returns"| Post[PostToolUse]
-    W -->|"Before response sent"| Stop[Stop Hook]
+    W -->|"When Claude tries to finish"| Stop[Stop Hook]
     P --> T{What kind?}
     T -->|"Behavior/style"| Sys[System prompt]
     T -->|"Format"| Few[Few-shot examples]
@@ -720,7 +714,7 @@ graph TD
 | "Ensure X never happens" | PreToolUse hook that blocks |
 | "Require human approval for Y" | PreToolUse hook as HITL gate |
 | "Sanitize/redact sensitive data" | PostToolUse hook |
-| "Improve response quality" | Stop hook |
+| "Don't let the agent stop until X is true" | Stop hook (decision: block) |
 | "Encourage but not require" | System prompt |
 | "Independent tasks, reduce latency" | Parallel tool calls |
 | "Dependent workflow, strict order" | Sequential execution |
@@ -733,11 +727,11 @@ graph TD
 
 | Concept | One-Line Summary | Mental Model |
 |---------|-----------------|--------------|
-| Coordinator-Subagent | Break 40 tools into 3 focused agents of 8-12 tools each | Restaurant host (routes, never cooks) |
+| Coordinator-Subagent | Split one overloaded agent into role-scoped subagents with small tool sets | Restaurant host (routes, never cooks) |
 | Agentic Loop | While stop_reason == "tool_use": execute tools → feed results back | Detective following leads until case closed |
 | PreToolUse Hook | Block/modify tool calls before execution (security gate) | Airport metal detector |
 | PostToolUse Hook | Transform/sanitize tool results before Claude sees them | Customs inspection on arrival |
-| Stop Hook | Quality-check Claude's response before user sees it | Gate agent final boarding check |
+| Stop Hook | Block Claude from finishing until a condition holds | Gate agent final boarding check |
 | HITL Gate | Risk-based: auto / notify / block depending on action severity | Corporate spending authority levels |
 | Parallel Execution | No data dependency between tasks → run simultaneously | Ordering multiple dishes at once |
 | Sequential Execution | Step B needs Step A's output → must wait | Can't order "same as my friend" before they order |
@@ -771,15 +765,15 @@ graph TD
 |---|---|---|
 | New session | (default) | Fresh task with no prior context needed |
 | Resume named session | `--resume <session-name>` | Continue investigation after a break; prior context still valid |
-| Fork session | `fork_session` | Explore two divergent approaches from the same analysis baseline |
+| Fork session | `--resume <id> --fork-session` (CLI) / `resume` + `fork_session=True` (Agent SDK) | Explore two divergent approaches from the same analysis baseline |
 
 ### --resume: Named Session Resumption
 
 ```bash
-# Save a session with a name
-claude --session-name "refactor-auth-module" "Explore the auth module"
+# Name a session when you start it (or later with /rename)
+claude -n "refactor-auth-module" "Explore the auth module"
 
-# Resume it the next morning
+# Resume it the next morning, by name or session ID
 claude --resume "refactor-auth-module" "Now implement the changes we planned"
 ```
 
@@ -793,7 +787,7 @@ Re-analyse that file and then proceed with the migration plan."
 
 ### fork_session: Parallel Branch Exploration
 
-`fork_session` creates an independent copy of the current conversation, so you can explore two approaches simultaneously without either polluting the other.
+Forking creates a new session (with its own session ID) that starts with a copy of the original's history; the original stays unchanged, so you can resume either branch separately. Forking branches the **conversation**, not the filesystem: file edits made in one branch are real and visible to the other.
 
 ```mermaid
 graph TD
@@ -816,3 +810,71 @@ graph TD
 | Next day, code was modified since last session | `--resume` + explicitly state changed files |
 | Prior tool results are stale/invalid | New session + inject structured summary |
 | Need to explore two divergent approaches | `fork_session` from baseline |
+
+---
+
+## 1.9 Spawning Subagents: the Agent (Task) Tool, AgentDefinition, and Context Passing
+
+### Key Concept
+
+**A subagent knows only what its prompt tells it, and it is spawned through one tool: Agent (formerly Task).**
+
+The exam guide calls the spawning tool "Task" and says a coordinator's `allowedTools` must include it. In current Claude Code and the Agent SDK the tool is named **Agent** (renamed in Claude Code v2.1.63; `Task(...)` references still work as aliases), so SDK examples list `"Agent"` in `allowed_tools`. Each subagent type is defined by an `AgentDefinition` (or a `.claude/agents/*.md` file) with a `description` Claude uses to decide when to delegate, a `prompt` (its system prompt), and an optional `tools` list that restricts it.
+
+Unless it is a fork, a subagent starts with a fresh context: no parent conversation, no tool results the parent already saw, no shared memory between invocations. The only thing passed from parent to subagent is the Agent tool's prompt string. **A subagent is a contractor who has read your brief and nothing else: if it isn't in the brief, it doesn't exist.**
+
+### In Practice
+
+**What breaks without this**: The synthesis subagent writes a report with no citations, because the coordinator passed "summarize the findings" instead of the findings themselves, with their source URLs and dates.
+
+**Decision trigger**: Before spawning, ask: "Could a new colleague do this from the prompt alone?" If not, put the prior findings into the prompt as structured data (claim, excerpt, source URL, document name, page, date) so attribution survives the handoff. For parallel work, emit several Agent calls **in one coordinator response**; calls spread over separate turns run one after another.
+
+**When you'd choose differently**: When a branch genuinely needs the whole conversation so far (for example, comparing two refactoring approaches from the same analysis), use a fork (`fork_session` in the SDK, `--fork-session` in the CLI, or a fork subagent) instead of re-briefing a fresh subagent. Current Claude Code runs subagents in the background by default and lets them spawn their own subagents (three levels by default), so bound depth, concurrency, and budget for large fan-outs.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"The subagent ignored context it inherited" is never the answer: non-fork subagents don't inherit context. And when a coordinator never delegates to a well-written subagent, check its <code>description</code> first; that's what Claude matches tasks against. Expect "Task tool" wording on the exam and "Agent tool" in current docs: they're the same tool.</div>
+
+---
+
+## Deep Dive
+
+### 1. The connective narrative
+
+Domain 1 is about **who decides** in an agent system. Inside a single agent, the model decides which tool to call next, and your loop simply honours `stop_reason`: continue on `tool_use`, stop on `end_turn`, handle anything else explicitly. Iteration caps are a safety net, not the steering wheel.
+
+Once one agent is overloaded with tools or responsibilities, you split it: a coordinator that decomposes the request, picks only the subagents the query needs, routes all communication, and synthesizes the results. Subagents start with nothing but their prompt, so context passing is explicit and structured, and parallelism comes from issuing several Agent calls in one response.
+
+Where the model must not decide, code decides. Prerequisite gates and PreToolUse hooks enforce ordering and limits (fail closed with exit 2 or `deny`), PostToolUse hooks normalize data before the model sees it, and structured handoffs give humans what they need when the agent escalates. Sessions tie it together over time: resume when prior context is still valid, fork to explore alternatives, start fresh with a summary when tool results have gone stale.
+
+### 2. Worked scenario
+
+> **Scenario.** A support agent with 30 tools sometimes refunds without verifying the customer, occasionally issues refunds over the $500 limit, and gets slow on multi-issue tickets.
+>
+> **Step 1 — split the tool load.** Move to a coordinator plus billing, shipping, and account subagents, each with only its own tools, defined with clear `description` fields so delegation is reliable.
+>
+> **Step 2 — enforce order.** Add a programmatic prerequisite: block `process_refund` and `lookup_order` until `get_customer` has returned a verified ID. A prompt rule failed 12% of the time; code fails 0%.
+>
+> **Step 3 — enforce the limit.** A PreToolUse hook on `mcp__support__process_refund` denies amounts over $500 with a reason that tells the agent to escalate.
+>
+> **Step 4 — parallelize multi-issue tickets.** The coordinator decomposes the message into separate issues and emits one Agent call per independent issue in a single response, then synthesizes one reply.
+>
+> **Step 5 — escalate well.** When escalating, the agent compiles a structured handoff (customer ID, root cause, amounts, recommended action) because the human won't read the transcript.
+>
+> **Outcome:** the model still does the reasoning, but every must-happen rule lives in code.
+
+### 3. Memory aid
+
+**LOOPS** — the Domain 1 checklist:
+- **L**oop on `stop_reason` (`tool_use` continue, `end_turn` stop)
+- **O**rchestrate through a coordinator that picks only the subagents it needs
+- **O**nly the prompt reaches a subagent: pass context explicitly and structured
+- **P**rogrammatic enforcement (gates, hooks) for anything that MUST happen
+- **S**essions: resume, fork, or restart with a summary depending on staleness
+
+### 4. Exam strategy for this domain
+
+- Domain 1 is the heaviest (27%). Most questions are scenario-based and ask for the *most effective* or *first* fix, so prefer the option that addresses the root cause with the least machinery.
+- Words like "ensure", "guarantee", or "never" point to code (hooks, gates); "improve", "encourage", or calibration problems point to prompts and few-shot examples.
+- Distractors blame the wrong component (a downstream agent when the coordinator's decomposition was too narrow) or over-engineer (a trained classifier before explicit criteria have been tried).
+- Five minutes before the exam: **find the layer that owns the failure, then pick the deterministic fix if the rule is mandatory.**

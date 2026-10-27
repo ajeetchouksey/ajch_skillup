@@ -27,13 +27,13 @@
       "id": "gh600-scenario-010-q1",
       "stem": "Despite passing CI, code scanning, secret scanning, and dependency review, why does Sam's evaluation still fail the PR?",
       "options": [
-        "Because passing automated checks is never a meaningful signal in any evaluation",
         "Because Sam checks constraint respect and intent alignment in addition to outcome — the issue said to touch only the test file, but production code changed too, and the issue asked for a flaky-test fix, not a change to production backoff behavior; the PR fails on two of four signals despite a fully green automated status",
+        "Because passing automated checks is never a meaningful signal in any evaluation",
         "Because the test itself is flaky and can't be trusted regardless of what changed",
         "Because code scanning tools are unreliable for fintech codebases specifically"
       ],
-      "correct": 1,
-      "explanation": "B is correct because a full evaluation checks more than whether the test passes — it checks whether the stated constraint (only touch the test file) was respected and whether the change matches the original intent (a test fix, not a production change), and this PR violates both despite every automated check passing, which is exactly why relying on CI status alone would have missed the scope violation. A overstates the point — automated checks are one signal, just not the only one. C misattributes the failure to test flakiness rather than to what the PR actually changed. D introduces an unsupported, unrelated claim about tooling reliability."
+      "correct": 0,
+      "explanation": "A is correct because a full evaluation checks more than whether the test passes — it checks whether the stated constraint (only touch the test file) was respected and whether the change matches the original intent (a test fix, not a production change), and this PR violates both despite every automated check passing, which is exactly why relying on CI status alone would have missed the scope violation. A overstates the point — automated checks are one signal, just not the only one. C misattributes the failure to test flakiness rather than to what the PR actually changed. D introduces an unsupported, unrelated claim about tooling reliability."
     },
     {
       "id": "gh600-scenario-010-q2",

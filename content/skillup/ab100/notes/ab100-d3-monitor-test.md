@@ -1,14 +1,14 @@
 # D3: Monitor, Test & Optimize Agentic Solutions
 
-> **Exam weight**: 22% · **Questions**: ~13 of 60
+> **Exam weight**: part of the official Deploy domain (20–25%, skills measured as of November 16, 2026) · companion to the main D3 Deploy note
 
 ## Overview
 
-Domain 3 covers the full observability and quality assurance lifecycle for AI agents — from defining evaluation metrics and running automated evals in AI Foundry, to integrating Azure Monitor telemetry, performing red-team safety testing, and optimizing token costs and latency in production.
+Domain 3 covers the full observability and quality assurance lifecycle for AI agents — from defining evaluation metrics and running automated evals in Microsoft Foundry, to integrating Azure Monitor telemetry, performing red-team safety testing, and optimizing token costs and latency in production.
 
 ---
 
-## AI Foundry Evaluation Framework
+## Foundry Evaluation Framework
 
 ### Quality Metrics
 
@@ -56,7 +56,7 @@ A response can be highly relevant but poorly grounded (correct answer but halluc
 
 ---
 
-## Running Evaluations in AI Foundry
+## Running Evaluations in Microsoft Foundry
 
 ### Evaluation Flow Architecture
 
@@ -69,7 +69,7 @@ graph TD
     LLM_JUDGE --> AGG[Aggregate Results<br/>Mean scores per metric]
     RULE --> AGG
     SAFE --> AGG
-    AGG --> DASH[AI Foundry Evaluation Dashboard]
+    AGG --> DASH[Foundry evaluation results]
 ```
 
 ### Evaluation Dataset Format
@@ -107,7 +107,7 @@ print(result["metrics"])  # {"groundedness.mean": 4.2, "relevance.mean": 3.8}
 
 ```mermaid
 graph LR
-    AG[AI Agent<br/>AI Foundry] -->|OpenTelemetry SDK| APPI[Application Insights]
+    AG[AI Agent<br/>Microsoft Foundry] -->|OpenTelemetry| APPI[Application Insights]
     AG -->|Diagnostics| AML[Azure Monitor Logs<br/>Log Analytics Workspace]
     APPI --> DASH[Azure Dashboard]
     APPI --> ALERT[Alert Rules]
@@ -136,17 +136,19 @@ configure_azure_monitor(connection_string=os.environ["APPLICATIONINSIGHTS_CONNEC
 tracer = trace.get_tracer(__name__)
 
 with tracer.start_as_current_span("agent-run") as span:
-    span.set_attribute("agent.id", agent.id)
-    span.set_attribute("thread.id", thread.id)
-    result = client.agents.create_and_process_run(thread.id, agent_id=agent.id)
-    span.set_attribute("run.tokens.total", result.usage.total_tokens)
+    span.set_attribute("agent.name", agent_name)
+    span.set_attribute("conversation.id", conversation_id)
+    response = call_agent(conversation_id, user_input)  # your agent or Responses API call
+    span.set_attribute("usage.total_tokens", response.usage.total_tokens)
 ```
+
+Foundry tracing is built on OpenTelemetry and Application Insights, and agents built with Microsoft Agent Framework emit traces automatically when tracing is enabled for the project, so manual spans like this are only needed for your own custom steps.
 
 ---
 
 ## Safety Testing & Red-Teaming
 
-### Azure AI Studio Safety Evaluations
+### Safety Evaluators and Severity Levels
 
 ```mermaid
 graph TD
@@ -162,7 +164,7 @@ graph TD
     SEV --> S1[2: Low]
     SEV --> S2[4: Medium]
     SEV --> S3[6: High]
-    SEV --> S4[7: Very High]
+    SEV --> S4[Eight-level output<br/>0-7 for finer grading]
 ```
 
 ### Red-Teaming Checklist
@@ -182,7 +184,7 @@ graph TD
 **Indirect prompt injection** is different from direct jailbreak:
 - **Direct**: User types "Ignore your instructions and..."
 - **Indirect**: A retrieved document contains "SYSTEM: ignore previous instructions" — the agent processes it as if it were legitimate context.
-Mitigation: Use **Azure AI Content Safety** on retrieved content before it enters the prompt, and treat retrieved content as **untrusted** in the prompt structure.
+Mitigation: turn on **Prompt Shields document attack detection** (off by default; for Foundry agents it can scan tool responses, preview) for retrieved content, and treat retrieved content as **untrusted** in the prompt structure (delimiters or spotlighting).
 </div>
 
 ---
@@ -206,21 +208,22 @@ graph LR
 
 | Technique | How | Token Savings |
 |-----------|-----|--------------|
-| **Prompt caching** | Cache static system prompt prefix | 90% on cached tokens |
-| **Semantic compression** | Compress context with a smaller model | 30–60% |
-| **Summary injection** | Summarize old turns, keep recent full | 40–70% |
-| **Selective retrieval** | Only inject most relevant RAG chunks | 20–50% |
+| **Prompt caching** | Keep a stable prefix of ≥1,024 tokens identical across requests | Discount on cached input tokens (model-dependent; up to 100% on Provisioned) |
+| **Semantic compression** | Compress context with a smaller model | Varies with content; evaluate quality impact |
+| **Summary injection** | Summarize old turns, keep recent full | Caps history tokens per request |
+| **Selective retrieval** | Only inject most relevant RAG chunks | Fewer context tokens per request |
 
 ### Caching in Azure OpenAI
 
 ```python
-# Static prefix eligible for caching (must be >1024 tokens)
+# Static prefix eligible for caching (at least 1,024 tokens, identical across requests)
 system_prompt = """[Long static instructions...]"""  # 2000 tokens — cached
 
 # Dynamic suffix (not cached)
 user_message = f"Customer query: {query}"
 
-# Cost: cached tokens = 50% of standard input price
+# Cost: cache reads are billed at a discount on input price (rate depends on the model)
+# Verify hits with usage.prompt_tokens_details.cached_tokens (0 = cache miss)
 ```
 
 ---
@@ -272,6 +275,35 @@ graph TD
 
 ---
 
+## Deep Dive: Making Monitoring and Testing Click
+
+### 1. The connective narrative
+
+Every metric in this note answers one of three questions: *is the answer supported* (groundedness), *does it answer what was asked* (relevance), and *is it safe* (safety evaluators and Prompt Shields). Reference-based metrics such as F1 and similarity add a fourth — *does it match the known right answer* — but only when you have ground truth. Knowing which inputs each metric needs (context, query, ground truth) tells you which metrics a given dataset can support.
+
+Testing uses those metrics before release, on a golden dataset and with red teaming; monitoring uses the same metrics after release, on sampled production traffic and scheduled runs, alongside operational signals like latency, token use and tool failures. Cost tuning (prompt caching, selective retrieval, summary injection, model routing) is safe only when you re-run the same evaluations afterwards, because every saving is also a change in behaviour.
+
+### 2. Worked scenario
+
+> **Scenario.** A support agent's P95 latency rises from 4 s to 8 s over a month, input tokens per request grow from about 850 to 1,340, and nightly groundedness slips from 4.2 to 3.6.
+>
+> **Reasoning.** All three moved together, so look for one cause. More input tokens plus lower groundedness points to retrieval: the knowledge base grew and the agent now injects more, weaker chunks. Latency follows token count.
+>
+> **Action.** Add a relevance threshold to retrieval and cap the number of chunks; keep the static instructions first so prompt caching still hits (check `cached_tokens`); re-run the golden dataset and confirm groundedness recovers before promoting the change.
+
+### 3. Memory aid
+
+**GRSS** — the four evaluator questions: **G**rounded? **R**elevant? **S**afe? **S**imilar to the reference (only if you have ground truth)?
+
+### 4. Exam strategy for this domain
+
+- High relevance with low groundedness means hallucination; low relevance means retrieval or intent problems.
+- Groundedness needs context, not ground truth; F1 and similarity need ground truth.
+- Infrastructure alerts don't catch quality regressions — expect a distractor that relies on HTTP 5xx alerts.
+- Five minutes before the exam: **match the metric to the inputs it needs, then to the failure it detects.**
+
+---
+
 ## Cheat Sheet 📋
 
 | Concept | Key Rule |
@@ -280,9 +312,9 @@ graph TD
 | Relevance | Measures if response answers the question (task completion) |
 | Groundedness requires | context + response (NOT ground truth) |
 | F1/Similarity require | response + ground truth reference |
-| Prompt caching cost | Cached tokens = 50% of standard input price |
+| Prompt caching cost | Cache reads discounted (model-dependent); verify with cached_tokens |
 | Prompt caching min | 1024 tokens static prefix to be eligible |
 | Indirect injection | Retrieved document contains malicious instructions |
-| Safety severity 7 | Very high risk — always block |
+| Safety severity scale | Default output 0/2/4/6; eight-level output 0–7 |
 | Golden dataset | Test on every model/prompt change before production |
 | P95 latency alert | > 10s for interactive agents |

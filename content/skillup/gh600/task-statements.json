@@ -68,7 +68,8 @@
             "gh600-d1-017",
             "gh600-d1-019",
             "gh600-d1-021",
-            "gh600-d1-022"
+            "gh600-d1-022",
+            "gh600-d1-023"
           ]
         }
       ]
@@ -108,7 +109,8 @@
           "knowledge": [
             "MCP server configuration",
             "GitHub remote MCP server",
-            "MCP registries and allow lists"
+            "MCP registries and allow lists",
+            "Enterprise MCP allowlist (managed-settings.json) vs. registry policy, and which Copilot surfaces each governs"
           ],
           "skills": [
             "Add and scope MCP servers as agent tools"
@@ -119,7 +121,11 @@
             "gh600-d2-012",
             "gh600-d2-013",
             "gh600-d2-014",
-            "gh600-d2-024"
+            "gh600-d2-024",
+            "gh600-d2-029",
+            "gh600-d2-030",
+            "gh600-d2-031",
+            "gh600-d2-032"
           ]
         },
         {
@@ -128,7 +134,8 @@
           "knowledge": [
             "Execution context evaluation",
             "Repo/branch scoping",
-            "CI invocation"
+            "CI invocation",
+            "Copilot cloud agent setup steps, firewall scope and Agents secrets"
           ],
           "skills": [
             "Configure an agent's scope to a repository/branch and enable autonomous branch/PR creation"
@@ -141,7 +148,9 @@
             "gh600-d2-020",
             "gh600-d2-021",
             "gh600-d2-022",
-            "gh600-d2-023"
+            "gh600-d2-023",
+            "gh600-d2-033",
+            "gh600-d2-034"
           ]
         },
         {
@@ -158,7 +167,8 @@
             "gh600-d2-025",
             "gh600-d2-026",
             "gh600-d2-027",
-            "gh600-d2-028"
+            "gh600-d2-028",
+            "gh600-d2-035"
           ]
         }
       ]
@@ -174,7 +184,8 @@
           "title": "Implement agent memory strategies",
           "knowledge": [
             "Short-term, long-term, and external memory",
-            "Memory expiration and pruning rules"
+            "Memory expiration and pruning rules",
+            "Copilot Memory: repository facts, citation validation and 28-day expiry"
           ],
           "skills": [
             "Scope agent memory to task-relevant information"
@@ -184,7 +195,9 @@
             "gh600-d3-002",
             "gh600-d3-003",
             "gh600-d3-004",
-            "gh600-d3-005"
+            "gh600-d3-005",
+            "gh600-d3-015",
+            "gh600-d3-016"
           ]
         },
         {
@@ -219,7 +232,8 @@
           "questionIds": [
             "gh600-d3-012",
             "gh600-d3-013",
-            "gh600-d3-014"
+            "gh600-d3-014",
+            "gh600-d3-017"
           ]
         }
       ]
@@ -407,7 +421,8 @@
           "knowledge": [
             "Policy-violation blocking",
             "Least-privilege scoping",
-            "Explicit authorization for irreversible changes"
+            "Explicit authorization for irreversible changes",
+            "Built-in Copilot cloud agent mitigations (write-access triggers, hidden-character filtering, requester cannot approve)"
           ],
           "skills": [
             "Preserve execution velocity by minimizing approvals that don't reduce risk"
@@ -418,7 +433,9 @@
             "gh600-d6-010",
             "gh600-d6-011",
             "gh600-d6-013",
-            "gh600-d6-014"
+            "gh600-d6-014",
+            "gh600-d6-015",
+            "gh600-d6-016"
           ]
         }
       ]

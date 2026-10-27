@@ -27,13 +27,13 @@
       "id": "ccap-scenario-010-q1",
       "stem": "What should Farah's team do first, before forming any hypothesis about the cause?",
       "options": [
-        "Immediately retrain or upgrade the model, since a rising error rate usually means the model needs to be more capable",
         "Pull the actual traces for several recently misclassified claims and inspect, in order, what context was retrieved, what the system prompt instructed, and what the model output",
+        "Immediately retrain or upgrade the model, since a rising error rate usually means the model needs to be more capable",
         "Lower the pass-rate threshold on the golden dataset to reflect the new, lower real-world accuracy",
         "Assume it's a temporary blip and wait another month to see if it resolves on its own"
       ],
-      "correct": 1,
-      "explanation": "B is correct because diagnosing a production regression starts with the actual evidence — the retrieved context, the instructions, and the output — rather than guessing at a cause; this is the same discipline that separates a real diagnosis from an assumption. A jumps to a fix before any evidence has been gathered. C hides the regression instead of investigating it. D risks letting a real, ongoing error pattern continue to affect real coverage decisions."
+      "correct": 0,
+      "explanation": "A is correct because diagnosing a production regression starts with the actual evidence — the retrieved context, the instructions, and the output — rather than guessing at a cause; this is the same discipline that separates a real diagnosis from an assumption. A jumps to a fix before any evidence has been gathered. C hides the regression instead of investigating it. D risks letting a real, ongoing error pattern continue to affect real coverage decisions."
     },
     {
       "id": "ccap-scenario-010-q2",
@@ -52,12 +52,12 @@
       "stem": "Why didn't the pre-launch evaluation (93% accuracy, 200-example golden dataset) catch this failure?",
       "options": [
         "The golden dataset was too small to reach statistical significance",
-        "The golden dataset is a snapshot measured against the world as it existed four months ago, against document IDs that were correct *then* — nothing has been continuously sampling live retrieval-hit-rate or citation-grounding in production to catch drift when the source system changed",
         "The grading method used rule-based exact match instead of LLM-as-judge",
+        "The golden dataset is a snapshot measured against the world as it existed four months ago, against document IDs that were correct *then* — nothing has been continuously sampling live retrieval-hit-rate or citation-grounding in production to catch drift when the source system changed",
         "The eval should have been re-run against the same 200 examples right before launch"
       ],
-      "correct": 1,
-      "explanation": "B is correct because a pre-launch score is inherently a point-in-time measurement — it says nothing about whether the system is still correct after an upstream data change months later, and only continuous production monitoring (sampling live retrieval quality, tracking drift) closes that specific gap. A doesn't address the actual timeline of the failure — a bigger one-time set still wouldn't catch a change that happened months after it was built. C is a grading-method concern, unrelated to the missing continuous-monitoring layer. D re-running against the same fixed examples still wouldn't detect a change in the *live* document index, since the golden set's own reference documents are static."
+      "correct": 2,
+      "explanation": "C is correct because a pre-launch score is inherently a point-in-time measurement — it says nothing about whether the system is still correct after an upstream data change months later, and only continuous production monitoring (sampling live retrieval quality, tracking drift) closes that specific gap. A doesn't address the actual timeline of the failure — a bigger one-time set still wouldn't catch a change that happened months after it was built. B is a grading-method concern, unrelated to the missing continuous-monitoring layer. D re-running against the same fixed examples still wouldn't detect a change in the *live* document index, since the golden set's own reference documents are static."
     },
     {
       "id": "ccap-scenario-010-q4",

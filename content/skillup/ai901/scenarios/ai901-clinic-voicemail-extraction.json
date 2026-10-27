@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ai901-scenario-001",
+  "title": "Northwind Clinics Turns Voicemail Into Appointments",
+  "description": "A group of clinics wants patient voicemails turned into structured appointment requests. The team must name the right workload, design a Content Understanding audio analyzer, pick a deployment that keeps data in the EU, handle the asynchronous API correctly, and build in the responsible AI safeguards that patient data demands.",
+  "examId": "ai901",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [1, 2],
+  "scenario": {
+    "background": "Every morning, reception staff at Northwind Clinics spend two hours listening to overnight voicemails and retyping names, callback numbers and appointment requests, and last month a mistyped number meant a patient with urgent test results was never called back. Northwind runs eight clinics in Germany and the Netherlands and has a Microsoft Foundry resource with one project for patient services. The clinic group's contract with its patients' insurers requires that patient data is processed only within the EU. The team wants a lightweight Python app that takes each voicemail recording, produces structured fields and places them in a review queue for the scheduling system.",
+    "characters": [
+      {
+        "name": "Dr. Priya Nair",
+        "role": "Director of Clinical Operations",
+        "concern": "She wants reception freed from retyping voicemails, but she will not accept any design where a wrong callback number reaches the scheduling system without a person checking it."
+      },
+      {
+        "name": "Tom Becker",
+        "role": "Developer",
+        "concern": "He wants the quickest working build and is tempted to store raw transcripts and let staff read them, since speech to text is the part he already knows."
+      },
+      {
+        "name": "Lena Ortiz",
+        "role": "Data Protection Officer",
+        "concern": "She needs patient data processed only in the EU and wants to know exactly which personal details are stored and who can see them."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ai901-scenario-001-q1",
+      "stem": "Tom proposes using speech to text and storing the raw transcript of each voicemail for staff to read. Dr. Nair wants caller name, callback number and requested appointment type as separate values. Which approach meets her requirement?",
+      "options": [
+        "Speech to text only, because a transcript already contains all the information",
+        "A Content Understanding audio analyzer with a field schema for name, number and appointment type",
+        "Text to speech, so staff can listen to a clearer version of each voicemail",
+        "Speech translation into English, so all voicemails are in one language"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the requirement names specific fields, which makes this an information-extraction workload. A Content Understanding audio analyzer returns a transcript plus schema fields, so the values can go straight into a review queue. A is wrong because a transcript is still unstructured text; staff would keep hunting for the number, which is the problem today. C is wrong because text to speech produces audio, the opposite direction. D is wrong because translation changes the language but still produces unstructured text."
+    },
+    {
+      "id": "ai901-scenario-001-q2",
+      "stem": "Tom defines the analyzer fields CallerName, CallbackNumber and AppointmentType with the method 'extract', and creating the analyzer fails. What should he change?",
+      "options": [
+        "Change the field type of CallbackNumber from string to integer",
+        "Convert each voicemail into a PDF document before analysis",
+        "Use 'generate' for the name and number and 'classify' for the appointment type",
+        "Base the analyzer on prebuilt-invoice, which supports extract"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: in Content Understanding the extract method is supported for documents only. Audio fields use generate (for values such as a name or number taken from what was said) or classify (for a choice from fixed categories, such as the appointment types the clinic offers). A is wrong because the field type is not the problem, and phone numbers are better stored as strings. B is wrong because converting audio to a PDF is a workaround that loses the audio analysis. D is wrong because prebuilt-invoice is a document analyzer for invoices and cannot analyse audio."
+    },
+    {
+      "id": "ai901-scenario-001-q3",
+      "stem": "Lena reminds the team that patient data must be processed only within the EU. Content Understanding uses the project's own model deployments. Which deployment type should the team use for those models?",
+      "options": [
+        "Global Standard, because it is Microsoft's recommended default",
+        "Developer, because it is the cheapest way to run a small app",
+        "Global Batch, because voicemails are processed overnight",
+        "Data Zone Standard in the EU data zone"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: Data Zone deployments process data only within the chosen zone, such as the EU, and Data Zone Standard bills per token. A is wrong because Global Standard can process requests in any Azure region worldwide, which breaks the EU-only requirement. B is wrong because Developer deployments are only for evaluating fine-tuned models, have no SLA and give no data-residency guarantee. C is wrong because Global Batch processes data globally, and its 24-hour target is too slow for urgent callbacks."
+    },
+    {
+      "id": "ai901-scenario-001-q4",
+      "stem": "Tom's REST client posts each voicemail to the analyzer and receives HTTP 202 Accepted with no fields. He plans to retry the POST until fields appear. What should the client do instead?",
+      "options": [
+        "Poll the URL in the Operation-Location header until the status is Succeeded",
+        "Retry the POST with a higher temperature setting",
+        "Switch to the prebuilt-read analyzer, which responds synchronously",
+        "Send the audio as an input_audio part to the analyzer endpoint"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: Content Understanding analysis is asynchronous. A 202 response means the job was accepted, and the Operation-Location header points to the result, which the client polls until the status is Succeeded. A is the documented pattern, and the Python SDK wraps it in begin_analyze(...).result(). B is wrong because retrying starts duplicate jobs and temperature is not an analyzer setting. C is wrong because prebuilt-read is a document OCR analyzer and is also asynchronous. D is wrong because input_audio is the content-part format for audio-capable chat models, not for Content Understanding."
+    },
+    {
+      "id": "ai901-scenario-001-q5",
+      "stem": "Dr. Nair insists that no wrong callback number reaches the scheduling system, and Lena wants personal details protected. Which design best addresses both concerns?",
+      "options": [
+        "Set the completion model's temperature to 0 so every field is always correct",
+        "Enable field confidence, send low-confidence fields to reception for review, and restrict and redact stored patient data",
+        "Add a notice to the clinic website that voicemails are processed by AI, and skip review",
+        "Store every recording permanently so any mistake can be investigated later"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: turning on confidence scores (estimateFieldSourceAndConfidence) and routing low-confidence values to a person supports reliability and safety and keeps humans accountable for what enters the schedule, while restricting access and redacting what is stored supports privacy and security. A is wrong because a low temperature makes output more repeatable, not guaranteed correct. C is wrong because a notice supports transparency but does nothing to catch wrong numbers. D is wrong because keeping all recordings forever increases privacy risk and still lets wrong numbers through."
+    }
+  ],
+  "keyLearnings": [
+    "When a requirement names the fields it needs, the workload is information extraction, whatever the input type; a transcript alone is still unstructured.",
+    "In Content Understanding, extract is document-only; audio, image and video fields use generate or classify.",
+    "Data-residency rules decide the deployment type: Data Zone keeps processing within a zone, while Global types may use any region.",
+    "Content Understanding is asynchronous: a 202 with Operation-Location means poll for the result, not resend the request.",
+    "Confidence scores plus human review turn reliability, accountability and privacy from principles into concrete design steps."
+  ]
+}

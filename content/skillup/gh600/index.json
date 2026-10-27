@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "0.1.13",
-  "contentUpdatedAt": "2026-09-02",
+  "contentVersion": "0.2.0",
+  "contentUpdatedAt": "2026-10-27",
   "provider": "GitHub",
   "palette": {
     "color": "#38bdf8",
@@ -94,6 +94,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Diagram-craft QA pass (mermaid-diagram-craft/SKILL.md): fixed 6 of 11 diagrams with real violations — reconnected an orphan subgraph in D1's delegation diagram, shortened 4 over-length node labels (D2, D4 x2, D6), shortened 2 over-length edge labels (D1, D4). Added an italic caption line below all 11 diagrams platform-wide had none — the markdown-notes stopgap convention documented in the same skill file. First-draft captions on 7 of the 11 diagrams exceeded the skill's own 5-10 word rule (caught on a second QA pass); all 11 now verified within range. No prose/content changed."
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Syllabus and fact refresh. Checked against the GH-600 study guide (learn.microsoft.com, page dated 2026-05-04): domains, weights and objectives unchanged. Renamed Copilot coding agent to Copilot cloud agent across notes, questions and scenarios. Corrected outdated facts against docs.github.com: cloud agent secrets are now Agents secrets and variables (not a copilot environment); MCP registry/allowlist policies do not apply to cloud agent (MCP servers in Copilot policy does), and the recommended client allowlist is managed-settings.json; MCP config types and required tools key; firewall scope excludes setup steps and MCP servers; 59-minute session limit; workflow-approval setting is repository-wide; excludedTools is a Copilot SDK session/defaultAgent setting. Rewrote gh600-d2-013, d2-021, d2-022 and tightened d1-013, d2-014, d3-013. Added 13 questions (d1-023, d2-029..035, d3-015..017, d6-015..016) and notes sections on Copilot Memory (D3) and cloud agent built-in guardrails (D6). Scenario correct-answer positions rebalanced; gh600-d2-005 rewritten (a custom agent's tools list selects tools, not paths); d5-011/d5-012 timings aligned with the 59-minute cloud-agent session limit."
     }
   ],
   "id": "gh600",
@@ -102,7 +108,7 @@
   "shortTitle": "GH-600",
   "contentLevel": "201",
   "description": "Validate your expertise operating, integrating, supervising, and governing AI agents inside production SDLC workflows, using GitHub as the control plane.",
-  "questions": 120,
+  "questions": 133,
   "duration": "120 min",
   "passScore": "700/1000",
   "passThreshold": 70,
@@ -245,6 +251,10 @@
     {
       "label": "Exam Sandbox",
       "url": "https://ghcertdemo.starttest.com/"
+    },
+    {
+      "label": "GitHub Docs — Copilot Cloud Agent Risks and Mitigations",
+      "url": "https://docs.github.com/copilot/concepts/agents/cloud-agent/risks-and-mitigations"
     }
   ],
   "taskStatementsFile": "content/skillup/gh600/task-statements.json"

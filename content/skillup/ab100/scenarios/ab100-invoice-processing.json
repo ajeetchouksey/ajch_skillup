@@ -1,17 +1,94 @@
 {
+  "schemaVersion": "2.0",
   "id": "ab100-invoice-processing",
   "title": "Intelligent Invoice Processing Agent",
-  "description": "A manufacturing company receives 5,000+ supplier invoices per month via email and EDI. The current manual process takes 3 days per invoice. The company wants to automate: (1) extracting invoice fields (vendor, amount, PO number, line items), (2) matching invoices to open purchase orders in SAP, (3) detecting discrepancies (quantity/price mismatch), (4) routing invoices over $50,000 for human approval, and (5) posting approved invoices to SAP. The solution must handle PDFs, scanned images, and structured EDI formats with 99%+ field extraction accuracy.",
-  "architecture_notes": "Trigger: Azure Logic Apps monitor an Exchange mailbox and Azure Blob Storage for new invoice files. Extraction: Azure AI Document Intelligence (prebuilt invoice model) extracts structured fields — vendor ID, invoice number, PO reference, line items, amounts, dates — with confidence scores. Orchestration: Azure AI Agent Service InvoiceAgent receives the extracted data, uses a Code Interpreter tool to calculate line item totals and compare against SAP PO data (retrieved via Azure Functions calling the SAP REST API). The agent uses Azure AI Search over a vendor history index to detect anomalous pricing patterns (hybrid search: BM25 + semantic reranking against historical invoices). Discrepancy handling: InvoiceAgent calls a DiscrepancyClassifierTool to categorize issues (quantity mismatch, price variance, missing PO). For invoices over $50,000 or with unresolvable discrepancies, the agent creates a Power Automate approval request routed to the AP manager — a HITL gate before SAP posting. Approved invoices: InvoiceAgent calls Azure Functions to post to SAP GL. State management: Cosmos DB stores invoice processing state, discrepancy details, and approval audit trail with TTL for GDPR compliance.",
-  "key_patterns": [
-    "Azure AI Document Intelligence for structured extraction from PDFs and images",
-    "Azure AI Agent Service for orchestration and business rule application",
-    "Azure AI Search hybrid search for anomaly detection against vendor history",
-    "Code Interpreter tool for financial calculations and PO matching",
-    "Power Automate HITL approval for high-value or discrepant invoices",
-    "Cosmos DB saga state for multi-step invoice lifecycle",
-    "Azure Functions as SAP integration adapter",
-    "Confidence score thresholds to route low-confidence extractions to human review"
+  "description": "A manufacturer wants to cut a three-day manual accounts-payable cycle for more than 5,000 supplier invoices a month by extracting fields, matching invoices to SAP purchase orders, classifying discrepancies, gating high-value invoices for approval and posting approved invoices. The scenario tests input-channel design, confidence-based accuracy control, deterministic matching, an enforceable approval gate, and pre-production validation.",
+  "examId": "ab100",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [1, 2, 3],
+  "scenario": {
+    "background": "One duplicate or mismatched payment to a supplier costs Brightwater Components more than a month of the time savings automation would bring, so the controller will approve an AP agent only if every posting is traceable and nothing over $50,000 is paid without a person's approval. The company receives more than 5,000 supplier invoices a month as PDF attachments, scanned paper and structured EDI messages, and each one currently takes about three days to key, match and approve. The proposed design uses Logic Apps to pick up invoices from a shared mailbox and Blob Storage, Azure Document Intelligence to extract fields, and a Foundry Agent Service InvoiceAgent that matches invoices to open SAP purchase orders through an Azure Functions adapter, classifies discrepancies, requests approvals through Power Automate and posts approved invoices to SAP. Processing state and the approval trail are kept in Cosmos DB.",
+    "characters": [
+      {
+        "name": "Grace Mwangi",
+        "role": "Accounts Payable Director",
+        "concern": "She wants her clerks out of manual keying, and as many routine invoices as possible posted without a person touching them."
+      },
+      {
+        "name": "Henrik Sorensen",
+        "role": "Financial Controller",
+        "concern": "He must be able to explain every posting to auditors and insists on 99% field accuracy, human approval above $50,000 and no duplicate payments."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ab100-invoice-processing-q1",
+      "stem": "Invoices arrive in three forms: digital PDFs, phone photos and scans of paper invoices, and structured EDI messages from the 40 largest suppliers. How should the extraction stage handle them?",
+      "options": [
+        "Render every input, including EDI messages, to PDF so that a single Document Intelligence prebuilt-invoice pipeline handles all three formats the same way",
+        "Send the raw files and EDI payloads directly to the agent's language model and ask it to return the invoice fields as JSON",
+        "Parse EDI messages directly with an EDI decoder and map them to the invoice schema, and send PDFs and images to the Document Intelligence prebuilt-invoice model",
+        "Train a custom neural extraction model on a year of historical invoices before go-live and use it for every format"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: EDI is already structured data, so decoding and mapping it is exact and cheap, and running it through optical character recognition (OCR) would only add error. PDFs, phone photos and scans are what the prebuilt-invoice model is for. It extracts header fields and line items and returns a confidence score for each field, which later stages use to decide what needs review. A is wrong because turning structured EDI into an image and then reading it back with OCR adds cost and a chance of extraction errors on data that was already exact. B is wrong because asking a language model to extract fields gives no per-field confidence scores to drive review routing, costs more per page at this volume, and is harder to audit than a purpose-built extraction model. D is wrong because the prebuilt-invoice model is the starting point and should be measured before anyone invests in training. Custom extraction models are for specific suppliers whose layouts underperform, not a prerequisite for go-live, and EDI still doesn't need OCR."
+    },
+    {
+      "id": "ab100-invoice-processing-q2",
+      "stem": "Henrik requires 99% field accuracy on amounts, purchase-order numbers and supplier IDs before anything is posted. How should the design meet that bar?",
+      "options": [
+        "Rely on the prebuilt-invoice model's published accuracy figure and post every extracted invoice without further checks",
+        "Set per-field confidence thresholds from a labelled sample, validate key fields against SAP master data, and send low-confidence fields to a clerk",
+        "Use the overall document confidence score and send an invoice to review only when that score is below 0.5",
+        "Ask the InvoiceAgent's language model to rate its own confidence in each extracted field and post the invoice when it says it is confident"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: a 99% bar is met by measuring and routing, not by trusting a single model. Per-field confidence scores, with thresholds calibrated on a labelled sample of Brightwater's own invoices, decide which fields a clerk verifies. Checking PO numbers and supplier IDs against SAP catches values that are plausible but wrong. If a supplier's layout keeps falling short, a custom extraction model for that supplier puts the effort where the errors are. A is wrong because no published accuracy figure guarantees accuracy on a particular company's documents. Accuracy has to be measured on this supplier mix, and posting without checks gives Henrik nothing to show auditors. C is wrong because a single document-level score can be high while the one field that matters, such as the total, is low. A 0.5 threshold is also arbitrary rather than calibrated on real data. D is wrong because a language model's self-reported confidence isn't calibrated to extraction accuracy, and it ignores the per-field scores the extraction service already provides."
+    },
+    {
+      "id": "ab100-invoice-processing-q3",
+      "stem": "The draft has the InvoiceAgent use the Code Interpreter tool to write Python for each invoice that sums line items and compares them with the SAP purchase order and goods receipt. Henrik asks how he will explain a match decision to auditors. What is the better design?",
+      "options": [
+        "Have the language model add up the line items and compare them with the purchase order in its own reasoning, which removes the tool call and its latency",
+        "Keep Code Interpreter but save every script it generates alongside the invoice so that auditors can read the code behind each decision",
+        "Fine-tune the model on historical match outcomes so that it learns the company's price and quantity tolerances",
+        "Implement the three-way match rules as a versioned Azure Function tool that returns discrepancy codes, and let the agent handle edge cases and supplier queries"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: a financial control should run the same tested, versioned logic every time. A deterministic matching function returns the same answer for the same inputs, can be unit-tested and change-controlled, and gives auditors a single rule set to review. The agent adds value where judgement is needed: classifying unusual discrepancies and drafting queries to suppliers. A is wrong because arithmetic done in the model's reasoning isn't guaranteed to be exact or repeatable, which is unacceptable for payment decisions. B is wrong because saving each script records what happened, but the logic is still regenerated per invoice and can differ between runs. That leaves auditors thousands of slightly different programs to review instead of one approved rule set. C is wrong because fine-tuning teaches patterns probabilistically and can't enforce exact tolerances. It also hides the rules inside model weights, where no one can inspect or change them in a controlled way."
+    },
+    {
+      "id": "ab100-invoice-processing-q4",
+      "stem": "Grace proposes that invoices over $50,000 with no discrepancies should post automatically, with the AP manager notified afterwards, to save time. Henrik refuses. How should the high-value path be built?",
+      "options": [
+        "Send invoices over $50,000 or with open discrepancies to a Power Automate approval for the AP manager, and post to SAP only on an Approve outcome",
+        "Post high-value invoices automatically when the three-way match is clean, and email the AP manager a summary so they can reverse any problem posting",
+        "Have the InvoiceAgent approve high-value invoices itself once it has checked the match twice, and record its reasoning as the approval",
+        "Hold high-value invoices in a Cosmos DB queue that the AP manager reviews at the end of each month, and post them all in a batch after review"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: the business rule calls for a person's approval above $50,000 before payment, so the gate has to sit before the SAP posting, not after it. A Power Automate approval assigned to the AP manager creates an auditable record of who decided and when. Making the posting step depend on an Approve outcome enforces the order, and including unresolved discrepancies covers the other risky path. The design still saves time, because invoices under $50,000 with clean matches flow through without anyone touching them, which is where Grace's time savings come from. B is wrong because notifying the manager after posting is detection, not prevention. A wrong payment may already have left the company before anyone reverses it. C is wrong because an agent checking its own work twice doesn't create separation of duties, and the policy specifically requires a person to approve. D is wrong because a monthly batch review delays payments by weeks and puts early-payment discounts and supplier relationships at risk. It is the opposite of the cycle-time goal and adds nothing that a per-invoice approval doesn't already give."
+    },
+    {
+      "id": "ab100-invoice-processing-q5",
+      "stem": "The pipeline works on 30 sample invoices, and Grace wants to switch it on for all suppliers next Monday. Henrik wants evidence first. What is the most appropriate go-live approach?",
+      "options": [
+        "Go live for all suppliers on Monday and treat the first month's supplier complaints and payment reversals as the evaluation signal",
+        "Re-run the 30 sample invoices in the Foundry agent playground after each prompt change and go live once all of them pass",
+        "Shadow-run months of processed invoices with known outcomes, evaluate against agreed go-live thresholds, then roll out by supplier segment with continuous evaluation",
+        "Ask the AP clerks to spot-check a random 1% of agent postings in SAP during the first quarter and stop the rollout if they find a problem"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: historical invoices with known correct outcomes form a realistic, labelled evaluation set, and shadow mode measures the agent without risking a payment. Agreed thresholds make go-live an evidence-based decision. Foundry evaluations, including agent metrics such as tool-call accuracy and custom evaluators for match decisions, give Henrik numbers he can defend. Rolling out by supplier segment, with tracing and continuous evaluation, limits the impact of anything the test set missed. A is wrong because using production failures as the test means real duplicate or wrong payments, which is the outcome Henrik is guarding against. B is wrong because 30 hand-picked invoices don't represent the variety in more than 5,000 a month, such as poor scans, partial deliveries and unusual layouts, and passing in the playground isn't a quality gate. D is wrong because a 1% spot check after posting finds problems only once money has moved, and is too small a sample to show 99% accuracy."
+    }
+  ],
+  "keyLearnings": [
+    "Match the extraction method to the input: decode structured EDI directly and send documents and images to the prebuilt-invoice model, whose per-field confidence scores drive review routing.",
+    "Accuracy targets are met by calibrated, per-field confidence thresholds and checks against master data, not by trusting a model's published or self-reported accuracy.",
+    "Put financial rules in deterministic, versioned tools and use the agent for judgement, and place human approval before the irreversible step, never after it.",
+    "Earn go-live with a shadow run on labelled historical data and agreed thresholds, then roll out in stages with tracing and continuous evaluation."
   ],
   "questionIds": ["ab100-d2-005", "ab100-d2-006", "ab100-d2-012", "ab100-d3-008", "ab100-d4-009"]
 }

@@ -66,16 +66,16 @@
   {
     "domain": 2,
     "id": "gh600-d2-005",
-    "scenario": "At Driftwood Media, a custom agent \"docs-agent\" is intended to only edit markdown files under /docs. An engineer configures `tools: [\"read\", \"edit\"]` without any path restriction. During a task, the agent edits src/index.ts, reasoning that updating a cross-reference there would \"improve\" the documentation.",
-    "question": "What tool-configuration gap allowed this out-of-scope edit to happen?",
+    "scenario": "At Driftwood Media, a custom agent \"docs-agent\" is meant to edit only markdown files under /docs. Its agent profile sets `tools: [\"read\", \"edit\"]`, and its instructions say to \"keep the docs accurate\". During a task, the agent edits src/index.ts, reasoning that updating a cross-reference there would \"improve\" the documentation.",
+    "question": "Which statement best explains why nothing in this configuration prevented the out-of-scope edit?",
     "options": [
-      "The agent lacked a bash tool, so it improvised by editing files outside its intended scope",
-      "The edit tool was granted without any path or scope restriction limiting it to the /docs directory, so nothing at the tool-capability level prevented touching src/index.ts",
-      "The read tool should have been removed so the agent could never discover src/index.ts existed",
-      "The agent's underlying model was too capable for the task and should have been downgraded"
+      "The agent had no shell tool, so it improvised by editing files outside its intended scope instead of running a script",
+      "The tools list controls which tools the agent may use, not which paths it may change; the /docs scope must come from its instructions and PR review",
+      "The read tool should have been removed, because an agent that cannot read src/index.ts can never decide to edit it",
+      "The underlying model was too capable for a docs task, and choosing a smaller model would have kept it within /docs"
     ],
     "correct": 1,
-    "explanation": "The principle: granting a capability tool like edit says what actions are possible, but without a scope or path constraint it says nothing about where those actions are allowed to happen — an unscoped edit tool is a green light for any file the agent decides is relevant.\n\nWhy the missing path restriction is correct: nothing in the configuration told the edit tool it was limited to /docs, so once the agent's own reasoning decided a change outside that directory was relevant, the tool happily allowed it — the gap is structural, not a reasoning failure to fix with better prompting alone.\n\nWhy the distractors fail:\n- Lacking bash: bash is unrelated to editing files directly; its absence doesn't explain why edit itself reached outside /docs.\n- Removing read: read access is what lets the agent do its actual documentation job (finding what to reference); removing it would break the intended task rather than fix the scope issue.\n- Downgrading the model: model capability isn't what determined the file path; a less capable model with the same unscoped tool could make the identical mistake.\n\nIn practice: whenever a tool operates on a filesystem, pair the capability grant with an explicit path/scope boundary — the tool being present is only half the configuration; where it's allowed to act is the other half.",
+    "explanation": "B is correct: a custom agent's `tools` property selects which tools are available (here read and edit); it has no setting that confines a tool to particular paths. The intended /docs-only scope therefore has to be stated in the agent's instructions, and enforced where it really matters by reviewing the agent's pull request, for example with CODEOWNERS on src/ so an out-of-scope change can't merge unreviewed.\n\nA is wrong because a shell tool is unrelated to the edit tool; adding or removing it doesn't change where edit can write.\n\nC is wrong because read access is what lets the agent do its documentation job, such as finding what to reference. Removing it breaks the intended task and still doesn't scope edit.\n\nD is wrong because model choice doesn't create a boundary. The gap is that no instruction or review control expressed the /docs scope, not that the model was too capable.",
     "tags": ["tool-scoping", "edit-tool", "troubleshooting", "analysis"],
     "difficulty": "medium"
   },
@@ -130,7 +130,7 @@
   {
     "domain": 2,
     "id": "gh600-d2-009",
-    "scenario": "At Beacon Financial, an engineer configures an MCP server for the coding agent using the following JSON: `{\"type\": \"local\", \"command\": \"npx\", \"args\": [\"-y\", \"ticketing-mcp-server\"], \"env\": {\"API_KEY\": \"...\"}}`.",
+    "scenario": "At Beacon Financial, an engineer configures an MCP server for the cloud agent using the following JSON: `{\"type\": \"local\", \"command\": \"npx\", \"args\": [\"-y\", \"ticketing-mcp-server\"], \"env\": {\"API_KEY\": \"...\"}}`.",
     "question": "What does this configuration represent?",
     "options": [
       "A local (stdio-based) MCP server that the agent's environment starts as a subprocess, communicating over standard input/output rather than a network endpoint",
@@ -195,32 +195,32 @@
   {
     "domain": 2,
     "id": "gh600-d2-013",
-    "scenario": "An org admin at Wraith Security adds a new MCP server to the repository's Copilot coding agent configuration file. Agent sessions afterward still show the server's tools as unavailable, even though the JSON entry looks correct.",
+    "scenario": "Wraith Security's enterprise has enabled Copilot cloud agent. A repository administrator adds a third-party ticketing MCP server under the repository's Settings > Copilot > MCP servers, with a valid tools list. In cloud agent sessions the built-in GitHub MCP server works, but the ticketing server's tools never appear.",
     "question": "What is the most likely cause?",
     "options": [
-      "The MCP server has not been explicitly allow-listed/approved in the organization's or repository's Copilot coding agent MCP settings — adding an entry to the configuration file alone does not grant it runtime access",
-      "The MCP server's tools are cached and will automatically appear after roughly 24 hours",
-      "MCP servers only function with custom agents and are never available to the built-in coding agent",
-      "The server needs to be renamed to conform to a specific GitHub naming convention before it can be used"
+      "The enterprise or organization hasn't enabled the \"MCP servers in Copilot\" policy, so third-party MCP servers can't run in sessions",
+      "No MCP Registry URL is set, and cloud agent runs only third-party servers listed in the organization's private registry",
+      "Newly added MCP servers are cached for roughly 24 hours before cloud agent sessions can load their tools",
+      "Cloud agent loads third-party MCP servers only from a custom agent profile, never from repository settings"
     ],
     "correct": 0,
-    "explanation": "The principle: for the coding agent, defining an MCP server in configuration and actually being permitted to use it at runtime are two separate steps — the platform requires an explicit allow-list/approval so that arbitrary configuration changes can't silently grant a session access to a new external tool source.\n\nWhy the allow-list explanation is correct: this two-step design (define, then approve) exists specifically to prevent an unreviewed or unauthorized server from becoming usable simply because someone edited a config file, which matches the symptom of \"configured correctly but still unavailable.\"\n\nWhy the distractors fail:\n- Caching delay: there's no documented 24-hour propagation behavior for MCP tool availability, and treating a permissions gap as a caching issue would just leave the server permanently unusable if the real cause is unaddressed.\n- Custom-agents-only claim: the coding agent does support MCP server integration; this isn't a categorical exclusion.\n- Naming convention: tool availability is governed by allow-list/approval status, not by the server's identifier matching a naming pattern.\n\nIn practice: when a newly configured MCP server's tools don't show up, check the organization/repository's MCP allow-list or approval settings before assuming the JSON configuration itself is wrong.",
+    "explanation": "The principle: MCP access for Copilot cloud agent has two layers. A policy decides whether third-party MCP servers may run at all, and the repository's MCP configuration decides which servers and tools a session gets. A correct configuration can't get past a policy that's switched off.\n\nWhy A is correct: GitHub's docs say Copilot cloud agent and third-party MCP servers are disabled by default in an enterprise, and the \"MCP servers in Copilot\" policy is what enables third-party servers. The built-in GitHub MCP server is one of the default servers the agent has without any policy change, which is exactly why it works while the ticketing server doesn't.\n\nWhy the distractors fail:\n- B: the \"MCP Registry URL\" and \"Restrict MCP access to registry servers\" policies don't apply to Copilot cloud agent at all; they're enforced in supported IDEs and Copilot CLI.\n- C: there's no documented caching delay; repository MCP configuration is read when a session starts.\n- D: repository settings are the documented place to configure MCP for cloud agent. A custom agent profile can add its own mcp-servers, but it isn't required.\n\nIn practice: when one MCP server works and another doesn't, look for what separates them. Here it's built-in versus third-party, which points straight at the policy layer rather than the JSON.",
     "tags": ["MCP-allow-lists", "governance", "troubleshooting", "analysis"],
     "difficulty": "hard"
   },
   {
     "domain": 2,
     "id": "gh600-d2-014",
-    "scenario": "A developer at Halcyon Cloud has a personal MCP server configured in their VS Code settings.json for local Copilot Chat use. They ask a teammate why the coding agent, when assigned a task in the same repository, can't just use that same locally configured server.",
-    "question": "Why can't the coding agent use an MCP server that is only configured locally in a developer's editor?",
+    "scenario": "A developer at Halcyon Cloud has a personal MCP server configured in their VS Code settings.json for local Copilot Chat use. They ask a teammate why the cloud agent, when assigned a task in the same repository, can't just use that same locally configured server.",
+    "question": "Why can't the cloud agent use an MCP server that is only configured locally in a developer's editor?",
     "options": [
-      "Local VS Code MCP servers use a protocol version that is fundamentally incompatible with the coding agent",
-      "Local MCP servers are always stdio-based, and the coding agent only supports remote, HTTP-based servers",
-      "The coding agent ignores editor-level settings entirely and can only read from a file named AGENTS.md",
-      "The coding agent runs in its own isolated cloud sandbox, separate from any developer's machine, so it can only use MCP servers explicitly configured (and allow-listed) at the repository or organization level — not ones defined only in a local editor"
+      "Local VS Code MCP servers use a protocol version that is fundamentally incompatible with the cloud agent",
+      "Local MCP servers are always stdio-based, and the cloud agent only supports remote, HTTP-based servers",
+      "The cloud agent ignores editor-level settings entirely and can only read from a file named AGENTS.md",
+      "The cloud agent runs in its own cloud environment, so it can only use MCP servers configured for the repository or in a custom agent profile"
     ],
     "correct": 3,
-    "explanation": "The principle: the coding agent's execution environment is not the developer's machine, so any configuration that exists only on that machine — including editor-level MCP server definitions — is invisible to the agent's session by construction.\n\nWhy the sandbox explanation is correct: because the agent runs in an isolated cloud environment provisioned per session, its available MCP servers must come from configuration that environment actually reads (repository- or organization-level, allow-listed settings), not from a developer's personal VS Code settings.json.\n\nWhy the distractors fail:\n- Protocol incompatibility: MCP is the same protocol regardless of where it's configured; there's no version mismatch inherent to local versus agent use.\n- Stdio-only-versus-remote-only claim: the coding agent supports both local (stdio) and remote MCP servers when properly configured at the platform level; the limitation isn't about transport type.\n- AGENTS.md-only claim: while instructions files matter for agent behavior, MCP server availability is a separate configuration concern from where the agent reads its instructions.\n\nIn practice: any capability you want the coding agent to have — including MCP servers — must be configured at a level the agent's own sandboxed environment can see, not assumed from what's already set up on a developer's local machine.",
+    "explanation": "The principle: the cloud agent's execution environment is not the developer's machine, so any configuration that exists only on that machine — including editor-level MCP server definitions — is invisible to the agent's session by construction.\n\nWhy the sandbox explanation is correct: because the agent runs in an isolated cloud environment provisioned per session, its available MCP servers must come from configuration that environment actually reads (the repository's Copilot MCP settings, or a custom agent profile's mcp-servers), not from a developer's personal VS Code settings.json.\n\nWhy the distractors fail:\n- Protocol incompatibility: MCP is the same protocol regardless of where it's configured; there's no version mismatch inherent to local versus agent use.\n- Stdio-only-versus-remote-only claim: the cloud agent supports both local (stdio) and remote MCP servers when properly configured at the platform level; the limitation isn't about transport type.\n- AGENTS.md-only claim: while instructions files matter for agent behavior, MCP server availability is a separate configuration concern from where the agent reads its instructions.\n\nIn practice: any capability you want the cloud agent to have — including MCP servers — must be configured at a level the agent's own sandboxed environment can see, not assumed from what's already set up on a developer's local machine.",
     "tags": ["MCP-config", "execution-context", "sandbox", "recall"],
     "difficulty": "easy"
   },
@@ -243,8 +243,8 @@
   {
     "domain": 2,
     "id": "gh600-d2-016",
-    "scenario": "A new team member at Fathom Data asks where the coding agent's file edits, test runs, and shell commands actually execute when a task is assigned.",
-    "question": "Which statement accurately describes the coding agent's execution context?",
+    "scenario": "A new team member at Fathom Data asks where the cloud agent's file edits, test runs, and shell commands actually execute when a task is assigned.",
+    "question": "Which statement accurately describes the cloud agent's execution context?",
     "options": [
       "It runs directly on the assigning developer's laptop, using their local credentials and environment",
       "It runs entirely inside the GitHub web UI's browser tab, with no separate backend compute involved",
@@ -252,23 +252,23 @@
       "It runs directly on the production servers of the repository it is modifying"
     ],
     "correct": 2,
-    "explanation": "The principle: the coding agent is designed to operate autonomously and asynchronously, which requires its own compute environment independent of any individual developer's machine or the application's production infrastructure.\n\nWhy the isolated sandbox explanation is correct: each session gets its own ephemeral, containerized environment (built on GitHub Actions infrastructure) where the repository is checked out and the agent's tools actually execute — this is what allows the agent to work asynchronously without tying up a developer's machine.\n\nWhy the distractors fail:\n- Local laptop execution: this would mean the developer's machine has to stay online and available for the entire session, which defeats the purpose of asynchronous, delegatable work.\n- Browser-tab-only execution: a browser tab can't run shell commands, install dependencies, or execute test suites; real compute is required behind the UI.\n- Production servers: running an in-progress, unreviewed change directly against production would be a severe and unnecessary risk; the agent's sandbox is deliberately separate from any live environment.\n\nIn practice: understanding that the agent's actions happen in its own sandbox — not your laptop, not production — is the foundation for reasoning correctly about what it can access (network, secrets, services) and what it can't without explicit configuration.",
+    "explanation": "The principle: the cloud agent is designed to operate autonomously and asynchronously, which requires its own compute environment independent of any individual developer's machine or the application's production infrastructure.\n\nWhy the isolated sandbox explanation is correct: each session gets its own ephemeral, containerized environment (built on GitHub Actions infrastructure) where the repository is checked out and the agent's tools actually execute — this is what allows the agent to work asynchronously without tying up a developer's machine.\n\nWhy the distractors fail:\n- Local laptop execution: this would mean the developer's machine has to stay online and available for the entire session, which defeats the purpose of asynchronous, delegatable work.\n- Browser-tab-only execution: a browser tab can't run shell commands, install dependencies, or execute test suites; real compute is required behind the UI.\n- Production servers: running an in-progress, unreviewed change directly against production would be a severe and unnecessary risk; the agent's sandbox is deliberately separate from any live environment.\n\nIn practice: understanding that the agent's actions happen in its own sandbox — not your laptop, not production — is the foundation for reasoning correctly about what it can access (network, secrets, services) and what it can't without explicit configuration.",
     "tags": ["execution-context", "sandbox", "coding-agent", "recall"],
     "difficulty": "easy"
   },
   {
     "domain": 2,
     "id": "gh600-d2-017",
-    "scenario": "Circuit Robotics has 40 repositories across the organization. Leadership wants to pilot the coding agent on only 5 specific repositories before deciding whether to expand further.",
+    "scenario": "Circuit Robotics has 40 repositories across the organization. Leadership wants to pilot the cloud agent on only 5 specific repositories before deciding whether to expand further.",
     "question": "How should this scoping be configured?",
     "options": [
-      "Enable the Copilot coding agent feature individually on each of the 5 target repositories via repository (or scoped organization) settings, leaving it disabled for the remaining 35",
+      "Enable the Copilot cloud agent feature individually on each of the 5 target repositories via repository (or scoped organization) settings, leaving it disabled for the remaining 35",
       "Enable the feature organization-wide and rely on each custom agent's frontmatter to silently no-op in the other 35 repositories",
       "Add a CODEOWNERS rule that restricts agent-authored pull requests to the 5 target repositories",
       "Configure a network firewall allow list that blocks the agent's outbound access specifically in the other 35 repositories"
     ],
     "correct": 0,
-    "explanation": "The principle: repository-level access to the coding agent is a distinct configuration surface from what the agent does once invoked — scoping which repositories can use it at all is an enablement decision, made where that enablement is actually controlled.\n\nWhy per-repository enablement is correct: turning the feature on for exactly the 5 pilot repositories (and leaving it off elsewhere) directly matches the stated intent, and keeps the other 35 repositories in a state where the agent literally cannot be invoked, not just discouraged from being used.\n\nWhy the distractors fail:\n- Org-wide enablement with silent no-op reliance: this leaves the agent invocable everywhere, contradicting the pilot's intended scope, and depends on custom-agent behavior rather than an actual access control.\n- CODEOWNERS restriction: CODEOWNERS governs review requirements for PRs, not whether the coding agent feature can be invoked in a repository in the first place.\n- Firewall allow-list blocking: network egress rules control what a running session can reach over the internet; they don't determine whether a session can be started in a given repository at all.\n\nIn practice: when piloting a new capability, look for the actual enablement toggle at the scope you want to control (here, per-repository) rather than approximating the restriction through an unrelated control surface.",
+    "explanation": "The principle: repository-level access to the cloud agent is a distinct configuration surface from what the agent does once invoked — scoping which repositories can use it at all is an enablement decision, made where that enablement is actually controlled.\n\nWhy per-repository enablement is correct: turning the feature on for exactly the 5 pilot repositories (and leaving it off elsewhere) directly matches the stated intent, and keeps the other 35 repositories in a state where the agent literally cannot be invoked, not just discouraged from being used.\n\nWhy the distractors fail:\n- Org-wide enablement with silent no-op reliance: this leaves the agent invocable everywhere, contradicting the pilot's intended scope, and depends on custom-agent behavior rather than an actual access control.\n- CODEOWNERS restriction: CODEOWNERS governs review requirements for PRs, not whether the cloud agent feature can be invoked in a repository in the first place.\n- Firewall allow-list blocking: network egress rules control what a running session can reach over the internet; they don't determine whether a session can be started in a given repository at all.\n\nIn practice: when piloting a new capability, look for the actual enablement toggle at the scope you want to control (here, per-repository) rather than approximating the restriction through an unrelated control surface.",
     "tags": ["repo-scope", "coding-agent", "governance", "comprehension"],
     "difficulty": "medium"
   },
@@ -280,7 +280,7 @@
     "options": [
       "Assign every new PR's author as \"Copilot\" as well, so it reviews its own submissions",
       "Configure branch protection to require Copilot's approval before merge, with no workflow definition needed",
-      "Wait for the coding agent to notice new pull requests on its own; no explicit trigger configuration is required",
+      "Wait for the cloud agent to notice new pull requests on its own; no explicit trigger configuration is required",
       "Add a GitHub Actions workflow step, triggered on the `pull_request` event, that invokes Copilot in headless/non-interactive mode to analyze the diff and post review comments, using appropriately scoped token permissions"
     ],
     "correct": 3,
@@ -291,7 +291,7 @@
   {
     "domain": 2,
     "id": "gh600-d2-019",
-    "scenario": "Overton Systems follows a GitFlow-style branching model where new feature work should branch from `develop`, not from the repository's default branch `main`. The coding agent is assigned an issue for a new feature.",
+    "scenario": "Overton Systems follows a GitFlow-style branching model where new feature work should branch from `develop`, not from the repository's default branch `main`. The cloud agent is assigned an issue for a new feature.",
     "question": "What must be configured or specified so the agent does not create its work branch from the wrong base?",
     "options": [
       "Nothing — the agent always infers the correct base branch by scanning recent merge history before starting",
@@ -307,12 +307,12 @@
   {
     "domain": 2,
     "id": "gh600-d2-020",
-    "scenario": "Leadership at Ridgeline Freight is nervous about enabling the coding agent because they've heard it can push commits and open pull requests \"on its own,\" without a human running any git commands.",
+    "scenario": "Leadership at Ridgeline Freight is nervous about enabling the cloud agent because they've heard it can push commits and open pull requests \"on its own,\" without a human running any git commands.",
     "question": "Which statement most accurately describes this autonomous capability?",
     "options": [
       "The agent requires a human to manually run `git push` and open the pull request after every session; it only stages changes locally",
       "The agent can merge its own pull requests without any review, by default, once CI checks pass",
-      "With the coding agent feature enabled and appropriate repository permissions granted, the agent can autonomously create a branch, commit changes, and open a pull request — but merging still requires the organization's normal review and approval process",
+      "With the cloud agent feature enabled and appropriate repository permissions granted, the agent can autonomously create a branch, commit changes, and open a pull request — but merging still requires the organization's normal review and approval process",
       "The agent can only open a pull request if a human first manually creates the branch for it to commit to"
     ],
     "correct": 2,
@@ -323,48 +323,48 @@
   {
     "domain": 2,
     "id": "gh600-d2-021",
-    "scenario": "At Vantage Point Capital, the coding agent's setup step fails while trying to `npm install` a package from the company's private package registry. The session log shows a network/connection error rather than an authentication error.",
-    "question": "Given the coding agent's default sandboxed environment, what is the most likely root cause?",
+    "scenario": "At Vantage Point Capital, Copilot cloud agent runs `npm install` with its Bash tool during a session to pull a package from the company's private package registry. The command fails with a network/connection error rather than an authentication error.",
+    "question": "Given the cloud agent's default environment, what is the most likely root cause?",
     "options": [
-      "The private registry's domain is not included in the coding agent's network allow list, so outbound requests to it are blocked by default in the sandboxed environment",
+      "The registry's domain isn't on the agent firewall's allowlist, so outbound requests to it are blocked",
       "The company's npm authentication token happened to expire at the exact moment of the session",
-      "The coding agent does not support npm at all and requires yarn to be used instead",
-      "The setup step ran before the repository had finished being cloned into the sandbox"
+      "The cloud agent does not support npm at all and requires yarn to be used instead",
+      "The command ran before the repository had finished being cloned into the agent's environment"
     ],
     "correct": 0,
-    "explanation": "The principle: the coding agent's sandbox restricts outbound network access by default, allowing only a known set of domains (such as public package registries and GitHub itself) unless additional domains are explicitly added to its allow list — this is a security boundary, not an incidental limitation.\n\nWhy the allow-list explanation is correct: a network/connection-level failure (as opposed to a 401/403 auth error) is the expected symptom of an outbound request being blocked before it ever reaches the private registry, which matches a domain that hasn't been added to the sandbox's allow list.\n\nWhy the distractors fail:\n- Coincidental token expiry: an expired token would typically surface as an authentication error (401/403) from the registry, not a network/connection failure — the symptom described doesn't match this cause.\n- npm unsupported claim: the coding agent's sandbox supports standard package manager tooling including npm; the failure described is about reachability, not tool support.\n- Clone-timing issue: setup steps run after the repository checkout completes as part of the session's provisioning sequence; a clone-ordering problem wouldn't manifest as a registry connection error.\n\nIn practice: when a coding agent's setup step fails to reach an internal or private service, the first thing to check is the environment's network allow list — this is one of the most common environment-specific constraints teams hit when onboarding a private registry or internal API.",
+    "explanation": "The principle: Copilot cloud agent's firewall limits internet access by default. It allows the hosts Copilot needs plus a recommended allowlist of common public package registries, and blocks everything else unless an administrator adds it. That's a security boundary, not an incidental limitation.\n\nWhy A is correct: a connection-level failure, as opposed to a 401/403, is the expected symptom of an outbound request blocked before it reaches the private registry. A private registry's domain isn't on the recommended allowlist, and the firewall applies to processes the agent starts through its Bash tool, which is how this npm install ran.\n\nWhy the distractors fail:\n- B: an expired token produces an authentication error from the registry, not a connection failure, and the coincidence is unlikely.\n- C: npm is a standard tool in the agent's environment; nothing restricts it to yarn.\n- D: the repository is checked out when the session is provisioned, and a checkout-ordering problem wouldn't surface as a registry connection error.\n\nIn practice: add the registry under Settings > Copilot > Internet access, or install private dependencies in copilot-setup-steps.yml. The firewall doesn't cover setup-step processes, so that second route needs its own review of what those steps download.",
     "tags": ["environment-constraints", "network-allowlist", "troubleshooting", "analysis"],
     "difficulty": "hard"
   },
   {
     "domain": 2,
     "id": "gh600-d2-022",
-    "scenario": "Crestwood Manufacturing's coding agent needs a `DATABASE_URL` and an API key to run integration tests during its session. Regular repository secrets are not automatically available inside the agent's ephemeral environment.",
+    "scenario": "Crestwood Manufacturing's cloud agent needs a `DATABASE_URL` and an API key to run integration tests during its session. The team already stores both as GitHub Actions repository secrets, but the agent's session can't see them.",
     "question": "How should these values be made available to the agent's session?",
     "options": [
       "Hardcode the values directly into the copilot-setup-steps.yml workflow file since it is already a workflow definition",
       "Paste the values into the issue body so they are included in the agent's task context",
-      "They cannot be made available; the agent must run every session without any secrets",
-      "Add them as secrets scoped to the special environment the coding agent uses (commonly named `copilot`), so the setup workflow can reference them the way any GitHub Actions environment secret is referenced"
+      "Store them as Codespaces secrets instead, since the agent's environment is a development environment like a codespace",
+      "Add them as Agents secrets and variables for the repository (or organization), which cloud agent exposes to its session as environment variables"
     ],
     "correct": 3,
-    "explanation": "The principle: the coding agent's setup workflow runs under a distinct Actions environment context, so secrets need to be scoped to that specific environment to be available to the session — ordinary repository secrets aren't automatically inherited.\n\nWhy the environment-scoped secret is correct: adding `DATABASE_URL` and the API key as secrets on the coding agent's designated environment makes them available to the setup workflow through the standard Actions secrets mechanism, without ever exposing the raw values in a file or an issue.\n\nWhy the distractors fail:\n- Hardcoding into copilot-setup-steps.yml: this commits sensitive credentials into version control in plain text, which is a serious exposure risk regardless of which workflow file is involved.\n- Pasting into the issue body: issue content is visible to anyone with read access to the repository (and potentially logged/indexed), making this an even broader exposure than committing to a workflow file.\n- \"Cannot be made available\" claim: this is factually incorrect — the environment-secret mechanism exists precisely to let sessions access credentials safely.\n\nIn practice: any credential an agent's session legitimately needs should go through the same environment-secret mechanism used for any other Actions job — never inline into a committed file or free-text task description.",
-    "tags": ["environment-constraints", "secrets", "copilot-environment", "application"],
+    "explanation": "The principle: Copilot cloud agent has its own dedicated secret type, Agents secrets and variables, kept separate from every other secret store so that a credential reaches the agent only when someone deliberately grants it.\n\nWhy D is correct: Agents secrets and variables can be set per repository, or at organization level and shared with chosen repositories, and they're exposed to the agent's session as environment variables. Secret values are masked in session logs. Values previously kept in the old `copilot` Actions environment were migrated to this type automatically.\n\nWhy the distractors fail:\n- A: hardcoding commits sensitive credentials to version control in plain text, a serious exposure regardless of which workflow file holds them.\n- B: issue content is visible to anyone with read access and may be logged or indexed, an even broader exposure.\n- C: GitHub's docs say cloud agent can't read GitHub Actions, Codespaces or Dependabot secrets and variables, so moving them to Codespaces fails just as Actions secrets did.\n\nIn practice: give the agent only the Agents secrets its task needs, and remember that only values prefixed COPILOT_MCP_ are passed through to MCP server configuration.",
+    "tags": ["environment-constraints", "secrets", "agents-secrets", "application"],
     "difficulty": "medium"
   },
   {
     "domain": 2,
     "id": "gh600-d2-023",
-    "scenario": "An engineer at Solace Health wants to understand the difference between chatting with Copilot locally inside their IDE versus assigning a task to the coding agent for the same repository.",
+    "scenario": "An engineer at Solace Health wants to understand the difference between chatting with Copilot locally inside their IDE versus assigning a task to the cloud agent for the same repository.",
     "question": "What is the key distinction between these two modes of interaction?",
     "options": [
-      "They are identical; the coding agent is simply a rebranded version of Copilot Chat with no functional difference",
-      "Copilot Chat in the IDE runs in the developer's local environment using their credentials and immediate context; the coding agent runs autonomously in an isolated cloud sandbox and produces a pull request without the developer driving each individual step",
-      "The coding agent can only read code and never write or modify it, unlike Copilot Chat in the IDE",
-      "Copilot Chat requires an MCP server connection to function, while the coding agent does not support MCP at all"
+      "They are identical; the cloud agent is simply a rebranded version of Copilot Chat with no functional difference",
+      "Copilot Chat in the IDE runs in the developer's local environment using their credentials and immediate context; the cloud agent runs autonomously in an isolated cloud sandbox and produces a pull request without the developer driving each individual step",
+      "The cloud agent can only read code and never write or modify it, unlike Copilot Chat in the IDE",
+      "Copilot Chat requires an MCP server connection to function, while the cloud agent does not support MCP at all"
     ],
     "correct": 1,
-    "explanation": "The principle: the meaningful difference between these two modes isn't the underlying model — it's where execution happens and who is driving each step, which determines what kind of task each mode is suited for.\n\nWhy the local-versus-sandbox distinction is correct: Copilot Chat in the IDE is synchronous and local, giving the developer moment-to-moment control using their own environment and credentials, while the coding agent is asynchronous and autonomous, running in its own cloud sandbox and returning a completed, reviewable pull request rather than requiring step-by-step direction.\n\nWhy the distractors fail:\n- \"Identical, just rebranded\": this ignores the fundamental execution-model difference (local/interactive versus sandboxed/autonomous) that determines what each mode can be trusted to do unattended.\n- \"Coding agent is read-only\": the coding agent's defining feature is that it can write code and open PRs autonomously; it is not restricted to reading.\n- MCP support claim: both interactive Copilot Chat and the coding agent can be configured to use MCP servers; MCP support isn't what separates them.\n\nIn practice: choose Copilot Chat for tight, interactive, moment-to-moment collaboration on a task you're actively driving, and delegate to the coding agent for well-scoped, boundable work you're comfortable reviewing as a finished PR.",
+    "explanation": "The principle: the meaningful difference between these two modes isn't the underlying model — it's where execution happens and who is driving each step, which determines what kind of task each mode is suited for.\n\nWhy the local-versus-sandbox distinction is correct: Copilot Chat in the IDE is synchronous and local, giving the developer moment-to-moment control using their own environment and credentials, while the cloud agent is asynchronous and autonomous, running in its own cloud sandbox and returning a completed, reviewable pull request rather than requiring step-by-step direction.\n\nWhy the distractors fail:\n- \"Identical, just rebranded\": this ignores the fundamental execution-model difference (local/interactive versus sandboxed/autonomous) that determines what each mode can be trusted to do unattended.\n- \"Cloud agent is read-only\": the cloud agent's defining feature is that it can write code and open PRs autonomously; it is not restricted to reading.\n- MCP support claim: both interactive Copilot Chat and the cloud agent can be configured to use MCP servers; MCP support isn't what separates them.\n\nIn practice: choose Copilot Chat for tight, interactive, moment-to-moment collaboration on a task you're actively driving, and delegate to the cloud agent for well-scoped, boundable work you're comfortable reviewing as a finished PR.",
     "tags": ["execution-context", "coding-agent", "copilot-chat", "comprehension"],
     "difficulty": "easy"
   },
@@ -447,5 +447,117 @@
     "explanation": "The principle: traceability means being able to reconstruct, after the fact, exactly what an agent did, why, and who is accountable for the outcome — which requires attribution at every layer (commit identity, linked session log, and audit trail), not just the final diff.\n\nWhy attributable logging is correct: linking the session log from the PR preserves the reasoning and tool calls behind the change, attributing commits to the agent's own identity keeps authorship honest, and audit log entries that distinguish agent from human events let security teams filter and review agent activity specifically — together these answer \"what happened, why, and by whom\" after the fact.\n\nWhy the distractors fail:\n- Minimal one-line commit messages: this deliberately discards the detail needed to reconstruct intent later, working against the stated traceability goal.\n- Re-attributing commits to a human: this actively falsifies the record by hiding that the change was agent-generated, which is the opposite of accountability — it makes the audit trail less accurate, not more useful.\n- Disabling session logging: the session log is the primary record of what the agent actually did and why; removing it leaves only the diff, which shows the result but not the process or reasoning behind it.\n\nIn practice: traceability for autonomous agent actions should be treated the same way as traceability for any production-impacting automation — preserve who/what acted, what they did, and why, rather than compressing or erasing that record for convenience.",
     "tags": ["traceability", "accountability", "audit-log", "comprehension"],
     "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-029",
+    "scenario": "At Harbor Lane Bank, an engineer adds a third-party error-monitoring MCP server to the repository's Copilot cloud agent MCP configuration. A security reviewer asks how the configuration controls which of the server's tools the agent may call.",
+    "question": "What does the cloud agent's MCP configuration use for this?",
+    "options": [
+      "A tools array on each server entry; GitHub recommends listing specific read-only tools, and \"*\" enables every tool",
+      "Nothing; the agent can call every tool the server exposes, and the server's own permissions are the only limit",
+      "The issue body, where the requester lists which MCP tools the session is allowed to call for that task",
+      "A list of the server's MCP resources and prompts to load; the server's tools are always enabled in full"
+    ],
+    "correct": 0,
+    "explanation": "The principle: adding an MCP server shouldn't mean inheriting its whole tool surface. Least privilege needs a per-server allowlist that lives in reviewed configuration.\n\nWhy A is correct: for Copilot cloud agent, tools is a required key for both local and remote servers. GitHub strongly recommends allowlisting specific read-only tools, and including \"*\" enables all of them.\n\nWhy the distractors fail:\n- B: the configuration itself scopes tools; relying only on the server's permissions exposes every tool it offers, destructive ones included.\n- C: issue text is task input, not configuration, and anyone writing an issue could widen the agent's capabilities if it worked that way.\n- D: cloud agent supports only MCP tools; it doesn't support resources or prompts provided by an MCP server.\n\nIn practice: review a server's tools list the way you'd review a dependency's permissions. \"*\" belongs only on servers whose entire surface the task genuinely needs.",
+    "tags": ["MCP-config", "least-privilege", "configuration", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-030",
+    "scenario": "Ostrander Health's enterprise admins publish a private MCP registry and set \"Restrict MCP access to registry servers\" to \"Registry only\". The security lead tells the CISO that every Copilot surface, including Copilot cloud agent, can now use only registry-listed servers.",
+    "question": "What is wrong with the security lead's claim?",
+    "options": [
+      "Registry policies don't apply to cloud agent; it is governed by the \"MCP servers in Copilot\" policy and repository MCP settings",
+      "Nothing; a Registry only policy applies uniformly to every Copilot surface, including cloud agent sessions started from issues",
+      "Registry policies apply only to cloud agent sessions; developers in IDEs can still install any MCP server they choose",
+      "Registry only restricts remote MCP servers but never local ones, so local servers stay unrestricted on every surface"
+    ],
+    "correct": 0,
+    "explanation": "The principle: a governance control only protects the surfaces that enforce it. Before reporting coverage, check where each policy actually applies.\n\nWhy A is correct: GitHub's docs state that the \"MCP Registry URL\" and \"Restrict MCP access to registry servers\" policies don't apply to Copilot cloud agent, and the registry enforcement table lists cloud agent as not supported. Cloud agent's MCP use is controlled by the \"MCP servers in Copilot\" policy and each repository's MCP configuration.\n\nWhy the distractors fail:\n- B: this is the exact over-claim the question tests; cloud agent is outside the registry policy's reach.\n- C: it's reversed. Supported IDEs and Copilot CLI are where registry enforcement happens.\n- D: registry enforcement applies to both remote and local servers; local servers must be in the registry with the correct server ID.\n\nIn practice: registry enforcement also matches only on server name or ID, which users can bypass by editing configuration files, which is why GitHub now recommends an allowlist in the enterprise's managed-settings.json for clients.",
+    "tags": ["MCP-registries", "governance", "exam-trap", "analysis"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-031",
+    "scenario": "Pellucid Software's enterprise wants developers using VS Code and Copilot CLI to run only MCP servers that security has approved, using a control that users can't get around by editing their own configuration files.",
+    "question": "Which approach does GitHub recommend?",
+    "options": [
+      "Host a private MCP registry and set the Registry only policy, which prevents installing any server not listed in it",
+      "Define allowedMcpServers and deniedMcpServers in the enterprise's managed-settings.json, matching by name, URL or command",
+      "Add a CODEOWNERS rule covering MCP configuration files in every repository so security reviews each change",
+      "Turn on the agent firewall for all repositories so that unapproved MCP servers can't reach the internet"
+    ],
+    "correct": 1,
+    "explanation": "The principle: a central allowlist is only as strong as its matching and its enforcement point. Prefer the control the platform applies in the client, where the user can't override it.\n\nWhy B is correct: GitHub calls the enterprise's managed-settings.json the recommended way to create an MCP allowlist, because the settings apply across clients and users can't override them. Entries can match by name, server URL or command, a deny rule from any source wins, and GitHub's August 2026 changelog lists the Copilot app, Copilot CLI and VS Code as enforcing it.\n\nWhy the distractors fail:\n- A: registry enforcement is in public preview, matches only on server name or ID, and can be bypassed by editing configuration files; strict enforcement that blocks installing non-registry servers isn't available.\n- C: CODEOWNERS governs files in a repository, not the MCP configuration on a developer's own machine.\n- D: the firewall applies to Copilot cloud agent's environment, not to IDEs or the CLI on a developer's machine, and it doesn't cover MCP server processes.\n\nIn practice: keep managed-settings.json in a .github-private repository so changes to the allowlist go through the same review as code.",
+    "tags": ["MCP-allow-lists", "governance", "best-practice", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-032",
+    "scenario": "Fenmore Analytics configures a remote MCP server for Copilot cloud agent that needs an API key. They create an Agents secret named `MONITOR_TOKEN` and reference it in the MCP configuration, but the server fails to authenticate.",
+    "question": "What is the most likely fix?",
+    "options": [
+      "Rename the secret with the COPILOT_MCP_ prefix, because only prefixed Agents secrets and variables reach MCP configuration",
+      "Move the secret to GitHub Actions repository secrets, which cloud agent reads before it reads any Agents secrets",
+      "Paste the token directly into the MCP configuration JSON, since only repository admins can see that settings page",
+      "Switch the server to OAuth authentication, which cloud agent uses automatically when connecting to remote servers"
+    ],
+    "correct": 0,
+    "explanation": "The principle: secrets for agent tooling should pass through a narrow, named channel, so a credential meant for the agent's own environment doesn't silently flow into third-party server configuration.\n\nWhy A is correct: GitHub's docs say only Agents secrets and variables whose names start with COPILOT_MCP_ are available to MCP configuration. A secret named MONITOR_TOKEN exists, but the MCP configuration can't see it.\n\nWhy the distractors fail:\n- B: cloud agent can't read GitHub Actions, Codespaces or Dependabot secrets at all.\n- C: a plaintext token in configuration loses masking and secret handling, and anyone with access to the settings or an export of them can read it.\n- D: cloud agent doesn't currently support remote MCP servers that use OAuth for authentication and authorization.\n\nIn practice: give each MCP credential its own COPILOT_MCP_ secret with the narrowest scope the server allows, so revoking one integration doesn't touch the others.",
+    "tags": ["MCP-config", "secrets", "troubleshooting", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-033",
+    "scenario": "Juniper Robotics adds `.github/workflows/copilot-setup-steps.yml` to preinstall its toolchain before Copilot cloud agent starts work. The workflow has a single job named `setup`, yet sessions still start without the toolchain.",
+    "question": "Why is the setup workflow being ignored?",
+    "options": [
+      "The job must be named copilot-setup-steps; Copilot doesn't pick up a setup job with any other name",
+      "Setup steps run only when the agent is started from Copilot Chat, not when an issue is assigned to it",
+      "The file must sit in the repository root rather than in the .github/workflows directory to be found",
+      "Setup steps run only after the agent opens its pull request, so they can't change the session itself"
+    ],
+    "correct": 0,
+    "explanation": "The principle: environment preparation only helps if the platform recognises it. Convention-based configuration fails silently when the convention isn't followed exactly.\n\nWhy A is correct: GitHub's docs say the job in copilot-setup-steps.yml must be called copilot-setup-steps or it won't be picked up by Copilot. With the job named setup, the agent starts in its default environment.\n\nWhy the distractors fail:\n- B: setup steps run before the agent starts work, whichever way the task was started.\n- C: the documented location is .github/workflows/copilot-setup-steps.yml.\n- D: setup steps run before the agent's work begins; that's their entire purpose.\n\nIn practice: run the workflow from the Actions tab after any change, and remember that only steps, permissions, runs-on, services, snapshot and timeout-minutes are honoured in that job.",
+    "tags": ["execution-context", "configuration", "troubleshooting", "recall"],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-034",
+    "scenario": "Cobalt Ridge's security team relies on Copilot cloud agent's firewall to stop data exfiltration. A reviewer notices that the repository's `copilot-setup-steps.yml` runs a third-party install script, and a local MCP server in the configuration calls an external analytics API.",
+    "question": "How should the team assess the firewall's protection here?",
+    "options": [
+      "Both are covered, because the firewall applies to every process in the agent's environment, including setup steps and MCP servers",
+      "The setup steps are covered, but MCP servers are exempt because they run with the GitHub MCP server's scoped token",
+      "Neither is covered: the firewall applies to processes the agent starts through its Bash tool, so review and scope these separately",
+      "The firewall makes further review unnecessary, because GitHub blocks all non-allowlisted traffic leaving the Actions runner"
+    ],
+    "correct": 2,
+    "explanation": "The principle: a control's real coverage, not its name, decides how much you can lean on it. Layered defences start with knowing each layer's gaps.\n\nWhy C is correct: GitHub's docs say the firewall only applies to processes started by the agent through its Bash tool, and that MCP server processes and processes started in Copilot setup steps aren't subject to it. GitHub also says the firewall shouldn't be considered a comprehensive security solution.\n\nWhy the distractors fail:\n- A: this over-states the firewall's scope; both processes in the scenario fall outside it.\n- B: setup steps aren't covered, and the GitHub MCP server's token has nothing to do with a third-party server's network access.\n- D: the firewall applies only within the GitHub Actions appliance to the agent's own processes, and sophisticated attacks may bypass it.\n\nIn practice: treat setup scripts and MCP servers as supply-chain code. Pin and review what they download and call, and allowlist only the MCP tools the task needs.",
+    "tags": ["network-allowlist", "environment-constraints", "edge-case", "evaluation"],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "gh600-d2-035",
+    "scenario": "Months after a change merged, an auditor at Larchmont Pay asks two things about a commit made by Copilot cloud agent: which human was accountable for it, and whether the commit can be trusted as genuinely produced by the agent.",
+    "question": "What does GitHub record on the agent's commits that answers both questions?",
+    "options": [
+      "Commits are authored by the requesting developer alone, so the agent's involvement appears only in the session log",
+      "Commits are authored by Copilot, with the developer who assigned the task as co-author, and are signed so they show as Verified",
+      "Commits are unsigned and attributed to a shared bot account, so accountability has to come from the audit log alone",
+      "Commits carry no author metadata, so the PR description is the only record of who requested the change"
+    ],
+    "correct": 1,
+    "explanation": "The principle: traceability needs both attribution, meaning who acted and on whose behalf, and integrity, meaning proof the record wasn't forged, stored on the artifact that outlives the session.\n\nWhy B is correct: GitHub documents that cloud agent's commits are authored by Copilot, with the developer who assigned the issue or requested the change marked as co-author, and that the commits are signed and show as Verified. The co-author answers accountability; the signature answers authenticity.\n\nWhy the distractors fail:\n- A: crediting only the human would hide that an agent wrote the change, the opposite of honest attribution.\n- C: the commits are signed, and accountability is recorded on the commit itself through co-authorship.\n- D: commits always carry author metadata; the PR description is useful context, not the attribution record.\n\nIn practice: pair commit attribution with retained session logs, so an investigator can see both who was accountable and what the agent reasoned at the time.",
+    "tags": ["traceability", "accountability", "concept", "recall"],
+    "difficulty": "easy"
   }
 ]

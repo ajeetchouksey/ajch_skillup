@@ -2,8 +2,8 @@
   {
     "domain": 1,
     "id": "gh600-d1-001",
-    "scenario": "Aiden, a platform engineer at Northwind Retail, is piloting GitHub Copilot coding agent on a backlog of well-scoped, labeled bugs before expanding its use to the rest of the team.",
-    "question": "Which of the following SDLC tasks is MOST appropriate to delegate to the Copilot coding agent?",
+    "scenario": "Aiden, a platform engineer at Northwind Retail, is piloting GitHub Copilot cloud agent on a backlog of well-scoped, labeled bugs before expanding its use to the rest of the team.",
+    "question": "Which of the following SDLC tasks is MOST appropriate to delegate to the Copilot cloud agent?",
     "options": [
       "Approving the merge of a pull request that touches the payments service",
       "Researching the repository, drafting a plan, and opening a pull request that fixes a well-scoped, labeled bug",
@@ -18,7 +18,7 @@
   {
     "domain": 1,
     "id": "gh600-d1-002",
-    "scenario": "Priya, an engineering manager at Cascade Robotics, assigns the Copilot coding agent an issue titled \"Improve the checkout flow\" with no acceptance criteria. The agent's resulting pull request touches 14 files across three services, including the payment gateway.",
+    "scenario": "Priya, an engineering manager at Cascade Robotics, assigns the Copilot cloud agent an issue titled \"Improve the checkout flow\" with no acceptance criteria. The agent's resulting pull request touches 14 files across three services, including the payment gateway.",
     "question": "What is the most likely root cause of the scope creep in the agent's PR?",
     "options": [
       "The agent's session hit its execution time limit before completing testing",
@@ -34,7 +34,7 @@
   {
     "domain": 1,
     "id": "gh600-d1-003",
-    "scenario": "To speed up agent PR merges, an admin at Solstice Bank adds the Copilot coding agent as a bypass actor on the main branch ruleset so its PRs skip the required review check, reasoning that the agent already ran tests and linters before opening the PR.",
+    "scenario": "To speed up agent PR merges, an admin at Solstice Bank adds the Copilot cloud agent as a bypass actor on the main branch ruleset so its PRs skip the required review check, reasoning that the agent already ran tests and linters before opening the PR.",
     "question": "What is the biggest risk introduced by this configuration?",
     "options": [
       "The agent will no longer be able to run tests in its ephemeral environment",
@@ -50,8 +50,8 @@
   {
     "domain": 1,
     "id": "gh600-d1-004",
-    "scenario": "A tech lead at Anchor Logistics files one issue asking the coding agent to \"update the shared auth library and also update the three downstream services that consume it,\" expecting a single agent session to handle all four repositories in one PR.",
-    "question": "What should the tech lead expect given how Copilot coding agent sessions are scoped?",
+    "scenario": "A tech lead at Anchor Logistics files one issue asking the cloud agent to \"update the shared auth library and also update the three downstream services that consume it,\" expecting a single agent session to handle all four repositories in one PR.",
+    "question": "What should the tech lead expect given how Copilot cloud agent sessions are scoped?",
     "options": [
       "The agent will open one pull request that spans all four repositories in a single diff",
       "The agent session operates against a single repository, so cross-repo work requires separate tasks/sessions and separate PRs per repo",
@@ -66,7 +66,7 @@
   {
     "domain": 1,
     "id": "gh600-d1-005",
-    "scenario": "Marcus, a staff engineer at Fenwick Media, assigns the coding agent a large refactor issue touching roughly 40 files, expecting it to complete in one session. The returned PR only refactors 12 files, and the session log shows the session stopped mid-task — but Marcus merges it anyway because tests pass.",
+    "scenario": "Marcus, a staff engineer at Fenwick Media, assigns the cloud agent a large refactor issue touching roughly 40 files, expecting it to complete in one session. The returned PR only refactors 12 files, and the session log shows the session stopped mid-task — but Marcus merges it anyway because tests pass.",
     "question": "What went wrong in how Marcus handled this delegation?",
     "options": [
       "He should have granted the agent bypass-actor status to merge faster",
@@ -82,12 +82,12 @@
   {
     "domain": 1,
     "id": "gh600-d1-006",
-    "scenario": "Devon, a QA lead at Cobalt Freight, adopts a team norm that any PR opened by the coding agent gets merged automatically once CI passes, \"since Copilot already checked its own work.\"",
+    "scenario": "Devon, a QA lead at Cobalt Freight, adopts a team norm that any PR opened by the cloud agent gets merged automatically once CI passes, \"since Copilot already checked its own work.\"",
     "question": "Why is this norm a mismatch with how agent-authored PRs should be treated?",
     "options": [
       "Agent-authored PRs cannot trigger CI at all, so this norm is technically impossible to implement",
       "An agent PR is a proposal for review like any human contributor's PR — CI passing confirms correctness of what was written, not that it's the right change to make",
-      "The coding agent is only able to open draft PRs, so auto-merge is blocked by GitHub regardless of the norm",
+      "The cloud agent is only able to open draft PRs, so auto-merge is blocked by GitHub regardless of the norm",
       "Agent PRs must always be reviewed by two different people, so single-approval auto-merge is a policy violation"
     ],
     "correct": 1,
@@ -98,7 +98,7 @@
   {
     "domain": 1,
     "id": "gh600-d1-007",
-    "scenario": "Before assigning a data-pipeline bug fix to the coding agent, Elena, a delivery lead at Lumen Analytics, writes an issue that states the failing test name, the expected behavior, the files most likely involved, and a note that the fix must not change the public API.",
+    "scenario": "Before assigning a data-pipeline bug fix to the cloud agent, Elena, a delivery lead at Lumen Analytics, writes an issue that states the failing test name, the expected behavior, the files most likely involved, and a note that the fix must not change the public API.",
     "question": "What is Elena doing by including this information before delegating the task?",
     "options": [
       "Defining the acceptance criteria and constraints the agent's output will be evaluated against",
@@ -114,7 +114,7 @@
   {
     "domain": 1,
     "id": "gh600-d1-008",
-    "scenario": "Raj, an SRE at Meridian Cloud, is deciding which of four pending tasks to delegate to the coding agent: (1) update a deprecated logging library call across the codebase, (2) approve and merge a PR into the release branch, (3) add unit tests for an existing utility function, (4) decide whether to migrate from REST to GraphQL for a public API.",
+    "scenario": "Raj, an SRE at Meridian Cloud, is deciding which of four pending tasks to delegate to the cloud agent: (1) update a deprecated logging library call across the codebase, (2) approve and merge a PR into the release branch, (3) add unit tests for an existing utility function, (4) decide whether to migrate from REST to GraphQL for a public API.",
     "question": "Which task should remain exclusively human-owned rather than delegated to the agent?",
     "options": [
       "Updating the deprecated logging library call",
@@ -197,20 +197,20 @@
     "scenario": "Callum, a platform lead at Fenwick Media, uses a default orchestrator agent that coordinates work and delegates execution to specialized sub-agents. He wants the orchestrator itself to stay planning-only — reasoning, deciding, and handing off, but never directly running bash commands or editing files — even though it inherits a broad default toolset.",
     "question": "What is the most precise way to enforce this without redefining the orchestrator's entire tool list from scratch?",
     "options": [
-      "Use the excludedTools property on the orchestrator agent to remove edit- and bash-capable tools from its inherited default set",
+      "Use excludedTools (in the Copilot SDK, defaultAgent.excludedTools) to strip edit- and bash-capable tools from the orchestrator",
       "Rewrite the orchestrator's tools property to list every tool it should keep, one by one, from an empty baseline",
       "Ask the sub-agents to reject any bash or edit calls that originate from the orchestrator",
       "Rely on the orchestrator's system prompt to state that it delegates rather than executes directly"
     ],
     "correct": 0,
-    "explanation": "The principle: when an agent inherits a broad default toolset and you only need to remove a small number of capabilities, a denylist (excludedTools) is the minimal, precise edit — it changes exactly what's needed without having to reconstruct and maintain the full allowlist as defaults evolve.\n\nWhy A is correct: excludedTools subtracts the specific edit/bash tools from the orchestrator's inherited defaults, leaving everything else (read, search, delegation tools) intact — a small, targeted, and low-maintenance configuration change.\n\nWhy the distractors fail:\n- B: manually rebuilding the full tools allowlist from an empty baseline works but requires tracking every default tool the orchestrator should keep, and it silently breaks if the platform adds new default tools the team forgets to re-add.\n- C: sub-agents rejecting calls \"from the orchestrator\" isn't how tool invocation is scoped in this architecture — sub-agents don't inspect caller identity to enforce another agent's boundaries.\n- D: a prompt instruction is a soft constraint the orchestrator could deviate from, the same weakness as any instruction-only control rather than a capability-level restriction.\n\nIn practice: prefer excludedTools when removing a small number of capabilities from an otherwise-good default set, and reserve a full tools allowlist rewrite for cases where you're building a narrowly scoped agent from scratch.",
+    "explanation": "The principle: when an agent inherits a broad default toolset and you only need to remove a small number of capabilities, a denylist (excludedTools) is the minimal, precise edit — it changes exactly what's needed without having to reconstruct and maintain the full allowlist as defaults evolve.\n\nWhy A is correct: excludedTools subtracts the specific edit/bash tools from the orchestrator's inherited defaults, leaving everything else (read, search, delegation tools) intact — a small, targeted, and low-maintenance configuration change. In the Copilot SDK, defaultAgent.excludedTools hides tools from the main agent only, so a sub-agent that lists those tools in its own tools property can still use them: exactly the delegate-but-don't-execute split Callum wants.\n\nWhy the distractors fail:\n- B: manually rebuilding the full tools allowlist from an empty baseline works but requires tracking every default tool the orchestrator should keep, and it silently breaks if the platform adds new default tools the team forgets to re-add.\n- C: sub-agents rejecting calls \"from the orchestrator\" isn't how tool invocation is scoped in this architecture — sub-agents don't inspect caller identity to enforce another agent's boundaries.\n- D: a prompt instruction is a soft constraint the orchestrator could deviate from, the same weakness as any instruction-only control rather than a capability-level restriction.\n\nIn practice: prefer excludedTools when removing a small number of capabilities from an otherwise-good default set, and reserve a full tools allowlist rewrite for cases where you're building a narrowly scoped agent from scratch.",
     "tags": ["excluded-tools", "tool-scoping", "configuration", "application"],
     "difficulty": "hard"
   },
   {
     "domain": 1,
     "id": "gh600-d1-014",
-    "scenario": "Beatriz, a release manager at Cobalt Freight, configures the coding agent workflow so that once a plan is generated, the agent opens its resulting changes as a draft pull request rather than a ready-for-review PR, marking it ready only after a teammate comments approval on the plan.",
+    "scenario": "Beatriz, a release manager at Cobalt Freight, configures the cloud agent workflow so that once a plan is generated, the agent opens its resulting changes as a draft pull request rather than a ready-for-review PR, marking it ready only after a teammate comments approval on the plan.",
     "question": "What does this draft-PR gate primarily achieve?",
     "options": [
       "It prevents CI from running on the agent's branch until the PR is marked ready",
@@ -258,26 +258,26 @@
   {
     "domain": 1,
     "id": "gh600-d1-017",
-    "scenario": "Grace, a GitHub org admin at BrightPath Health, enables GitHub Copilot coding agent at the organization level for all repositories, but the payments-processing repository's maintainers request that the agent remain disabled there due to compliance review requirements.",
+    "scenario": "Grace, a GitHub org admin at BrightPath Health, enables GitHub Copilot cloud agent at the organization level for all repositories, but the payments-processing repository's maintainers request that the agent remain disabled there due to compliance review requirements.",
     "question": "What configuration approach satisfies both requirements?",
     "options": [
-      "Disable Copilot coding agent org-wide instead, since a single repository's concerns should apply everywhere",
+      "Disable Copilot cloud agent org-wide instead, since a single repository's concerns should apply everywhere",
       "Keep the org-level enablement policy on, and configure a per-repository opt-out for the payments-processing repository",
       "Grant the payments-processing repository's maintainers admin rights over the entire organization's Copilot policy",
       "Ask the payments-processing team to delete the repository and recreate it outside the organization"
     ],
     "correct": 1,
-    "explanation": "The principle: autonomy guardrails should operate at the granularity of the actual risk — org-wide enablement paired with per-repository opt-out lets an organization default to productivity while still respecting exceptions where a specific repo's risk profile warrants disabling the feature locally.\n\nWhy B is correct: this configuration gives every other team the benefit of the coding agent while cleanly excluding the one repository that has a documented compliance reason to opt out, without affecting anyone else.\n\nWhy the distractors fail:\n- A: disabling org-wide because one repository has a concern discards the benefit for every team that has no such concern; it fails to match the guardrail to the actual scope of the risk.\n- C: granting one team admin rights over the entire org's policy is a massive overreach relative to their actual need (opting out one repo) and creates a new governance risk.\n- D: recreating the repository outside the organization abandons the org's governance, security, and access controls entirely — a disproportionate and impractical response to a configuration need.\n\nIn practice: layered policy (org default plus repo-level override) is the standard pattern for balancing platform-wide productivity gains against localized compliance or risk requirements — reach for the narrowest override that solves the actual concern.",
+    "explanation": "The principle: autonomy guardrails should operate at the granularity of the actual risk — org-wide enablement paired with per-repository opt-out lets an organization default to productivity while still respecting exceptions where a specific repo's risk profile warrants disabling the feature locally.\n\nWhy B is correct: this configuration gives every other team the benefit of the cloud agent while cleanly excluding the one repository that has a documented compliance reason to opt out, without affecting anyone else.\n\nWhy the distractors fail:\n- A: disabling org-wide because one repository has a concern discards the benefit for every team that has no such concern; it fails to match the guardrail to the actual scope of the risk.\n- C: granting one team admin rights over the entire org's policy is a massive overreach relative to their actual need (opting out one repo) and creates a new governance risk.\n- D: recreating the repository outside the organization abandons the org's governance, security, and access controls entirely — a disproportionate and impractical response to a configuration need.\n\nIn practice: layered policy (org default plus repo-level override) is the standard pattern for balancing platform-wide productivity gains against localized compliance or risk requirements — reach for the narrowest override that solves the actual concern.",
     "tags": ["enablement-policy", "configuration", "autonomy-guardrails", "recall"],
     "difficulty": "easy"
   },
   {
     "domain": 1,
     "id": "gh600-d1-018",
-    "scenario": "Owen, a security architect at Meridian Cloud, is configuring a branch protection ruleset for the main branch. He wants the coding agent to be able to push commits directly to its own working branches without being blocked by rules meant for direct-to-main pushes, but he wants every PR — including the agent's — to still require the standard number of approving reviews before merge.",
+    "scenario": "Owen, a security architect at Meridian Cloud, is configuring a branch protection ruleset for the main branch. He wants the cloud agent to be able to push commits directly to its own working branches without being blocked by rules meant for direct-to-main pushes, but he wants every PR — including the agent's — to still require the standard number of approving reviews before merge.",
     "question": "How should Owen configure the ruleset's bypass list to achieve this?",
     "options": [
-      "Add the coding agent as a bypass actor for the ruleset that governs pull request review requirements",
+      "Add the cloud agent as a bypass actor for the ruleset that governs pull request review requirements",
       "Scope the bypass narrowly (for example, to rules that don't apply to the agent's own working branches) rather than to the rule requiring approving reviews before merge into main",
       "Disable branch protection on main entirely while the agent is active, then re-enable it afterward",
       "Add every repository collaborator as a bypass actor so the agent's reviewers aren't blocked either"
@@ -350,5 +350,21 @@
     "explanation": "The principle: effective human oversight scales by concentrating review effort at the points where a decision actually branches the outcome (what to do, whether the result is acceptable) and using event-driven alerts to surface exceptions in between, rather than demanding continuous attention that doesn't scale past one task at a time.\n\nWhy B is correct: plan review catches wrong scope or destructive intent before execution, PR review catches problems in the final result, and lifecycle events (such as a failed step) surface exceptions that need attention in between — together this covers the meaningful decision points without requiring a human to watch every tool call.\n\nWhy the distractors fail:\n- A: approving every individual tool call turns the reviewer into a synchronous bottleneck for each step, which doesn't scale and defeats much of the purpose of delegating the work in the first place.\n- C: removing review checkpoints entirely reintroduces exactly the risk this design is meant to prevent — CI alone can't evaluate intent or business-context correctness.\n- D: requiring live presence for the full task duration is the same bottleneck as option A in a different form, and it doesn't leverage the async, event-driven tooling built for this purpose.\n\nIn practice: mature agent operating models are checkpoint-based, not continuous-supervision-based — the goal is for a human to spend attention proportional to the decision's risk, not proportional to the agent's wall-clock runtime.",
     "tags": ["human-in-the-loop", "session-monitoring", "architecture", "evaluation"],
     "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "gh600-d1-023",
+    "scenario": "Kai, a platform engineer at Tidewater Insurance, wants Copilot cloud agent sessions in one repository to stop after 30 minutes. A colleague asks whether the limit could instead be raised to two hours for large refactors.",
+    "question": "Which statement about cloud agent session time limits is accurate?",
+    "options": [
+      "Sessions can run for at most 59 minutes; timeout-minutes in copilot-setup-steps.yml can set a shorter limit, but the maximum can't be raised",
+      "Sessions have no fixed limit; they run until the agent decides the task is complete or a reviewer stops them",
+      "The limit defaults to 59 minutes, and repository administrators can raise it to several hours in the cloud agent settings",
+      "The limit is set per issue with a time-limit label, which the agent reads before it starts working on the task"
+    ],
+    "correct": 0,
+    "explanation": "The principle: a hard execution ceiling is one of the guardrails that bounds an autonomous agent's autonomy. Teams can tighten it but not remove it, so task design has to fit inside it.\n\nWhy A is correct: GitHub documents a maximum of 59 minutes per Copilot cloud agent session and says the limit can't be extended. Setting timeout-minutes in copilot-setup-steps.yml gives a shorter limit, which meets Kai's 30-minute goal.\n\nWhy the distractors fail:\n- B: sessions are bounded; a task that runs past the limit stops wherever it got to.\n- C: there's no setting that raises the maximum, so a two-hour refactor has to be split into smaller tasks.\n- D: there's no label-based time limit; the only documented control is timeout-minutes in the setup workflow.\n\nIn practice: size delegated tasks to finish well inside the limit, and read the session log's stopping condition before treating a PR as complete.",
+    "tags": ["configuration", "recall", "session-limits"],
+    "difficulty": "easy"
   }
 ]

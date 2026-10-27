@@ -5,13 +5,14 @@
     "scenario": "A financial services company wants to automate their loan pre-qualification process. The process involves collecting applicant data, running credit checks via an external API, and generating a preliminary recommendation. The team has no ML engineers but has experienced Power Platform developers.",
     "question": "Which Azure service combination best fits this scenario?",
     "options": [
-      "Azure AI Foundry Agent Service with a custom Python orchestrator and Azure Functions",
+      "Foundry Agent Service with a custom Python orchestrator and Azure Functions",
       "Copilot Studio with Power Automate flows and Dataverse for applicant data",
       "Azure Machine Learning pipeline with a custom scikit-learn model",
-      "Azure Logic Apps with Azure Cognitive Services Form Recognizer"
+      "Azure Logic Apps with Azure Document Intelligence"
     ],
     "correct": 1,
-    "explanation": "Copilot Studio with Power Automate is correct because: the team has Power Platform expertise (not ML engineers), the data is in Microsoft ecosystem (Dataverse), and the workflow can be built without custom code. Azure AI Foundry Agent Service (A) requires pro-code Python skills the team lacks. Azure ML (C) is for custom model training, not agent orchestration. Logic Apps + Form Recognizer (D) handles document processing but lacks the conversational/reasoning layer needed for pre-qualification recommendations.",
+    "explanation": "B is correct: the team has Power Platform expertise rather than ML engineers, the applicant data fits naturally in Dataverse, and Copilot Studio with Power Automate flows can collect the data, call the credit-check API and produce the recommendation without custom code. A is wrong because Foundry Agent Service with a custom Python orchestrator demands pro-code skills the team doesn't have. C is wrong because Azure Machine Learning is for training custom models, not for orchestrating a conversational, multi-step agent workflow. D is wrong because Logic Apps with Document Intelligence handles document processing but lacks the conversational and reasoning layer needed to produce pre-qualification recommendations.",
+    "difficulty": "medium",
     "tags": ["copilot-studio", "power-automate", "make-vs-buy", "use-case-selection"]
   },
   {
@@ -21,12 +22,13 @@
     "question": "What pricing strategy should they adopt?",
     "options": [
       "Stay on pay-as-you-go but add more regional endpoints with Azure Front Door for load distribution",
-      "Switch to Provisioned Throughput Units (PTU) as primary with pay-as-you-go as overflow",
       "Switch entirely to PTU to eliminate variable latency",
-      "Use Azure Cache for Redis to cache common responses and reduce Azure OpenAI calls"
+      "Use Azure Cache for Redis to cache common responses and reduce Azure OpenAI calls",
+      "Switch to Provisioned Throughput Units (PTU) as primary with pay-as-you-go as overflow"
     ],
-    "correct": 1,
-    "explanation": "PTU as primary with PAYG overflow (B) is the spillover pattern — ideal when volume is high and predictable (2B tokens/day), but some capacity buffer is needed for spikes. PTU alone (C) risks throttling during unexpected traffic spikes with no fallback. PAYG with more endpoints (A) addresses distribution but not the fundamental latency variability from shared capacity. Caching (D) reduces volume but doesn't guarantee latency for novel queries and introduces cache invalidation complexity.",
+    "correct": 3,
+    "explanation": "D is correct: PTU as primary with pay-as-you-go as overflow is the spillover pattern, ideal when volume is high and predictable (about 2 billion tokens a day) but some buffer is still needed for spikes. A is wrong because more regional pay-as-you-go endpoints spread the load but don't remove the latency variability that comes from shared capacity. B is wrong because PTU alone has no fallback, so unexpected traffic spikes above the reserved capacity get throttled. C is wrong because caching reduces call volume but can't guarantee latency for novel queries and adds cache-invalidation complexity.",
+    "difficulty": "medium",
     "tags": ["PTU", "pay-as-you-go", "capacity-planning", "spillover-pattern"]
   },
   {
@@ -41,7 +43,8 @@
       "Prohibited — AI systems in healthcare are not permitted under EU AI Act"
     ],
     "correct": 2,
-    "explanation": "Clinical decision support systems are explicitly listed as high-risk under EU AI Act Annex III. High-risk classification applies because it affects patient safety and clinical outcomes. It requires a conformity assessment, risk management system, technical documentation, and human oversight mechanisms before deployment. Minimal risk (A) ignores the safety implications. Limited risk (B) only applies to chatbots/content generation without safety impact. Prohibited (D) is wrong — medical AI is regulated, not banned.",
+    "explanation": "C is correct: an AI system that suggests diagnoses and next steps for clinicians is typically regulated as medical device software under the EU Medical Device Regulation, and Article 6(1) of the EU AI Act makes an AI system high-risk when it is, or is a safety component of, a product covered by Annex I legislation (which includes the MDR) that needs third-party conformity assessment. It then needs a risk management system, technical documentation, human oversight and a conformity assessment before deployment. A is wrong because framing the output as 'only suggestions' ignores that the suggestions directly shape clinical decisions and patient safety. B is wrong because limited risk covers transparency-only cases such as chatbots and generated content without a safety impact, not clinical decision support. D is wrong because the EU AI Act regulates medical AI rather than banning it; healthcare is not a prohibited practice.",
+    "difficulty": "easy",
     "tags": ["EU-AI-Act", "high-risk", "healthcare", "responsible-AI"]
   },
   {
@@ -50,44 +53,47 @@
     "scenario": "An e-commerce company wants to build an order inquiry agent. Their order data lives in a proprietary SQL database, their return policy is in SharePoint, and their shipping status comes from a third-party logistics REST API. They have a team of .NET developers.",
     "question": "Which approach best meets these requirements?",
     "options": [
+      "Foundry Agent Service with Azure Functions tools for SQL and logistics API",
       "Copilot Studio with SharePoint knowledge source and HTTP connector actions",
-      "Azure AI Foundry Agent Service with Azure Functions tools for SQL and logistics API",
-      "Azure AI Foundry Agent Service with only the built-in file search tool for SharePoint documents",
+      "Foundry Agent Service with only the built-in file search tool for SharePoint documents",
       "Copilot Studio with a Power Automate flow connecting to SQL and the logistics API"
     ],
-    "correct": 1,
-    "explanation": "Azure AI Foundry Agent Service with Azure Functions (B) is correct: .NET developers can build custom Functions for SQL queries and REST API calls, and the Agent Service handles orchestration. The data sources are non-Microsoft (proprietary SQL + third-party API), which is the key signal for AI Agent Service over Copilot Studio. Copilot Studio with HTTP connector (A) can handle SharePoint and simple APIs but lacks robust SQL integration. File search only (C) ignores the dynamic SQL and logistics data. Copilot Studio + Power Automate (D) could work but is more complex and the team's .NET skills are better applied in Azure Functions.",
+    "correct": 0,
+    "explanation": "A is correct: the .NET developers can build Azure Functions tools for the SQL queries and the logistics REST API, and Foundry Agent Service handles the orchestration; non-Microsoft data sources (a proprietary SQL database and a third-party API) are the key signal for Foundry Agent Service over Copilot Studio. B is wrong because Copilot Studio with an HTTP connector covers SharePoint and simple APIs but has no robust path for querying the proprietary SQL database. C is wrong because file search alone ignores the dynamic order data in SQL and the shipping status from the logistics API. D is wrong because Copilot Studio plus Power Automate could work but is more complex for this team, whose .NET skills are better applied in Azure Functions.",
+    "difficulty": "medium",
     "tags": ["AI-agent-service", "azure-functions", "make-vs-buy", "tool-design"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-005",
-    "scenario": "A company is designing an Azure AI Foundry Hub for three teams: HR, Finance, and Customer Support. Each team has different data sensitivity requirements, and the Finance team must comply with SOC 2 isolation requirements.",
-    "question": "What is the correct Hub and Project structure?",
+    "scenario": "A company is rolling out Microsoft Foundry for three teams: HR, Finance, and Customer Support. HR and Support are prototyping agents and want to share model deployments and connected tools. Finance is taking a production agent live and must show SOC 2 auditors its own access control, network configuration, encryption keys, and quota.",
+    "question": "Which Foundry topology best meets these requirements?",
     "options": [
-      "One Hub with one Project, using Azure RBAC roles to restrict access per team",
-      "One Hub with three Projects (one per team), each Project having isolated endpoints and storage",
-      "Three separate Hubs, one per team, each with its own Key Vault and Storage Account",
-      "One Hub with three Projects, where the Finance Project uses a dedicated Key Vault separate from the shared Hub Key Vault"
+      "One Foundry resource with a single shared project, using Azure RBAC roles to separate the three teams",
+      "One Foundry resource with three projects, giving the Finance project its own private endpoint and customer-managed key",
+      "Three hub-based projects in Foundry (classic) under one shared hub, each with its own storage account",
+      "One Foundry resource with HR and Support projects, plus a separate Foundry resource for Finance's production workload"
     ],
-    "correct": 1,
-    "explanation": "One Hub with three Projects (B) is the standard AI Foundry governance pattern. The Hub provides shared governance infrastructure (Key Vault, Storage, ACR, App Insights), while Projects provide workload isolation with separate endpoints and deployments. One project for Finance gives it isolated deployments without requiring a separate Hub. One project/one RBAC approach (A) doesn't isolate compute or endpoints. Three separate Hubs (C) is over-engineered and loses the shared governance benefit. A separate Key Vault outside the Hub (D) breaks the Hub architecture pattern — Finance Project inherits the Hub's Key Vault but has its own deployment isolation.",
-    "tags": ["AI-foundry-hub", "project-isolation", "governance", "RBAC"]
+    "correct": 3,
+    "explanation": "D is correct: Microsoft's Foundry rollout guidance treats isolation as the default for production, with one Foundry resource per production workload boundary when you need independent access control, networking, keys and quota. Co-located teams can share one resource and use a project per use case, so HR and Support share deployments and tools while Finance gets its own resource. A is wrong because one shared project mixes all three teams' agents, files and evaluations in a single workspace. B is wrong because private networking, customer-managed keys and quota belong to the parent Foundry resource and are shared by its projects, so a project can't carry its own isolated network or key boundary. C is wrong because hub-based projects belong to Foundry (classic), where Microsoft is no longer focusing new investment, and a shared hub still shares its blast radius.",
+    "difficulty": "hard",
+    "tags": ["foundry-resource", "project-isolation", "architecture", "governance"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-006",
-    "scenario": "A startup is building a customer-facing chatbot using Azure AI Foundry. They expect 1,000 users/day during the first 3 months, ramping to 50,000 users/day by month 6. Token consumption will scale proportionally.",
+    "scenario": "A startup is building a customer-facing chatbot on Microsoft Foundry. They expect 1,000 users a day for the first 3 months, ramping to 50,000 users a day by month 6. Token consumption will scale with users, and early traffic is spiky and hard to predict.",
     "question": "What is the most cost-effective deployment strategy for this growth trajectory?",
     "options": [
-      "Start with PTU from day 1 to lock in capacity before demand grows",
-      "Start with pay-as-you-go and switch to PTU once usage consistently exceeds 60% of a PTU unit",
-      "Use only pay-as-you-go with no PTU to maximize flexibility",
-      "Deploy Phi-3-mini on a dedicated compute cluster to avoid Azure OpenAI costs entirely"
+      "Start on Global Standard pay-per-token, then move the steady base load to provisioned throughput once traffic is consistent and high",
+      "Buy provisioned throughput (PTU) from day 1 to lock in capacity before demand grows",
+      "Stay on pay-per-token permanently, because provisioned throughput never costs less than tokens",
+      "Self-host Phi-3-mini on dedicated GPU VMs from day 1 to avoid per-token charges entirely"
     ],
-    "correct": 1,
-    "explanation": "Starting with PAYG and migrating to PTU when utilization consistently exceeds 60% of a PTU (B) is the correct cost-optimization pattern. PTU break-even is typically at >60% utilization — below that, PAYG is cheaper. At 1,000 users/day, PAYG is clearly cheaper. At 50,000 users/day with stable consumption, PTU is cost-effective. PTU from day 1 (A) wastes money on idle capacity. PAYG only (C) becomes expensive at high scale. Phi-3-mini on dedicated compute (D) changes the model entirely and adds infrastructure management overhead.",
-    "tags": ["PTU", "cost-optimization", "pay-as-you-go", "capacity-planning"]
+    "correct": 0,
+    "explanation": "A is correct: Microsoft's deployment-type guidance recommends Global Standard as the default starting point, pay-per-token types for variable or bursty traffic, and provisioned types for consistent high volume or when you need low latency variance. Early traffic is small and unpredictable; by month 6 the base load is steady enough to size PTUs against it, with pay-per-token kept for overflow. B is wrong because reserved capacity bought before demand exists is paid for whether or not it's used. C is wrong because at sustained high volume, reserved throughput can cost less than tokens and gives more predictable latency, so 'never' is false. D is wrong because self-hosting swaps the model and adds GPU infrastructure, patching and scaling work the team doesn't need at 1,000 users a day.",
+    "difficulty": "medium",
+    "tags": ["ptu", "deployment-types", "cost-optimization", "capacity-planning"]
   },
   {
     "domain": 1,
@@ -101,7 +107,8 @@
       "Right to rectification — users must be able to correct factual errors in agent responses"
     ],
     "correct": 1,
-    "explanation": "Data minimization (Article 5) and storage limitation require that personal data is kept only as long as necessary for the specified purpose. For an agent processing legal documents with PII, conversation logs must have an explicit TTL policy (e.g., 90 days) and only store data necessary for the service. Data portability (A) is a requirement but doesn't specifically impact how logs are stored. Consent (C) is required before processing but is about legal basis, not storage mechanics. Right to rectification (D) applies to factual data about individuals, not AI responses.",
+    "explanation": "B is correct: data minimization and storage limitation (GDPR Article 5) require that personal data is kept only as long as necessary for its purpose, so conversation logs for an agent handling PII-heavy contracts need an explicit TTL (for example, 90 days) and should store only what the service needs. A is wrong because data portability is a real right, but it governs exporting data on request, not how long or how much conversation history is stored. C is wrong because consent concerns the legal basis for processing, not the storage mechanics of the logs. D is wrong because the right to rectification applies to inaccurate personal data about the individual, not to correcting AI responses.",
+    "difficulty": "medium",
     "tags": ["GDPR", "data-minimization", "storage-limitation", "compliance"]
   },
   {
@@ -112,11 +119,12 @@
     "options": [
       "Yes — an AI agent should replace the LSTM model and use LLM reasoning for failure prediction",
       "No — the failure prediction component should remain an ML model (LSTM); an agent is appropriate for the ERP integration and escalation logic",
-      "Yes — Azure AI Foundry Agent Service can directly consume sensor data streams and learn from them",
+      "Yes — Foundry Agent Service can directly consume sensor data streams and learn from them",
       "No — this should use Azure Logic Apps for the full pipeline without any AI component"
     ],
     "correct": 1,
-    "explanation": "The correct architecture separates concerns: the LSTM model handles structured time-series prediction (what it's designed for), while an agent handles the subsequent workflow — interpreting the prediction, drafting a maintenance order, calling the ERP API, and escalating if needed. LLMs are not appropriate for time-series anomaly detection (A) — they don't process raw sensor streams. AI Foundry Agent Service (C) can receive predictions as tool outputs but cannot process raw sensor streams or train on them. Logic Apps alone (D) lacks the reasoning layer needed for contextual escalation decisions.",
+    "explanation": "B is correct: the architecture should separate concerns, keeping the LSTM model for structured time-series failure prediction (what it is designed for) and using an agent for the follow-on workflow: interpreting the prediction, drafting the maintenance order, calling the ERP API and escalating when needed. A is wrong because LLMs are not suited to time-series anomaly detection and don't process raw sensor streams. C is wrong because Foundry Agent Service can receive predictions as tool outputs but cannot consume raw sensor streams or train on them. D is wrong because Logic Apps alone lacks the reasoning layer needed for contextual escalation decisions, and dropping the AI component discards the working prediction model.",
+    "difficulty": "medium",
     "tags": ["use-case-selection", "ML-vs-agent", "orchestration", "architecture"]
   },
   {
@@ -131,13 +139,14 @@
       "System Prompt Disclosure"
     ],
     "correct": 1,
-    "explanation": "A Transparency Note is the Microsoft document that explains to stakeholders (including regulators and customers) what an AI system does, its capabilities and limitations, intended use cases, and the safeguards in place. A Model Card (A) documents model performance metrics and training data — it's a technical document about the model itself, not the deployed system. The RAI Impact Assessment (C) is an internal evaluation document used during design, not an external-facing regulatory document. System Prompt Disclosure (D) is not a formal Microsoft artifact.",
+    "explanation": "B is correct: a Transparency Note is the Microsoft document that explains to stakeholders, including regulators and customers, what an AI system does, its capabilities and limitations, its intended uses and the safeguards in place. A is wrong because a Model Card documents a model's performance metrics and training data; it describes the model, not the deployed system. C is wrong because the RAI Impact Assessment is an internal evaluation done during design, not an external-facing document for regulators. D is wrong because 'System Prompt Disclosure' is not a formal Microsoft Responsible AI artifact.",
+    "difficulty": "easy",
     "tags": ["transparency-note", "responsible-AI", "governance", "regulatory"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-010",
-    "scenario": "A media company wants to build an AI agent that generates marketing copy for social media posts. The content will be published automatically without human review. The agent uses GPT-4o accessed via Azure AI Foundry.",
+    "scenario": "A media company wants to build an AI agent that generates marketing copy for social media posts. The content will be published automatically without human review. The agent uses GPT-4o accessed via Microsoft Foundry.",
     "question": "Which risk must be addressed before enabling fully automated publishing?",
     "options": [
       "Token quota exhaustion — the agent might exceed Azure OpenAI rate limits",
@@ -146,23 +155,25 @@
       "Cost — GPT-4o is expensive for high-volume content generation"
     ],
     "correct": 1,
-    "explanation": "Protected material reproduction is the primary risk for automated publishing — GPT-4o might generate content similar to copyrighted text or protected brand assets from its training data. Azure AI Content Safety's 'Protected Material' detection evaluator should be run on all outputs before publishing. Token quota (A) is an operational concern, not a blocker for automated publishing. Latency (C) is an API rate limit issue, not a publishing risk. Cost (D) is a business consideration but not a risk that blocks automated publishing from a governance standpoint.",
+    "explanation": "B is correct: with no human review, the primary risk is that GPT-4o reproduces protected material such as copyrighted text from its training data, so protected material detection should run on every output before it is published. A is wrong because token quota exhaustion is an operational concern, not a governance risk that blocks automated publishing. C is wrong because social media API rate limits are a throughput issue, not a publishing risk. D is wrong because cost is a business consideration, not a risk that must be mitigated before content goes out unreviewed.",
+    "difficulty": "medium",
     "tags": ["protected-material", "content-safety", "responsible-AI", "automated-publishing"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-011",
-    "scenario": "A company operates in three Azure regions: East US, West Europe, and Southeast Asia. They need their AI agents to serve customers in all regions with data residency requirements: EU customers must have their data processed and stored only in West Europe.",
-    "question": "How should they architect the Azure AI Foundry deployment?",
+    "scenario": "A company serves customers from East US, West Europe, and Southeast Asia. A data residency rule says EU customers' data must be stored and processed only inside the EU.",
+    "question": "How should they architect the Microsoft Foundry deployment?",
     "options": [
-      "One AI Foundry Hub in East US with projects for each region, routing traffic globally",
-      "Three AI Foundry Hubs, one per region, with region-specific routing at the application tier",
-      "One AI Foundry Hub in West Europe (the strictest requirement), shared across all regions",
-      "One AI Foundry Hub with a single project, using Azure API Management to route and transform requests by region"
+      "One Foundry resource in East US with a Global Standard deployment, serving all three regions",
+      "One Foundry resource in West Europe with a Global Standard deployment, shared by all three regions",
+      "A Foundry resource per region, with EU customers routed at the application tier to a West Europe resource that uses a Data Zone (EU) or Standard deployment",
+      "One Foundry resource with a single project, using Azure API Management to rewrite requests by region"
     ],
-    "correct": 1,
-    "explanation": "Three regional Hubs (B) is correct for strict data residency. West Europe processes EU data (GDPR requirement), East US handles North American traffic, and Southeast Asia handles APAC. A single Hub in East US (A) violates EU data residency requirements. A single West Europe Hub (C) forces all traffic through EU, adding unnecessary latency for non-EU users. API Management routing (D) doesn't change where the data is processed — it still touches the single Hub's infrastructure.",
-    "tags": ["data-residency", "GDPR", "multi-region", "hub-architecture"]
+    "correct": 2,
+    "explanation": "C is correct: data at rest stays in the resource's Azure geography, but where inference runs depends on the deployment type. Global types may process prompts in any Azure region, Data Zone types process only within the EU data zone, and Standard (regional) processes within the chosen Azure geography. An EU resource in West Europe with a Data Zone EU or Standard deployment, with EU users routed to it, meets the rule while US and APAC users get local resources. A is wrong because EU data would be stored and processed in the US. B is wrong because a Global Standard deployment may process EU prompts outside the EU even though the resource sits in West Europe. D is wrong because API Management can route traffic but can't change where a single resource stores data or where its deployment processes prompts.",
+    "difficulty": "hard",
+    "tags": ["data-residency", "deployment-types", "architecture", "compliance"]
   },
   {
     "domain": 1,
@@ -176,22 +187,24 @@
       "Security threat modeling and pen testing plan"
     ],
     "correct": 1,
-    "explanation": "An RAI (Responsible AI) Impact Assessment is uniquely required for AI systems and must be completed before development begins. It identifies potential harms, affected population groups, and mitigation strategies that shape the architecture and safeguards. Stakeholder requirements (A), architecture design (C), and security threat modeling (D) are all standard software engineering tasks done for any project. The RAI Impact Assessment is specifically required by Microsoft's responsible AI framework and the EU AI Act for AI systems, particularly high-risk ones.",
+    "explanation": "B is correct: an RAI (Responsible AI) Impact Assessment is specific to AI systems and should be completed before development begins, because the harms, affected groups and mitigations it identifies shape the architecture and safeguards; Microsoft's Responsible AI Standard calls for it, and the EU AI Act imposes similar risk-management duties on high-risk systems. A is wrong because stakeholder requirements gathering is standard for any software project. C is wrong because architecture design and technology selection are also standard engineering tasks, not AI-specific ones. D is wrong because security threat modeling and pen-test planning apply to every project, not uniquely to AI agents.",
+    "difficulty": "easy",
     "tags": ["RAI-impact-assessment", "responsible-AI", "pre-development", "governance"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-013",
-    "scenario": "A company has selected GPT-4o for their customer service agent. Six months later, Azure releases GPT-4o-mini, which costs 80% less and benchmarks show it performs comparably on their specific use case. The business wants to switch immediately to reduce costs.",
+    "scenario": "A company has selected GPT-4o for their customer service agent. Six months later, GPT-4o-mini is available at a fraction of GPT-4o's per-token price, and public benchmarks suggest it performs comparably. The business wants to switch immediately to reduce costs.",
     "question": "What is the correct model migration procedure?",
     "options": [
-      "Update the model parameter in the AI Foundry deployment configuration and redeploy immediately",
-      "Run the golden dataset evaluation against GPT-4o-mini, validate metrics meet thresholds, deploy to a staging slot, run canary traffic at 1-5%, then promote to production",
+      "Update the model parameter in the Foundry deployment configuration and redeploy immediately",
+      "Run the golden dataset evaluation against GPT-4o-mini, validate metrics meet thresholds, deploy it as a separate staging deployment, run canary traffic at 1-5%, then promote to production",
       "Deploy GPT-4o-mini in parallel and use A/B testing with 50/50 traffic split for two weeks before switching",
       "Switch during a maintenance window to minimize user impact"
     ],
     "correct": 1,
-    "explanation": "The staged migration process (B) — eval against golden dataset → staging → canary → production — is the correct MLOps pattern for model changes. Benchmarks on general tasks don't guarantee equivalent performance on your specific domain; the golden dataset validates on your actual use case. Immediate redeployment (A) skips quality validation. 50/50 A/B (C) exposes too many users to an unvalidated model; 1-5% canary is the correct starting point. Maintenance window switch (D) is about downtime, not validation — it skips the quality check entirely.",
+    "explanation": "B is correct: the staged migration (golden-dataset evaluation, a separate staging deployment, 1-5% canary traffic, then promotion) is the MLOps pattern for model changes, because general benchmarks don't guarantee equivalent performance on your domain and the golden dataset validates your actual use case. A is wrong because updating the deployment and redeploying immediately skips quality validation entirely. C is wrong because a 50/50 A/B split exposes half of users to an unvalidated model; a small canary is the correct starting point. D is wrong because a maintenance window addresses downtime, not quality, so the evaluation step is still skipped.",
+    "difficulty": "medium",
     "tags": ["model-migration", "MLOps", "golden-dataset", "canary-deployment"]
   },
   {
@@ -201,18 +214,19 @@
     "question": "Where should this business rule enforcement be implemented?",
     "options": [
       "In the agent's system prompt: 'Orders above $10,000 must be approved before placement'",
-      "As a code-enforced check in the Azure Function that places orders, blocking calls above the threshold and routing to an approval workflow",
       "In the LLM's reasoning through few-shot examples showing the agent seeking approval for large orders",
-      "In Azure API Management policies that reject order API calls above $10,000"
+      "In Azure API Management policies that reject order API calls above $10,000",
+      "As a code-enforced check in the Azure Function that places orders, blocking calls above the threshold and routing to an approval workflow"
     ],
-    "correct": 1,
-    "explanation": "Code enforcement in the Azure Function (B) is the only option that provides a guaranteed, unforgeable boundary. The function checks the order amount before executing and routes to a Power Automate approval flow if the threshold is exceeded — the LLM literally cannot bypass this regardless of how it reasons. System prompt instructions (A) and few-shot examples (C) are probabilistic — a crafted input could potentially override them. API Management (D) could work as a secondary defense but doesn't handle the approval routing and shouldn't be the primary enforcement mechanism for business rules.",
+    "correct": 3,
+    "explanation": "D is correct: a code-enforced check in the Azure Function that places orders is a deterministic boundary; it checks the amount before executing and routes anything over $10,000 to an approval workflow (for example, a Power Automate approval), and the LLM cannot bypass it however it reasons. A is wrong because a system prompt instruction is probabilistic guidance that a crafted input or reasoning error can override. B is wrong because few-shot examples are also probabilistic and offer no guarantee the model will seek approval. C is wrong because API Management could reject large calls as a secondary defense, but it doesn't route to an approval workflow and shouldn't be the primary enforcement point for business rules.",
+    "difficulty": "medium",
     "tags": ["human-in-the-loop", "business-rules", "code-enforcement", "approval-workflow"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-015",
-    "scenario": "A startup is planning to use Azure AI Foundry to build a product recommendation agent. The CTO asks you to estimate the monthly Azure OpenAI cost. The system will handle 10,000 queries/day, each with an average 500 token prompt and 300 token response, using GPT-4o.",
+    "scenario": "A startup is planning to use Microsoft Foundry to build a product recommendation agent. The CTO asks you to estimate the monthly Azure OpenAI cost. The system will handle 10,000 queries/day, each with an average 500 token prompt and 300 token response, using GPT-4o.",
     "question": "What additional information is most important to refine this cost estimate?",
     "options": [
       "The latency requirements — lower latency models cost more",
@@ -221,7 +235,8 @@
       "The Azure region — token pricing varies by region"
     ],
     "correct": 1,
-    "explanation": "RAG context injection is the most significant variable in token cost estimation — each retrieved chunk (typically 200-500 tokens) can double or triple the prompt token count. A 500-token estimate assumes no RAG context; with 3 retrieved chunks at 400 tokens each, the prompt becomes 1,700 tokens — a 3.4× cost increase. Latency requirements (A) don't affect token pricing (PTU vs PAYG affects latency but the token rate is the same). Azure Functions cost (C) is typically negligible compared to LLM inference. Azure OpenAI token pricing (D) is consistent across regions within the same deployment type.",
+    "explanation": "B is correct: RAG context injection is the biggest variable in the token estimate, because each retrieved chunk (often a few hundred tokens) can double or triple the prompt; with three 400-token chunks, a 500-token prompt becomes 1,700 tokens, a 3.4x increase in input tokens. A is wrong because latency targets are met through deployment choices such as provisioned throughput, and they don't change how many tokens each query consumes, which is what drives this estimate. C is wrong because Azure Functions invocation cost is typically negligible compared with LLM inference. D is wrong because price differences are driven mainly by deployment type (Global, Data Zone or Regional), and the region matters far less to this estimate than whether every prompt carries retrieved context.",
+    "difficulty": "medium",
     "tags": ["cost-estimation", "RAG", "token-usage", "capacity-planning"]
   },
   {
@@ -230,13 +245,14 @@
     "scenario": "A large enterprise is beginning its journey to adopt AI agents across 12 business units. The CIO wants a structured framework to govern the adoption journey — from initial strategy through to scaling — rather than having each unit experiment independently.",
     "question": "Which Microsoft framework provides the structured AI adoption guidance for enterprise-scale implementation?",
     "options": [
+      "The Cloud Adoption Framework (CAF) for Azure — specifically its AI adoption guidance, which covers AI strategy, plan, ready, and govern, secure and manage",
       "The Microsoft AI Business School curriculum for executive alignment",
-      "The Cloud Adoption Framework (CAF) for Azure — specifically the AI adoption scenario which covers strategy, planning, ready, adopt, govern, and manage phases",
       "The Microsoft Well-Architected Framework AI Workloads pillar",
       "The Azure Architecture Center AI reference architectures"
     ],
-    "correct": 1,
-    "explanation": "The Cloud Adoption Framework (CAF) for Azure — AI adoption scenario (B) is the structured enterprise framework. It covers all lifecycle phases: strategy (define the business case), plan (identify skills, timelines), ready (platform setup), adopt (implementation waves), govern (policies, controls), and manage (ongoing operations). The Microsoft AI Business School (A) is a learning program for executives, not an adoption framework. The Well-Architected Framework (C) governs workload quality attributes (reliability, security, etc.) — it's applied after decisions are made, not to plan the adoption journey. Azure Architecture Center (D) provides reference architectures for specific scenarios, not enterprise adoption governance.",
+    "correct": 0,
+    "explanation": "A is correct: the Cloud Adoption Framework (CAF) for Azure AI adoption guidance is the structured enterprise framework. It starts with an AI strategy (business outcomes, decision rights and a central function such as an AI Center of Excellence), then plan (turning use cases into a production plan), ready (fitting AI workloads into an Azure landing zone), and govern, secure and manage (standards for running AI workloads). B is wrong because the Microsoft AI Business School is a learning program for executives, not an adoption framework. C is wrong because the Well-Architected Framework guides workload quality (reliability, security and so on) once decisions are made; it doesn't plan the adoption journey. D is wrong because the Azure Architecture Center offers reference architectures for specific scenarios, not enterprise adoption governance.",
+    "difficulty": "easy",
     "tags": ["cloud-adoption-framework", "AI-adoption", "governance", "enterprise"]
   },
   {
@@ -251,7 +267,8 @@
       "Relevance — filter out products not relevant to the user's query before indexing"
     ],
     "correct": 1,
-    "explanation": "Timeliness (B) is the critical first dimension when data changes frequently and stale data causes business harm. A price from the weekly ERP update is up to 7 days old; recommending a price that changed yesterday creates customer trust issues. The team must establish staleness thresholds per source and implement refresh schedules accordingly. Accuracy (A) is important but static product attributes change infrequently. Cleanliness (C) is preprocessing work that should happen after freshness is understood. Relevance (D) is a retrieval concern at query time, not a data quality dimension to address during ingestion planning.",
+    "explanation": "B is correct: timeliness is the first dimension to evaluate when data changes constantly and stale data causes harm; a price from the weekly ERP update can be up to 7 days old, so the team must set staleness thresholds per source and refresh schedules to match. A is wrong because accuracy matters, but static product attributes change rarely and aren't the main risk here. C is wrong because cleanliness is preprocessing work that follows once freshness requirements are understood. D is wrong because relevance is a query-time retrieval concern, not the ingestion-time quality dimension to address first.",
+    "difficulty": "medium",
     "tags": ["grounding-data", "timeliness", "data-quality", "knowledge-base"]
   },
   {
@@ -261,28 +278,30 @@
     "question": "Which responsibility is core to the AI Center of Excellence rather than individual business units?",
     "options": [
       "Writing the business requirements for each AI agent use case",
-      "Defining enterprise AI standards, model governance policies, shared platform infrastructure, and enabling repeatable patterns that business units consume",
       "Deploying production agents and managing day-to-day operations for each business unit",
-      "Procuring compute resources on a per-project basis for individual teams"
+      "Procuring compute resources on a per-project basis for individual teams",
+      "Defining enterprise AI standards, model governance policies, shared platform infrastructure, and enabling repeatable patterns that business units consume"
     ],
-    "correct": 1,
-    "explanation": "The AI CoE owns enterprise standards and shared enablement (B): model governance policies (which models are approved for which data classifications), shared infrastructure (AI Foundry hubs, shared observability), and repeatable patterns (reference architectures, prompt library templates, evaluation frameworks). Business units apply these standards to their specific use cases. Business requirements (A) belong to the business unit — they understand their processes. Day-to-day operations (C) are executed by product teams, not the CoE. Per-project procurement (D) should flow through the CoE's shared capacity model, not be managed individually.",
+    "correct": 3,
+    "explanation": "D is correct: the AI CoE owns enterprise standards and shared enablement: model governance policies (which models are approved for which data classifications), shared infrastructure such as Foundry resources and observability, and repeatable patterns like reference architectures, prompt templates and evaluation frameworks that business units consume. A is wrong because business requirements belong to the business unit, which understands its own processes. B is wrong because day-to-day operation of production agents sits with the product teams, not the CoE. C is wrong because per-project procurement is what the CoE's shared capacity model replaces; it shouldn't be managed team by team.",
+    "difficulty": "easy",
     "tags": ["AI-CoE", "governance", "enterprise-AI", "platform-strategy"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-019",
-    "scenario": "A company has deployed 8 different AI models across their platform: GPT-4o for complex reasoning, GPT-4o-mini for summarization, Phi-3-medium for code generation, and Claude 3 Haiku for quick classifications. Their application receives mixed query types and they want to optimize both cost and quality automatically.",
-    "question": "What pattern should they implement to route queries to the most appropriate model?",
+    "scenario": "A company runs a mixed workload on Microsoft Foundry: complex multi-step reasoning requests, routine summarization, and quick classifications. Every request currently goes to one large model. They want cost to drop without losing quality, without writing and maintaining their own routing classifier, and only approved models may be used.",
+    "question": "What should they implement?",
     "options": [
-      "Deploy all models behind Azure API Management and use round-robin load balancing",
-      "Implement a model router — a lightweight classifier that inspects each incoming query and routes it to the most cost-effective model capable of handling that query type",
-      "Use GPT-4o exclusively with a compressed system prompt to reduce cost",
-      "Implement user-facing model selection dropdowns so users choose their preferred model"
+      "Put several model deployments behind Azure API Management and round-robin requests across them",
+      "Keep the single large model and shorten the system prompt to cut input tokens",
+      "Add a dropdown so each user picks the model they think suits their request",
+      "Deploy Foundry model router in Balanced mode, with a model subset limited to the approved models"
     ],
-    "correct": 1,
-    "explanation": "A model router (B) is the correct pattern for multi-model optimization. The router uses a lightweight classifier (often a small, fast model or rule-based logic) to categorize the incoming query by complexity, domain, and required capability, then routes to the cheapest model that meets the quality bar. Simple classifications go to Haiku ($0.25/Mtok), complex reasoning goes to GPT-4o ($5/Mtok), code generation goes to Phi-3. Round-robin (A) ignores query characteristics and sends expensive queries to cheap models (quality failure) and simple queries to expensive models (waste). GPT-4o exclusively (C) resolves quality but wastes cost on simple tasks. User selection (D) is poor UX and places cognitive load on users who don't understand model capabilities.",
-    "tags": ["model-router", "cost-optimization", "multi-model", "intelligent-routing"]
+    "correct": 3,
+    "explanation": "D is correct: Foundry model router is a trained language model that you deploy like any other model; it analyses each prompt in real time and routes it to a suitable underlying model. Balanced mode, the default, picks the most cost-effective model within a small quality band of the best model for that prompt, and a model subset restricts routing, including automatic failover, to the models you approve. A is wrong because round-robin ignores what each request needs, so complex prompts land on weak models and simple ones on expensive models. B is wrong because a shorter prompt saves some tokens but still sends simple requests to the most expensive model. C is wrong because users can't judge model fit consistently, and it pushes an architecture decision onto them.",
+    "difficulty": "medium",
+    "tags": ["model-router", "cost-optimization", "architecture", "application"]
   },
   {
     "domain": 1,
@@ -290,28 +309,30 @@
     "scenario": "A healthcare organization is proposing an AI agent to automate prior authorization reviews. Currently, 12 full-time staff spend 85% of their time on this process. The agent will handle 70% of cases automatically. The AI platform costs $200K/year. Staff cost is $75K/person/year.",
     "question": "What is the correct approach to calculate the ROI for this AI solution?",
     "options": [
-      "ROI = (Number of automated cases / Total cases) × 100%",
       "ROI = ((Cost savings from staff reduction - AI platform cost) / AI platform cost) × 100%, using 3-year TCO including implementation, training, and maintenance costs",
+      "ROI = (Number of automated cases / Total cases) × 100%",
       "ROI = AI platform cost / Number of cases processed per year",
       "ROI = Staff hours saved / AI platform cost"
     ],
-    "correct": 1,
-    "explanation": "Full 3-year TCO ROI calculation (B) is the correct approach. Cost savings: 12 staff × 85% time on task × 70% automation = 7.14 FTEs saved × $75K = $535K/year gross savings. AI platform cost: $200K/year + implementation (one-time) + training + maintenance = full TCO. ROI = ((535K - 200K - amortized setup) / full 3-year investment) × 100%. This gives the business case a defensible financial justification. Automation percentage alone (A) measures adoption, not financial return. Cost-per-case (C) is a unit economics metric, not ROI. Hours saved/cost ratio (D) is a productivity metric without revenue/savings context.",
+    "correct": 0,
+    "explanation": "A is correct: ROI should be calculated on a 3-year TCO. Savings are 12 staff x 85% time on the task x 70% automation = 7.14 FTEs x $75K, about $535K a year gross; costs are the $200K platform plus implementation, training and maintenance; ROI = (savings - total cost) / total cost x 100%, which gives a defensible business case. B is wrong because the automation percentage measures adoption, not financial return. C is wrong because cost per case is a unit-economics metric, not ROI. D is wrong because hours saved per dollar is a productivity ratio that never converts the savings into a financial return against the full investment.",
+    "difficulty": "medium",
     "tags": ["ROI", "TCO", "cost-benefit", "business-case"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-021",
-    "scenario": "A supply chain company needs an AI agent to handle vendor invoice processing. Their shortlist includes: building a custom agent from scratch on Azure AI Foundry, buying a pre-built invoice processing SaaS solution, or extending Microsoft 365 Copilot with a custom connector to their ERP. The team has 3 Azure developers but limited AI expertise.",
+    "scenario": "A supply chain company needs an AI agent to handle vendor invoice processing. Their shortlist includes: building a custom agent from scratch on Microsoft Foundry, buying a pre-built invoice processing SaaS solution, or extending Microsoft 365 Copilot with a custom connector to their ERP. The team has 3 Azure developers but limited AI expertise.",
     "question": "Which framework correctly guides the build-buy-extend decision?",
     "options": [
       "Always build custom — proprietary solutions provide competitive advantage",
-      "Evaluate: differentiation (does this capability differentiate the business?), time-to-value, TCO, and integration complexity. Buy or extend if the process is standard; build only when differentiation justifies the investment",
       "Always buy SaaS — it's faster and cheaper than building",
-      "Extend M365 Copilot for all use cases — it provides the fastest time-to-value"
+      "Extend M365 Copilot for all use cases — it provides the fastest time-to-value",
+      "Evaluate: differentiation (does this capability differentiate the business?), time-to-value, TCO, and integration complexity. Buy or extend if the process is standard; build only when differentiation justifies the investment"
     ],
-    "correct": 1,
-    "explanation": "The build-buy-extend framework (B) evaluates four dimensions: business differentiation (generic invoice processing does NOT differentiate — buy or extend), time-to-value (SaaS or extend is faster), TCO over 3 years (custom build has higher ongoing maintenance), and integration complexity (ERP connector for M365 Copilot might be simpler than a full custom build). For commodity processes like invoice processing, buy or extend almost always wins. Build custom only when the process is a true differentiator or existing solutions can't meet requirements. Blanket build (A) is wasteful for commodity processes. Blanket buy (C) ignores integration complexity and data sovereignty. Blanket extend M365 (D) ignores cases where the process has no M365 touchpoint.",
+    "correct": 3,
+    "explanation": "D is correct: the build-buy-extend decision weighs differentiation, time-to-value, TCO and integration complexity; generic invoice processing doesn't differentiate the business, so buying or extending usually wins, and building is justified only for a true differentiator or when existing solutions can't meet the requirements. A is wrong because always building wastes investment on commodity processes and carries higher ongoing maintenance. B is wrong because always buying ignores integration complexity and data-sovereignty constraints. C is wrong because always extending Microsoft 365 Copilot ignores processes that have no Microsoft 365 touchpoint.",
+    "difficulty": "medium",
     "tags": ["build-buy-extend", "make-vs-buy", "decision-framework", "TCO"]
   },
   {
@@ -326,7 +347,8 @@
       "SLMs are only appropriate for classification tasks, not generative extraction"
     ],
     "correct": 1,
-    "explanation": "SLMs are preferable (B) when: the task domain is narrow (contract clause extraction — specific and well-defined), labeled training data exists (50K clauses), latency is critical (SLMs inference faster), data privacy is a concern (on-premises SLM deployment avoids sending confidential contracts to cloud APIs), or edge deployment is required. A fine-tuned Phi-3-medium on 50K contract clauses may outperform GPT-4o on this specific task at 10% of the cost. SLMs are NOT universally superior (A) — they fail on tasks requiring broad world knowledge. SLMs don't always outperform large models (C) — only on tasks they've been specifically trained for. SLMs can absolutely generate text, not just classify (D).",
+    "explanation": "B is correct: an SLM is preferable when the task is narrow and well defined (contract clause extraction), labeled data exists (50,000 clauses), latency is strict, privacy rules out cloud API calls, or the deployment must run at the edge or on premises; a fine-tuned Phi-3-medium can match or beat a large general model on such a task at a fraction of the cost. A is wrong because SLMs are not universally better; they struggle with tasks that need broad world knowledge. C is wrong because SLMs don't always outperform large models; they tend to win only on tasks they were specifically trained for. D is wrong because SLMs generate text and can perform generative extraction, not just classification.",
+    "difficulty": "medium",
     "tags": ["SLM", "fine-tuning", "Phi-3", "model-selection"]
   },
   {
@@ -341,38 +363,41 @@
       "Configure the agent's LLM temperature to 0 to ensure deterministic, consistent responses"
     ],
     "correct": 1,
-    "explanation": "A centralized prompt library (B) systematically addresses inconsistency by capturing what works. The library contains: proven templates for common tasks (meeting summary, email draft, data analysis), annotated examples showing effective vs ineffective prompts, guidelines for task-specific adaptation, and version control to track improvements. It democratizes best practices without requiring every user to become a prompt engineer. Training courses (A) improve individual skill but don't scale — knowledge decays and new hires need onboarding repeatedly. Restricting access (C) reduces business value. Temperature 0 (D) affects output randomness, not the quality of the task formulation in the prompt.",
+    "explanation": "B is correct: a centralized, versioned prompt library captures what works (proven templates for common tasks, annotated good and bad examples, adaptation guidelines) and spreads best practice without requiring every user to become a prompt engineer. A is wrong because training improves individual skill but doesn't scale; knowledge decays and every new hire needs it again. C is wrong because restricting access to power users cuts business value instead of fixing prompt quality. D is wrong because temperature 0 only reduces output randomness; it does nothing for a poorly formulated prompt.",
+    "difficulty": "easy",
     "tags": ["prompt-library", "prompt-engineering", "AI-CoE", "standardization"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-024",
-    "scenario": "A company already has Microsoft 365 E3 licenses for all employees and wants to deploy AI agents for sales workflow automation. The CTO is debating between extending Microsoft 365 Copilot with custom connectors vs building a new custom agent in Azure AI Foundry Agent Service.",
-    "question": "When should you extend Microsoft 365 Copilot rather than build a custom agent in Azure AI Foundry?",
+    "scenario": "A company already has Microsoft 365 E3 licenses for all employees and wants to deploy AI agents for sales workflow automation. The CTO is debating between extending Microsoft 365 Copilot with custom connectors vs building a new custom agent in Foundry Agent Service.",
+    "question": "When should you extend Microsoft 365 Copilot rather than build a custom agent in Microsoft Foundry?",
     "options": [
-      "Always choose M365 Copilot extension — it's included in the E3 license",
       "Extend M365 Copilot when the workflow lives in M365 surfaces (Teams, Outlook, SharePoint), the data is in Microsoft Graph, and the required capabilities are available via connectors and topics — without needing custom code orchestration",
-      "Build in Azure AI Foundry when the company has any Azure developers",
+      "Always choose M365 Copilot extension — it's included in the E3 license",
+      "Build in Microsoft Foundry when the company has any Azure developers",
       "Extend M365 Copilot only for external customer-facing scenarios"
     ],
-    "correct": 1,
-    "explanation": "Extend M365 Copilot (B) when: the work happens in M365 surfaces (sales team uses Teams and Outlook daily), the data is in Microsoft Graph or Dataverse (CRM data, email, calendar), connectors can expose the needed actions (CRM lookup, create opportunity), and topics in Copilot Studio can handle the conversation flow. This provides fastest time-to-value with familiar user surfaces. M365 Copilot E3 does NOT include Copilot extensibility at no charge (A) — Copilot for M365 licensing applies. Azure AI Foundry is appropriate when the workflow spans non-Microsoft systems, requires complex custom orchestration, or needs capabilities beyond what Copilot Studio supports — not simply because Azure developers exist (C). M365 Copilot serves internal users; external customer-facing scenarios typically use standalone Copilot Studio agents (D).",
+    "correct": 0,
+    "explanation": "A is correct: extend Microsoft 365 Copilot when the work happens in Microsoft 365 surfaces (Teams, Outlook, SharePoint), the data is in Microsoft Graph or Dataverse, and connectors and Copilot Studio topics can supply the needed actions and conversation flow without custom orchestration code, giving the fastest time-to-value in familiar tools. B is wrong because Microsoft 365 E3 does not include Microsoft 365 Copilot; Copilot is a separately licensed add-on, so the extension is not free with E3 and still has to fit the use case. C is wrong because Microsoft Foundry is chosen when the workflow spans non-Microsoft systems or needs complex custom orchestration, not simply because Azure developers exist. D is wrong because Microsoft 365 Copilot serves internal users; external customer-facing scenarios typically use standalone Copilot Studio agents.",
+    "difficulty": "medium",
     "tags": ["M365-Copilot", "extend-vs-build", "Copilot-Studio", "architecture-decision"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-025",
-    "scenario": "A company is designing a multi-agent solution for their customer service operations. Three agents are needed: a Triage Agent (classifies incoming queries), a Knowledge Agent (searches product documentation), and an Escalation Agent (routes to human agents). The architect must decide on the technology for each.",
-    "question": "How should Microsoft's multi-agent platform portfolio be applied to this scenario?",
+    "scenario": "A company is designing a multi-agent solution for customer service. A Triage Agent classifies incoming queries, a Knowledge Agent searches product documentation, and an Escalation Agent applies complex, code-heavy routing rules before handing customers to people. The business team works in Copilot Studio; a small pro-code team works in Microsoft Foundry.",
+    "question": "How should the Microsoft agent platforms be combined?",
     "options": [
-      "Use Azure AI Foundry Agent Service for all three agents to ensure consistent orchestration",
-      "Use Copilot Studio for all three agents to minimize licensing complexity",
-      "Design the Triage and Knowledge Agents in Copilot Studio (low-code, conversational), orchestrate with an Azure AI Foundry coordinator agent that invokes Copilot Studio agents via A2A protocol when complex retrieval or escalation logic requires pro-code customization",
-      "Use Microsoft 365 Copilot for the Triage Agent, Copilot Studio for Knowledge, and Azure AI Foundry for Escalation"
+      "Build the Triage and Knowledge agents in Copilot Studio, build the Escalation Agent in Foundry, and connect it to the Copilot Studio triage agent as a connected agent",
+      "Build all three agents in Foundry Agent Service so that orchestration is consistent",
+      "Build all three agents in Copilot Studio to keep everything in one licensing model",
+      "Use Microsoft 365 Copilot for triage, Copilot Studio for knowledge, and Foundry for escalation, with no connection between them"
     ],
-    "correct": 2,
-    "explanation": "Mixing platforms based on capability fit (C) is the expert approach. Copilot Studio handles conversational triage and knowledge retrieval with low-code configuration, knowledge sources, and built-in connector actions. Azure AI Foundry provides the coordinator layer with pro-code orchestration, complex routing logic, and Agent-to-Agent (A2A) protocol calls to Copilot Studio agents when needed. This uses each platform where it excels. Foundry-only (A) over-engineers the conversational components. Copilot Studio-only (B) limits orchestration complexity and pro-code integration. Option D mixes three platforms unnecessarily without clear rationale for the split.",
-    "tags": ["multi-agent", "A2A-protocol", "Copilot-Studio", "Foundry", "orchestration"]
+    "correct": 0,
+    "explanation": "A is correct: each platform does the part it's best at. Copilot Studio gives the business team low-code conversation design and knowledge sources for triage and documentation search, and a Copilot Studio agent can call other agents, including a Foundry agent or any agent that speaks the Agent2Agent (A2A) protocol, so the code-heavy escalation logic lives in Foundry while triage stays in charge of the conversation. B is wrong because it pushes simple conversational work onto the scarce pro-code team. C is wrong because complex, code-heavy routing is exactly what Foundry handles better. D is wrong because three unconnected agents on three platforms give customers no coordinated journey.",
+    "difficulty": "hard",
+    "tags": ["multi-agent", "copilot-studio", "foundry-agent-service", "architecture"]
   },
   {
     "domain": 1,
@@ -381,12 +406,13 @@
     "question": "How should knowledge sources be configured to support all three data types?",
     "options": [
       "Upload all documents to Azure Blob Storage and connect one custom connector to retrieve everything",
-      "Configure SharePoint as a generative knowledge source, add the policy portal URL as a website knowledge source, and create a Power Automate action (or HTTP connector action) to query the SAP SuccessFactors API for vacation balances at runtime",
       "Fine-tune the agent's LLM on all three data sources to bake the knowledge in",
-      "Use only SharePoint — SAP and web data must be manually synchronized into SharePoint first"
+      "Use only SharePoint — SAP and web data must be manually synchronized into SharePoint first",
+      "Configure SharePoint as a generative knowledge source, add the policy portal URL as a website knowledge source, and create a Power Automate action (or HTTP connector action) to query the SAP SuccessFactors API for vacation balances at runtime"
     ],
-    "correct": 1,
-    "explanation": "Using purpose-built integrations for each source (B) is the correct approach. Copilot Studio natively supports: SharePoint as a generative knowledge source (RAG over documents), website URLs as knowledge sources (crawled and indexed), and connector actions or HTTP connectors for real-time API calls to SAP. This gives the agent grounded, current data from each system without data duplication. Azure Blob Storage (A) loses the native SharePoint integration and requires custom retrieval logic. Fine-tuning (C) is inappropriate — it bakes in static knowledge with no real-time SAP data and requires retraining when policies change. Synchronizing to SharePoint (D) introduces data lag, duplication, and governance complexity.",
+    "correct": 3,
+    "explanation": "D is correct: each source gets a purpose-built integration: SharePoint as a knowledge source for the documents, the policy portal URL as a public website knowledge source, and a Power Automate or HTTP connector action that queries the SAP SuccessFactors API for vacation balances at runtime, so the agent stays grounded in current data without duplication. A is wrong because moving everything to Blob Storage loses the native SharePoint integration and needs custom retrieval logic. B is wrong because fine-tuning bakes in static knowledge, can't provide real-time vacation balances, and must be repeated whenever policies change. C is wrong because syncing SAP and web data into SharePoint introduces lag, duplication and governance complexity.",
+    "difficulty": "medium",
     "tags": ["knowledge-sources", "Copilot-Studio", "SharePoint", "API-connectors"]
   },
   {
@@ -395,13 +421,14 @@
     "scenario": "A company has critical business data spread across: Dataverse (CRM records), Azure SQL Database (operational data), SharePoint (documents), and Azure Data Lake (analytics data). They are planning an AI agent that needs to access all four sources. The data architect asks how to organize this data to make it available to other AI systems.",
     "question": "What is the recommended data organization strategy for AI grounding across these sources?",
     "options": [
-      "Migrate all data into a single Azure SQL Database to simplify the retrieval layer",
       "Keep data in its authoritative source; use Azure AI Search as a unified retrieval layer with connectors to each source — index structured data, unstructured documents, and build a knowledge graph for cross-source relationships",
+      "Migrate all data into a single Azure SQL Database to simplify the retrieval layer",
       "Copy all data into a SharePoint document library for easy Copilot Studio integration",
       "Build separate vector indexes for each data source and let the agent query all four independently"
     ],
-    "correct": 1,
-    "explanation": "Azure AI Search as a unified retrieval layer (B) is the enterprise pattern. It avoids data duplication by connecting to authoritative sources: SQL connector for Dataverse and Azure SQL, blob indexer for SharePoint documents, ADLS connector for analytics data. The unified search index allows the agent to query across all sources in one retrieval call. Cross-source relationships can be modeled through knowledge graph features. Single SQL migration (A) creates a non-authoritative copy with sync complexity. SharePoint copy (C) is impractical for SQL/ADLS data. Four separate indexes (D) requires the agent to orchestrate four retrieval calls and merge results — complex and slow.",
+    "correct": 0,
+    "explanation": "A is correct: keep data in its authoritative sources and use Azure AI Search as a unified retrieval layer, so the agent queries one index instead of four systems. Built-in indexers cover Azure SQL Database, Azure Data Lake Storage Gen2 and SharePoint document libraries (preview); Dataverse data can be landed in OneLake through Fabric link and indexed from there, or pushed through the push API; and cross-source relationships are modeled with shared entity keys or a knowledge graph built alongside the index. B is wrong because migrating everything into one Azure SQL database creates a non-authoritative copy with ongoing sync complexity. C is wrong because copying SQL and data-lake data into a SharePoint library is impractical and loses structure. D is wrong because four separate indexes force the agent to orchestrate four retrieval calls and merge the results, which is complex and slow.",
+    "difficulty": "hard",
     "tags": ["data-organization", "Azure-AI-Search", "grounding", "unified-retrieval"]
   },
   {
@@ -411,27 +438,29 @@
     "question": "When should generative AI orchestration be used in Copilot Studio rather than classic topic matching?",
     "options": [
       "Always use generative orchestration — it replaces the need for classic topics entirely",
-      "Use generative orchestration when: user input is unpredictable and can't be enumerated with trigger phrases, multiple knowledge sources must be searched simultaneously, or the response requires synthesizing information across documents rather than a deterministic API lookup",
       "Use classic topics always — generative responses are unpredictable and unreliable for business processes",
-      "Use generative orchestration only when the company has Azure OpenAI Service deployed separately"
+      "Use generative orchestration only when the company has Azure OpenAI Service deployed separately",
+      "Use generative orchestration when: user input is unpredictable and can't be enumerated with trigger phrases, multiple knowledge sources must be searched simultaneously, or the response requires synthesizing information across documents rather than a deterministic API lookup"
     ],
-    "correct": 1,
-    "explanation": "Generative orchestration (B) excels when: natural language queries are too varied to enumerate (damage assessment descriptions vary infinitely), multi-source search is needed (warranty policy docs + product spec sheets + claim history), or synthesis across documents is required. Classic topics with trigger phrases work perfectly for predictable, structured interactions (warranty lookup — user provides claim number, system returns status). Using generative for everything (A) wastes LLM tokens on interactions that deterministic logic handles better. Classic-only (C) cannot handle unstructured, open-ended queries effectively. Generative orchestration in Copilot Studio uses the configured Azure OpenAI connection — no separate deployment required (D).",
+    "correct": 3,
+    "explanation": "D is correct: generative orchestration fits when user input is too varied to enumerate with trigger phrases (damage descriptions vary endlessly), several knowledge sources must be searched together, or the answer requires synthesis across documents; predictable, structured interactions such as a warranty lookup stay in classic topics. A is wrong because using generative orchestration for everything spends model calls on interactions deterministic logic handles better and more predictably. B is wrong because classic-only design can't handle open-ended, unstructured claims. C is wrong because generative orchestration runs on Copilot Studio's built-in, Microsoft-managed models; no separate Azure OpenAI deployment is required.",
+    "difficulty": "medium",
     "tags": ["Copilot-Studio", "generative-orchestration", "classic-topics", "design-decision"]
   },
   {
     "domain": 1,
     "id": "ab100-d1-029",
-    "scenario": "A company's CFO asks for a Total Cost of Ownership (TCO) analysis for their planned AI agent platform over 3 years. The platform will use Azure AI Foundry with PTU deployments, Copilot Studio, and Azure AI Search.",
+    "scenario": "A company's CFO asks for a Total Cost of Ownership (TCO) analysis for their planned AI agent platform over 3 years. The platform will use Microsoft Foundry with PTU deployments, Copilot Studio, and Azure AI Search.",
     "question": "Which cost categories must be included in a complete TCO for an AI-powered business solution?",
     "options": [
-      "Only Azure service costs — Azure OpenAI, AI Search, and Storage",
       "Azure infrastructure (compute, storage, networking), AI service costs (OpenAI tokens/PTU, AI Search, Content Safety), licensing (Copilot Studio, M365 Copilot), implementation (development, integration), training and change management, ongoing operations (monitoring, maintenance, model updates), and opportunity cost of human tasks replaced",
+      "Only Azure service costs — Azure OpenAI, AI Search, and Storage",
       "Azure service costs plus development time only",
       "Azure service costs and licensing only — implementation is a sunk cost not included in TCO"
     ],
-    "correct": 1,
-    "explanation": "Complete TCO (B) captures all cost dimensions: infrastructure (compute, storage, networking), AI services (OpenAI token/PTU costs, AI Search indexing and query units, Content Safety analysis units), licensing (Copilot Studio per-session costs, M365 Copilot per-user licensing), implementation (development sprints, integration engineering, testing), change management (training, documentation, user adoption programs), ongoing operations (monitoring dashboards, model evaluation, prompt tuning, knowledge base refreshes), and optionally the opportunity cost of redeployed staff. Azure-only (A) dramatically understates real cost. Omitting licensing, training, and operations is a common mistake that leads to budget overruns. Implementation is part of TCO (D) — it's a real cost regardless of how it's accounted for.",
+    "correct": 0,
+    "explanation": "A is correct: a complete TCO covers infrastructure (compute, storage, networking), AI services (tokens or PTU, AI Search, Content Safety), licensing (Copilot Studio, Microsoft 365 Copilot), implementation (development, integration, testing), training and change management, ongoing operations (monitoring, evaluation, prompt tuning, knowledge refreshes) and optionally the opportunity cost of the work replaced. B is wrong because counting only Azure service costs dramatically understates the real cost. C is wrong because adding development time still omits licensing, training and operations, a common cause of budget overruns. D is wrong because implementation is a real cost that belongs in TCO regardless of how it is accounted for.",
+    "difficulty": "easy",
     "tags": ["TCO", "cost-planning", "AI-investment", "business-case"]
   },
   {
@@ -441,12 +470,173 @@
     "question": "Which scenario is BEST served by a prebuilt Microsoft agent rather than a custom-built solution?",
     "options": [
       "Processing insurance claims using proprietary adjudication rules specific to the company",
-      "Summarizing emails, drafting meeting follow-ups, and retrieving CRM data within Outlook — served by Microsoft 365 Copilot for Sales",
       "Building a multi-language customer service agent that integrates with a proprietary ticketing system",
-      "Analyzing satellite imagery for agricultural yield prediction"
+      "Analyzing satellite imagery for agricultural yield prediction",
+      "Summarizing emails, drafting meeting follow-ups, and retrieving CRM data within Outlook — served by Microsoft 365 Copilot for Sales"
     ],
-    "correct": 1,
-    "explanation": "Microsoft 365 Copilot for Sales (B) is a prebuilt agent that works within Outlook and Teams to summarize emails, draft follow-up emails grounded in CRM data, surface account insights, and prepare for meetings — exactly matching this scenario. It requires configuration (connecting to Dynamics 365 Sales or Salesforce), not custom development. Proprietary insurance adjudication rules (A) require custom logic that no prebuilt agent can provide. Multi-language support for proprietary ticketing (C) requires custom connectors and conversation design. Satellite imagery analysis (D) requires custom computer vision models — no prebuilt Microsoft agent covers this.",
+    "correct": 3,
+    "explanation": "D is correct: Microsoft 365 Copilot for Sales is a prebuilt agent that works in Outlook and Teams to summarize emails, draft follow-ups grounded in CRM data and prepare for meetings, and it needs configuration (connecting Dynamics 365 Sales or Salesforce), not custom development. A is wrong because proprietary adjudication rules require custom logic that no prebuilt agent provides. B is wrong because integrating with a proprietary ticketing system requires custom connectors and conversation design. C is wrong because satellite imagery yield prediction needs custom computer vision models that no prebuilt Microsoft agent covers.",
+    "difficulty": "easy",
     "tags": ["prebuilt-agents", "M365-Copilot-for-Sales", "time-to-value", "build-vs-buy"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-031",
+    "scenario": "A COO wants AI to automate an order-exception process. The business team isn't technical, wants a managed platform with low-code or natural-language authoring, and wants to carry as little operational responsibility as possible.",
+    "question": "Which Microsoft option does the Cloud Adoption Framework's AI guidance point to?",
+    "options": [
+      "Azure Virtual Machines running an open-source model",
+      "Azure Machine Learning with a custom-trained model",
+      "Microsoft Copilot Studio",
+      "Azure Kubernetes Service hosting a custom agent runtime"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: CAF's AI guidance says to approve the solution that meets the requirements with the least operational responsibility, and for automating business functionality on a SaaS platform it points to Copilot Studio, a managed platform for creating and deploying agents with low-code or natural-language development. A is wrong because CAF says Azure infrastructure shouldn't be the default and fits only when you need control over models or runtimes that managed platforms can't give. B is wrong because Azure Machine Learning is for training and deploying your own models, which this process doesn't need. D is wrong because running your own runtime on AKS carries the most operational ownership.",
+    "difficulty": "easy",
+    "tags": ["cloud-adoption-framework", "copilot-studio", "strategy", "recall"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-032",
+    "scenario": "A platform team gives each business unit its own project in a shared Microsoft Foundry resource and grants permissions only at project scope. One unit's agent also needs speech-to-text from Foundry Tools, and those calls fail with authorization errors.",
+    "question": "What is the most likely cause, and how should the solution rules account for it?",
+    "options": [
+      "Speech-to-text isn't part of Foundry and has to be bought as a separate product",
+      "Project-scoped roles expire after 24 hours and must be reassigned every day",
+      "The agent needs an API key written into its instructions to call speech services",
+      "Some Foundry Tools APIs, such as speech-to-text, still need access at the parent Foundry resource scope, so assign that role at resource scope or give the workload its own Foundry resource"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Microsoft's Foundry rollout guidance notes that most agent-centric APIs support project-scope permissions, but some traditional Foundry Tools APIs (formerly Azure AI Services), such as speech-to-text, still require parent resource-scope access. The design has to either grant that role at resource scope, accepting broader access, or isolate the workload in its own resource. A is wrong because Azure Speech is part of Foundry Tools. B is wrong because Azure role assignments don't expire on a schedule. C is wrong because keys in instructions can be extracted from the prompt; Microsoft recommends Microsoft Entra ID and RBAC.",
+    "difficulty": "hard",
+    "tags": ["foundry-tools", "rbac", "solution-constraints", "troubleshooting"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-033",
+    "scenario": "A team replaced its model deployment with Foundry model router on default settings. Most requests work, but requests containing very long contracts sometimes fail with context-length errors.",
+    "question": "What explains this, and what should they change?",
+    "options": [
+      "Model router's effective context window is limited by its smallest underlying model, so use a model subset of models that support the needed context, or shorten the prompt",
+      "Model router caps every request at 4,096 tokens whatever models sit behind it",
+      "Model router doesn't accept documents, so contracts must be sent as images",
+      "Switching the routing mode to Cost removes the context limit"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the documented context window for model router is that of the smallest underlying model, so a long prompt succeeds only if it happens to be routed to a model with a bigger window. A model subset limited to large-context models fixes this, as does summarizing, truncating or retrieving only the relevant sections. B is wrong because there's no fixed 4,096-token cap; the limit follows the smallest model in the pool. C is wrong because text prompts are routed normally, and routing decisions are based on text input. D is wrong because routing mode trades quality against cost; it doesn't change any model's context window.",
+    "difficulty": "hard",
+    "tags": ["model-router", "context-window", "troubleshooting", "exam-trap"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-034",
+    "scenario": "A retailer uses Foundry model router for millions of short product-description rewrites a day. The output only has to be good enough, and the budget is tight.",
+    "question": "Which routing mode fits best?",
+    "options": [
+      "Quality",
+      "Balanced, because it's the only mode that takes price into account",
+      "Cost",
+      "None, because routing modes apply only to reasoning models"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Cost mode considers a wider quality band (about 5–6% of the best model for the prompt) and picks the most cost-effective model in it, which suits high-volume, budget-sensitive work. A is wrong because Quality mode picks the highest-rated model and ignores cost. B is wrong because Balanced also weighs cost, but within a narrow band of about 1–2%, so it saves less; it's the general-purpose default. D is wrong because routing modes apply to the whole routing pool, not only to reasoning models.",
+    "difficulty": "medium",
+    "tags": ["model-router", "cost-optimization", "comparison", "application"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-035",
+    "scenario": "A bank wants to summarize 3 million archived call transcripts once. Results are needed within a day or two, and nobody is waiting on individual responses.",
+    "question": "Which Foundry deployment type is most cost-effective?",
+    "options": [
+      "Global Provisioned",
+      "Global Standard with many parallel requests",
+      "Developer",
+      "Global Batch"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Global Batch processes asynchronous groups of requests submitted in a file, with separate quota, a 24-hour target turnaround, and a 50% discount compared with Global Standard. A is wrong because provisioned capacity is reserved throughput for steady interactive load, and buying it for a one-off job wastes money. B is wrong because Global Standard costs more per token, and the job would compete with online traffic for quota. C is wrong because Developer deployments are for evaluating fine-tuned models, with a 24-hour lifetime and no SLA.",
+    "difficulty": "easy",
+    "tags": ["deployment-types", "batch", "cost-optimization", "recall"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-036",
+    "scenario": "A European insurer must keep prompt processing inside the EU, but wants higher quota and broader model availability than single-geography deployments offer. Its interactive traffic is bursty.",
+    "question": "Which deployment type should the architect specify?",
+    "options": [
+      "Data Zone Standard in an EU region",
+      "Global Standard in West Europe",
+      "Global Provisioned in Sweden Central",
+      "Developer in an EU region"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Data Zone deployments process prompts and responses only within the Microsoft-defined data zone, which for the EU follows the EU Data Boundary, and Data Zone Standard gives higher default quota than geography-based types, with pay-per-token billing that suits bursty traffic. B is wrong because Global types may process data in any Azure region, even when the resource is in West Europe. C is wrong because Global Provisioned also routes globally, and reserved capacity doesn't suit bursty traffic. D is wrong because Developer deployments are only for evaluating fine-tuned models and carry no data-residency guarantee.",
+    "difficulty": "medium",
+    "tags": ["deployment-types", "data-residency", "compliance", "application"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-037",
+    "scenario": "Two teams are planning agents in Microsoft Foundry. Team A needs an internal FAQ agent made of instructions, a model, and file search. Team B has an existing LangGraph multi-agent application with custom orchestration code, and wants Foundry to run it with managed scaling and identity.",
+    "question": "Which Foundry agent type should each team use?",
+    "options": [
+      "Team A: a hosted agent; Team B: a prompt agent",
+      "Both teams: prompt agents, because prompt agents can run any framework's code",
+      "Team A: a prompt agent; Team B: a hosted agent",
+      "Both teams: virtual machines, because Foundry can't host third-party frameworks"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: prompt agents are defined by configuration alone (instructions, model and tools), and Foundry runs them with no code or containers to manage, which fits an FAQ agent. Hosted agents let you bring your own code and framework, such as Agent Framework, LangGraph or the OpenAI Agents SDK, as a container or source .zip, and Foundry runs it with a managed endpoint, autoscaling and a dedicated Microsoft Entra identity. A is wrong because it reverses the fit. B is wrong because prompt agents don't run custom application code. D is wrong because hosted agents exist precisely to run third-party framework code on Foundry.",
+    "difficulty": "medium",
+    "tags": ["foundry-agent-service", "hosted-agents", "strategy", "comparison"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-038",
+    "scenario": "An AI Center of Excellence is building a prompt library for 30 Copilot Studio and Foundry agents. Prompts often break without anyone noticing when someone edits them or when the underlying model changes.",
+    "question": "Which guideline should the prompt library enforce?",
+    "options": [
+      "Let each maker keep personal copies of prompts so that changes don't affect anyone else",
+      "Keep only the latest version of each prompt to avoid confusion",
+      "Ban all prompt changes once an agent is live",
+      "Store each prompt as a versioned asset with an owner, the model it was tested on, and its evaluation results, and re-run the evaluation set before a changed prompt is published"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a prompt library works when prompts are managed like code: versioned, owned, tied to the model they were validated against, and gated by an evaluation run before publishing, so a change or model update that breaks behavior is caught and can be rolled back. A is wrong because personal copies fragment quality and defeat the purpose of a shared library. B is wrong because without history you can't compare versions or roll back. C is wrong because freezing prompts blocks needed fixes and model migrations; the goal is controlled change, not no change.",
+    "difficulty": "medium",
+    "tags": ["prompt-library", "ai-coe", "governance", "best-practice"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-039",
+    "scenario": "An architect is writing prompt engineering guidelines for agents that have long, stable instructions and short, changing user input.",
+    "question": "Which guideline improves both cost and consistency?",
+    "options": [
+      "Put stable instructions and examples at the start of the prompt and variable content at the end, keeping the stable prefix identical across requests",
+      "Put the user's question first so the model reads it before the instructions",
+      "Paraphrase the instructions slightly on each request so the model doesn't over-fit to them",
+      "Insert the current timestamp at the top of every prompt for traceability"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Azure OpenAI prompt caching needs a prompt of at least 1,024 tokens whose first 1,024 tokens are identical, and Microsoft's guidance is to place stable or repeated content at the beginning and dynamic content at the end. Identical instructions also make behavior more predictable. B is wrong because variable content first changes the prefix every time, so nothing is cached. C is wrong because paraphrasing breaks caching and makes behavior less predictable. D is wrong because a changing timestamp at the top guarantees a cache miss; put traceability data at the end or in metadata.",
+    "difficulty": "medium",
+    "tags": ["prompt-engineering", "prompt-caching", "best-practice", "application"]
+  },
+  {
+    "domain": 1,
+    "id": "ab100-d1-040",
+    "scenario": "A team is planning a Copilot Studio agent that uses computer use with a standard model to key supplier invoices into a legacy web portal. Each run averages 6 steps, and they expect 20,000 runs a month. The CFO wants the agent's consumption cost in the ROI model.",
+    "question": "How many Copilot Credits a month should the ROI model assume for computer use?",
+    "options": [
+      "120,000",
+      "100,000",
+      "600,000",
+      "1,800,000"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: computer use is billed per step, at 5 Copilot Credits per step with a standard model and 15 with a premium model, so 6 steps × 5 credits × 20,000 runs = 600,000 credits a month. A is wrong because it multiplies runs by steps but leaves out the per-step rate. B is wrong because it charges 5 credits per run instead of per step. D is wrong because it uses the premium rate of 15 credits per step, but the team uses a standard model.",
+    "difficulty": "hard",
+    "tags": ["roi", "copilot-credits", "computer-use", "analysis"]
   }
 ]

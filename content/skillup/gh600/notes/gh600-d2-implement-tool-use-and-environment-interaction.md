@@ -1,10 +1,10 @@
 # D2: Implement Tool Use and Environment Interaction
 
-> **Exam weight**: 23% · **Questions**: ~28 of 120
+> **Exam weight**: 23% · **Questions**: ~35 of 133
 
 ## Overview
 
-This is the largest domain on the exam, and for good reason: it's where an agent stops being a conversational model and starts being able to *do* things — read a repo, call an external API, run a command, open a pull request. Every capability you grant is also a risk surface, so the domain is really about one repeated discipline applied across four layers: deciding exactly which tools an agent needs, wiring those tools in safely (including MCP servers), running the agent inside a scoped development environment, and handling the moment something goes wrong without losing control or the audit trail.
+This is the largest domain on the exam, and for good reason: it's where an agent stops being a conversational model and starts being able to *do* things — read a repo, call an external API, run a command, open a pull request. Every capability you grant is also a risk surface, so the domain is really about one repeated discipline applied across four layers: deciding exactly which tools an agent needs, wiring those tools in safely (including MCP servers), running the agent inside a scoped development environment, and handling the moment something goes wrong without losing control or the audit trail. GitHub's hosted agent appears here under its current name, Copilot cloud agent; earlier docs and courseware call it Copilot coding agent.
 
 > 💡 **Human Angle**: Giving an agent tool access is like issuing a new hire a keycard — it should open exactly the doors their job requires on day one, not the whole building "just in case they need it later."
 
@@ -28,7 +28,9 @@ Tool selection starts from the task, not from the catalog. For a given agent rol
 
 **Reference the specific server-qualified tool name — MCP tools are namespaced to the server that exposes them, never a generic capability label.**
 
-Once required tools are identified, configuration happens through the agent's `tools` property (an explicit allowlist — start from nothing, add only what's needed) or `excludedTools` (a denylist that subtracts specific tools from an inherited default set). Built-in tools like read/edit/bash/grep/glob/view sit alongside MCP-provided tools, which are namespaced to the server that exposes them (e.g., a GitHub MCP server's `issues` tool is distinct from a Slack MCP server's `post_message` tool even if both are loosely "communication" actions) — so an allowlist entry has to reference the specific server-qualified tool name, not a generic capability label. **It's like calling two different plumbers "the plumber"** — the label doesn't tell you which one actually shows up.
+Once required tools are identified, configuration happens through the agent's `tools` property, an explicit allowlist: start from nothing and add only what's needed. In a custom agent profile (`.agent.md`), omitting `tools` or using `tools: ["*"]` enables every available tool, `tools: []` disables all of them, and the built-in aliases are `read`, `edit`, `search`, `execute` (also accepted as `shell` or `Bash`), `web`, `agent` and `todo`. The denylist alternative, `excludedTools`, is a Copilot SDK setting at the session or `defaultAgent` level rather than a profile property; it subtracts specific tools from an inherited set.
+
+MCP-provided tools sit alongside the built-ins and are namespaced to the server that exposes them. A profile references them as `server-name/tool-name`, or `server-name/*` for every tool on that server, so a GitHub MCP server's issue tools are distinct from a Slack MCP server's `post_message` tool even if both are loosely "communication" actions. An allowlist entry therefore has to reference the specific server-qualified tool name, not a generic capability label. **It's like calling two different plumbers "the plumber"** — the label doesn't tell you which one actually shows up.
 
 ### In Practice
 
@@ -64,7 +66,9 @@ The exam likes to offer "grant the tool, then instruct the agent not to use it d
 
 **A server offering thirty tools doesn't mean an agent should receive all thirty — least privilege applies at the MCP layer too.**
 
-The Model Context Protocol lets an agent call tools exposed by an external server — local (run as a subprocess, e.g., a Docker-packaged server started with a command and args) or remote (an HTTP endpoint the agent connects to directly). Configuration for GitHub Copilot's coding agent happens through an `mcpServers` block: each entry names the server, its `type` (`local` or `http`), how to reach it (`command`/`args` for local, `url` for remote), any required authentication, and — critically — which of the server's tools are actually exposed to the agent. **It's a rented office suite where you only get keys cut for the rooms your team actually uses, not the whole floor.**
+The Model Context Protocol lets an agent call tools exposed by an external server — local (run as a subprocess, e.g., a Docker-packaged server started with a command and args) or remote (an HTTP endpoint the agent connects to directly). For Copilot cloud agent, a repository administrator adds this as JSON under the repository's **Settings > Copilot > MCP servers** (a custom agent profile can also carry its own `mcp-servers`).
+
+The JSON must contain an `mcpServers` object. Each entry names the server, its `type` (`local`, `stdio`, `http` or `sse`), how to reach it (`command`/`args` for local, `url` for remote), any required authentication, and, critically, a required `tools` array saying which of the server's tools are exposed to the agent. GitHub strongly recommends allowlisting specific read-only tools; `"*"` enables them all. The cloud agent uses only MCP **tools**: it doesn't support MCP resources or prompts, or remote servers that authenticate with OAuth. **It's a rented office suite where you only get keys cut for the rooms your team actually uses, not the whole floor.**
 
 ```mermaid
 flowchart TD
@@ -94,7 +98,9 @@ flowchart TD
 
 **Scope by toolset and read-only mode — the same read/write discipline applied to GitHub's own API surface.**
 
-GitHub hosts its own remote MCP server (reachable at `https://api.githubcopilot.com/mcp/`) that exposes GitHub platform capabilities — issues, pull requests, repositories, Actions, code security — as MCP tools, authenticated via a bearer token (OAuth or PAT) sent with the request. Two configuration levers matter most: **toolsets**, which group related tools (e.g., `issues`, `pull_requests`, `actions`) so you can enable only the groups a given agent needs instead of the entire surface; and a **read-only mode**, which restricts the server to non-mutating operations only. **It's a security badge that opens the mailroom but not the server room.**
+GitHub hosts its own remote MCP server (reachable at `https://api.githubcopilot.com/mcp/`) that exposes GitHub platform capabilities — issues, pull requests, repositories, Actions, code security — as MCP tools, authenticated via a bearer token (OAuth or PAT) sent with the request. Copilot cloud agent gets this server built in and enabled by default, using a specially scoped token with read-only access to the current repository only; widening that access means supplying your own personal access token or GitHub App token and choosing toolsets with the `X-MCP-Toolsets` header.
+
+Two configuration levers matter most: **toolsets**, which group related tools (e.g., `issues`, `pull_requests`, `actions`) so you can enable only the groups a given agent needs instead of the entire surface; and a **read-only mode**, which restricts the server to non-mutating operations only. **It's a security badge that opens the mailroom but not the server room.**
 
 ### In Practice
 
@@ -122,20 +128,22 @@ An MCP registry is a catalog — a place to discover servers that expose a given
 
 **An org-level MCP allow list moves the trust decision from "did this repo's maintainer make a good call" to "did security actually approve this server."**
 
-Because any contributor could otherwise wire an arbitrary MCP server into an agent workflow, org owners can configure an **MCP server allow list** policy that restricts which MCP servers are permitted for use with Copilot's coding agent across the organization — only servers on the approved list can be connected, regardless of what an individual repository's configuration requests. This matters because a compromised or malicious MCP server has a direct path to whatever context and credentials the agent session holds. **It's a corporate vendor-approval list, not a suggestion box.**
+Because any developer could otherwise wire an arbitrary MCP server into their Copilot client, enterprises can define an **MCP allowlist**. GitHub's recommended method is the enterprise's `managed-settings.json` file (usually kept in a `.github-private` repository), with `allowedMcpServers` and `deniedMcpServers` entries that match servers by name, server URL or command. A deny rule from any source wins, and once an allowlist exists, anything that doesn't match it is blocked; built-in default servers such as the GitHub MCP server are always allowed. GitHub's August 2026 changelog lists the Copilot app, Copilot CLI and VS Code as the clients that enforce it. The older alternative, a private MCP registry with a "Registry only" policy, is in public preview and matches on server name or ID only, which users can bypass by editing configuration files.
+
+Copilot cloud agent is governed differently. The "MCP Registry URL" and "Restrict MCP access to registry servers" policies don't apply to it. Instead, the "MCP servers in Copilot" policy decides whether third-party MCP servers can run at all (in an enterprise, cloud agent and third-party MCP servers start disabled), and each repository's MCP configuration, with its required `tools` list, decides which servers and tools a session gets. This matters because a compromised or malicious MCP server has a direct path to whatever context and credentials the agent session holds. **It's a corporate vendor-approval list, not a suggestion box.**
 
 ### In Practice
 
-**What breaks without this**: one repo wiring in an unreviewed server creates an exfiltration path that has nothing to do with that repo's own code quality — without an org-level allow list, the practical security posture of every coding-agent session in the org is only as strong as the least-careful repository maintainer's MCP configuration.
+**What breaks without this**: one developer or repo wiring in an unreviewed server creates an exfiltration path that has nothing to do with that repo's own code quality. Without a central allowlist for clients, and without the "MCP servers in Copilot" policy plus reviewed repository MCP settings for cloud agent, the org's practical security posture is only as strong as its least-careful configuration.
 
-**Decision trigger**: ask "if any contributor in the org could add an MCP server config to any repo today, would that be an acceptable security posture?" If not, the allow list needs to be enabled and enforced centrally rather than relying on repo-by-repo review discipline.
+**Decision trigger**: ask "if any contributor in the org could add an MCP server config to any repo today, would that be an acceptable security posture?" If not, enforce it centrally rather than relying on repo-by-repo review discipline, and check which surface each control actually covers: a client allowlist doesn't govern cloud agent sessions.
 
 **When you'd choose differently**: a small, security-mature team with tight repository access control and a very short list of contributors might reasonably treat repo-level review as sufficient without a separate org-level allow list — but that's a calculated risk acceptance for a specific context, not a substitute for the mechanism existing at scale.
 
 ### Exam Trap ⚠️
 
 <div class="note-trap">
-Watch for questions that treat "the MCP server is listed in a registry" as sufficient justification to connect it, or that describe an org relying on individual repo maintainers to vet MCP servers instead of a central allow list. Both are the "convenient but ungoverned" answer. Think of an MCP allow list like a vendor-approval list in procurement: the vendor being easy to find in a catalog was never the question — whether someone with authority signed off on trusting them is.
+Watch for questions that treat "the MCP server is listed in a registry" as sufficient justification to connect it, or that describe an org relying on individual repo maintainers to vet MCP servers instead of a central allow list. Both are the "convenient but ungoverned" answer. A second trap: assuming a "Registry only" policy also locks down Copilot cloud agent. It doesn't; the cloud agent is controlled by the "MCP servers in Copilot" policy and the repository's own MCP configuration. Think of an MCP allow list like a vendor-approval list in procurement: the vendor being easy to find in a catalog was never the question — whether someone with authority signed off on trusting them is.
 </div>
 
 ## Integrating Agents into Development Environments
@@ -144,7 +152,7 @@ Watch for questions that treat "the MCP server is listed in a registry" as suffi
 
 **Prepare the environment before the agent's first tool call — don't burn session budget on setup the agent has to redo itself.**
 
-Coding agent sessions run inside an isolated, ephemeral compute environment rather than on a developer's machine or a shared long-lived box — each session starts clean and is discarded afterward. Teams can customize what that environment looks like before the agent's first tool call using a dedicated setup workflow (a `copilot-setup-steps` job) that installs dependencies, sets up language toolchains, or seeds any state the agent's later work will assume is already present — the same way a CI job's setup phase prepares an environment before the actual build/test steps run. **It's arriving at a hotel room that's already made up, not one where you have to bring your own furniture.**
+Cloud agent sessions run inside an isolated, ephemeral compute environment rather than on a developer's machine or a shared long-lived box — each session starts clean and is discarded afterward. Teams can customize what that environment looks like before the agent's first tool call using a dedicated setup workflow, `.github/workflows/copilot-setup-steps.yml`, whose single job must be named `copilot-setup-steps` or Copilot won't pick it up. Only `steps`, `permissions`, `runs-on`, `services`, `snapshot` and `timeout-minutes` (maximum 59) are honoured, and if a setup step exits non-zero, Copilot skips the remaining setup steps and starts work with the environment as it is. The workflow installs dependencies, sets up language toolchains, or seeds any state the agent's later work will assume is already present — the same way a CI job's setup phase prepares an environment before the actual build/test steps run. **It's arriving at a hotel room that's already made up, not one where you have to bring your own furniture.**
 
 ### In Practice
 
@@ -158,7 +166,7 @@ Coding agent sessions run inside an isolated, ephemeral compute environment rath
 
 **One session, one repository, one branch — that's what makes a session's diff reviewable as a single coherent unit.**
 
-A coding agent session is scoped to a single repository and operates on its own branch — it cannot push directly to a protected branch, and it cannot span multiple repositories within one session (the same constraint Domain 1 covers for task decomposition, expressed here as an environment-level fact rather than a planning choice). Everything the session touched is confined to one branch in one repo, so a reviewer never has to reason about partial, cross-repository side effects from a single session. **It's one contractor, one job site, one set of blueprints — not five sites managed off memory.**
+A cloud agent session is scoped to a single repository and operates on one branch: a new `copilot/` branch it creates, or the branch of the existing pull request it was asked to work on. It can push only to that branch, stays subject to branch protections and required checks, and it cannot span multiple repositories within one session (the same constraint Domain 1 covers for task decomposition, expressed here as an environment-level fact rather than a planning choice). Everything the session touched is confined to one branch in one repo, so a reviewer never has to reason about partial, cross-repository side effects from a single session. **It's one contractor, one job site, one set of blueprints — not five sites managed off memory.**
 
 ### In Practice
 
@@ -172,7 +180,7 @@ A coding agent session is scoped to a single repository and operates on its own 
 
 **An agent-authored PR is exactly the diff you don't want CI executing unreviewed — the same approval gate as a first-time external contributor applies.**
 
-An agent-opened PR triggers the repository's CI the same way a human-opened PR would, but with one important gate: workflows on agent-authored PRs commonly require the same approval step used for first-time external contributors before Actions workflows run automatically — a maintainer has to approve the workflow run rather than it firing unattended. This exists because a PR whose diff came from an autonomous process is exactly the scenario where you don't want CI (which can have write-capable secrets and deploy permissions) executing unreviewed instructions with no human checkpoint at all. **It's the same background check you'd run on a first-day contractor, not a return visitor.**
+An agent-opened PR triggers the repository's CI the same way a human-opened PR would, but with one important gate. By default, GitHub Actions workflows don't run when Copilot pushes changes: someone with write access has to click **Approve and run workflows** in the PR's merge box, much like the approval step for first-time external contributors. A repository administrator can turn off **Require approval for workflow runs** in the repository's Copilot cloud agent settings, and GitHub warns that this lets unreviewed Copilot code gain write access to the repository or reach Actions secrets. This exists because a PR whose diff came from an autonomous process is exactly the scenario where you don't want CI (which can have write-capable secrets and deploy permissions) executing unreviewed instructions with no human checkpoint at all. **It's the same background check you'd run on a first-day contractor, not a return visitor.**
 
 ### In Practice
 
@@ -180,13 +188,13 @@ An agent-opened PR triggers the repository's CI the same way a human-opened PR w
 
 **Decision trigger**: ask "would I auto-approve CI runs on a PR from a first-time external contributor without looking at the diff first?" If not, don't configure agent PRs to skip that same gate just because the author is a trusted agent product rather than an unknown human.
 
-**When you'd choose differently**: a narrowly-scoped, low-privilege workflow (e.g., a lint-only check with no secrets and no deploy capability) can reasonably be exempted from the approval gate for agent PRs specifically because a compromised run of *that* workflow has no meaningful blast radius — the exemption should be scoped to the workflow's actual capability, not granted broadly.
+**When you'd choose differently**: a repository whose workflows are all narrowly scoped and low-privilege (lint and unit-test checks with no secrets, no write-capable token and no deploy step) can reasonably turn the approval requirement off, because a compromised run has no meaningful blast radius. The setting covers the whole repository, not individual workflows, so judge it by the most privileged workflow the agent's push could trigger.
 
 ### Key Concept
 
 **Draft status is itself a checkpoint — it separates "the agent finished" from "a human agreed it's ready."**
 
-Once execution is unlocked, the agent creates its own working branch off the base branch, commits incrementally, and opens a pull request — by default as a **draft**, signaling it isn't yet ready for merge consideration even though the code changes are complete. This mirrors Domain 1's plan/act/review boundary at the Git level. **It's a draft manuscript, not a published book** — the label alone tells the reader not to cite it yet.
+Once execution is unlocked, the agent creates its own working branch off the base branch, commits incrementally, and opens a pull request as a **draft**, signaling it isn't yet ready for merge consideration even though the code changes are complete. Copilot can't mark its own draft ready for review, and it can't approve or merge pull requests; a human does those steps. This mirrors Domain 1's plan/act/review boundary at the Git level. **It's a draft manuscript, not a published book** — the label alone tells the reader not to cite it yet.
 
 ### In Practice
 
@@ -200,7 +208,9 @@ Once execution is unlocked, the agent creates its own working branch off the bas
 
 **Default-deny network egress is what makes a successful prompt injection a contained failure instead of a leaked-secret incident.**
 
-The agent's execution environment sits behind a network firewall that, by default, allows access only to a curated set of domains needed for common development work (source hosting, common package registries) and blocks everything else — this exists specifically to reduce the blast radius of a prompt-injection attack that tries to get the agent to exfiltrate data to an arbitrary external endpoint. Administrators can extend this allowlist with additional domains a given repository's build genuinely needs. Secrets available to the agent are scoped through a dedicated environment (conceptually similar to a GitHub Actions deployment environment) rather than being broadly injected — so a credential the agent's task doesn't need isn't sitting in its environment where a misbehaving tool call could reach it. **It's a building's card-access system that only opens the doors a badge is scoped for, not every door because it's simpler to configure.**
+The agent's execution environment sits behind a firewall that limits internet access by default. It always allows the hosts Copilot needs to work with GitHub, plus a recommended allowlist (also on by default) of OS package repositories, container registries, language package registries and certificate authorities, and blocks everything else. This exists specifically to reduce the blast radius of a prompt-injection attack that tries to get the agent to exfiltrate data to an arbitrary external endpoint. Organization owners and repository administrators extend it under **Settings > Copilot > Internet access**; organization and repository rules are combined.
+
+Know the firewall's limits. It applies only to processes the agent starts through its Bash tool inside the GitHub Actions appliance, so MCP server processes and processes started by `copilot-setup-steps` aren't covered, and GitHub says it shouldn't be treated as a comprehensive security solution. Secrets reach the agent only as dedicated **Agents** secrets and variables, set at repository or organization level. The agent can't read GitHub Actions, Codespaces or Dependabot secrets, only `COPILOT_MCP_`-prefixed values are passed to MCP configuration, and secret values are masked in session logs. A credential the agent's task doesn't need therefore isn't sitting in its environment where a misbehaving tool call could reach it. **It's a building's card-access system that only opens the doors a badge is scoped for, not every door because it's simpler to configure.**
 
 ### In Practice
 
@@ -279,7 +289,7 @@ When an agent hits a failure it can't resolve through retry or self-correction, 
 
 **Traceability is what turns "an agent did something" into "we can determine exactly what it did, when, and why."**
 
-Every action an agent takes should be reconstructable after the fact: session logs capturing what the agent reasoned and which tools it called, commits attributed to the agent's identity (distinguishing agent-authored work from human-authored work in the repository's history), and organization-level audit log entries recording session starts, tool invocations against sensitive resources, and outcomes. **It's a flight recorder, not a shrug** — the difference between an incident being investigable and being a mystery.
+Every action an agent takes should be reconstructable after the fact: session logs capturing what the agent reasoned and which tools it called, commits attributed to the agent's identity (Copilot cloud agent's commits are authored by Copilot, co-authored by the developer who assigned the task, and signed so they show as Verified), and organization-level audit log entries recording session starts, tool invocations against sensitive resources, and outcomes. **It's a flight recorder, not a shrug** — the difference between an incident being investigable and being a mystery.
 
 ### In Practice
 
@@ -329,19 +339,19 @@ If a scenario question describes any step skipping straight to "grant broad acce
 | Concept | Key Rule |
 |---------|----------|
 | Tool selection | Start from an empty set; add only tools the task literally requires |
-| `tools` vs `excludedTools` | Explicit allowlist for precision/stability; denylist for trimming a known-good default |
-| MCP tool names | Namespaced to their server — reference the specific server-qualified tool, not a generic label |
+| `tools` vs `excludedTools` | Explicit allowlist for precision/stability; denylist (Copilot SDK session/`defaultAgent` setting) for trimming a known-good default. Profile: omitted or `["*"]` = all tools, `[]` = none |
+| MCP tool names | Namespaced to their server: `server-name/tool-name` or `server-name/*`, not a generic label |
 | Tool permission scoping | Default to read-only wherever supported; grant write access only for the specific mutation needed |
-| Adding an MCP server | Configure `mcpServers` (type, url/command, auth) and expose only the specific tool names needed |
-| GitHub remote MCP server | `https://api.githubcopilot.com/mcp/`; scope by toolset (issues, pull_requests, actions, code_security) + read-only mode |
+| Adding an MCP server | Cloud agent: repo **Settings > Copilot > MCP servers**; `mcpServers` with `type` (local/stdio/http/sse), url/command, auth and a required `tools` list. Tools only: no resources, prompts or OAuth remotes |
+| GitHub remote MCP server | `https://api.githubcopilot.com/mcp/`; scope by toolset (issues, pull_requests, actions, code_security) + read-only mode. Built into cloud agent with a read-only token for the current repo |
 | MCP registries | Discovery mechanism only — presence in a registry is not equivalent to organizational trust |
-| MCP allow lists | Org-level policy restricting which MCP servers can connect at all, enforced centrally, not per-repo |
-| Execution context | Ephemeral, sandboxed session; `copilot-setup-steps`-style workflow prepares the environment beforehand |
-| Repository/branch scope | One session = one repository, its own branch; never a protected branch directly, never cross-repo |
-| CI invocation | Agent-authored PRs commonly require the same workflow-approval gate as first-time external contributors |
+| MCP allow lists | Enterprise `managed-settings.json` (`allowedMcpServers`/`deniedMcpServers`), enforced in Copilot clients, not per-repo. Registry policies don't apply to cloud agent; use the "MCP servers in Copilot" policy there |
+| Execution context | Ephemeral, Actions-powered session (max 59 min); `.github/workflows/copilot-setup-steps.yml` with a job named `copilot-setup-steps` prepares it |
+| Repository/branch scope | One session = one repository, one `copilot/` branch (or the existing PR's branch); never a protected branch directly, never cross-repo |
+| CI invocation | By default, workflows on Copilot's pushes wait for **Approve and run workflows**; the repo-level opt-out risks secrets and write access |
 | Autonomous PR creation | Opens as **draft** by default — draft-to-ready is itself a human checkpoint |
-| Network firewall | Default-deny allowlist; extend only for genuine build/test domain needs, not general convenience |
-| Secrets scoping | Delivered via a dedicated environment, limited to what the task needs — never broadly injected |
+| Network firewall | Default-limited internet + recommended allowlist; extend in **Settings > Copilot > Internet access**. Covers the agent's Bash-tool processes only, not MCP servers or setup steps |
+| Secrets scoping | **Agents** secrets/variables (repo or org); no access to Actions, Codespaces or Dependabot secrets; `COPILOT_MCP_` prefix for MCP |
 | Retries | Bounded, with backoff, for transient failures only (timeout, rate limit, flaky network) |
 | Non-transient failures | Escalate, don't retry — a deterministic failure won't resolve by trying the same action again |
 | Rollback | Branch isolation makes rollback = close/discard, not a destructive undo against a protected branch |

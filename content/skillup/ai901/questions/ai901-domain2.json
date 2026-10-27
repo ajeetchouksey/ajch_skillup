@@ -1,0 +1,1123 @@
+[
+  {
+    "domain": 2,
+    "id": "ai901-d2-001",
+    "scenario": "A developer wants every response from a support assistant to stay on Contoso products, use a friendly tone and decline unrelated requests.",
+    "question": "Where should these instructions go?",
+    "options": [
+      "In the system prompt",
+      "In each user prompt typed by the customer",
+      "In the deployment's TPM rate limit",
+      "In the max output tokens setting"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the system prompt (system instructions) sets the model's behaviour, role, tone and boundaries for the whole conversation, and the application controls it. B is wrong because the user prompt is the end user's request; relying on customers to type the rules is unreliable and they could leave them out. C is wrong because the TPM rate limit controls capacity, not behaviour. D is wrong because max output tokens only caps response length.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-002",
+    "scenario": "An app parses the model's answers, but the format keeps changing: sometimes a bulleted list, sometimes a paragraph, sometimes JSON with different field names.",
+    "question": "Which prompt change most reliably produces a consistent format?",
+    "options": [
+      "Raise the temperature so the model explores better formats",
+      "Increase max output tokens so the model has room for a complete answer",
+      "State the exact output structure in the system prompt and include an example",
+      "Ask the user to request JSON at the end of each question"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: being explicit about the required output structure, and showing an example of it (one-shot or few-shot), is a core prompt-engineering technique for consistent, parseable output. A is wrong because a higher temperature increases randomness and makes format drift worse. B is wrong because length is not the problem; the model is free to choose a format. D is wrong because end users should not have to control the format, and they will not do it consistently.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-003",
+    "scenario": "A developer adds three example question-and-answer pairs to the prompt before the user's question.",
+    "question": "What effect do these examples have?",
+    "options": [
+      "They permanently retrain the deployed model on the three examples",
+      "They guide the format and style of the answer for that request only",
+      "They are ignored, because models only follow the system prompt",
+      "They raise the deployment's token-per-minute limit"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: few-shot examples condition the model for the current inference only. They show the pattern to follow but do not change the model's weights. A is wrong because changing the model permanently requires fine-tuning, which is a separate process. C is wrong because models do use examples in the prompt; that is why few-shot prompting works. D is wrong because prompt content has no effect on a deployment's rate limit, though longer prompts do consume more tokens.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "exam-trap"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-004",
+    "scenario": "An HR assistant sometimes invents policy details that are not in the company handbook.",
+    "question": "Which prompt design best reduces fabricated answers?",
+    "options": [
+      "Add 'Always be accurate' to the user prompt and raise the temperature",
+      "Write a longer persona description describing the assistant as an HR expert",
+      "Remove the system prompt so the model relies on its own training",
+      "Ground the prompt with handbook text, answer only from it, and allow 'I don't know'"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: grounding the prompt with relevant source text, telling the model to answer only from it, and giving it an 'out' when the answer is not there are documented techniques for reducing fabrication. Asking for citations helps too. A is wrong because telling a model to be accurate does not give it the facts, and a higher temperature makes invention more likely. B is wrong because a persona changes tone, not the facts the model can draw on. C is wrong because without instructions or context the model falls back on general training data, which knows nothing about this company's policies.",
+    "tags": [
+      "best-practice",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-005",
+    "scenario": "A simple chat client sends only the latest user message to the model. Users complain that it forgets what they said two messages ago.",
+    "question": "What is the cause?",
+    "options": [
+      "The model's temperature is too low to remember earlier messages",
+      "The deployment type does not support conversations",
+      "Each request stands alone, so the app must include earlier turns or use a conversation",
+      "The system prompt is too long, so the model drops earlier messages"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a model only sees what is in the current request. Chat apps keep context by sending the conversation history with each call, or by using a service-side conversation, such as a Foundry conversation, that stores the earlier items. A is wrong because temperature controls randomness, not memory. B is wrong because no deployment type stores conversation history by itself. D is wrong because the earlier messages were never sent in the first place.",
+    "tags": [
+      "troubleshooting",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-006",
+    "question": "In the Microsoft Foundry portal, which sequence gets a model ready for use in a client application?",
+    "options": [
+      "Create a project, deploy a model from the catalog, test it in the playground, then call it from the app",
+      "Write the client app, then fine-tune a model, then create a project to host it",
+      "Create a Content Understanding analyzer, then deploy it as a chat model",
+      "Test prompts in the playground, then create the project the playground will use"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the documented workflow is to create a Foundry project, choose and deploy a model from the model catalog, experiment in the playground, and then use the deployment from your client app. B is wrong because you need a project and a deployed model before an app has anything to call, and fine-tuning is optional. C is wrong because analyzers are for information extraction and are not chat models. D is wrong because the playground runs inside a project, so the project must exist first.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-007",
+    "question": "What happens when you deploy a model in Microsoft Foundry?",
+    "options": [
+      "The model's weights are copied into your project so you can download them",
+      "The model is retrained on the files stored in your project",
+      "The model can only be used inside the portal playground",
+      "Capacity is allocated and an endpoint is created that apps call by deployment name"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: deploying a model allocates capacity (with a token-per-minute rate limit), fixes the deployment's configuration, such as model version and deployment type, and exposes an endpoint that applications call using the deployment name. A is wrong because a standard deployment gives you an API, not a copy of the model weights. B is wrong because deployment does not train the model; fine-tuning is a separate process. C is wrong because the point of a deployment is that client applications can call it, not just the playground.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-008",
+    "scenario": "A developer wants to see how two different deployed models answer the same prompt and system instructions before choosing one for an app.",
+    "question": "What is the quickest way to do this in the Foundry portal?",
+    "options": [
+      "Create a Content Understanding analyzer for each model",
+      "Use the model playground's compare feature to run both models side by side",
+      "Publish both models as agents to Microsoft Teams and ask colleagues to vote",
+      "Change each deployment's type to Global Batch and compare the batch output"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the model playground lets you test prompts and settings and compare models side by side (up to three), so you can judge answers before writing any code. A is wrong because analyzers extract information from content; they are not used to compare chat models. C is wrong because publishing to Teams is far more work and exposes unfinished choices to users. D is wrong because batch jobs are asynchronous with up to 24-hour turnaround, which does not suit interactive comparison.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-009",
+    "scenario": "During testing, an app calling a model deployment starts getting HTTP 429 (too many requests) errors at busy times.",
+    "question": "Which response best addresses the problem?",
+    "options": [
+      "Raise the temperature so the model responds faster",
+      "Move the deployment to the Developer type, which has no limits",
+      "Raise the deployment's tokens-per-minute limit within quota, or cut max tokens and concurrency",
+      "Switch the chat app to Global Batch so that requests are queued"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a 429 error means the deployment's rate limit has been exceeded. A higher tokens-per-minute (TPM) limit gives more capacity, and lowering max tokens or the number of concurrent requests reduces the tokens consumed. A is wrong because temperature affects randomness, not throughput. B is wrong because Developer deployments are for evaluating fine-tuned models and are not meant for production traffic. D is wrong because batch processing targets up to 24 hours, which is unusable for a live chat app.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-010",
+    "scenario": "A team is building three AI apps and wants shared governance, quotas and security for all of them, with each app's agents and files kept separate.",
+    "question": "How should it organise Microsoft Foundry?",
+    "options": [
+      "One Foundry resource with a separate Foundry project for each app",
+      "One Foundry project with a separate Foundry resource for each app",
+      "Three hub-based projects, because Foundry projects cannot share a resource",
+      "A single project for all three apps, with agents named by app"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the Foundry resource is the Azure resource that provides models, quotas, governance and security, and a Foundry project is a workspace inside it for building agents, evaluations and files. One resource with many projects is the documented pattern. B is wrong because it inverts the hierarchy; projects live inside a resource, not the other way round. C is wrong because many Foundry projects can share one resource, and hub-based projects are the older model. D is wrong because a single project mixes the three apps' agents and files, which the team wants to avoid.",
+    "tags": [
+      "architecture",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-011",
+    "question": "Which Python package and class does the Foundry SDK use to connect to a Microsoft Foundry project?",
+    "options": [
+      "azure-ai-textanalytics and TextAnalyticsClient",
+      "azure-cognitiveservices-speech and SpeechConfig",
+      "azure-ai-projects and AIProjectClient",
+      "azure-ai-contentunderstanding and ContentUnderstandingClient"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the Foundry SDK for Python is the azure-ai-projects package, and AIProjectClient connects to a project endpoint. From it you can get an OpenAI-compatible client for calling models and agents. A is wrong because TextAnalyticsClient is the SDK for Azure Language. B is wrong because SpeechConfig belongs to the Azure Speech SDK. D is wrong because ContentUnderstandingClient is for Azure Content Understanding.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-012",
+    "scenario": "A developer deployed gpt-4.1-mini with the deployment name 'support-chat'. The code calls responses.create(model='gpt-4.1-mini', ...) and fails with a deployment-not-found error.",
+    "question": "What should the developer change?",
+    "options": [
+      "Use the model family name 'gpt-4.1' instead",
+      "Remove the model parameter so a default deployment is used",
+      "Redeploy the model with the Developer deployment type",
+      "Pass the deployment name 'support-chat' as the model value"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: when you call a Foundry deployment, the model value is the deployment name you chose, not the base model name. The two only match when you name the deployment after the model. A is wrong because a family name does not identify any deployment. B is wrong because the request must say which deployment to use. C is wrong because the deployment type has nothing to do with how the deployment is identified.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "exam-trap"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-013",
+    "scenario": "A developer has created project = AIProjectClient(endpoint=..., credential=DefaultAzureCredential()) and wants to send a prompt to a deployed model.",
+    "question": "Which code sends the prompt and reads the reply?",
+    "options": [
+      "openai = project.get_openai_client(); r = openai.responses.create(model=deployment, input=prompt); print(r.output_text)",
+      "r = project.deployments.run(deployment, prompt); print(r.text)",
+      "r = project.agents.create_version(prompt); print(r.version)",
+      "openai = project.get_openai_client(); r = openai.images.generate(model=deployment, prompt=prompt); print(r)"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: AIProjectClient.get_openai_client() returns an OpenAI-compatible client, and responses.create with the deployment name and input returns a response whose output_text property holds the generated text. B is wrong because the deployments operations manage deployments; they do not run prompts. C is wrong because create_version defines an agent, it does not chat with a model. D is wrong because images.generate is for image-generation models, not text chat.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-014",
+    "scenario": "Code using AIProjectClient(endpoint=..., credential=DefaultAzureCredential()) fails on a developer's laptop with an authentication error. The endpoint is correct.",
+    "question": "What is the most likely fix?",
+    "options": [
+      "Pass the project API key as DefaultAzureCredential(api_key=...)",
+      "Sign in with az login as an identity that has access to the Foundry project",
+      "Replace the endpoint with the model deployment name",
+      "Change the endpoint from https to http for local testing"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: DefaultAzureCredential gets a Microsoft Entra ID token from an available identity, which on a laptop is often the Azure CLI sign-in. Running az login as a user with access to the project lets it authenticate. A is wrong because DefaultAzureCredential does not accept an API key; it is the Entra ID path. C is wrong because the client needs the project endpoint URL, and the deployment name is passed later as the model. D is wrong because Foundry endpoints require HTTPS.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-015",
+    "question": "Which endpoint format does AIProjectClient expect for a Foundry project?",
+    "options": [
+      "https://<resource-name>.services.ai.azure.com/api/projects/<project-name>",
+      "https://management.azure.com/subscriptions/<id>/projects/<project-name>",
+      "https://<resource-name>.openai.azure.com/openai/v1",
+      "https://portal.azure.com/<resource-name>/<project-name>"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a Foundry project endpoint has the form https://<resource-name>.services.ai.azure.com/api/projects/<project-name>, and you can copy it from the project overview in the portal. B is wrong because management.azure.com is the Azure Resource Manager endpoint for managing resources, not for calling models. C is wrong because that is the OpenAI-compatible endpoint used directly with the OpenAI client, not the project endpoint. D is wrong because the Azure portal URL is a web UI, not an API endpoint.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-016",
+    "question": "Which three parts make up a Foundry agent?",
+    "options": [
+      "A deployment type, a rate limit and a region",
+      "A model, instructions and tools",
+      "A tokenizer, an encoder and a decoder",
+      "An analyzer, a field schema and a confidence score"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: an agent is a model, plus instructions (the system prompt that defines its job and behaviour), plus tools that let it act or retrieve knowledge. A is wrong because those are deployment settings for a model, not parts of an agent. C is wrong because those describe the internals of a transformer model. D is wrong because those are parts of Content Understanding.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-017",
+    "scenario": "An agent must answer questions using the company's uploaded product manuals and cite them.",
+    "question": "Which tool should be added in the Foundry portal?",
+    "options": [
+      "Code interpreter",
+      "Web search",
+      "File search, with the manuals uploaded",
+      "Image generation"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the file search tool indexes uploaded files in a vector store and lets the agent retrieve relevant passages to ground its answers, with citations. A is wrong because code interpreter runs Python code for calculations and data analysis; it does not search a document collection. B is wrong because web search looks at public web content, not the company's private manuals. D is wrong because image generation creates pictures.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-018",
+    "scenario": "A finance agent must take an uploaded CSV of monthly sales, calculate growth rates and produce a chart.",
+    "question": "Which tool lets the agent do this?",
+    "options": [
+      "Code interpreter",
+      "File search",
+      "Web search",
+      "Azure Language MCP server"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: code interpreter lets an agent write and run Python in a sandbox, which is how it can calculate figures from a CSV and draw charts. B is wrong because file search retrieves text passages for grounding; it does not run calculations. C is wrong because web search fetches public information, not calculations on the user's file. D is wrong because the Language tools analyse text (for example PII or language detection) and do not do numerical analysis.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-019",
+    "scenario": "A team describes its agent design: web search and code interpreter are added as tools, and an uploaded policy library provides knowledge.",
+    "question": "Which statement best describes the difference between tools and knowledge in a Foundry agent?",
+    "options": [
+      "Tools give the agent context, and knowledge gives it the ability to act",
+      "Tools and knowledge are the same thing with different names",
+      "Knowledge is only available to agents published to Microsoft Teams",
+      "Tools let the agent take actions; knowledge grounds its answers in data"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Microsoft's training sums it up as 'Tools = actions. Knowledge = context.' Tools let the agent do things such as run code or search, and knowledge grounds its answers in your data, with citations. A is wrong because it reverses the two roles. B is wrong because they solve different problems, even though some tools (such as file search) are how knowledge is connected. C is wrong because knowledge works for agents in the portal and in code, whatever the publishing channel.",
+    "tags": [
+      "comparison",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-020",
+    "scenario": "A developer has finished testing an agent in the Foundry portal and wants other applications and channels to use it.",
+    "question": "What does publishing the agent do?",
+    "options": [
+      "It retrains the agent's model on the test conversations",
+      "It turns the agent into a managed Azure resource with a stable endpoint",
+      "It deletes the agent from the project and exports it as a file",
+      "It converts the agent into a Content Understanding analyzer"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: publishing turns the agent into a managed Azure resource with a stable endpoint, which applications and channels such as Microsoft Teams can use. A is wrong because publishing does not train anything. C is wrong because the agent stays in the project; publishing exposes it rather than removing it. D is wrong because analyzers are a separate Content Understanding concept.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-021",
+    "scenario": "A developer has written an agent's instructions and added a file search tool in the Foundry portal.",
+    "question": "What is the best next step before publishing the agent?",
+    "options": [
+      "Publish it immediately and collect feedback from end users",
+      "Increase the model deployment's TPM to the maximum quota",
+      "Chat with it in the agents playground, using expected and tricky questions",
+      "Remove the instructions so the model can answer more freely"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the agents playground lets you test an agent with realistic and edge-case questions and review its responses and tool use before anyone depends on it. A is wrong because untested agents can give wrong or unsafe answers to real users. B is wrong because capacity does not tell you whether the agent behaves correctly. D is wrong because the instructions are what define the agent's job and boundaries.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-022",
+    "scenario": "A client app has project_client (an AIProjectClient), an agent retrieved with project_client.agents.get(agent_name='learning-agent'), and openai_client = project_client.get_openai_client().",
+    "question": "Which call sends the user's message to that agent?",
+    "options": [
+      "openai_client.responses.create(input=msgs, extra_body={'agent': {'name': agent.name, 'type': 'agent_reference'}})",
+      "openai_client.threads.runs.create(thread_id=t.id, assistant_id=agent.id)",
+      "project_client.deployments.get(agent.name).invoke(msgs)",
+      "openai_client.images.generate(model=agent.name, prompt=msgs)"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: in the Foundry Agent Service, an app calls an agent through the Responses API and identifies the agent with an agent reference, which is the pattern shown in Microsoft's training. B is wrong because threads, runs and assistants belong to the older Assistants API; Foundry agents now use conversations, items and responses. C is wrong because deployments are model deployments, not agents, and have no invoke method. D is wrong because images.generate is for image models.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-023",
+    "scenario": "A developer adapts the agent client code from Microsoft's lab but replaces DefaultAzureCredential with the project's API key to avoid signing in. The calls to the agent now fail.",
+    "question": "What is the best explanation and fix?",
+    "options": [
+      "The key is in the wrong header; send it as a bearer token instead",
+      "The project endpoint is wrong; agents must be called on the openai.azure.com endpoint",
+      "The agent must be republished each time a new key is generated",
+      "This code path needs Microsoft Entra ID, so use DefaultAzureCredential and sign in"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the agent client code in Microsoft's exercise uses AIProjectClient with DefaultAzureCredential, and the lab notes that key-based authentication is not supported for it. The fix is to authenticate with an Entra ID identity, for example after az login. A is wrong because an API key is not an Entra ID bearer token, so changing the header will not help. B is wrong because agents are reached through the Foundry project endpoint with AIProjectClient. C is wrong because publishing has nothing to do with key rotation.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-024",
+    "scenario": "A developer wants a multi-turn chat between users and a Foundry agent in which the agent remembers earlier turns.",
+    "question": "Which approach matches the current Foundry Agent Service?",
+    "options": [
+      "Create a thread, add messages and start a run for each turn",
+      "Create a conversation and pass its ID in each responses.create call",
+      "Redeploy the model after every turn so it learns the conversation",
+      "Store each turn as a separate agent version"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the current Agent Service uses conversations, items and responses. Creating a conversation and passing its ID with each Responses API call lets the service keep the history. A is wrong because threads, messages and runs are the older Assistants API concepts that Foundry has replaced. C is wrong because redeploying does not train the model or store conversation state. D is wrong because agent versions capture changes to an agent's definition, not chat history.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "exam-trap"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-025",
+    "scenario": "A Python app uses the Azure Language SDK: client = TextAnalyticsClient(endpoint=endpoint, credential=AzureKeyCredential(key)).",
+    "question": "How should the app call language detection for a single string named text?",
+    "options": [
+      "client.detect_language(text)",
+      "client.detect_language([text])[0]",
+      "client.responses.create(input=text)",
+      "client.analyze(text, task='language')"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: TextAnalyticsClient methods take a list of documents and return a list of results, so a single string is passed as [text] and the first result is read with [0]. The result then exposes primary_language with its name, ISO code and confidence score. A is wrong because the methods expect a list of documents, not a single string. C is wrong because responses.create belongs to the OpenAI client for generative models. D is wrong because there is no generic analyze method with a task name on this client.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-026",
+    "scenario": "A developer's prototype asks a chat model to 'return the language of this text'. The answers vary ('Spanish', 'es', 'It is Spanish') and there is no confidence score.",
+    "question": "What is the best way to get consistent, structured results?",
+    "options": [
+      "Lower the chat model's max output tokens",
+      "Ask the chat model to answer in capital letters",
+      "Call language detection in the Azure Language SDK",
+      "Switch the chat model to a Global Batch deployment"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Microsoft's guidance notes that generative model results can vary between calls, and that the Azure Language SDK is the better choice when an app needs consistent, structured values such as a language code and confidence score. A is wrong because a shorter answer can still vary in form and still has no confidence score. B is wrong because a formatting instruction does not make the model's output deterministic. D is wrong because the deployment type affects cost and latency, not the shape of the output.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-027",
+    "scenario": "An app must remove names, phone numbers and other personal data from support tickets before they are stored.",
+    "question": "Which Azure Language SDK call and result property give the cleaned text?",
+    "options": [
+      "recognize_entities, then the entities' text values",
+      "extract_key_phrases, then the key_phrases list",
+      "analyze_sentiment, then the sentiment label",
+      "recognize_pii_entities, then the result's redacted_text"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: PII detection identifies personal and health information, and the result's redacted_text property holds the input with that information masked. A is wrong because general named entity recognition lists entities but does not return redacted text. B is wrong because key phrases are the main concepts, not personal data. C is wrong because sentiment analysis scores tone.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-028",
+    "scenario": "A team wants an agent in the Foundry portal to call Azure Language capabilities, such as PII detection, as a tool.",
+    "question": "Which statement is correct?",
+    "options": [
+      "They connect the Azure Language MCP server tool with their Foundry resource name; no separate Language resource is needed",
+      "They must first create a separate Azure Language resource and paste its key into the agent instructions",
+      "Agents cannot use Azure Language; its features are only available through Language Studio",
+      "They must fine-tune the agent's model on PII examples, because tools cannot do text analysis"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the Azure Language MCP server is a managed service that exposes Azure Language in Foundry Tools through MCP. You add it from the tools list and connect with your Foundry resource name, without creating a separate Language resource. B is wrong because no separate resource is needed, and secrets should never be pasted into instructions. C is wrong because agents can use Language through the MCP tool, and Language Studio is being retired in favour of Foundry. D is wrong because a purpose-built tool does this more reliably than fine-tuning.",
+    "tags": [
+      "architecture",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-029",
+    "scenario": "An app records a user's spoken question as a WAV file and sends it to a deployed audio-capable chat model, such as gpt-audio-mini.",
+    "question": "How is the audio included in the chat request?",
+    "options": [
+      "As a public URL in an image_url content part",
+      "As base64-encoded data in an input_audio content part with format 'wav'",
+      "As raw bytes in the system prompt",
+      "As a file uploaded to the agent's vector store"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: in Chat Completions, audio is sent as a content part of type input_audio that holds the base64-encoded audio data and its format, such as wav, alongside any text parts. A is wrong because image_url parts are for images, not audio. C is wrong because prompts are text; binary audio must be encoded and sent as an audio content part. D is wrong because a vector store indexes documents for file search and does not pass a spoken prompt to the model.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-030",
+    "scenario": "A team wants users to ask questions out loud and get answers from a single deployed model, without a separate speech-to-text step.",
+    "question": "Which kind of model deployment is required?",
+    "options": [
+      "A text-embedding model",
+      "A text-only small language model",
+      "A multimodal model that accepts audio input",
+      "An image-generation model"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: to respond to a spoken prompt directly, the deployed model must accept audio as input. Audio-capable models in Foundry include gpt-audio models, the gpt-realtime family and Phi-4-multimodal-instruct. A is wrong because embedding models produce vectors and do not answer questions. B is wrong because a text-only model would need a separate speech-to-text step first. D is wrong because image-generation models produce images.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-031",
+    "scenario": "A developer wants an audio-capable chat model to reply with spoken audio as well as text.",
+    "question": "What must the request include?",
+    "options": [
+      "A higher temperature so the model chooses to speak",
+      "An SSML document in the system prompt",
+      "A stop sequence of 'audio'",
+      "modalities set to text and audio, plus an audio setting with a voice and format"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: audio-capable chat models return spoken output when the request asks for the text and audio modalities and gives audio settings such as the voice and output format. The response then holds the audio data and a transcript. A is wrong because temperature affects randomness, not output modality. B is wrong because SSML is the markup for Azure Speech text to speech, not a switch for chat-model audio output. C is wrong because a stop sequence ends text generation and has nothing to do with audio.",
+    "tags": [
+      "configuration",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-032",
+    "scenario": "A company wants a real-time voice agent that responds with low latency and handles interruptions, noise and end-of-turn detection, without building its own speech pipeline.",
+    "question": "Which option fits best?",
+    "options": [
+      "The Voice Live API",
+      "Batch transcription followed by a text-to-speech job",
+      "A Content Understanding audio analyzer",
+      "Speech translation with two target languages"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the Voice Live API is a fully managed, low-latency speech-to-speech service for voice agents, combining recognition, a generative model and synthesis, with features such as noise suppression, interruption handling and end-of-turn detection. B is wrong because batch transcription is asynchronous and best-effort, which suits archives rather than live conversation. C is wrong because Content Understanding extracts information from recordings rather than holding a conversation. D is wrong because speech translation converts between languages and does not create a conversational agent.",
+    "tags": [
+      "comparison",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-033",
+    "question": "Which Python package and object start a speech recognition or synthesis app with Azure Speech in Foundry Tools?",
+    "options": [
+      "azure-ai-projects and AIProjectClient",
+      "azure-ai-textanalytics and TextAnalyticsClient",
+      "azure-cognitiveservices-speech and SpeechConfig, using the Foundry resource key and endpoint",
+      "openai and the OpenAI client's audio_url parameter"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the Azure Speech SDK for Python is azure-cognitiveservices-speech, and SpeechConfig is created with the Foundry resource key and endpoint before you create a recognizer or synthesizer. A is wrong because AIProjectClient is for Foundry projects, models and agents. B is wrong because TextAnalyticsClient is for Azure Language. D is wrong because the OpenAI client calls generative models, not the Speech service SDK.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-034",
+    "scenario": "A dictation app must transcribe a user speaking for several minutes. The prototype uses recognize_once_async() and only captures the first sentence.",
+    "question": "What should the developer use instead?",
+    "options": [
+      "speak_text_async(), which processes longer audio",
+      "start_continuous_recognition() with handlers for recognized events",
+      "A higher speech_synthesis_voice_name value",
+      "recognize_once_async() called with a longer timeout argument"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: recognize_once_async() returns after a single utterance (up to about 30 seconds), so long dictation needs continuous recognition, which raises recognized events as each phrase is transcribed. A is wrong because speak_text_async() is for text to speech, not recognition. C is wrong because the voice name is a synthesis setting and has no effect on recognition. D is wrong because single-shot recognition still stops after one utterance.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-035",
+    "scenario": "An app needs to read a confirmation message aloud with a specific neural voice.",
+    "question": "Which code pattern does this?",
+    "options": [
+      "Create a SpeechRecognizer and call recognize_once_async(text)",
+      "Call TextAnalyticsClient.analyze_sentiment([text]) and play the result",
+      "Send the text to images.generate with a voice parameter",
+      "Set speech_synthesis_voice_name, create a SpeechSynthesizer, call speak_text_async(text).get()"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: to synthesise speech you set the voice on SpeechConfig with speech_synthesis_voice_name, create a SpeechSynthesizer with an audio output config, and call speak_text_async(text).get(). A result reason of SynthesizingAudioCompleted confirms success. A is wrong because a SpeechRecognizer converts speech to text, the opposite direction. B is wrong because sentiment analysis returns a score, not audio. C is wrong because images.generate produces images.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-036",
+    "scenario": "A broadcaster needs transcripts of 10,000 archived recordings stored in Azure Blob Storage. Results are needed within a few days, not in real time.",
+    "question": "Which Azure Speech option fits best?",
+    "options": [
+      "Batch transcription, pointing to the files with SAS URIs and collecting results asynchronously",
+      "Real-time transcription streaming each file through the microphone input",
+      "Fast transcription, sending each file synchronously from a single loop",
+      "Text to speech with batch synthesis"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: batch transcription is designed for large volumes of prerecorded audio. You point it at the files (for example with shared access signature URIs) and receive results asynchronously, with jobs scheduled on a best-effort basis. B is wrong because real-time transcription is for live audio and gives intermediate results, which is wasteful for an archive. C is wrong because fast transcription is synchronous with predictable latency, which suits single files such as voicemail rather than a huge archive. D is wrong because batch synthesis produces audio from text, the opposite direction.",
+    "tags": [
+      "comparison",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-037",
+    "scenario": "A developer uses the Responses API to ask a vision-capable model what is in an image at a public URL.",
+    "question": "How is the image included in the user message content?",
+    "options": [
+      "As a content part of type input_image with the image URL",
+      "As an input_audio content part",
+      "As the system prompt text",
+      "As a separate file search tool"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: in the Responses API, the user message content can hold an input_text part with the question and an input_image part with the image URL (or base64 data). B is wrong because input_audio is for audio. C is wrong because the system prompt is text that sets behaviour; it cannot hold an image. D is wrong because file search retrieves document passages and does not pass images to the model.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-038",
+    "scenario": "An app sends photos stored on an internal file share to a vision-capable model by URL. The requests fail because the model cannot fetch the images.",
+    "question": "What is the best fix?",
+    "options": [
+      "Increase the temperature so the model retries the download",
+      "Base64-encode each image and send it as a data URL in the request",
+      "Rename the files with a .png extension",
+      "Put the file-share path in the system prompt"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: image URLs sent to the model must be reachable from the service. Images that are not publicly accessible can be base64-encoded and sent as a data URL in the request instead. A is wrong because temperature does not affect how images are fetched. C is wrong because the extension does not make a private share reachable. D is wrong because the model cannot open a file path mentioned in text.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-039",
+    "scenario": "A Chat Completions request sends a photo of a dense printed spec sheet with the image detail setting at 'low'. The model misreads the small text.",
+    "question": "Which change is most likely to help?",
+    "options": [
+      "Set detail to 'high' so the model processes the image at higher resolution",
+      "Keep 'low' and raise max tokens",
+      "Convert the image to GIF, which is processed frame by frame",
+      "Move the image into the system prompt"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the detail setting controls how much resolution the model uses. 'low' processes a 512x512 version, which is cheaper but loses fine detail, while 'high' lets the model see small text. B is wrong because max tokens limits the response length and does not change how well the model sees the image. C is wrong because only the first frame of a GIF is used, and the format change does not add detail. D is wrong because images are passed as content parts of a message, not as system prompt text.",
+    "tags": [
+      "configuration",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-040",
+    "scenario": "An app calls images.generate on a GPT-image model deployment and must save the result as a PNG file.",
+    "question": "How should the app handle the response?",
+    "options": [
+      "Download the image from the URL in data[0].url",
+      "Read output_text and save it with a .png extension",
+      "Decode the base64 string in data[0].b64_json and write the bytes to a file",
+      "Poll an Operation-Location URL until the image is ready"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GPT-image models always return the image as base64 data, so the app decodes b64_json and writes the bytes to a file. A is wrong because GPT-image models do not return a URL; the response_format option is not supported. B is wrong because output_text is the text output of a Responses API call, not image data. D is wrong because image generation returns the image in the response; polling is how video generation and Content Understanding work.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-041",
+    "scenario": "A marketing team wants a short product video created from a text prompt with a Sora model in Foundry.",
+    "question": "How does the video generation request work?",
+    "options": [
+      "The video is returned immediately in the same response, like a chat answer",
+      "The video is created by a chat model with the image_generation tool",
+      "The prompt is sent to Azure Speech, which renders the video",
+      "The app creates a job, polls its status, then downloads the finished video"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: video generation is asynchronous. You create a video job, poll its status until it completes (which can take minutes), and then download the content. A is wrong because a video takes far too long to render for a synchronous response. B is wrong because the image_generation tool produces still images, and Sora models are the video generation models in Foundry. C is wrong because Azure Speech handles audio, not video.",
+    "tags": [
+      "concept",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-042",
+    "scenario": "A developer following an older tutorial tries to use a dall-e-3 deployment for a new image-generation app, but the deployment no longer works.",
+    "question": "What should the developer do?",
+    "options": [
+      "Use a GPT-image series model, because dall-e-3 has been retired",
+      "Redeploy dall-e-3 with the Global Batch deployment type",
+      "Use a text-embedding model and convert its vectors into pixels",
+      "Use Azure Vision Image Analysis to generate the image"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Microsoft retired the dall-e-3 model on 4 March 2026, and existing deployments stopped working. The documentation directs developers to GPT-image series models. B is wrong because a retired model cannot be redeployed under any deployment type. C is wrong because embeddings represent meaning; they are not images. D is wrong because Image Analysis describes existing images and does not create new ones.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-043",
+    "scenario": "A developer is building a lightweight app that lets warehouse staff photograph a damaged parcel and get three bullet points describing the damage.",
+    "question": "Which design is simplest?",
+    "options": [
+      "Train a custom image-classification model with thousands of labelled photos first",
+      "Deploy a vision-capable model and send the photo plus a text instruction in one request",
+      "Use speech to text on the photo's metadata",
+      "Send the photo to an embeddings model and print the vector"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a vision-capable multimodal model, such as a GPT-4.1 or GPT-5 series deployment, can interpret an image together with a text instruction in a single request, so no training is needed. A is wrong because custom training is unnecessary when a prebuilt multimodal model can describe the damage. C is wrong because speech to text processes audio. D is wrong because an embedding vector is not a readable description.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-044",
+    "scenario": "A team plans an app that uses the Azure Face service to report the emotion and gender of people in photos.",
+    "question": "Which statement is accurate?",
+    "options": [
+      "Emotion and gender are standard Face attributes available to any subscription",
+      "Emotion is available, but gender must be inferred with a custom model",
+      "Emotion and gender recognition are retired, and identity features need approved access",
+      "Face returns emotion only when the image detail setting is 'high'"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Microsoft retired the emotion and gender capabilities of Face as part of its responsible AI commitments, and Face identity features such as verification and identification are Limited Access, available only to Microsoft-managed customers and partners who apply. A is wrong because these attributes are retired rather than standard. B is wrong because both emotion and gender were retired. D is wrong because the detail setting belongs to multimodal chat requests, not the Face service.",
+    "tags": [
+      "concept",
+      "evaluation",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-045",
+    "scenario": "A team is starting a new app that needs image captions and tags. It is considering Azure Vision Image Analysis 4.0.",
+    "question": "What does Microsoft's guidance say?",
+    "options": [
+      "Image Analysis 4.0 is the recommended long-term choice for all new vision apps",
+      "Image Analysis 4.0 custom models are the best way to add new labels",
+      "Captions and tags are only available through Custom Vision",
+      "Image Analysis 4.0 is deprecated, so consider multimodal models or Content Understanding"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Image Analysis 4.0 is deprecated and will be retired on 25 September 2028. Microsoft's migration guidance points most image-understanding needs to GPT models or Content Understanding. A is wrong because a deprecated service is not the long-term recommendation. B is wrong because Image Analysis custom models were already retired in March 2025. C is wrong because Custom Vision is also scheduled for retirement, and captions were an Image Analysis feature.",
+    "tags": [
+      "best-practice",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-046",
+    "scenario": "An accounts team wants to extract vendor, invoice date, totals and line items from supplier invoices without building a schema.",
+    "question": "Which Content Understanding analyzer should it start with?",
+    "options": [
+      "prebuilt-audioSearch",
+      "prebuilt-invoice",
+      "prebuilt-videoSearch",
+      "prebuilt-imageSearch"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: prebuilt-invoice is a domain-specific prebuilt analyzer with a ready-made schema for invoice fields, including nested line items. A is wrong because prebuilt-audioSearch analyses audio, producing a transcript and summary. C is wrong because prebuilt-videoSearch analyses video. D is wrong because prebuilt-imageSearch produces a description of an image, not invoice fields.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-047",
+    "scenario": "A team wants each extracted field to include a confidence score and the location in the document where the value was found, so reviewers can check it.",
+    "question": "What must the team do?",
+    "options": [
+      "Nothing; confidence and grounding are always returned for every field",
+      "Lower the completion model's temperature to 0",
+      "Use prebuilt-read, which adds confidence to every custom field",
+      "Enable estimateFieldSourceAndConfidence in the analyzer configuration"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: confidence scores (from 0 to 1) and grounding (where in the source the value came from) are opt-in in Content Understanding, enabled with the estimateFieldSourceAndConfidence setting on the analyzer (or per field). A is wrong because these values are not returned unless enabled. B is wrong because temperature is not how Content Understanding exposes confidence. C is wrong because prebuilt-read extracts text and layout; it does not apply a custom field schema.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-048",
+    "scenario": "A custom document analyzer needs three fields: VendorName (printed on the page), DocumentCategory (one of 'invoice', 'credit note' or 'statement'), and a one-sentence Summary.",
+    "question": "Which field methods should be used?",
+    "options": [
+      "VendorName: extract; DocumentCategory: classify; Summary: generate",
+      "VendorName: generate; DocumentCategory: extract; Summary: classify",
+      "All three: extract, because the analyzer is for documents",
+      "VendorName: classify; DocumentCategory: generate; Summary: extract"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: extract returns a value that appears in the content (supported for documents), classify picks from a predefined set of categories, and generate produces new text such as a summary. B is wrong because a category from a fixed list is a classify task, and a summary is generated rather than classified. C is wrong because neither a category label nor a summary appears as text to extract. D is wrong because it mixes up all three methods.",
+    "tags": [
+      "configuration",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-049",
+    "scenario": "A developer's first call to prebuilt-invoice fails with an error about missing model deployments, even though prebuilt-read works.",
+    "question": "What is the likely cause?",
+    "options": [
+      "prebuilt-invoice only accepts images, not PDFs",
+      "The analyzer needs a chat completion model and an embeddings model deployed and set as defaults",
+      "Content Understanding must be created as a separate hub-based project",
+      "The API version must be changed to a Language Studio version"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Content Understanding uses your own Foundry model deployments. Most analyzers need a chat completion model and an embeddings model mapped as defaults, while prebuilt-read and prebuilt-layout need no generative model, which is why they still work. A is wrong because invoice analysis supports PDF documents. C is wrong because Content Understanding is a Foundry Tool on the Foundry resource. D is wrong because Language Studio is unrelated to Content Understanding.",
+    "tags": [
+      "troubleshooting",
+      "comprehension"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-050",
+    "scenario": "A team plans to use an image analyzer to pull totals and dates from photographed paper receipts.",
+    "question": "What does Microsoft's guidance recommend?",
+    "options": [
+      "Use an image analyzer with generate fields, because receipts are photos",
+      "Use prebuilt-imageSearch and parse the description for numbers",
+      "Use a document analyzer (such as prebuilt-receipt), because extraction relies on the text",
+      "Use image generation to redraw the receipt more clearly first"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: image analyzers are not optimised for scenarios that depend mainly on the text in the image, so Microsoft recommends a document field-extraction schema, such as the prebuilt receipt analyzer. A is wrong because the analysis depends on printed text, which document analyzers handle better. B is wrong because a paragraph description is not reliable structured data. D is wrong because redrawing can invent or change values.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-051",
+    "scenario": "A custom analyzer for conference-room photos defines an integer field TotalAttendees with method 'extract'. Creating the analyzer fails.",
+    "question": "What is wrong?",
+    "options": [
+      "Integer fields are not supported in Content Understanding",
+      "Images must be converted to video before fields can be defined",
+      "The analyzer must use the prebuilt-invoice base analyzer",
+      "Extract is only supported for documents; image fields use generate or classify"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: in Content Understanding the extract method is supported for documents only. Image, audio and video analyzers use generate (for values such as counts or descriptions) or classify. A is wrong because integer is a supported field type. B is wrong because images are a supported modality of their own. C is wrong because a custom image analyzer is based on prebuilt-image, not a document analyzer.",
+    "tags": [
+      "configuration",
+      "analysis",
+      "exam-trap"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-052",
+    "scenario": "A retailer wants each store-shelf photo returned as JSON with a StockLevel value of 'Full', 'Partial' or 'Empty', plus a short description of any problem.",
+    "question": "Which analyzer design fits?",
+    "options": [
+      "A custom analyzer based on prebuilt-image with a classify field and a generate field",
+      "prebuilt-read, which reads all text on the shelf labels",
+      "prebuilt-audioSearch, with the photo converted to sound",
+      "A GPT-image model prompted to draw the shelf as full"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a custom analyzer built on the prebuilt-image base can classify the stock level into fixed categories and generate a short description, returning both as structured JSON. B is wrong because reading label text does not assess how full the shelf is. C is wrong because audio analyzers process sound. D is wrong because image generation creates pictures instead of analysing them.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-053",
+    "scenario": "A podcast team wants a transcript and a short summary of each episode without designing a schema.",
+    "question": "Which prebuilt analyzer fits?",
+    "options": [
+      "prebuilt-invoice",
+      "prebuilt-layout",
+      "prebuilt-audioSearch",
+      "prebuilt-imageSearch"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: prebuilt-audioSearch transcribes audio and adds a summary, which suits search and retrieval scenarios. A is wrong because prebuilt-invoice is for invoice documents. B is wrong because prebuilt-layout extracts document structure such as tables. D is wrong because prebuilt-imageSearch describes images.",
+    "tags": [
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-054",
+    "scenario": "A contact centre wants each recorded call analysed for a summary, sentiment, topics and the people and companies mentioned.",
+    "question": "Which Content Understanding option is designed for this?",
+    "options": [
+      "prebuilt-videoSearch",
+      "prebuilt-callCenter",
+      "prebuilt-read",
+      "prebuilt-contract"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: prebuilt-callCenter is a domain-specific analyzer for call recordings and returns fields such as summary, sentiment, topics, companies and people. A is wrong because prebuilt-videoSearch is for video segments and descriptions. C is wrong because prebuilt-read performs OCR on documents. D is wrong because prebuilt-contract analyses legal agreements.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-055",
+    "scenario": "A company analyses training videos with Content Understanding. Each video covers several topics, and the team wants a separate description and fields for each topic section.",
+    "question": "Which statement is correct?",
+    "options": [
+      "Background music cues are transcribed and used as chapter markers",
+      "Video analysis always treats the whole video as one segment",
+      "Each frame is returned as a separate full-resolution image for the app to analyse",
+      "Enable segmentation with content categories so each section gets its own output"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Content Understanding can split a video into segments when segmentation is enabled with defined content categories, and it then returns descriptions and fields for each segment. With segmentation off, the whole video is one segment. A is wrong because only spoken words are transcribed; music and sound effects are ignored. B is wrong because segmentation can be turned on. C is wrong because the service samples frames and returns key frames, not every frame at full resolution.",
+    "tags": [
+      "concept",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-056",
+    "question": "In what format does Content Understanding return audio and video transcripts in its markdown output?",
+    "options": [
+      "WebVTT",
+      "SSML",
+      "Plain CSV",
+      "SRT only"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Content Understanding returns transcripts in WebVTT format, with timing information, and the JSON output also includes the transcript phrases. B is wrong because SSML is a markup language for controlling speech synthesis. C is wrong because transcripts are not returned as CSV. D is wrong because SRT is a different subtitle format that Content Understanding does not use for its transcripts.",
+    "tags": [
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-057",
+    "scenario": "A developer installs azure-ai-contentunderstanding and creates client = ContentUnderstandingClient(endpoint, AzureKeyCredential(key)).",
+    "question": "Which code analyses an invoice at a URL and reads the fields?",
+    "options": [
+      "result = client.analyze(text=url, analyzer='prebuilt-invoice'); print(result.sentiment)",
+      "poller = client.begin_analyze(analyzer_id='prebuilt-invoice', inputs=[{'url': url}]); result = poller.result(); print(result.contents[0].fields)",
+      "result = client.responses.create(model='prebuilt-invoice', input=[{'url': url}]); print(result.output_text)",
+      "result = client.detect_language([url])[0]; print(result.primary_language.name, result.fields)"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: analysis is a long-running operation, so begin_analyze returns a poller and result() waits for completion. The extracted fields are on each item in result.contents. A is wrong because there is no synchronous analyze method that returns sentiment. C is wrong because responses.create belongs to the OpenAI client for generative models. D is wrong because detect_language is an Azure Language method.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-058",
+    "scenario": "An app loads extracted invoice fields straight into the finance system. Some values are wrong when invoices are blurry.",
+    "question": "Which design best reduces bad data?",
+    "options": [
+      "Lower the temperature of the image-generation model",
+      "Only accept invoices with a single page",
+      "Send fields below a confidence threshold to human review",
+      "Increase the number of fields in the schema"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Content Understanding can return a confidence score with each field, so the app can process high-confidence values automatically and send low-confidence ones to a person. This also supports reliability and safety and keeps a human in the loop. A is wrong because no image-generation model is involved. B is wrong because page count is not what causes poor-quality values. D is wrong because more fields do not make the existing values more accurate.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-059",
+    "scenario": "A REST client posts to {endpoint}/contentunderstanding/analyzers/prebuilt-invoice:analyze?api-version=2025-11-01 and gets HTTP 202 Accepted with no fields in the body. The developer assumes the call failed.",
+    "question": "What should the client do?",
+    "options": [
+      "Repeat the POST until a 200 response with fields is returned",
+      "Switch to an image-generation model, which answers synchronously",
+      "Switch the header from Ocp-Apim-Subscription-Key to a model name",
+      "Poll the Operation-Location URL from the response until the status is Succeeded"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: analysis is asynchronous. A 202 response means the job was accepted, and its Operation-Location header points to the analyzer result, which the client polls until the status changes from NotStarted or Running to Succeeded. A is wrong because repeating the POST starts new jobs and wastes tokens. B is wrong because image generation has nothing to do with extracting fields. C is wrong because the key header is correct for key-based authentication.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  }
+]

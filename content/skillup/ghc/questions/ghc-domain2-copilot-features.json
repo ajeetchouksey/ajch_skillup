@@ -4,15 +4,15 @@
     "domain": 2,
     "difficulty": "easy",
     "type": "single",
-    "question": "What is the FIRST step to enable GitHub Copilot functionality in VS Code?",
+    "question": "What is the FIRST step to start using GitHub Copilot in a current version of VS Code?",
     "options": [
-      "A. Install the GitHub Copilot extension from the VS Code Marketplace and sign in with a GitHub account that has an active Copilot subscription",
-      "B. Run `npm install github-copilot` in the project terminal",
-      "C. Enable Copilot in VS Code Settings > Extensions > GitHub Copilot",
-      "D. Create a `.copilot` configuration file in the project root directory"
+      "Select the Copilot icon in the Status Bar, choose Use AI Features, and sign in with your GitHub account",
+      "Run `npm install github-copilot` in the project terminal",
+      "Create a `.copilot` configuration file in the project root directory",
+      "Request a Copilot license file from GitHub Support and import it into VS Code settings"
     ],
     "correct": 0,
-    "explanation": "Enabling Copilot in VS Code requires: (1) installing the GitHub Copilot extension from the Marketplace, then (2) signing in with a GitHub account that has an active Copilot subscription (Individual, Business, or Enterprise).",
+    "explanation": "A is correct: VS Code's setup guide says to hover over the Copilot icon in the Status Bar, select Use AI Features and sign in with GitHub; an account with no Copilot plan is enrolled in Copilot Free, and organization members get access from a Copilot Business or Enterprise seat. B is wrong because Copilot is not an npm package added to a project. C is wrong because no `.copilot` file enables Copilot. D is wrong because access comes from the plan or seat on your GitHub account, not from a license file.",
     "tags": [
       "copilot-features",
       "enterprise",
@@ -27,13 +27,13 @@
     "type": "single",
     "question": "A developer sees a gray 'ghost text' inline suggestion in VS Code while typing. Which keyboard shortcut accepts the FULL suggestion?",
     "options": [
-      "A. Enter",
-      "B. Ctrl+Space",
-      "C. Tab",
-      "D. Alt+]"
+      "Enter",
+      "Ctrl+Space",
+      "Tab",
+      "Ctrl+Right"
     ],
     "correct": 2,
-    "explanation": "Tab is the default keyboard shortcut to accept a complete inline (ghost text) suggestion from GitHub Copilot in VS Code. Alt+] cycles to the next alternative suggestion; Alt+[ cycles to the previous.",
+    "explanation": "C is correct: VS Code's inline suggestions docs say to 'accept a suggestion by pressing the Tab key'. A is wrong because Enter inserts a new line rather than accepting ghost text. B is wrong because Ctrl+Space triggers IntelliSense completions, not Copilot acceptance. D is wrong because Ctrl+Right (Cmd+Right on macOS) accepts only the next word of the suggestion, not the whole thing.",
     "tags": [
       "copilot-features",
       "vscode"
@@ -46,10 +46,10 @@
     "type": "single",
     "question": "Which of the following BEST describes the difference between GitHub Copilot inline suggestions and GitHub Copilot Chat?",
     "options": [
-      "A. Inline suggestions appear as ghost text while typing; Copilot Chat is a conversational interface for questions, explanations, and code requests",
-      "B. Copilot Chat is only available on github.com; inline suggestions work only in the terminal",
-      "C. Inline suggestions only work for Python; Copilot Chat works for all languages",
-      "D. Copilot Chat requires a separate paid subscription from inline suggestions"
+      "Inline suggestions appear as ghost text while typing; Copilot Chat is a conversational interface for questions, explanations, and code requests",
+      "Copilot Chat is only available on github.com; inline suggestions work only in the terminal",
+      "Inline suggestions only work for Python; Copilot Chat works for all languages",
+      "Copilot Chat requires a separate paid subscription from inline suggestions"
     ],
     "correct": 0,
     "explanation": "Inline suggestions (ghost text) appear contextually as you type in the editor. Copilot Chat is a dedicated chat panel for conversational interactions — asking questions, explaining code, requesting refactors, and getting documentation help.",
@@ -67,10 +67,10 @@
     "type": "single",
     "question": "A developer at Meridian Analytics wants to use GitHub Copilot Agent Mode. Which statement BEST describes what Agent Mode enables?",
     "options": [
-      "A. Agent Mode allows GitHub to automatically review and merge pull requests on a schedule",
-      "B. Agent Mode enables Copilot to autonomously plan and execute multi-step coding tasks, iterate on errors, and use tools within a defined scope",
-      "C. Agent Mode permanently replaces the need for human code review in CI/CD pipelines",
-      "D. Agent Mode is only available in GitHub Copilot Enterprise plan"
+      "Agent Mode allows GitHub to automatically review and merge pull requests on a schedule",
+      "Agent Mode enables Copilot to autonomously plan and execute multi-step coding tasks, iterate on errors, and use tools within a defined scope",
+      "Agent Mode permanently replaces the need for human code review in CI/CD pipelines",
+      "Agent Mode is only available in GitHub Copilot Enterprise plan"
     ],
     "correct": 1,
     "explanation": "Agent Mode enables Copilot to autonomously undertake multi-step coding tasks — planning, writing code, running tests, iterating on errors — within a defined scope, going beyond single-file or single-action suggestions.",
@@ -84,15 +84,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "Which command correctly installs the GitHub Copilot CLI extension?",
+    "question": "The legacy `gh-copilot` GitHub CLI extension (`gh copilot suggest` and `gh copilot explain`) stopped working on October 25, 2025. What replaced it?",
     "options": [
-      "A. `npm install -g github-copilot-cli`",
-      "B. `gh extension install github/gh-copilot`",
-      "C. `pip install github-copilot`",
-      "D. `brew install gh-copilot`"
+      "GitHub Copilot CLI, an agentic terminal tool started with the `copilot` command",
+      "The `gh models` extension, which took over the `suggest` and `explain` commands",
+      "Copilot Chat in the VS Code integrated terminal; there is no terminal-native Copilot tool",
+      "A GitHub App-based Copilot Extension installed from GitHub Marketplace"
     ],
-    "correct": 1,
-    "explanation": "`gh extension install github/gh-copilot` is the correct command. GitHub Copilot CLI is installed as a GitHub CLI (`gh`) extension. The `gh` CLI must be installed and authenticated first.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub retired the gh-copilot extension and its docs point to the standalone GitHub Copilot CLI, which you run with `copilot` (since January 2026, `gh copilot` can also install and launch it). B is wrong because gh-models was a separate extension for trying AI models and never took over suggest/explain. C is wrong because Copilot CLI runs natively in any terminal on Linux, macOS and Windows. D is wrong because GitHub App-based Copilot Extensions were themselves sunset on November 10, 2025.",
     "tags": [
       "copilot-features",
       "copilot-cli"
@@ -103,15 +103,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "A developer at TechNova Solutions wants to understand what a complex shell command does using Copilot CLI. Which command should they use?",
+    "question": "A developer wants GitHub Copilot CLI to explain a complex shell command and then propose a safer alternative, without leaving the terminal. What should they do?",
     "options": [
-      "A. `gh copilot explain \"<command>\"`",
-      "B. `gh copilot suggest --explain <command>`",
-      "C. `gh copilot decode \"<command>\"`",
-      "D. `gh copilot help \"<command>\"`"
+      "Start an interactive session with `copilot` and ask in natural language, approving any tool use it requests",
+      "Run `gh copilot explain \"<command>\"`",
+      "Run `copilot --decode \"<command>\"`",
+      "Run `gh copilot suggest --explain <command>`"
     ],
     "correct": 0,
-    "explanation": "`gh copilot explain \"<command>\"` uses Copilot to provide a natural language explanation of what a shell command does, making it easier to understand complex or unfamiliar commands without consulting external documentation.",
+    "explanation": "A is correct: the current Copilot CLI is conversational. `copilot` opens an interactive session where you ask questions and give tasks, and it asks permission before it runs tools unless you pre-approve them. B is wrong because `gh copilot explain` belonged to the retired gh-copilot extension. C is wrong because Copilot CLI has no `--decode` flag. D is wrong because `gh copilot suggest` was also part of the retired extension and never had an `--explain` flag.",
     "tags": [
       "copilot-features",
       "copilot-cli",
@@ -124,15 +124,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "Which `gh copilot` subcommand helps developers generate shell commands from natural language descriptions?",
+    "question": "Which command runs GitHub Copilot CLI non-interactively, completing a single prompt and exiting, so it can be used in a script?",
     "options": [
-      "A. `gh copilot generate`",
-      "B. `gh copilot suggest`",
-      "C. `gh copilot create`",
-      "D. `gh copilot write`"
+      "`copilot -p \"<prompt>\"` (or `--prompt`), with `--allow-tool` to pre-approve the tools it may use",
+      "`gh copilot suggest \"<prompt>\"`",
+      "`copilot --batch \"<prompt>\"`",
+      "`copilot run \"<prompt>\" --silent`"
     ],
-    "correct": 1,
-    "explanation": "`gh copilot suggest` takes a natural language description and generates the appropriate shell command interactively. It asks follow-up questions to clarify intent and refine the suggestion.",
+    "correct": 0,
+    "explanation": "A is correct: GitHub documents programmatic mode as passing one prompt with `-p` or `--prompt`; because nobody is there to approve tools, you pre-approve them with `--allow-tool` or `--allow-all-tools`, and `--deny-tool` overrides both. B is wrong because `gh copilot suggest` was part of the retired gh-copilot extension. C is wrong because `--batch` is not a Copilot CLI option. D is wrong because there is no `run` subcommand or `--silent` flag.",
     "tags": [
       "copilot-features"
     ]
@@ -142,15 +142,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "Vertex Systems is configuring GitHub Copilot content exclusions to prevent certain files from being used as context. Where can content exclusions be configured?",
+    "question": "Vertex Systems (Copilot Business) wants to stop certain files being used as Copilot context. Where can content exclusions be configured?",
     "options": [
-      "A. Only in the `.copilotignore` file in the repository root",
-      "B. At the repository level (repository settings) and at the organization level (organization settings)",
-      "C. Only at the IDE level in each developer's VS Code settings.json",
-      "D. Only enterprise plan administrators can configure content exclusions"
+      "Only in a `.copilotignore` file in the repository root",
+      "In GitHub settings at the repository level, the organization level and the enterprise level",
+      "Only at the IDE level in each developer's VS Code settings.json",
+      "Only by enterprise owners, in the enterprise AI controls"
     ],
     "correct": 1,
-    "explanation": "Content exclusions are configured at the repository level (repository Settings > Copilot > Content exclusions) and the organization level (organization Settings > Copilot). These prevent specified files from being sent as context for Copilot suggestions.",
+    "explanation": "B is correct: repository administrators set exclusions in repository settings, organization owners set them for users who get a seat from the organization, and enterprise owners set them under AI controls > Copilot > Content exclusion for all Copilot users in the enterprise; the feature needs Copilot Business or Enterprise. A is wrong because Copilot does not read a `.copilotignore` file. C is wrong because exclusions are not configured per developer in settings.json. D is wrong because repository admins and organization owners can also configure exclusions.",
     "tags": [
       "copilot-features",
       "content-exclusions",
@@ -164,13 +164,13 @@
     "type": "single",
     "question": "What is 'Copilot Edits' in GitHub Copilot?",
     "options": [
-      "A. A feature that automatically fixes code style violations on save",
-      "B. A Copilot feature that edits and improves pull request descriptions",
-      "C. The ability for developers to edit Copilot's system-level prompts",
-      "D. A feature that enables Copilot to propose and apply edits across multiple files based on a natural language description"
+      "A feature that automatically fixes code style violations on save",
+      "A Copilot feature that edits and improves pull request descriptions",
+      "The ability for developers to edit Copilot's system-level prompts",
+      "A feature that enables Copilot to propose and apply edits across multiple files based on a natural language description"
     ],
     "correct": 3,
-    "explanation": "Copilot Edits enables developers to describe a change in natural language and have Copilot propose edits across multiple files simultaneously, enabling broader refactoring, feature additions, and codebase-wide changes.",
+    "explanation": "D is correct: Copilot Edits is about describing a change in natural language and reviewing Copilot's proposed edits across several files before keeping them. In current VS Code, multi-file edits are made in Agent mode (the separate Edit mode was deprecated in VS Code 1.110), but the review-then-apply idea is the same. A is wrong because fixing style on save is a formatter's job. B is wrong because pull request descriptions come from PR summaries. C is wrong because developers do not edit Copilot's system prompts; they customize behavior with instructions files.",
     "tags": [
       "copilot-features",
       "refactoring",
@@ -184,10 +184,10 @@
     "type": "single",
     "question": "What does Model Context Protocol (MCP) enable when used with GitHub Copilot Agent Mode?",
     "options": [
-      "A. MCP enables Copilot to run in fully offline mode without internet connectivity",
-      "B. MCP enables Copilot to connect to external tools and data sources (databases, APIs, file systems) through standardized interfaces",
-      "C. MCP is a protocol for encrypting Copilot suggestions in transit between IDE and GitHub servers",
-      "D. MCP enables Copilot to share context with other developers collaborating on the same file"
+      "MCP enables Copilot to run in fully offline mode without internet connectivity",
+      "MCP enables Copilot to connect to external tools and data sources (databases, APIs, file systems) through standardized interfaces",
+      "MCP is a protocol for encrypting Copilot suggestions in transit between IDE and GitHub servers",
+      "MCP enables Copilot to share context with other developers collaborating on the same file"
     ],
     "correct": 1,
     "explanation": "Model Context Protocol (MCP) allows Copilot Agent Mode to connect to external tools and data sources through standardized interfaces, enabling Copilot to interact with databases, APIs, project management tools, and file systems during agentic tasks.",
@@ -203,10 +203,10 @@
     "type": "single",
     "question": "Which GitHub Copilot feature automatically generates a natural language summary of the changes made in a pull request?",
     "options": [
-      "A. Copilot Code Review",
-      "B. Pull Request summaries",
-      "C. Copilot Edits",
-      "D. Copilot Spaces"
+      "Copilot Code Review",
+      "Pull Request summaries",
+      "Copilot Edits",
+      "Copilot Spaces"
     ],
     "correct": 1,
     "explanation": "GitHub Copilot Pull Request summaries automatically generate a description of the changes, key decisions, and impact of a PR, saving developers time writing PR descriptions and helping reviewers understand the changes faster.",
@@ -222,10 +222,10 @@
     "type": "single",
     "question": "A developer at NovaBuild wants Copilot to consistently follow their repository's coding conventions in all Copilot Chat interactions. Which file should they create?",
     "options": [
-      "A. `.github/copilot-config.json`",
-      "B. `.github/copilot-instructions.md`",
-      "C. `.copilot/rules.md`",
-      "D. `COPILOT_RULES.md` in the repository root"
+      "`.github/copilot-config.json`",
+      "`.github/copilot-instructions.md`",
+      "`.copilot/rules.md`",
+      "`COPILOT_RULES.md` in the repository root"
     ],
     "correct": 1,
     "explanation": "Creating `.github/copilot-instructions.md` allows developers to define custom instructions that GitHub Copilot Chat follows for all interactions within that repository — ensuring consistent coding conventions, style, and context.",
@@ -242,10 +242,10 @@
     "type": "single",
     "question": "An organization admin at Pinnacle Corp wants to enable GitHub Copilot Code Review for their organization's pull requests. Where should they configure this?",
     "options": [
-      "A. In each repository's CODEOWNERS file",
-      "B. In the organization's Copilot settings to enable Code Review and configure policies",
-      "C. By installing a separate 'GitHub Copilot Code Review' GitHub App",
-      "D. By adding a `.github/workflows/copilot-review.yml` workflow to each repository"
+      "In each repository's CODEOWNERS file",
+      "In the organization's Copilot settings to enable Code Review and configure policies",
+      "By installing a separate 'GitHub Copilot Code Review' GitHub App",
+      "By adding a `.github/workflows/copilot-review.yml` workflow to each repository"
     ],
     "correct": 1,
     "explanation": "Organization-wide Copilot Code Review is configured in the organization's Copilot settings. Admins can enable the feature, set policies, configure review standards, and control which repositories and pull requests are covered.",
@@ -263,10 +263,10 @@
     "type": "single",
     "question": "What does the 'GitHub Copilot Spaces' feature provide to development teams?",
     "options": [
-      "A. Cloud storage for Copilot-generated code snippet libraries",
-      "B. A collaborative environment where teams create AI-powered experiences with curated context, documentation, and tools",
-      "C. A whiteboard feature for planning integrated with Copilot suggestions",
-      "D. A dedicated isolated Copilot server for enterprise on-premises deployments"
+      "Cloud storage for Copilot-generated code snippet libraries",
+      "A collaborative environment where teams create AI-powered experiences with curated context, documentation, and tools",
+      "A whiteboard feature for planning integrated with Copilot suggestions",
+      "A dedicated isolated Copilot server for enterprise on-premises deployments"
     ],
     "correct": 1,
     "explanation": "GitHub Copilot Spaces allows teams to create dedicated AI-powered collaboration environments with curated context, documentation, and tool access — enabling richer, more grounded team-based AI assistance.",
@@ -284,13 +284,13 @@
     "type": "single",
     "question": "Which Copilot Chat slash command asks Copilot to generate unit tests for selected code?",
     "options": [
-      "A. `/debug`",
-      "B. `/optimize`",
-      "C. `/tests`",
-      "D. `/unittest`"
+      "`/debug`",
+      "`/optimize`",
+      "`/tests`",
+      "`/unittest`"
     ],
     "correct": 2,
-    "explanation": "`/tests` is a built-in Copilot Chat slash command that generates unit tests for selected code. Other built-in commands include `/explain` (explain code), `/fix` (fix bugs), `/docs` (generate docs), and `/new` (scaffold a new project).",
+    "explanation": "C is correct: `/tests` generates unit tests for the selected code. GitHub's cheat sheet lists `/explain`, `/fix`, `/fixTestFailure`, `/tests`, `/new`, `/help` and `/clear` for VS Code. A is wrong because `/debug` is not a Copilot Chat slash command. B is wrong because `/optimize` is a Visual Studio command that improves running time, not one that writes tests. D is wrong because `/unittest` does not exist.",
     "tags": [
       "copilot-features",
       "copilot-chat",
@@ -305,10 +305,10 @@
     "type": "single",
     "question": "An organization admin wants to review which developers are using GitHub Copilot and what policy events occurred. Where should they look?",
     "options": [
-      "A. The organization's Audit Log, filtered for Copilot action events",
-      "B. GitHub Actions workflow logs for each repository",
-      "C. GitHub Copilot's built-in individual usage dashboard",
-      "D. The GitHub Copilot REST API at `/orgs/{org}/copilot/usage`"
+      "The organization's Audit Log, filtered for Copilot action events",
+      "GitHub Actions workflow logs for each repository",
+      "GitHub Copilot's built-in individual usage dashboard",
+      "The GitHub Copilot REST API at `/orgs/{org}/copilot/usage`"
     ],
     "correct": 0,
     "explanation": "Organization audit logs capture Copilot-specific events such as enabling/disabling Copilot access, policy changes, seat assignments, and feature access changes. Admins can filter by the `copilot` action category.",
@@ -324,15 +324,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "A developer is using GitHub Copilot Chat and wants to provide a specific file as context. Which syntax correctly attaches a file?",
+    "question": "In VS Code Copilot Chat, how do you explicitly attach a specific file, such as `src/utils.ts`, as context?",
     "options": [
-      "A. `#file:src/utils.ts`",
-      "B. `@file:src/utils.ts`",
-      "C. `[src/utils.ts]`",
-      "D. `include:src/utils.ts`"
+      "Type `#` followed by the file name (for example `#utils.ts`), drag the file onto the Chat view, or use Add Context",
+      "Type `@file:src/utils.ts`, because the `@` prefix attaches files",
+      "Wrap the path in square brackets, such as `[src/utils.ts]`",
+      "Put `include:src/utils.ts` on the first line of the prompt"
     ],
     "correct": 0,
-    "explanation": "Using `#file:filename.ext` syntax in Copilot Chat attaches a specific file as explicit context for the conversation, allowing Copilot to provide more accurate, file-aware assistance.",
+    "explanation": "A is correct: VS Code's chat context docs say you add a file, folder or symbol by typing `#` followed by its name, by dragging it onto the Chat view, or with the Add Context (+) button. B is wrong because `@` invokes chat participants such as `@terminal`, not files. C is wrong because brackets are plain text to the model and attach nothing. D is wrong because there is no `include:` directive.",
     "tags": [
       "copilot-features",
       "copilot-chat",
@@ -345,15 +345,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "What is the purpose of 'prompt files' (`.github/prompts/*.md`) in GitHub Copilot?",
+    "question": "What is the purpose of prompt files (`.github/prompts/*.prompt.md`) in GitHub Copilot?",
     "options": [
-      "A. Reusable markdown files containing prompts that can be invoked in Copilot Chat for consistent, repeatable interactions",
-      "B. Files that store Copilot's API configuration and rate limit settings",
-      "C. Files that log all prompts sent to Copilot for compliance audit purposes",
-      "D. Configuration files that set Copilot's model temperature and inference parameters"
+      "Reusable markdown files containing prompts that can be invoked in Copilot Chat for consistent, repeatable interactions",
+      "Files that store Copilot's API configuration and rate limit settings",
+      "Files that log all prompts sent to Copilot for compliance audit purposes",
+      "Configuration files that set Copilot's model temperature and inference parameters"
     ],
     "correct": 0,
-    "explanation": "Prompt files (`.github/prompts/`) are reusable markdown files containing commonly used prompts. Developers can reference them in Copilot Chat for consistent, standardized interactions — useful for code reviews, documentation, or common coding tasks.",
+    "explanation": "A is correct: prompt files are reusable Markdown prompts stored in the repository; in VS Code you run one by typing `/` followed by its name in chat, which gives the team consistent, repeatable requests. Unlike custom instructions, which apply automatically, you choose when to use a prompt file. B is wrong because prompt files hold no API or rate-limit settings. C is wrong because they do not log prompts; Copilot prompts are not recorded in the audit log. D is wrong because they do not set model temperature or other inference parameters.",
     "tags": [
       "copilot-features",
       "copilot-chat",
@@ -368,10 +368,10 @@
     "type": "single",
     "question": "An admin at Stellar DevOps wants to use the GitHub REST API to programmatically check Copilot seat usage for their organization. Which API endpoint category should they use?",
     "options": [
-      "A. `/orgs/{org}/members` with a Copilot filter parameter",
-      "B. `/enterprises/{enterprise}/copilot/metrics` for all organizations",
-      "C. `/orgs/{org}/actions/secrets` for token management",
-      "D. `/orgs/{org}/copilot/billing` and related billing/seats endpoints"
+      "`/orgs/{org}/members` with a Copilot filter parameter",
+      "`/enterprises/{enterprise}/copilot/metrics` for all organizations",
+      "`/orgs/{org}/actions/secrets` for token management",
+      "`/orgs/{org}/copilot/billing` and related billing/seats endpoints"
     ],
     "correct": 3,
     "explanation": "The GitHub REST API provides `/orgs/{org}/copilot/billing` endpoints to retrieve Copilot seat usage, manage seat assignments, get billing summaries, and track subscription data programmatically.",
@@ -386,15 +386,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "Which GitHub Copilot feature allows a developer to describe a new application idea in natural language and receive a generated initial scaffold?",
+    "question": "Which GitHub feature let users describe an app idea in natural language and get a working micro-app, and was retired on github.com on August 31, 2026?",
     "options": [
-      "A. Copilot Edits",
-      "B. Agent Mode with MCP",
-      "C. GitHub Copilot Spark",
-      "D. Pull Request summaries"
+      "Copilot Edits",
+      "Agent Mode with MCP",
+      "GitHub Copilot Spark",
+      "Pull Request summaries"
     ],
     "correct": 2,
-    "explanation": "GitHub Copilot Spark enables developers to describe an application idea in natural language and receive a generated app scaffold, accelerating the initial project setup and prototyping phase.",
+    "explanation": "C is correct: GitHub Spark turned natural-language descriptions into deployable apps. GitHub stopped accepting new Spark users and apps on August 4, 2026 and closed it on August 31, 2026; deployed apps keep running, and GitHub now points builders to Copilot in VS Code, Copilot CLI and the GitHub Copilot app. A is wrong because Copilot Edits changes existing files rather than generating a hosted app. B is wrong because agent mode with MCP works inside your own project and tools. D is wrong because PR summaries describe pull request changes.",
     "tags": [
       "copilot-features",
       "ide-integration"
@@ -405,15 +405,15 @@
     "domain": 2,
     "difficulty": "medium",
     "type": "single",
-    "question": "A developer uses `@workspace` in GitHub Copilot Chat. What does this context participant enable?",
+    "question": "In VS Code Copilot Chat, a developer asks 'Where is user authentication handled in this project?' without knowing which files matter. What should they add to the prompt?",
     "options": [
-      "A. Opens the entire GitHub repository in a new browser tab for browsing",
-      "B. Provides Copilot Chat with indexed context from across the entire local workspace to answer codebase-wide questions",
-      "C. Sends the workspace configuration to GitHub's servers for remote analysis",
-      "D. Syncs the local workspace with the remote repository's default branch"
+      "`#codebase`, which searches the workspace for code relevant to the question",
+      "`#selection`, which includes the whole workspace when nothing is selected",
+      "`@terminal`, which indexes every file in the workspace",
+      "`/new`, which rebuilds the workspace index before answering"
     ],
-    "correct": 1,
-    "explanation": "`@workspace` is a Copilot Chat participant that allows asking questions about your entire codebase. Copilot indexes workspace files to provide context-aware answers about the full project structure, patterns, and relationships.",
+    "correct": 0,
+    "explanation": "A is correct: `#codebase` asks Copilot to search the workspace for relevant code; it does not paste the entire codebase into context. The older `@workspace` participant did a similar job, but VS Code now marks `@` participants as deprecated and unsupported in the Copilot harness. B is wrong because `#selection` adds only the currently selected text. C is wrong because `@terminal` has context about the terminal shell, not the codebase. D is wrong because `/new` scaffolds a new project.",
     "tags": [
       "copilot-features",
       "copilot-chat",
@@ -426,15 +426,15 @@
     "domain": 2,
     "difficulty": "hard",
     "type": "single",
-    "question": "How can an organization admin configure GitHub Copilot to be available only in certain IDEs for all organization members?",
+    "question": "An organization owner wants to control which Copilot features members can use across IDEs, Copilot CLI and github.com. How is this managed?",
     "options": [
-      "A. By configuring IDE feature availability policies in the organization's Copilot settings",
-      "B. By purchasing IDE-specific Copilot license add-ons for each IDE type",
-      "C. By creating per-repository `.copilot/ide-config.json` policy files",
-      "D. IDE availability is determined solely by the Copilot plan tier, not by admin policy"
+      "Through the organization's Copilot policies (Settings > Copilot > Policies); each policy applies to specific surfaces, and clients such as Copilot CLI have their own policy",
+      "By buying IDE-specific Copilot license add-ons for each editor",
+      "By committing a `.copilot/ide-config.json` policy file to every repository",
+      "It cannot be managed, because feature availability is fixed by the plan tier"
     ],
     "correct": 0,
-    "explanation": "Organization admins can configure Copilot feature availability policies in organization settings, including which IDE integrations (VS Code, JetBrains, Vim, Neovim, Visual Studio, etc.) are permitted for organization members.",
+    "explanation": "A is correct: organization owners set Copilot policies under Settings > Code, planning, and automation > Copilot > Policies. GitHub's policy docs say policies apply wherever users authenticate to Copilot (IDEs, github.com and Copilot CLI), a reference table lists the surfaces each policy covers, and the GitHub Copilot app and Copilot CLI have separate client policies. B is wrong because Copilot has no per-IDE license add-ons. C is wrong because no repository file controls Copilot policy. D is wrong because owners can enable or disable features such as Copilot in GitHub.com, MCP servers, models and preview features.",
     "tags": [
       "copilot-features",
       "administration",
@@ -449,13 +449,13 @@
     "type": "single",
     "question": "What are 'Sub-Agents' in the context of GitHub Copilot Agent Mode?",
     "options": [
-      "A. Human reviewers who validate and approve Agent Mode outputs before merging",
-      "B. External AI services connected to Agent Mode via the MCP protocol",
-      "C. GitHub Actions bots that automatically merge Agent Mode-generated pull requests",
-      "D. Specialized agent instances that can be delegated specific subtasks to optimize context usage and enable parallel task execution"
+      "Human reviewers who validate and approve Agent Mode outputs before merging",
+      "External AI services connected to Agent Mode via the MCP protocol",
+      "GitHub Actions bots that automatically merge Agent Mode-generated pull requests",
+      "Agent instances that the main agent delegates scoped subtasks to; each works in its own context and returns a focused result"
     ],
     "correct": 3,
-    "explanation": "Sub-Agents in Agent Mode are specialized instances that can be delegated specific subtasks, enabling better context management, parallel task execution, and optimized handling of complex multi-step development workflows.",
+    "explanation": "D is correct: VS Code describes a subagent as a delegated worker that 'works in its own context and returns a focused result to the main agent'. It does not inherit the main conversation, which keeps research and intermediate work out of the main context window. A is wrong because subagents are agents, not human reviewers. B is wrong because MCP servers provide tools and data, not delegated agents. C is wrong because subagents do not merge pull requests.",
     "tags": [
       "copilot-features",
       "context"
@@ -466,15 +466,15 @@
     "domain": 2,
     "difficulty": "easy",
     "type": "single",
-    "question": "A developer sees multiple alternative inline suggestions available from Copilot. How do they cycle through the alternatives in VS Code?",
+    "question": "A developer sees a Copilot inline suggestion in VS Code and wants to compare it with the alternative suggestions Copilot has generated. What is the documented way to do this?",
     "options": [
-      "A. Press F5 to cycle forward through all available alternatives",
-      "B. Right-click in the editor and select 'Show GitHub Copilot alternatives'",
-      "C. Press Alt+] to see the next suggestion and Alt+[ to see the previous suggestion",
-      "D. Type `/alternatives` in the inline suggestion ghost text area"
+      "Press F5 to cycle forward through all available alternatives",
+      "Right-click in the editor and select 'Show GitHub Copilot alternatives'",
+      "Hover over the inline suggestion and choose from the suggestions shown",
+      "Type `/alternatives` in the inline suggestion ghost text area"
     ],
     "correct": 2,
-    "explanation": "When multiple inline suggestions are available, developers cycle through them using Alt+] (next suggestion) and Alt+[ (previous suggestion) in VS Code, allowing comparison before accepting the best option with Tab.",
+    "explanation": "C is correct: VS Code's inline suggestions docs say Copilot 'might offer multiple, alternative suggestions' and that hovering over inline suggestions 'enables you to select from multiple suggestions'; you then accept with Tab, or accept the next word with Ctrl+Right (Cmd+Right on macOS). A is wrong because F5 starts debugging. B is wrong because there is no such context-menu command. D is wrong because slash commands are typed in chat, not in ghost text.",
     "tags": [
       "copilot-features",
       "vscode"
@@ -487,10 +487,10 @@
     "type": "single",
     "question": "An admin at ClearPath Technologies wants to control whether organization members can use GitHub Copilot features on github.com (web editor, PR summaries) in addition to their IDE. Where is this configured?",
     "options": [
-      "A. In the organization's Copilot policy settings, which controls feature availability on github.com separately from IDE access",
-      "B. In each repository's branch protection rules settings",
-      "C. In the GitHub Actions permissions settings for the organization",
-      "D. In each member's individual GitHub profile settings — admins cannot control this centrally"
+      "In the organization's Copilot policy settings, which controls feature availability on github.com separately from IDE access",
+      "In each repository's branch protection rules settings",
+      "In the GitHub Actions permissions settings for the organization",
+      "In each member's individual GitHub profile settings — admins cannot control this centrally"
     ],
     "correct": 0,
     "explanation": "Organization Copilot settings include separate controls for feature availability on github.com (web editor, Copilot Chat on github.com, PR summaries) and IDE-based features, giving admins granular control over where Copilot is accessible.",
@@ -499,6 +499,725 @@
       "copilot-chat",
       "administration",
       "ide-integration"
+    ]
+  },
+  {
+    "id": "ghc-d2-026",
+    "domain": 2,
+    "scenario": "A junior developer at Apex Systems is comparing Copilot inline chat with the Chat view in VS Code.",
+    "question": "What is the key advantage of using inline chat with GitHub Copilot?",
+    "options": [
+      "It enables direct integration with external code repositories",
+      "It automatically generates comprehensive unit tests for the code",
+      "It allows code generation in several programming languages at once",
+      "It gives access to Copilot's features without leaving the code editor"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: inline chat (Ctrl+I in VS Code) opens a chat prompt directly in the editor, so you can ask for a change to the code in front of you without switching to the Chat view. A is wrong because inline chat doesn't connect to external repositories. B is wrong because it only generates tests if you ask it to. C is wrong because it works on the code at hand rather than producing several languages at once.",
+    "tags": [
+      "ide-integration",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-027",
+    "domain": 2,
+    "question": "How does an organization owner enable or disable Copilot features for their organization?",
+    "options": [
+      "By installing GitHub Apps that control Copilot behavior",
+      "In the organization's Settings, under Code, planning, and automation > Copilot",
+      "By editing files in the organization's repositories",
+      "By asking GitHub Support to change the settings"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's policy docs have organization owners open the organization's Settings, choose Copilot under Code, planning, and automation, and then Policies or Models. A is wrong because no GitHub App controls Copilot policy. C is wrong because policies are not stored in repository files. D is wrong because owners manage these settings themselves.",
+    "tags": [
+      "policy-management",
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-028",
+    "domain": 2,
+    "question": "Which of the following is NOT a feature of GitHub Copilot in Visual Studio Code?",
+    "options": [
+      "Smart actions",
+      "Real-time debugging with breakpoints",
+      "Inline code completions",
+      "Inline chat"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: breakpoints, stepping and variable inspection come from VS Code's debugger, not from Copilot. A is wrong because smart actions (one-click actions such as generating a commit message) are a Copilot feature. C is wrong because inline completions are Copilot's core feature. D is wrong because inline chat is a Copilot feature in the editor.",
+    "tags": [
+      "ide-integration",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-029",
+    "domain": 2,
+    "question": "Where can developers use GitHub Copilot Chat?",
+    "options": [
+      "Only inside code files, for completions",
+      "Only in Codespaces, for real-time collaboration",
+      "Only in pull requests, to discuss changes",
+      "In the IDE and on GitHub.com, including issues, pull requests, files and repositories"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Copilot Chat is available in supported IDEs and on GitHub.com, where you can ask about a repository, file, issue or pull request; it is also in GitHub Mobile and Copilot CLI. A is wrong because completions are a different feature and chat is not limited to files. B is wrong because Codespaces is just one place an IDE can run. C is wrong because pull requests are only one of many places chat works.",
+    "tags": [
+      "copilot-chat",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-030",
+    "domain": 2,
+    "question": "What is the primary purpose of the GitHub Copilot usage metrics REST API?",
+    "options": [
+      "To control Copilot extension settings in IDEs",
+      "To manage user accounts and access permissions",
+      "To support chat between developers on a team",
+      "To report how Copilot is being used across an organization or enterprise"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the usage metrics endpoints return downloadable reports of Copilot usage for an organization or enterprise, including per-user and per-repository reports. A is wrong because extension settings are managed in the IDE and through policies. B is wrong because seats are managed with the Copilot user management API. C is wrong because the API has nothing to do with team chat.",
+    "tags": [
+      "usage-metrics",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-031",
+    "domain": 2,
+    "question": "In GitHub Copilot in VS Code, what are 'smart actions'?",
+    "options": [
+      "Automatic fixes applied to all errors without review",
+      "One-click AI actions that work without writing a prompt, such as generating a commit message",
+      "Commands that execute complex terminal scripts",
+      "A tool that writes full project documentation"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: VS Code describes smart actions as one-click AI actions available from the sparkle icon or context menu that need no prompt, for example generating a commit message, renaming a symbol or fixing a test failure. A is wrong because suggested changes are still reviewed. C is wrong because running terminal scripts is agent or CLI work. D is wrong because documentation is something you ask for, not a smart action's purpose.",
+    "tags": [
+      "ide-integration",
+      "concept",
+      "recall"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d2-032",
+    "domain": 2,
+    "question": "When you request a one-day Copilot usage metrics report through the REST API, how is the `day` parameter formatted?",
+    "options": [
+      "YYYY-MM-DD, for example 2026-10-01",
+      "A Unix timestamp in milliseconds",
+      "A human-readable date such as 'October 1, 2026'",
+      "A relative date such as '7 days ago'"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the usage metrics endpoints such as `/orgs/{org}/copilot/metrics/reports/organization-1-day` take a required `day` parameter in YYYY-MM-DD format; the 28-day 'latest' endpoints take no day at all. B, C and D are wrong because the API documents only the YYYY-MM-DD format. (The older `since`/`until` parameters belonged to the legacy metrics API, which closed on April 2, 2026.)",
+    "tags": [
+      "usage-metrics",
+      "rest-api",
+      "recall"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d2-033",
+    "domain": 2,
+    "question": "Which command installs GitHub Copilot CLI with npm?",
+    "options": [
+      "`npm install -g @github/copilot`",
+      "`gh extension install github/gh-copilot`",
+      "`npm install -g github-copilot-cli`",
+      "`pip install github-copilot`"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub's install guide uses `npm install -g @github/copilot`, which needs Node.js 22 or later; you can also use `winget install GitHub.Copilot`, `brew install --cask copilot-cli` or the install script. B is wrong because it installs the retired gh-copilot extension. C is wrong because that is not the package name. D is wrong because Copilot CLI isn't distributed through pip.",
+    "tags": [
+      "copilot-cli",
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "id": "ghc-d2-034",
+    "domain": 2,
+    "question": "How far back can an enterprise request one-day Copilot usage metrics reports through the REST API?",
+    "options": [
+      "Up to 1 year, with data available from October 10, 2025",
+      "28 days",
+      "7 days",
+      "14 days"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub's usage metrics API says reports are available from October 10, 2025, and history can be accessed for up to 1 year from the current date. B is wrong because 28 days is the window of the separate 'latest 28-day' report, and was the limit of the retired legacy metrics API. C and D are wrong because no 7-day or 14-day limit is documented.",
+    "tags": [
+      "usage-metrics",
+      "rest-api",
+      "edge-case"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "id": "ghc-d2-035",
+    "domain": 2,
+    "question": "What does the organization-level Copilot policy 'Opt in to preview features' do?",
+    "options": [
+      "It lets members choose a different AI model for Copilot Chat",
+      "It lets members give feedback on pull request summaries",
+      "It lets members use Copilot features that are not yet generally available",
+      "It lets members install Copilot Extensions"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's organization policy docs list 'Opt in to preview features', which allows members to try Copilot features before general availability; it appears once 'Copilot in GitHub.com' is enabled. A is wrong because models are managed on the Models page. B is wrong because feedback collection is a separate policy. D is wrong because GitHub App-based Copilot Extensions were sunset in November 2025.",
+    "tags": [
+      "policy-management",
+      "configuration",
+      "recall"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "id": "ghc-d2-036",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "Which command installs GitHub Copilot CLI on Windows using WinGet?",
+    "options": [
+      "`winget install GitHub.cli`, then `gh extension install github/gh-copilot`",
+      "`winget install Microsoft.GitHubCopilot`",
+      "`winget install GitHub.Copilot`",
+      "`winget install GitHub.CopilotChat --source msstore`"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's install guide lists `winget install GitHub.Copilot` for Windows (with `GitHub.Copilot.Prerelease` for the prerelease build), alongside npm (`npm install -g @github/copilot`, Node.js 22+), Homebrew and the install script. A is wrong because `GitHub.cli` is GitHub CLI and the gh-copilot extension was retired on October 25, 2025. B is wrong because there is no `Microsoft.GitHubCopilot` package; the publisher ID is GitHub. D is wrong because Copilot Chat is not a WinGet package and the CLI is not installed from the Microsoft Store source.",
+    "tags": [
+      "copilot-cli",
+      "configuration",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-037",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "In a GitHub Copilot CLI session, a developer wants to agree an implementation plan with Copilot before it writes any code. What should they do?",
+    "options": [
+      "Start the session with `copilot -p` so Copilot only describes the change",
+      "Run `/compact` so Copilot summarises the task into a plan first",
+      "Add `--deny-tool='write'` so Copilot cannot change any files",
+      "Press Shift+Tab to switch to plan mode, or use `/plan` with the prompt"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's Copilot CLI docs say plan mode 'lets you collaborate with Copilot on an implementation plan before any code is written'; Shift+Tab cycles between standard, plan and autopilot mode, and `/plan [PROMPT]` creates an implementation plan before coding. A is wrong because `-p` is programmatic mode, which runs the prompt to completion and exits. B is wrong because `/compact` summarises conversation history to free context space. C is wrong because denying the write tool blocks edits but does not give you a collaborative plan to review.",
+    "tags": [
+      "copilot-cli",
+      "best-practice",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-038",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A CI job runs `copilot -p \"Clean up the build folder\" --allow-all-tools --deny-tool='shell(rm)'`. During the run Copilot decides to call `rm -rf build`. What happens?",
+    "options": [
+      "The command runs, because `--allow-all-tools` overrides any deny rule",
+      "Copilot pauses and waits for a human to approve the `rm` command",
+      "The `rm` command is blocked, because `--deny-tool` takes precedence over the allow options",
+      "The CLI refuses to start, because allow-all and deny options cannot be combined"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub documents that `--deny-tool` 'takes precedence over the `--allow-all-tools` and `--allow-tool` options', and gives `--deny-tool='shell(rm)'` as the example that blocks any `rm` command. The command reference adds that with `--allow-all-tools`, 'deny rules and enterprise restrictions still apply'. A is wrong because it reverses the precedence. B is wrong because allowed and denied tools are both 'will not prompt for permission'; a denied tool is simply refused. D is wrong because combining a broad allow with narrow denies is the documented pattern.",
+    "tags": [
+      "copilot-cli",
+      "configuration",
+      "exam-trap",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-039",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A script captures the output of `copilot -p \"Summarise the test results\"` into a file, but the file includes session metadata as well as the answer. Which option gives clean text?",
+    "options": [
+      "`-s` (silent)",
+      "`--no-ask-user`",
+      "`--share='./report.md'`",
+      "`--autopilot`"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub's guide to running Copilot CLI programmatically says to 'use `-s` (silent) when capturing output', which suppresses session metadata so you get clean text. B is wrong because `--no-ask-user` stops the agent from asking clarifying questions; it does not change output formatting. C is wrong because `--share` saves the session transcript to a file, which is the opposite of trimming it. D is wrong because `--autopilot` keeps the agent working until the task is complete in interactive mode; it is not an output option.",
+    "tags": [
+      "copilot-cli",
+      "configuration",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-040",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer closed a Copilot CLI session by accident and wants to pick up the most recent one in this directory straight away, without choosing from a list. Which command fits?",
+    "options": [
+      "`copilot -p \"continue\"`",
+      "`copilot --continue`",
+      "`copilot /compact`",
+      "`copilot --add-dir .`"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's CLI reference says `--continue` will 'resume the most recent session in the current working directory, falling back to the globally most recent session'. To choose a session from a list instead, use the `--resume` option or the `/resume` slash command. A is wrong because `-p` starts a new programmatic session that runs one prompt and exits; it has no memory of the closed session. C is wrong because `/compact` shrinks the history of the current session. D is wrong because `--add-dir` grants access to a directory; it does not restore a session.",
+    "tags": [
+      "copilot-cli",
+      "concept",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-041",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "In Copilot CLI, a developer wants to hand off a long refactor so it keeps running even after they shut down their laptop, and get a pull request back. What should they use?",
+    "options": [
+      "Autopilot mode (Shift+Tab), so the agent works without approval prompts",
+      "`copilot -p` with `--allow-all-tools`, run in a background terminal",
+      "`/fleet`, so subagents work on parts of the task in parallel",
+      "`/delegate` (or a prompt prefixed with `&`) to hand the task to Copilot cloud agent"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's docs say '`/delegate` pushes the task to Copilot cloud agent on GitHub'; you can also prefix a prompt with `&`. Copilot offers to commit unstaged changes to a new branch as a checkpoint, then the cloud agent opens a draft pull request and requests your review. The docs recommend it when you want to 'hand off a task entirely and continue running even if you shut down your local machine'. A is wrong because 'autopilot mode runs locally in your CLI session', so it stops with your machine. B is wrong because a background terminal is still local. C is wrong because `/fleet` runs subagents in parallel within the local session.",
+    "tags": [
+      "copilot-cli",
+      "copilot-features",
+      "comparison",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-042",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A developer with a Copilot Business seat can use Copilot CLI, but `/delegate` does not work for them. Which organization policies must both be enabled?",
+    "options": [
+      "The 'Copilot in GitHub.com' policy and the 'Opt in to preview features' policy",
+      "The 'MCP servers in Copilot' policy and the Copilot code review policy",
+      "The Copilot CLI policy and the Copilot cloud agent policy",
+      "The 'Suggestions matching public code' policy and the Copilot CLI policy"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's 'Administering Copilot CLI' docs state that both the Copilot CLI policy and the Copilot cloud agent policy must be enabled for users to be able to use `/delegate`, because the command hands the task to the cloud agent. A is wrong because those policies cover Copilot features on GitHub.com and preview access, not delegation from the CLI. B is wrong because MCP and code review policies do not gate the cloud agent. D is wrong because the public code policy controls matching suggestions; the CLI policy alone is already enabled in this case.",
+    "tags": [
+      "copilot-cli",
+      "policy-management",
+      "troubleshooting",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-043",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "Mid-session, Copilot CLI needs to read files in a sibling folder outside the directory you trusted at launch. Which slash command grants access?",
+    "options": [
+      "`/context ../shared-lib`",
+      "`/mcp add ../shared-lib`",
+      "`/resume ../shared-lib`",
+      "`/add-dir ../shared-lib`"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's docs say you can 'add a trusted directory manually at any time' with `/add-dir PATH`, which allows file access to that directory and loads its `.github/skills` and `.github/agents` as trusted configuration. A is wrong because `/context` shows context-window token usage. B is wrong because `/mcp` manages MCP server configuration, not file access. C is wrong because `/resume` switches to a different session.",
+    "tags": [
+      "copilot-cli",
+      "configuration",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-044",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A team lead wants every developer who opens the repository in VS Code to get the same MCP server for agent mode. Where should the configuration go?",
+    "options": [
+      "In `.github/copilot-instructions.md`, listing the server URL",
+      "In each developer's VS Code user settings; workspace MCP files are not supported",
+      "In `.vscode/mcp.json` in the workspace, using the top-level `servers` key",
+      "In a prompt file at `.github/prompts/mcp.prompt.md`"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: VS Code's MCP docs give the workspace `.vscode/mcp.json` (or a user-profile `mcp.json`) as the configuration location and say 'the VS Code format uses `servers`'. Committing the workspace file shares it with the team; secrets should not be committed. A is wrong because custom instructions are natural-language guidance, not tool configuration. B is wrong because workspace configuration is supported; user-profile config is the personal option. D is wrong because prompt files are reusable prompts and cannot register MCP servers.",
+    "tags": [
+      "mcp",
+      "configuration",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-045",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "In VS Code, the main agent asks a subagent to 'check the approach we discussed earlier', and the subagent returns an unrelated answer. What is the most likely cause?",
+    "options": [
+      "The subagent used a cheaper model than the main agent",
+      "A Local subagent does not inherit the main conversation history, so the delegated task must be self-contained",
+      "Subagents can only read files, so they ignore instructions about approaches",
+      "Subagents must be defined as custom agents before they can receive a task"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: VS Code's subagents docs state that 'a Local subagent doesn't inherit the main conversation history', so the delegated task must include the goal, context, allowed actions and expected result. A reference to 'what we discussed earlier' means nothing to it. A is wrong because model choice affects quality and cost, not whether earlier context is visible. C is wrong because without a custom agent a subagent inherits the main agent's instructions and selected tools. D is wrong because the main agent can delegate without any custom agent.",
+    "tags": [
+      "agent-mode",
+      "troubleshooting",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-046",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A team has a custom agent in `.github/agents/` that should only be used as a helper subagent and must not appear in the agents dropdown. Which frontmatter achieves this?",
+    "options": [
+      "`disable-model-invocation: true`",
+      "`agents: []`",
+      "`tools: []`",
+      "`user-invocable: false`"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: VS Code's subagents docs say `user-invocable` (default `true`) controls visibility in the agents dropdown, so setting it to `false` hides a helper that only subagents should use. A is wrong because `disable-model-invocation: true` does the opposite: it stops other agents invoking it as a subagent. B is wrong because the `agents` property restricts which subagents a coordinator may call. C is wrong because removing all tools changes what the agent can do, not where it is listed.",
+    "tags": [
+      "agent-mode",
+      "configuration",
+      "edge-case",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-047",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer started a Copilot session in the VS Code Chat view and now wants to continue the same work in GitHub Copilot CLI. What does VS Code provide for this?",
+    "options": [
+      "Copy the chat transcript and paste it into `copilot -p`",
+      "Run `/delegate` in the Chat view to move the session to the terminal",
+      "Right-click the session and select 'Resume in Terminal'",
+      "Export the session as a prompt file and run it from the CLI"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: VS Code's agents overview says that to move a Copilot session to the CLI you 'right-click the session and select Resume in Terminal'. Sessions started in Copilot CLI can likewise be discovered and continued in VS Code. A is wrong because pasting a transcript into programmatic mode starts a new one-shot session rather than continuing the existing one. B is wrong because `/delegate` is a Copilot CLI command that hands work to the cloud agent. D is wrong because prompt files are reusable prompts, not session state.",
+    "tags": [
+      "agent-sessions",
+      "ide-integration",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-048",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "What is the maximum execution time of a single Copilot cloud agent session?",
+    "options": [
+      "30 minutes",
+      "2 hours",
+      "Unlimited, as long as the pull request stays open",
+      "59 minutes"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's 'About Copilot cloud agent' page states that 'each Copilot cloud agent session has a maximum execution time of 59 minutes'. The limit cannot be extended, though you can set a shorter one with `timeout-minutes` in `copilot-setup-steps.yml`. A and B are wrong because they are not the documented limit. C is wrong because sessions are time-limited regardless of the pull request's state.",
+    "tags": [
+      "cloud-agent",
+      "concept",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-049",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "An issue asks for matching API changes in a backend repository and a separate frontend repository. A developer assigns it to Copilot cloud agent. What should they expect?",
+    "options": [
+      "Copilot changes only the repository the task was started in; the other repository needs its own task",
+      "Copilot opens one pull request in each repository from a single task",
+      "Copilot creates a monorepo branch that combines both repositories",
+      "Copilot refuses the task, because cloud agent only works on issues with no linked repositories"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub documents that 'Copilot can only make changes in the repository specified when you start a task', and that it works on one branch at a time and opens one pull request per task. A cross-repository change therefore needs a task per repository. B is wrong because one task produces at most one pull request in one repository. C is wrong because the agent does not merge repositories. D is wrong because the agent accepts issues normally; the limit is on which repository it can change.",
+    "tags": [
+      "cloud-agent",
+      "edge-case",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-050",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "Copilot cloud agent keeps failing because the build needs a private toolchain that is not on the runner. How should the team fix this?",
+    "options": [
+      "Add install commands to `.github/copilot-instructions.md` so the agent runs them each time",
+      "Ask the agent in the issue to install the toolchain and raise its session limit to 3 hours",
+      "Add `.github/workflows/copilot-setup-steps.yml` with a `copilot-setup-steps` job that installs it before Copilot starts",
+      "Create a Copilot Space that contains the toolchain installer"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's docs say a setup steps file lets you 'deterministically install tools or dependencies before Copilot starts work'. It lives at `.github/workflows/copilot-setup-steps.yml`, must contain a single job named `copilot-setup-steps`, and only takes effect from the default branch. A is wrong because instructions are guidance the model may follow, not guaranteed setup, and each attempt wastes session time. B is wrong because the session limit is 59 minutes and cannot be extended (`timeout-minutes` can only be set lower). D is wrong because Spaces provide context for answers, not runner software.",
+    "tags": [
+      "cloud-agent",
+      "configuration",
+      "troubleshooting",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-051",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "How do you run a prompt file named `review-api.prompt.md` in VS Code Copilot Chat?",
+    "options": [
+      "It runs automatically on every chat request in the workspace",
+      "Type `/review-api` in the chat input, or use Chat: Run Prompt",
+      "Type `@review-api` to call it as a chat participant",
+      "Type `#review-api` to attach it as context"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: VS Code describes prompt files as Markdown files 'that you invoke as slash commands in chat'; you type `/` plus the prompt name, run Chat: Run Prompt from the Command Palette, or press the play button in the editor title of the open file. A is wrong because automatic application is what custom instructions do; prompt files run only when invoked. C is wrong because `@` addresses chat participants. D is wrong because `#` attaches context or tools; it would add the file's text, not run it as a prompt with its frontmatter.",
+    "tags": [
+      "prompt-files",
+      "concept",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-052",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A prompt file sets `agent: reviewer` and lists `tools: ['search', 'fetch']`. The `reviewer` custom agent lists different tools. Which tools are available when the prompt runs?",
+    "options": [
+      "The tools from the `reviewer` custom agent, because the agent definition always wins",
+      "The default tools of the built-in Agent, because the two lists conflict",
+      "The union of both lists",
+      "The tools listed in the prompt file, which take priority over the custom agent's tools"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: VS Code's prompt files docs give the order of priority as (1) tools specified in the prompt file, (2) tools from the referenced custom agent, (3) default tools for the selected agent. Any listed tool that is not available is ignored. A is wrong because the custom agent's tools are only the second choice. B is wrong because default tools are the last fallback, not a conflict rule. C is wrong because the lists are not merged; the first defined level applies.",
+    "tags": [
+      "prompt-files",
+      "configuration",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-053",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A team wants Python-only conventions to apply only when Copilot works on `.py` files. What should they create?",
+    "options": [
+      "A section headed `## Python` in `.github/copilot-instructions.md`",
+      "A prompt file `.github/prompts/python.prompt.md` with `agent: agent`",
+      "A file in `.github/instructions/` named `python.instructions.md` with `applyTo: '**/*.py'` in its frontmatter",
+      "An `AGENTS.md` file inside every folder that contains Python code"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: path-specific instructions are `NAME.instructions.md` files in or below `.github/instructions`, and VS Code attaches one automatically when its `applyTo` glob (relative to the workspace root, for example `**/*.py`) matches a file the agent creates or modifies. A is wrong because `.github/copilot-instructions.md` applies repository-wide; a heading does not scope it. B is wrong because prompt files run only when someone invokes them. D is wrong because nested `AGENTS.md` discovery is an experimental setting and does not target a file type.",
+    "tags": [
+      "custom-instructions",
+      "configuration",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-054",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A team added naming rules to `.github/copilot-instructions.md`. Chat and agent mode follow them, but ghost-text suggestions do not. What explains this?",
+    "options": [
+      "Custom instructions are not taken into account for inline suggestions as you type",
+      "The file must be named `copilot-instructions.instructions.md` for inline suggestions",
+      "Inline suggestions read instructions only from the pull request's head branch",
+      "Inline suggestions need the organization custom instructions policy to be enabled"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: VS Code's custom instructions docs state that 'custom instructions are not taken into account for inline suggestions as you type in the editor'. They apply to chat and agent requests. This is by design, not a misconfiguration. B is wrong because no file name enables instructions for inline suggestions. C is wrong because head-branch reading describes Copilot code review on pull requests. D is wrong because organization instructions are a separate GitHub.com feature and do not change inline suggestions.",
+    "tags": [
+      "custom-instructions",
+      "ide-integration",
+      "exam-trap",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-055",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "In Copilot Chat on GitHub.com, a developer's personal instructions, the repository's instructions and the organization's instructions conflict. Which order of precedence does GitHub document?",
+    "options": [
+      "Organization, then repository, then personal",
+      "Repository, then organization, then personal",
+      "No order; all three are combined and the model decides",
+      "Personal, then repository, then organization"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's custom instructions docs list precedence on GitHub.com from highest to lowest as personal instructions, then repository instructions (path-specific, repository-wide and agent instructions), then organization instructions. A and B are wrong because they reverse or reorder that list. C is wrong for GitHub.com; it describes Copilot CLI, VS Code and Visual Studio, which combine applicable files 'without defining a general precedence order'.",
+    "tags": [
+      "custom-instructions",
+      "comparison",
+      "exam-trap",
+      "analysis"
+    ]
+  },
+  {
+    "id": "ghc-d2-056",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A pull request changes `package.json`, a `.log` file, an `.svg` icon and two TypeScript files. Copilot code review comments only on the TypeScript. Why?",
+    "options": [
+      "Copilot code review only reviews TypeScript and Python",
+      "The other files were excluded because the pull request was a draft",
+      "Copilot code review does not review dependency management files, log files or SVG files",
+      "Copilot reviews only the two most recently changed files in a pull request"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's code review docs list file types Copilot will not review: dependency management files (such as `package.json` and `Gemfile.lock`), log files and SVG files. The rest of the pull request is reviewed normally. A is wrong because Copilot code review 'reviews code written in any language'. B is wrong because draft status affects whether automatic reviews trigger, not which files are reviewed. D is wrong because there is no most-recent-files rule.",
+    "tags": [
+      "code-review",
+      "edge-case",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-057",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "How long are messages in Copilot Chat on GitHub.com kept before they are permanently deleted?",
+    "options": [
+      "7 days",
+      "28 days",
+      "90 days",
+      "Until the user deletes them"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's 'Chat in GitHub' docs state that messages are kept for 28 days before permanent deletion, and that Copilot Chat stores up to 100 of your most recent conversations. A and C are wrong because they are not the documented period. D is wrong because conversations are deleted automatically after the retention period, whether or not the user deletes them.",
+    "tags": [
+      "copilot-chat",
+      "concept",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-058",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer on Copilot Free wants to create a Copilot Space for their side project. What does GitHub document?",
+    "options": [
+      "Spaces need a Copilot Business or Enterprise seat",
+      "Spaces need Copilot Pro+ or Max",
+      "Free users can view public spaces but cannot create their own",
+      "Anyone with a Copilot seat, including Copilot Free, can create and use Spaces"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: GitHub's Spaces docs state that anyone with a Copilot seat, including Copilot Free, can create and use Spaces, and that eligibility depends on the user's seat, not the organization that owns the space. Questions asked in a space count as Copilot Chat requests and consume AI credits. A and B are wrong because there is no paid-plan requirement. C is wrong because Free users can create spaces, not only view them.",
+    "tags": [
+      "spaces",
+      "plans",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-059",
+    "domain": 2,
+    "difficulty": "medium",
+    "type": "single",
+    "question": "A developer has a Copilot Space with the team's architecture docs and wants to use it while working in VS Code. How?",
+    "options": [
+      "Spaces are only available in Copilot Chat on GitHub.com",
+      "Export the space to `.github/copilot-instructions.md`",
+      "Run the GitHub MCP server in the IDE to access context from the space",
+      "Attach the space with `#space` in a prompt file"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: GitHub's Spaces docs say you can use Spaces in your IDE by running the GitHub MCP server to access context from your spaces. A is wrong because GitHub.com is not the only place to use them. B is wrong because there is no export to instructions, and doing so would lose the automatic updates GitHub-based sources get. D is wrong because `#space` is not a documented chat reference for Spaces.",
+    "tags": [
+      "spaces",
+      "mcp",
+      "application"
+    ]
+  },
+  {
+    "id": "ghc-d2-060",
+    "domain": 2,
+    "difficulty": "easy",
+    "type": "single",
+    "question": "Which Copilot plan limits inline code completions to 2,000 per month?",
+    "options": [
+      "Copilot Free",
+      "Copilot Pro",
+      "Copilot Business",
+      "Copilot Pro+"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: GitHub's plans page states that inline completions are 'limited to 2000 completions per month on Copilot Free'. Free also uses auto model selection only. B, C and D are wrong because the 2,000-completion cap is a Copilot Free limit; paid plans instead include a monthly allowance of GitHub AI Credits (for example 1,500 for Pro and 1,900 per user for Business).",
+    "tags": [
+      "plans",
+      "concept",
+      "recall"
+    ]
+  },
+  {
+    "id": "ghc-d2-061",
+    "domain": 2,
+    "difficulty": "hard",
+    "type": "single",
+    "question": "A startup's developers each pay for Copilot Pro+. Security now requires that secrets files are never used as Copilot context. What must change?",
+    "options": [
+      "Each developer adds the files to `.gitignore`, which Copilot treats as content exclusion",
+      "Move the developers to Copilot Business or Enterprise seats from an organization and configure content exclusion",
+      "Each developer turns off 'Allow GitHub to use my data for AI model training'",
+      "Upgrade each developer from Pro+ to Copilot Max, which adds content exclusion"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub's plans comparison shows content exclusion included only in Copilot Business and Copilot Enterprise; it is not included in Free, Student, Pro, Pro+ or Max. Exclusions are configured in repository, organization or enterprise settings and apply to users whose seat comes from those plans. A is wrong because `.gitignore` is not a Copilot exclusion mechanism. C is wrong because the training setting controls model training, not whether files are used as context. D is wrong because Max does not include content exclusion either.",
+    "tags": [
+      "plans",
+      "content-exclusions",
+      "comparison",
+      "evaluation"
     ]
   }
 ]

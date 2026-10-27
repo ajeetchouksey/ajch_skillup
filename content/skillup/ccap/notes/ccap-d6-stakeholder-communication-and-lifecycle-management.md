@@ -1,6 +1,6 @@
 # D6: Stakeholder Communication & Lifecycle Management
 
-> **Exam weight**: 14% · **Questions**: ~17 of 120
+> **Exam weight**: 14% · **Questions**: ~18 of 139
 
 ## Overview
 
@@ -164,7 +164,7 @@ A Claude solution's lifecycle is not a one-time build-and-ship event — it's a 
 - **Discovery** — entry: a business need is identified. Exit: a stakeholder-approved discovery brief exists (this domain's first topic). The architect's role here is investigative and facilitative, not decisive.
 - **Design** — entry: an approved discovery brief. Exit: architectural decisions are made, documented as ADRs, and signed off by the relevant technical and business stakeholders (this domain's second topic). The architect's role is decisive and communicative — proposing options, naming trade-offs, securing alignment.
 - **Handoff** — entry: a signed-off design. Exit: implementation and operational documentation is complete, the receiving team (engineering, operations, support) is briefed and has demonstrated understanding (not just received a document), and ownership is explicitly transferred (this domain's fourth topic). Skipping this phase's exit criteria — treating "the doc exists" as equivalent to "the team can operate this" — is the most common real-world handoff failure.
-- **Monitoring** — entry: the system is live. Exit: this phase doesn't formally exit while the system is in production — it's continuous, tracking the SLA metrics established earlier (quality via the D4 evaluation suite, latency, uptime, cost) and the feedback register against real usage, surfacing drift or degradation before a stakeholder has to.
+- **Monitoring** — entry: the system is live. Exit: this phase doesn't formally exit while the system is in production — it's continuous, tracking the SLA metrics established earlier (quality via the D4 evaluation suite, latency, uptime, cost) and the feedback register against real usage, surfacing drift or degradation before a stakeholder has to. Model lifecycle belongs here too: Claude model IDs are pinned snapshots, but Anthropic deprecates and retires older models (with at least 60 days' notice for publicly released models), and requests to a retired model fail, so someone must watch the deprecations page and re-run the eval suite on the replacement well before the retirement date.
 - **Iteration** — entry: monitoring data or stakeholder feedback identifies a gap (quality regression, new requirement, scope expansion). Exit: the iteration is scoped and — critically — routed to the *right* re-entry point in the lifecycle: a minor prompt tweak may only need a lightweight design-and-redeploy cycle, while a new use case or a materially different data source needs to loop all the way back to discovery, because the original discovery brief no longer describes the actual problem being solved.
 
 Designing before discovery produces a solution to the wrong problem; building before design sign-off produces rework when a late-surfaced stakeholder objection invalidates work already done; treating handoff as a formality produces a system nobody but the original architect can safely operate; and skipping the "return to discovery" step for a materially new requirement produces feature creep bolted onto an architecture that was never scoped for it.
@@ -231,6 +231,7 @@ The reason this domain exists separately from the technical domains (D1–D5) is
 | Documentation layers | Architecture overview (what + why) → implementation guidance (how, buildable spec) → operational runbook (what to do when it breaks) — each traceable to its ADR |
 | Handoff exit criteria | Docs complete **and** receiving team demonstrates capability (e.g., incident drill) **and** ownership explicitly transferred — a delivered doc alone does not satisfy handoff |
 | Lifecycle phases | Discovery → Design → Handoff → Monitoring (continuous) → Iteration → routes back to Handoff (in-scope fix) or Discovery (scope-changing gap) |
+| Model deprecation | Monitored input with an owner: re-run evals on the recommended replacement, re-tune prompts and effort, stage the cutover well before the retirement date (retired models fail requests) |
 | Iteration routing test | Does the gap fit inside the original discovery brief's scope? Yes → lightweight iteration. No (new use case, new data source, new risk profile) → return to discovery |
 
 ## What to Remember

@@ -203,78 +203,72 @@ You don't teach a new chef by reading them a cookbook — you plate three dishes
 | Can't cover every edge case | Add explicit rules for long-tail |
 | Claude may deviate on novel inputs | Validation-retry loop |
 
-<div class="note-trap"><strong>TRAP:</strong> The exam may present few-shot examples as "guaranteeing" output format. They do NOT guarantee it — they only make it highly likely. For GUARANTEED schema compliance, you need Tier 1 (forced tool_use). If a question asks "which approach GUARANTEES valid JSON?" → tool_use, never few-shot.</div>
+<div class="note-trap"><strong>TRAP:</strong> The exam may present few-shot examples as "guaranteeing" output format. They do NOT guarantee it — they only make it highly likely. For GUARANTEED schema compliance, you need an API-level mechanism: tool use with a strict schema, or structured outputs. If a question asks "which approach GUARANTEES valid JSON?" → tool_use with a JSON schema, never few-shot.</div>
 
 ---
 
-## 3.4 Extended Thinking
+## 3.4 Thinking (Adaptive and Extended)
 
 ### The Story: "The Bug That Vanished Under Pressure"
 
-You're building a code review assistant. Simple bugs (missing semicolons, typos) get caught fine. But a senior dev submits a race condition buried across three files. Claude's response? "The code looks well-structured. Consider adding more comments." It completely missed the concurrency bug.
+You're building a code review assistant. Simple bugs get caught fine. But a senior dev submits a race condition buried across three files, and the reply is "The code looks well-structured. Consider adding more comments."
 
-You enable extended thinking with a 10K token budget. Now Claude reasons step-by-step internally: "Thread A acquires lock on line 42... Thread B reads without lock on line 67... if Thread A hasn't flushed yet... RACE CONDITION." The thinking block shows the full reasoning chain. The response block gives the user a crisp diagnosis.
+With thinking at a higher effort, Claude reasons in its own words before answering: "Thread A acquires the lock on line 42... Thread B reads without it on line 67... RACE CONDITION." That reasoning arrives in `thinking` blocks ahead of the answer, and the final text gives a crisp diagnosis.
 
-<div class="note-important"><strong>Extended thinking = a private scratchpad.</strong> The thinking block is visible to developers via the API but NEVER shown to end users. The text block is the user-facing output. Two separate content blocks in the response.</div>
+<div class="note-important"><strong>Thinking = a dedicated reasoning phase.</strong> It arrives in <code>thinking</code> content blocks before the answer; the text blocks are the user-facing output. Thinking tokens are billed as output tokens and count toward <code>max_tokens</code>.</div>
 
-```mermaid
-sequenceDiagram
-    participant D as Developer
-    participant C as Claude API
-    
-    D->>C: Enable thinking (budget: 10K tokens)
-    Note over C: 🧠 Thinking Block<br/>(reasoning, visible to dev only)
-    Note over C: 📝 Response Block<br/>(shown to end user)
-    C->>D: {thinking: "...", text: "..."}
-```
+### How It Works on Current Models
 
-### How to Enable
+| Model generation | How thinking is controlled |
+|---|---|
+| Current models (Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1) | **Adaptive** thinking, on by default: Claude decides when and how much to think, and you steer depth with the `effort` parameter |
+| Claude Opus 4.6–4.8, Sonnet 4.6 | Off until you set `thinking: {"type": "adaptive"}` |
+| Older models | Manual **extended thinking**: `thinking: {"type": "enabled", "budget_tokens": N}` (deprecated on the 4.6 models, not accepted on later ones) |
 
 ```python
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     max_tokens=16000,
-    thinking={
-        "type": "enabled",
-        "budget_tokens": 10000  # Max tokens for internal reasoning
-    },
-    messages=[{"role": "user", "content": complex_question}]
+    thinking={"type": "adaptive", "display": "summarized"},  # show summarized thinking text
+    output_config={"effort": "high"},                          # steer how hard Claude works
+    messages=[{"role": "user", "content": complex_question}],
 )
 
 for block in response.content:
     if block.type == "thinking":
-        print(f"🧠 Reasoning: {block.thinking}")  # Dev visibility only
+        print(f"🧠 Reasoning: {block.thinking}")  # for developers, not end users
     elif block.type == "text":
-        print(f"📝 Answer: {block.text}")          # User-facing output
+        print(f"📝 Answer: {block.text}")
 ```
+
+On current models the thinking text is omitted from responses unless you opt in with `display: "summarized"`. When you pass a conversation back, keep the thinking blocks unchanged; the API decides which ones it needs.
 
 ### Mental Model: "The Exam Scratch Paper"
 
-Extended thinking is like giving Claude a blank scratch page during an exam. For simple recall questions ("What's the capital of France?"), scratch paper is wasted time. For multi-step proofs and complex debugging, it's essential. The `budget_tokens` parameter is how much scratch paper you hand Claude.
+Thinking is a scratch page. For "What's the capital of France?" it's wasted time; for multi-step proofs and complex debugging it's essential. **Effort is how much scratch paper you hand Claude.**
 
 ### When to Use (and When NOT To)
 
-| Task | Use Thinking? | Reason |
+| Task | More thinking? | Reason |
 |------|:---:|---|
-| Complex math/logic | ✅ | Multi-step scratchpad essential |
-| Architecture decisions | ✅ | Weighing trade-offs needs reasoning space |
-| Code debugging (complex) | ✅ | Step-by-step tracing of execution |
-| Simple classification | ❌ | Adds latency, no benefit |
-| FAQ responses | ❌ | Straightforward recall |
+| Complex math/logic | ✅ | Multi-step reasoning |
+| Architecture decisions | ✅ | Weighing trade-offs |
+| Complex debugging | ✅ | Tracing execution step by step |
+| Simple classification | ❌ (low effort) | Adds latency, little benefit |
+| FAQ responses | ❌ (low effort) | Straightforward recall |
 
-### Extended Thinking vs Chain-of-Thought Prompting
+### Thinking vs Chain-of-Thought Prompting
 
-| | Extended Thinking | CoT Prompting ("think step by step") |
+| | Thinking (API feature) | CoT prompting ("think step by step") |
 |--|:---:|:---:|
-| Mechanism | API feature (`thinking.type`) | Prompt instruction |
-| Reliability | ✅ Always activates | ⚠️ May skip reasoning |
-| Output | Separate blocks (thinking + text) | Mixed into response |
-| Cost control | `budget_tokens` param | No control |
-| Visibility | Thinking block (dev only) | Visible to user |
+| Mechanism | `thinking` + `effort` parameters | Prompt instruction |
+| Output | Separate `thinking` blocks + text | Mixed into the response |
+| Control | Effort level (budget_tokens on older models) | None |
+| Visibility | Developer-side; omitted or summarized by default | Visible to the user |
 
-<div class="note-trap"><strong>TRAP:</strong> Exam may ask "how do you ensure Claude reasons through a complex problem?" The answer is extended thinking (API feature), NOT "add 'think step by step' to the prompt." CoT prompting is unreliable — Claude may skip it. Extended thinking is guaranteed to activate when enabled.</div>
+<div class="note-trap"><strong>TRAP:</strong> "How do you get Claude to reason through a complex problem?" → the API's thinking feature, not "add 'think step by step' to the prompt". And on the exam, remember the review lesson: more thinking in the <em>same</em> session doesn't replace an independent reviewer (see 3.7).</div>
 
-<div class="note-scribble">Key difference for exam: extended thinking produces TWO content blocks (thinking + text). CoT produces ONE block with reasoning mixed into the user-visible output. If they ask about "separate reasoning output" → extended thinking.</div>
+<div class="note-trap"><strong>TRAP (tools):</strong> Forced tool use (<code>tool_choice</code> "any" or a named tool) is incompatible with manual extended thinking, and Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject forced tool use on every request. Where forcing is accepted, the response starts with the tool call and has no thinking block.</div>
 
 ---
 
@@ -296,54 +290,57 @@ As you can see, the sentiment is clearly positive because...
 
 Claude wrapped the JSON in markdown fences and added prose around it. Your `json.loads()` call gets the entire string — fences, prose, and all. You can regex it out... but next time Claude might format differently. You've built a parser for Claude's unpredictable wrapping, not for your actual data.
 
-<mark>This is why Anthropic has a reliability hierarchy for structured output. The exam WILL test whether you know which tier guarantees schema compliance.</mark>
+<mark>Structured output has a reliability ladder. The exam tests whether you know which mechanisms guarantee schema compliance and which only make it likely.</mark>
 
 ```mermaid
 graph TD
     subgraph "Most Reliable → Least Reliable"
-        T1["🥇 Tier 1: tool_use + forced tool_choice<br/>GUARANTEED schema match"]
-        T2["🥈 Tier 2: output_config schema<br/>Highly reliable"]
-        T3["🥉 Tier 3: Few-shot examples<br/>Usually works"]
-        T4["4️⃣ Tier 4: Prompt instruction ('output as JSON')<br/>May add fences, prose — UNRELIABLE"]
+        T1["🥇 API-level: tool_use with a JSON schema (strict: true)<br/>or JSON outputs (output_config.format)<br/>Schema compliance via constrained decoding"]
+        T3["🥈 Few-shot examples<br/>Usually works"]
+        T4["🥉 Prompt instruction ('output as JSON')<br/>May add fences, prose — UNRELIABLE"]
     end
-    
-    T1 --> T2 --> T3 --> T4
+
+    T1 --> T3 --> T4
 ```
 
 ### Mental Model: "Tax Forms vs Sticky Notes"
 
-- **Tier 1 (forced tool_use)** is like a tax form — every field MUST be filled, every field has an exact type, and the form is rejected if it doesn't match. Claude has no choice but to comply.
-- **Tier 4 (prompt instruction)** is like asking someone to "write it on a sticky note as JSON" — they might write JSON, but they might also add a smiley face, a note saying "here you go!", or use the wrong format entirely.
+- **API-level structured output** is a tax form: every field has an exact type and the form can't be submitted in the wrong shape.
+- **Prompt instruction** is asking someone to "write it on a sticky note as JSON": they might, or they might add a smiley face and "here you go!"
 
-<div class="note-important"><strong>Tier 1 = GUARANTEED. Tier 2 = highly reliable. Tier 3 = usually works. Tier 4 = may fail.</strong> If an exam question uses the word "guarantee" or "ensure," the answer is ALWAYS Tier 1 (tool_use + forced tool_choice).</div>
+<div class="note-important"><strong>Schema compliance ≠ correctness.</strong> Strict tool use and JSON outputs guarantee the structure (except for refusals and <code>max_tokens</code> truncation). They don't guarantee the values: line items can still fail to sum, and values can land in the wrong field. That's what semantic validation and retry loops are for.</div>
 
-### Tier 1: Forced Tool Use (MOST RELIABLE)
+### Tier 1: Tool Use with a Strict Schema (the exam's answer)
 
 ```python
 tools = [{
     "name": "extract_sentiment",
-    "description": "Extract sentiment from text",
+    "description": "Record the sentiment analysis of the given text.",
+    "strict": True,                      # constrained decoding: input always validates
     "input_schema": {
         "type": "object",
         "properties": {
             "sentiment": {"type": "string", "enum": ["positive", "negative", "neutral"]},
-            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "confidence": {"type": "number"},            # strict mode doesn't support min/max
+            "summary": {"anyOf": [{"type": "string"}, {"type": "null"}]},  # nullable when the source may lack it
             "key_phrases": {"type": "array", "items": {"type": "string"}}
         },
-        "required": ["sentiment", "confidence", "key_phrases"]
+        "required": ["sentiment", "confidence", "summary", "key_phrases"],
+        "additionalProperties": False
     }
 }]
 
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-opus-5",               # a model that accepts forced tool use
+    max_tokens=1024,
     tools=tools,
-    tool_choice={"type": "tool", "name": "extract_sentiment"},  # FORCED
-    messages=[{"role": "user", "content": f"Analyze: {text}"}]
+    tool_choice={"type": "tool", "name": "extract_sentiment"},  # force where supported
+    messages=[{"role": "user", "content": f"Analyze: {text}"}],
 )
-# Result is GUARANTEED to match the schema ✅
+result = next(b.input for b in response.content if b.type == "tool_use")
 ```
 
-<div class="note-scribble">The magic ingredient is tool_choice with type "tool" and the specific name. Without tool_choice, Claude MIGHT use the tool. With it forced, Claude MUST use it and MUST fill every required field to schema spec.</div>
+<div class="note-scribble">The exam's tool_choice options: "auto" (may reply with text), "any" (must call some tool), {"type": "tool", "name": ...} (must call that tool). Know them cold. In current production code, Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 return a 400 error for "any" or a named tool, so there you use "auto" plus strict tools, or JSON outputs via output_config.format.</div>
 
 ### Tier 4: Why "Just Ask" Fails
 
@@ -362,7 +359,7 @@ As you can see, the sentiment is positive because...
 # 💀 Can't parse — has markdown fences + prose around it
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> An exam answer that says "add 'respond only in JSON' to the prompt" is NEVER the most reliable option when tool_use is also available. Prompt instructions are Tier 4 — bottom of the reliability stack.</div>
+<div class="note-trap"><strong>TRAP:</strong> An exam answer that says "add 'respond only in JSON' to the prompt" is NEVER the most reliable option when tool_use is also available. Prompt instructions are the bottom of the reliability ladder.</div>
 
 ---
 
@@ -395,7 +392,7 @@ MAX_RETRIES = 3
 
 for attempt in range(MAX_RETRIES):
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5-5",
         tools=tools,
         tool_choice={"type": "tool", "name": "generate_sql"},
         messages=messages,
@@ -417,8 +414,12 @@ Your query:
 ```
 Fix ONLY the specific error above."""
     
+    tool_use = next(b for b in response.content if b.type == "tool_use")
     messages.append({"role": "assistant", "content": response.content})
-    messages.append({"role": "user", "content": error_msg})
+    messages.append({"role": "user", "content": [{
+        "type": "tool_result", "tool_use_id": tool_use.id,
+        "is_error": True, "content": error_msg,      # every tool_use needs a tool_result
+    }]})
 
 raise SQLGenerationError(f"Failed after {MAX_RETRIES} attempts")
 ```
@@ -481,13 +482,13 @@ When Claude generates AND reviews in the **same conversation**:
 ```python
 # Session 1: GENERATE
 article = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     messages=[{"role": "user", "content": "Write a blog post about..."}],
 ).content[0].text
 
 # Session 2: REVIEW (completely fresh — no generation context!)
 review = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     messages=[{"role": "user", "content": f"""
 You did NOT write this article. Review it critically:
 <article>{article}</article>
@@ -498,7 +499,7 @@ Be harsh. The author expects frank feedback."""}],
 
 # Session 3: REVISE (apply specific feedback)
 revised = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     messages=[{"role": "user", "content": f"""
 Original: <article>{article}</article>
 Feedback: <review>{review}</review>
@@ -583,7 +584,7 @@ Extract: title, author, date, topics. Output as JSON.
 
 Your data extraction pipeline uses a deeply nested schema: `customer.profile.contact.primary_email`. Claude fills it correctly 80% of the time. The other 20%? It creates `customer.contact.email` (wrong nesting), or `customer.profile.email` (skips a level), or puts the whole object at the wrong depth. Your validation catches it, but you're burning retries and tokens on structural errors that shouldn't happen.
 
-You flatten the schema: `customer_name`, `customer_email`, `customer_phone`. Accuracy jumps to 95%+. <mark>Flat schemas dramatically reduce structural errors because Claude doesn't have to track nesting depth.</mark>
+You flatten the schema: `customer_name`, `customer_email`, `customer_phone`, and the structural errors largely disappear. <mark>Flatter schemas reduce structural errors because there's less nesting to get wrong.</mark> (With strict tool use or JSON outputs, structure is enforced anyway; flattening still makes values easier to place correctly.)
 
 ### Mental Model: "The Form vs The Filing System"
 
@@ -593,7 +594,7 @@ A flat schema is like a simple form — one field per line, fill in the blank. A
 
 | Rule | ✅ Do | ❌ Don't |
 |------|------|---------|
-| 1. Empty arrays | `"items": []` | `"items": null` |
+| 1. Lists: empty arrays | `"items": []` | `"items": null` |
 | 2. Enum + escape hatch | `enum: ["a","b","other"]` | Open string (anything goes) |
 | 3. Flat schemas | `customer_name, customer_email` | `customer.profile.contact.email` |
 | 4. strict: true | Forces exact shape | Allows extra fields |
@@ -601,16 +602,16 @@ A flat schema is like a simple form — one field per line, fill in the blank. A
 ### Why Flat > Nested
 
 ```json
-// ✅ FLAT — Claude fills correctly 95%+ of time
+// ✅ FLAT — fewer places to put a value wrong
 {"customer_name": "...", "customer_email": "...", "order_total": 0}
 
 // ❌ NESTED — Claude makes more structural errors
 {"customer": {"profile": {"contact": {"email": "..."}}}}
 ```
 
-<div class="note-scribble">On the exam, if you see a question about "reducing JSON extraction errors" — the answer is almost always "flatten the schema." It's the single highest-impact change you can make to schema design for LLM consumption.</div>
+<div class="note-scribble">On the exam, "reduce JSON syntax errors" points to tool_use with a schema; "reduce fabricated values" points to optional/nullable fields; "handle new categories" points to enum + "other" + detail. Flattening helps placement errors but is rarely the headline answer.</div>
 
-<div class="note-important"><strong>Always use empty arrays [] as defaults, never null.</strong> Null handling is a common source of downstream crashes. An empty array is always safe to iterate over; null requires explicit checks.</div>
+<div class="note-important"><strong>Lists default to empty arrays; missing scalars are nullable.</strong> An empty array is safe to iterate. For a scalar the document may not contain (a discount code, a due date), make it optional/nullable so the model isn't pushed to fabricate a value to satisfy a required field.</div>
 
 ---
 
@@ -620,7 +621,7 @@ A flat schema is like a simple form — one field per line, fill in the blank. A
 
 You're building a chatbot. User says "My name is Sarah." Claude responds warmly. User then asks "What's my name?" Claude says "I don't have access to that information."
 
-Your colleague is baffled: "But she literally just told it!" You check the code and realize the second API call only contains the latest user message — not the conversation history. Claude doesn't remember Sarah's name because <mark>Claude is completely stateless — there is no server-side session. You must send the FULL conversation history in every single API call.</mark>
+Your colleague is baffled: "But she literally just told it!" You check the code and realize the second API call only contains the latest user message — not the conversation history. Claude doesn't remember Sarah's name because <mark>the Messages API is stateless: you must send the FULL conversation history in every API call.</mark> (Session features such as Claude Code's --resume and the Agent SDK's resume option work by storing that history for you and sending it again.)
 
 ### Mental Model: "The Goldfish Waiter"
 
@@ -634,7 +635,7 @@ import anthropic
 client = anthropic.Anthropic()  # uses ANTHROPIC_API_KEY env var
 
 message = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     max_tokens=1024,
     system="You are a helpful coding assistant.",  # System prompt
     messages=[
@@ -646,25 +647,28 @@ message = client.messages.create(
 # Claude sees full history → can answer "Sarah" ✅
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> <code>max_tokens</code> controls OUTPUT length, NOT the context window size. The context window (200K tokens) is fixed per model. If a question asks "how do you increase how much Claude can read?" — max_tokens is WRONG. Context window is model-dependent and cannot be changed via API parameters.</div>
+<div class="note-trap"><strong>TRAP:</strong> <code>max_tokens</code> controls OUTPUT length, NOT the context window size. The context window is fixed per model (1M tokens on the current Claude models).If a question asks "how do you increase how much Claude can read?" — max_tokens is WRONG. Context window is model-dependent and cannot be changed via API parameters.</div>
 
-<div class="note-trap"><strong>TRAP:</strong> Claude is STATELESS. There is no session ID, no server-side memory, no "continue conversation" endpoint. If an answer mentions "session persistence" or "server-side context" — it's wrong. Full history must be sent every call.</div>
+<div class="note-trap"><strong>TRAP:</strong> The Messages API is STATELESS: no server-side conversation memory, so full history must be sent every call. Don't confuse this with Claude Code / Agent SDK sessions, which persist transcripts locally and replay them when you resume.</div>
 
 ### Model Selection
 
-| Model | Best For | Context | Key Trait |
-|-------|----------|---------|-----------|
-| Claude Opus 4 | Complex reasoning, agentic tasks | 200K | Highest capability, most expensive |
-| Claude Sonnet 4 | Balanced tasks, coding | 200K | Best price/performance ratio |
-| Claude Haiku 3.5 | High-volume, classification | 200K | Fastest, cheapest |
+Current lineup (models overview, October 2026). Model comparison metrics are out of scope for the exam; this is orientation only.
 
-<div class="note-scribble">For exam questions about model selection: if cost/latency matter → Haiku. If quality matters most → Opus. If it says "balanced" or "production workload" → Sonnet. The exam usually makes one option obviously wrong by mismatching model to use case (e.g., Opus for 10,000 simple classifications).</div>
+| Model | API ID | Best For | Context |
+|-------|--------|----------|---------|
+| Claude Fable 5.1 | `claude-fable-5-1` | Demanding reasoning, long-horizon agentic work | 1M |
+| Claude Opus 5.5 | `claude-opus-5-5` | Long-running agentic coding and knowledge work (the recommended starting point) | 1M |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | Best combination of speed and intelligence | 1M |
+| Claude Haiku 5.5 | `claude-haiku-5-5` | High-volume, latency-sensitive: classification, extraction, routing | 1M |
+
+<div class="note-scribble">Rule of thumb: high-volume, latency-sensitive work → Haiku; balanced production workloads → Sonnet; hardest agentic and reasoning work → Opus or Fable. And remember the exam guide's point: a bigger model or context window doesn't fix attention dilution; splitting the work does.</div>
 
 ### Streaming Responses
 
 ```python
 with client.messages.stream(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-5-5",
     max_tokens=1024,
     messages=[{"role": "user", "content": "Write a poem"}]
 ) as stream:
@@ -685,8 +689,8 @@ Your real-time dashboard needs to show Claude's response as it's generated — u
 | Prompt structure | XML tags: role → context → instructions → constraints → output_format | "unambiguous delimiter" |
 | Determinism | Explicit categorical rules > vague adjectives | "consistent," "deterministic" |
 | Few-shot | 2-4 examples sweet spot; NOT guaranteed | "usually works" |
-| Extended thinking | API feature; `budget_tokens`; separate thinking + text blocks | "complex reasoning," "scratchpad" |
-| Most reliable output | tool_use + forced tool_choice + strict schema = GUARANTEED | "guarantee," "ensure schema" |
+| Thinking | API feature; adaptive + `effort` on current models (`budget_tokens` only on older ones); separate thinking blocks | "complex reasoning," "scratchpad" |
+| Most reliable output | tool_use with a strict JSON schema (forced via tool_choice where supported) or JSON outputs | "guarantee," "ensure schema" |
 | Retry loop | Exact error + location + original content + focused fix | "specific feedback" |
 | Self-review blindness | Separate session for review (fresh context, no history) | "same conversation" = problem |
 | Injection defense | XML boundary + "treat as data" rule (defense-in-depth) | "untrusted input," "user content" |
@@ -722,12 +726,12 @@ def extract_with_retry(document: str, max_retries: int = 2) -> ExtractionResult:
 
     for attempt in range(max_retries + 1):
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-5-5",
             tools=[extraction_tool],
             tool_choice={"type": "tool", "name": "extract_invoice"},
             messages=messages
         )
-        raw = response.content[0].input
+        raw = next(b.input for b in response.content if b.type == "tool_use")
 
         try:
             return ExtractionResult(**raw)   # ← semantic validation here
@@ -735,9 +739,14 @@ def extract_with_retry(document: str, max_retries: int = 2) -> ExtractionResult:
             if attempt == max_retries:
                 raise
             # Inject error back: document + failed extraction + exact validation error
+            tool_use = next(b for b in response.content if b.type == "tool_use")
             messages += [
                 {"role": "assistant", "content": response.content},
-                {"role": "user", "content": f"Validation failed: {e}\nOriginal: {raw}\nFix and retry."}
+                {"role": "user", "content": [{
+                    "type": "tool_result", "tool_use_id": tool_use.id, "is_error": True,
+                    "content": f"Validation failed: {e}\nYour extraction: {raw}\n"
+                               "Re-read the document above and call the tool again.",
+                }]},
             ]
 ```
 
@@ -763,7 +772,9 @@ def extract_with_retry(document: str, max_retries: int = 2) -> ExtractionResult:
 | Property | Value |
 |---|---|
 | Cost savings | **50% off** standard API pricing |
-| Processing time | Up to **24 hours** (no guaranteed SLA) |
+| Processing time | Most batches finish within 1 hour; requests not processed within **24 hours** expire (no latency SLA) |
+| Limits | Up to 100,000 requests or 256 MB per batch |
+| Results | Available for 29 days; each has a type: succeeded, errored, canceled, or expired |
 | Correlation | Use **`custom_id`** to match requests to responses |
 | Multi-turn tool calling | ❌ **NOT supported** |
 | Polling | Check completion status by polling |
@@ -787,13 +798,13 @@ Batch workflows (Message Batches API) ✅
 
 ```python
 # Submit
-batch = client.beta.messages.batches.create(requests=[
+batch = client.messages.batches.create(requests=[
     {"custom_id": "invoice-001", "params": {"messages": [...]}},
     {"custom_id": "invoice-002", "params": {"messages": [...]}},
 ])
 
 # Correlate results
-for result in client.beta.messages.batches.results(batch.id):
+for result in client.messages.batches.results(batch.id):
     print(result.custom_id, result.result)  # ← custom_id links back to your request
 ```
 
@@ -808,4 +819,73 @@ for result in client.beta.messages.batches.results(batch.id):
 • <code>stop_sequences</code>: Optional. Custom stop strings<br/>
 • <code>tools</code>: Optional. Array of tool definitions<br/>
 • <code>tool_choice</code>: Optional. Controls tool invocation behavior<br/>
-• <code>thinking</code>: Optional. Enable extended thinking with budget</div>
+• <code>thinking</code>: Optional. Adaptive thinking (or extended thinking with budget_tokens on older models)<br/>
+• <code>output_config</code>: Optional. <code>effort</code> level and <code>format</code> for JSON outputs</div>
+
+---
+
+## 4.10 Multi-Instance and Multi-Pass Review Architectures
+
+### Key Concept
+
+**Reviews get better when you change the reviewer's context, not when you ask the same session to try harder.**
+
+The exam guide makes two separate points. First, a model that generated code keeps its reasoning context, so it is less likely to question its own decisions; an **independent instance** without that context catches subtle issues more effectively than self-review instructions or extended thinking. Second, a single pass over many files suffers attention dilution, producing deep feedback on some files, shallow feedback on others, and contradictory verdicts on identical code.
+
+The fix for the second problem is **multi-pass review**: per-file passes for local issues, then a separate integration pass for cross-file data flow. A verification pass can add a confidence level to each finding so limited reviewer time goes to the uncertain ones. **One editor reads every chapter; a different editor checks the plot holds together; neither is the author.**
+
+### In Practice
+
+**What breaks without this**: The generating session approves its own race condition, and a 14-file single-pass review flags a pattern in one file while approving the identical pattern in another.
+
+**Decision trigger**: Ask two questions. Does the reviewer share the author's context? If yes, spin up an independent instance. Is the review spread across many files? If yes, split into per-file passes plus an integration pass.
+
+**When you'd choose differently**: For a small, single-file change, one independent pass is enough. Don't "fix" attention dilution with a bigger model or context window, and don't require consensus across three identical runs; that suppresses real but intermittently caught bugs.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">Distractors for review questions: "ask the same session to be more critical", "enable more thinking in the authoring session", "use a model with a larger context window", "run three passes and keep only findings that appear twice", and "make developers split their PRs". The exam answers are an independent review instance and per-file plus integration passes.</div>
+
+---
+
+## Deep Dive
+
+### 1. The connective narrative
+
+This domain (Domain 4, Prompt Engineering & Structured Output, in the official blueprint) is about turning a probabilistic model into a component other systems can depend on. It starts with **precision**: explicit, categorical criteria ("flag a comment only when the claimed behaviour contradicts the code") beat vague hedges like "be conservative", and high false-positive categories are worth switching off temporarily because they erode trust in the accurate ones.
+
+Next comes **consistency**. When instructions alone give inconsistent output, two to four targeted few-shot examples, ideally showing why one choice beat a plausible alternative, teach both the format and the judgment. Then **structure**: tool use with a JSON schema (strict where available) removes syntax errors, while schema design (nullable fields for data that may be missing, enum plus "other" plus detail for open categories) stops the model fabricating values.
+
+Finally, **verification**. Schemas don't guarantee semantics, so you validate (calculated_total versus stated_total), retry with the specific error, and recognize when a retry can't help because the data isn't in the source. Batch processing trades latency for a 50% discount when nothing is waiting on the result, and independent, multi-pass review catches what the author's own context hides.
+
+### 2. Worked scenario
+
+> **Scenario.** An invoice-extraction pipeline returns invalid JSON 3% of the time, invents PO numbers on invoices that have none, and its totals sometimes don't add up. Finance wants the whole archive reprocessed cheaply.
+>
+> **Step 1 — structure.** Replace "respond in JSON" with an extraction tool whose input_schema is the invoice schema (strict), so syntax errors disappear.
+>
+> **Step 2 — stop fabrication.** Make `po_number` nullable and add a few-shot example of an invoice without one, returning null.
+>
+> **Step 3 — semantics.** Extract `line_items`, `stated_total`, and `calculated_total`, plus `conflict_detected`; when validation fails, retry with the document, the failed extraction, and the exact error.
+>
+> **Step 4 — know when to stop.** If the missing value lives in a separate PO document that wasn't provided, route to human review instead of retrying.
+>
+> **Step 5 — the archive.** Refine the prompt on a sample, then submit the archive through the Message Batches API with a `custom_id` per invoice, and resubmit only failed or expired IDs.
+>
+> **Outcome:** zero syntax errors, no invented PO numbers, discrepancies flagged rather than hidden, and the backlog processed at half the price.
+
+### 3. Memory aid
+
+**PRESS** — making output dependable:
+- **P**recise criteria, not vague hedges
+- **R**epresentative few-shot examples (2-4, with reasoning)
+- **E**nforced structure (tool_use + JSON schema)
+- **S**emantic validation and targeted retries
+- **S**econd opinion: independent instances and multi-pass review
+
+### 4. Exam strategy for this domain
+
+- "Guarantee valid JSON" → tool use with a schema; "reduce false positives" → explicit criteria (and few-shot boundary examples); "inconsistent format" → few-shot examples.
+- When a retry "keeps failing", check whether the data exists in the source at all.
+- Batch API questions hinge on one thing: is anyone waiting on the result? Pre-merge checks no; overnight reports yes.
+- Five minutes before the exam: **structure from the API, judgment from examples, truth from validation.**

@@ -1,61 +1,66 @@
 # Domain 2: Claude Code Configuration & Workflows
-**Exam Weight: 20%**
+**Exam Weight: 20%** (official blueprint: Domain 3, "Claude Code Configuration & Workflows")
 
 ---
 
 ## The Big Idea
 
-Imagine you join a new team. You open Claude Code. It formats your Python with tabs (you hate tabs). It ignores the team's API naming conventions. A colleague on the same repo gets perfect results. What's different? **Configuration.** Claude Code has a layered configuration system that controls everything — from personal style to file-level rules — and understanding that system is 20% of the CCA-F exam.
+Imagine you join a new team. You open Claude Code. It formats your Python with tabs (you hate tabs). It ignores the team's API naming conventions. A colleague on the same repo gets perfect results. What's different? **Configuration.** Claude Code reads instructions from several places (your user files, the project, path-scoped rules, skills) and enforces behaviour from others (permissions, hooks). Knowing which mechanism does what is 20% of the CCA-F exam.
 
-<div class="note-important"><strong>Core Principle:</strong> Configuration cascades from broad → specific. The MOST specific rule always wins — like CSS specificity.</div>
+<div class="note-important"><strong>Core Principle:</strong> CLAUDE.md files and rules are <em>context</em>, not enforcement. They are concatenated into Claude's context, and nothing "overrides" anything. If something MUST happen or MUST NOT happen, use permissions or hooks.</div>
 
 ---
 
-## 2.1 The 3-Level CLAUDE.md Hierarchy
+## 2.1 The CLAUDE.md Hierarchy
 
 ### 📖 The Story
 
-Picture this: Alex is a senior developer who likes 2-space indentation and Conventional Commits everywhere. Their team at Acme Corp has a monorepo with strict architecture rules. And their React components follow very specific naming patterns that differ from their backend Go services.
+Alex is a senior developer who likes 2-space indentation and Conventional Commits everywhere. Their team at Acme Corp has a monorepo with strict architecture rules, and their React components follow naming patterns that differ from their Go services.
 
-Alex needs **three layers** of rules:
+Alex needs **three kinds** of instructions:
 - Personal preferences (follow Alex across every project)
 - Team/project standards (shared with the whole Acme team)
 - File-specific requirements (React files get different rules than Go files)
 
-Claude Code solves this with the **3-Level CLAUDE.md Hierarchy** — and the exam loves to test which level wins conflicts.
+Claude Code covers all three, and the exam tests where each one belongs.
 
-### 🧠 Mental Model: CSS Specificity
+### 🧠 Mental Model: Layers in One Briefing Pack
 
-Think of CLAUDE.md hierarchy exactly like CSS:
-- **Global** (`~/.claude/CLAUDE.md`) = browser default stylesheet — weakest
-- **Project** (`./CLAUDE.md`) = external stylesheet — medium
-- **Scoped** (`.claude/rules/*.md`) = inline style — **strongest, always wins**
+Think of every instruction file as a page in the same briefing pack handed to Claude at the start of a session:
+- **User** (`~/.claude/CLAUDE.md`) = your personal cover note — only in *your* pack
+- **Project** (`./CLAUDE.md` or `./.claude/CLAUDE.md`) = the team's shared pages — in everyone's pack via git
+- **Directory** (`packages/billing/CLAUDE.md`) = pages added when Claude starts working in that folder
+- **Rules** (`.claude/rules/*.md`) = topic pages; with a `paths` glob they're added only when Claude touches matching files
 
-<mark>When rules conflict, the most specific (scoped) ALWAYS wins.</mark>
+<mark>All pages are read together. Later pages don't cancel earlier ones; if two pages contradict each other, Claude may follow either.</mark>
 
 ```mermaid
 graph TD
-    G["~/.claude/CLAUDE.md<br/>🌍 GLOBAL<br/>(Lowest Priority)"] --> P["./CLAUDE.md<br/>📁 PROJECT<br/>(Middle Priority)"]
-    P --> S[".claude/rules/*.md<br/>🎯 SCOPED<br/>(Highest Priority)"]
-    
-    style G fill:#1e293b,stroke:#64748b
+    M["Managed policy CLAUDE.md<br/>(org-wide, IT-deployed)"] --> U["~/.claude/CLAUDE.md<br/>USER (only you)"]
+    U --> P["./CLAUDE.md or ./.claude/CLAUDE.md<br/>PROJECT (shared via git)"]
+    P --> D["subdir/CLAUDE.md<br/>DIRECTORY (loads on demand)"]
+    P --> R[".claude/rules/*.md<br/>RULES (paths = conditional)"]
+
+    style U fill:#1e293b,stroke:#64748b
     style P fill:#1e293b,stroke:#a78bfa
-    style S fill:#1e293b,stroke:#22c55e
+    style D fill:#1e293b,stroke:#a78bfa
+    style R fill:#1e293b,stroke:#22c55e
 ```
 
-### The Three Levels in Detail
+### The Levels in Detail
 
-| Level | Location | Applies To | Use For |
-|-------|----------|-----------|---------|
-| 🌍 Global | `~/.claude/CLAUDE.md` | All projects on machine | Personal prefs, style |
-| 📁 Project | `./CLAUDE.md` | This repo only | Architecture, team rules |
-| 🎯 Scoped | `.claude/rules/*.md` | Files matching `path:` glob | File-specific standards |
+| Level | Location | Loaded | Shared? | Use For |
+|-------|----------|--------|---------|---------|
+| Managed policy | OS-specific path, deployed by IT | Every session | Whole org | Company standards, compliance |
+| User | `~/.claude/CLAUDE.md` | At launch | Only you | Personal style, shortcuts |
+| Project | `./CLAUDE.md` or `./.claude/CLAUDE.md` | At launch | Team, via git | Architecture, team rules |
+| Local | `./CLAUDE.local.md` (gitignored) | At launch | Only you | Your sandbox URLs, test data |
+| Directory | `subdir/CLAUDE.md` | When Claude reads/edits a file in that subdir | Team, via git | Package-specific conventions |
+| Rules | `.claude/rules/*.md` | Unscoped: at launch. With `paths`: when a matching file is read or edited | Team, via git | Topic files, file-type conventions |
 
-<div class="note-scribble">Remember: Global is YOUR machine, Project is YOUR REPO, Scoped is YOUR FILES. Person → Team → Precision.</div>
+<div class="note-scribble">Files in the directories <em>above</em> where you launched load at launch. Files in subdirectories <em>below</em> load on demand. Run <code>/context</code> to see which memory files actually loaded; <code>/memory</code> lists and opens them.</div>
 
-### Level 1: Global — Your Personal Preferences
-
-**Use case: "The Consistent Developer"** — Alex wants Conventional Commits and TypeScript strict mode in every single project, whether it's a weekend hack or Acme's production monorepo.
+### Level 1: User — Your Personal Preferences
 
 ```markdown
 # ~/.claude/CLAUDE.md
@@ -63,155 +68,115 @@ graph TD
 - Always use TypeScript strict mode
 - Prefer functional components over class components
 - Use 2-space indentation
-- Never use `any` type
 - Commit messages: Conventional Commits format
 ```
 
-This lives on Alex's machine. The team never sees it. It never goes into version control.
+This lives on Alex's machine. The team never sees it, and it never goes into version control. That is also why a new teammate doesn't get these instructions: a classic exam diagnosis.
 
 ### Level 2: Project — Team-Shared Standards
-
-**Use case: "The Team Onboarding Doc"** — A new hire clones the Acme monorepo. Without reading a wiki, without asking Slack, Claude Code already knows the architecture because `./CLAUDE.md` lives in the repo root.
 
 ```markdown
 # ./CLAUDE.md (at repo root)
 
 ## Architecture
 - Monorepo: apps/frontend, apps/backend, packages/shared
-- Frontend: React 19 + TanStack Query
-- Backend: Express + PostgreSQL
 - All API responses: {data, error, meta} shape
 
-## Key Files
-- apps/backend/src/repos/ — database access layer
-- packages/shared/src/types/ — shared TypeScript interfaces
+## Standards
+- Testing conventions: @docs/testing.md
+- API conventions: @docs/api-conventions.md
 ```
 
-<div class="note-important"><strong>Project CLAUDE.md is version-controlled.</strong> It's committed to the repo — every team member gets the same rules automatically.</div>
+<div class="note-important"><strong>@import keeps CLAUDE.md modular.</strong> <code>@path/to/file</code> pulls another file into context alongside the CLAUDE.md that references it (relative paths resolve from the importing file; imports can nest up to four hops). Imports organise content but don't save context, because imported files load with their parent.</div>
 
-### Level 3: Scoped Rules — File-Specific (HIGHEST PRIORITY)
-
-**Use case: "The Polyglot Monorepo"** — Acme's repo has React frontends, Go microservices, and Python ML pipelines. React files need `handleClick` naming. Go files need `errcheck` patterns. Python needs type hints. One project-level rule can't cover all of them.
+### Level 3: Rules — Topic Files and Path Scoping
 
 ```markdown
 ---
-path: apps/frontend/**/*.tsx
+paths:
+  - "apps/frontend/**/*.tsx"
 ---
 # React Component Standards
 
 - Props interface: {ComponentName}Props
-- Use React.memo() for list item components
-- Suspense boundaries at route level only
 - Event handlers: handleClick, handleSubmit
 ```
 
-The `path:` frontmatter tells Claude: "Only apply these rules when I'm working on files that match this glob pattern."
+The `paths` frontmatter tells Claude Code: "Load this rule only when Claude reads, writes, or edits a file matching one of these globs." A rule without `paths` loads at launch with the same priority as `.claude/CLAUDE.md`.
 
 ### The Frontmatter Trap
 
-This is one of the most commonly tested gotchas on the exam. The YAML frontmatter in scoped rules supports exactly **one key**: `path:`.
+`paths` (plural) is the **only** field Claude Code reads from a rule's frontmatter. It accepts a YAML list or a comma-separated string, and supports globs such as `**/*.test.tsx` and brace expansion like `src/**/*.{ts,tsx}`.
 
 ```yaml
 ---
-path: src/**/*.ts    # ✅ ONLY valid key
+paths:
+  - "src/**/*.ts"      # ✅ the only field Claude Code reads
 ---
 ```
 
-<div class="note-trap"><strong>TRAP:</strong> The exam will show options like <code>glob:</code>, <code>applies_to:</code>, <code>scope:</code>, or <code>files:</code> as valid frontmatter keys. NONE of these exist. Only <code>path:</code> works.</div>
+<div class="note-trap"><strong>TRAP:</strong> Options like <code>path:</code> (singular), <code>glob:</code>, <code>applies_to:</code>, <code>scope:</code> or <code>applyTo:</code> (that one is GitHub Copilot's) are all ignored without an error, so the rule silently loads for every file.</div>
 
-### Conflict Resolution Walkthrough
-
-Let's say Alex has these three configs:
+### Conflict Walkthrough
 
 | Source | Rule |
 |--------|------|
-| Global | "Use 2-space indentation" |
+| User | "Use 2-space indentation" |
 | Project | "Use 4-space indentation for Python files" |
-| Scoped (`path: **/*.py`) | "Use tabs for indentation" |
+| Rule (`paths: ["**/*.py"]`) | "Use tabs for indentation" |
 
-When Alex edits a `.py` file, Claude uses **tabs** — because scoped rules win. When Alex edits a `.ts` file (no scoped rule matches), Claude uses **2-space** from global (project rule only mentioned Python).
+When Alex edits a `.py` file, all three instructions are in context and they contradict each other, so **Claude may follow any of them**. The fix isn't to rely on a precedence order; it's to remove the contradiction (for example, delete the indentation line from the project file and keep the Python rule).
 
-<div class="note-scribble">If the exam asks "which rule applies?" — always check: does a scoped rule's path: glob match the file in question? If yes, scoped wins. Period.</div>
+<div class="note-scribble">If the exam asks "which rule wins?", the honest answer is "none is guaranteed": instructions are concatenated, ordered from broad to specific. Make the files consistent, or use a hook or linter if the behaviour is mandatory.</div>
 
 ---
 
-## 2.2 Skills vs Tools
+## 2.2 Skills, Rules, and Tools
 
 ### 📖 The Story
 
-Your team lead asks: "I want Claude to know our database schema when writing repository code, AND I want it to be able to run migrations." Two completely different needs:
+Your team lead asks: "I want Claude to know our database schema when writing repository code, AND I want it to be able to run migrations." Two different needs:
 
-1. **Knowing** the schema = passive context, like having docs open in a tab
-2. **Running** a migration = active execution, like clicking a button that changes the world
+1. **Knowing** the schema = context, like having docs open in a tab
+2. **Running** a migration = execution, something that changes the world
 
-Claude Code separates these into **Skills** (knowledge) and **Tools** (actions). The exam will present scenarios and ask you to classify — and the boundary is razor-sharp.
+Context comes from CLAUDE.md, rules, and skills. Execution comes from tools (built-ins like Bash and Edit, or MCP tools).
 
 ### 🧠 Mental Model: Library Book vs Power Tool
 
-- A **Skill** is a **library book** — you read it, you gain knowledge, the book doesn't change the world
-- A **Tool** is a **power drill** — you use it, holes appear in walls, the world changes
+- A **rule or skill** is a **library book**: you read it and gain knowledge; the book doesn't change the world
+- A **tool** is a **power drill**: you use it, holes appear in walls
 
-<mark>The decision rule: "Does it EXECUTE code at runtime?" → Tool. "Does it INFORM Claude?" → Skill.</mark>
+<mark>Decision rule: "Does it EXECUTE something?" → tool (built-in or MCP). "Does it INFORM Claude?" → CLAUDE.md, a rule, or a skill.</mark>
 
-```mermaid
-graph LR
-    subgraph "📚 SKILLS (Knowledge)"
-        SK1[Schema docs]
-        SK2[Coding standards]
-        SK3[Architecture ADRs]
-    end
-    
-    subgraph "⚡ TOOLS (Actions)"
-        TL1[Run query]
-        TL2[Send email]
-        TL3[Deploy app]
-    end
-    
-    SK1 -->|"Informs"| C[🤖 Claude]
-    SK2 -->|"Guides"| C
-    SK3 -->|"Contextualizes"| C
-    C -->|"Calls"| TL1
-    C -->|"Calls"| TL2
-    C -->|"Calls"| TL3
-```
+### Where Each Kind of Context Lives
 
-### Classification Practice
+| You want... | Use | Why |
+|---|---|---|
+| Facts Claude needs in every session | `CLAUDE.md` | Always loaded |
+| Conventions for one file type or area | `.claude/rules/*.md` with `paths` | Loads only when matching files are touched |
+| A multi-step procedure or reference used for specific tasks | Skill in `.claude/skills/<name>/SKILL.md` | Description is always visible; the body loads only when invoked or judged relevant |
+| To run queries, call APIs, deploy | A tool (built-in or MCP server) | Something has to execute |
 
-| Item | Skill or Tool? | Why |
-|------|:---:|---|
-| Database schema diagram | 📚 Skill | Informs query writing — no execution |
-| Execute SQL query | ⚡ Tool | Runs code against DB — side effects |
-| API endpoint docs | 📚 Skill | Context for Claude — read-only knowledge |
-| Call an API endpoint | ⚡ Tool | Actually makes HTTP request — side effects |
-| Coding standards | 📚 Skill | Guides code generation — no execution |
-| Run linter | ⚡ Tool | Executes eslint process — spawns a process |
-| Architecture decisions | 📚 Skill | Context for design choices — read-only |
-| Deploy to production | ⚡ Tool | Runs deployment pipeline — changes the world |
-
-<div class="note-trap"><strong>TRAP:</strong> "Database schema documentation" is a SKILL (read-only context), not a tool. Even though it's about a database, it doesn't execute anything. Don't be tricked by the subject matter — focus on whether it RUNS code.</div>
-
-### Use Case: Skill File in Action
-
-**"The Schema-Aware Repository Layer"** — You want Claude to write correct SQL whenever it touches files in `apps/backend/src/repos/`. You give it the schema as a scoped skill:
+### Use Case: Schema-Aware Repository Code
 
 ```markdown
 <!-- .claude/rules/database-schema.md -->
 ---
-path: apps/backend/src/repos/**/*.ts
+paths:
+  - "apps/backend/src/repos/**/*.ts"
 ---
 # Database Schema (Read-Only Context)
 
-## Users Table
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK, gen_random_uuid() |
 | email | text | UNIQUE, NOT NULL |
-| role | enum('admin','user') | DEFAULT 'user' |
 ```
 
-Claude now "knows" the schema whenever it touches repo files. No execution. No side effects. Pure knowledge injection.
+Claude now "knows" the schema whenever it touches repository files. To *query* the live database, you'd add an MCP server.
 
-<div class="note-scribble">Skills are just markdown files that Claude reads. They live in .claude/rules/ with a path: glob. They're technically the same mechanism as scoped CLAUDE.md rules — just focused on knowledge rather than behavioral instructions.</div>
+<div class="note-trap"><strong>TRAP:</strong> Skills don't live in <code>.claude/rules/</code>. Skills are folders under <code>.claude/skills/</code> (or <code>~/.claude/skills/</code>) with a <code>SKILL.md</code>; rules are single Markdown files under <code>.claude/rules/</code>.</div>
 
 ---
 
@@ -219,34 +184,34 @@ Claude now "knows" the schema whenever it touches repo files. No execution. No s
 
 ### 📖 The Story
 
-Your startup uses three external services: a PostgreSQL database, the GitHub API, and a custom internal search engine. You want Claude Code to query all three — not through copy-pasting API docs, but through actual live connections. You need MCP servers.
-
-MCP (Model Context Protocol) servers are the **pluggable backends** that give Claude Code real-world capabilities. Each server exposes tools that Claude can call. And the exam expects you to know exactly how they're configured.
+Your startup uses a PostgreSQL database, the GitHub API, and an internal search engine. You want Claude Code to query all three through live connections. You need MCP servers.
 
 ### 🧠 Mental Model: USB Devices
 
-Think of MCP servers like USB peripherals:
 - Claude Code is the computer
-- Each MCP server is a USB device (printer, camera, storage)
-- `stdio` is the USB cable (always the same standard)
-- The device driver (`command` + `args`) tells the computer how to talk to it
+- Each MCP server is a peripheral that brings its own tools
+- The transport is the cable: **stdio** for a local process, **HTTP** for a remote server
+- The scope decides whose computer the device is plugged into
 
-<mark>Transport is ALWAYS "stdio" for local MCP servers.</mark> The exam may offer "http", "websocket", or "grpc" — these are wrong for local dev tool configurations.
+### Scopes: Who Gets the Server
 
-```mermaid
-graph LR
-    CC[Claude Code] -->|stdio| S1[Database MCP Server]
-    CC -->|stdio| S2[GitHub MCP Server]
-    CC -->|stdio| S3[Filesystem MCP Server]
-    
-    S1 -->|"5 tools"| DB[(PostgreSQL)]
-    S2 -->|"4 tools"| GH[GitHub API]
-    S3 -->|"3 tools"| FS[Local Files]
+| Scope | Stored in | Loads in | Shared? |
+|---|---|---|---|
+| Local (default for `claude mcp add`) | `~/.claude.json` | Current project only | No |
+| Project | `.mcp.json` in the repo root | Current project | Yes, via version control |
+| User | `~/.claude.json` | All your projects | No |
+
+```bash
+# Team-shared server, written to .mcp.json
+claude mcp add --scope project --transport http tracker https://mcp.example.com/tracker
+
+# Personal/experimental server, available in all of your projects
+claude mcp add --scope user --transport stdio scratch -- npx -y my-experimental-server
 ```
 
-### Configuration in .claude/settings.json
+<div class="note-important"><strong>Project-scoped servers need approval.</strong> In interactive sessions Claude Code asks before using servers from a project's <code>.mcp.json</code>. In <code>claude -p</code> and Agent SDK runs there's no prompt, so those servers load without asking; use <code>--strict-mcp-config</code> or <code>--bare</code> in CI if you don't want repository-defined servers to start.</div>
 
-**Use case: "The Multi-Service Workspace"** — Here's how you wire up three MCP servers for a typical full-stack project:
+### A Project `.mcp.json`
 
 ```json
 {
@@ -254,77 +219,41 @@ graph LR
     "database": {
       "command": "node",
       "args": ["./mcp-servers/db-server.js"],
-      "transport": "stdio"
+      "env": { "DATABASE_URL": "${DATABASE_URL}" }
     },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" },
-      "transport": "stdio"
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src"],
-      "transport": "stdio"
+    "search": {
+      "type": "http",
+      "url": "${SEARCH_URL:-https://search.internal.example.com}/mcp",
+      "headers": { "Authorization": "Bearer ${SEARCH_TOKEN}" }
     }
   }
 }
 ```
 
-### Anatomy of an MCP Server Entry
+| Field | Purpose |
+|-------|---------|
+| `command` + `args` | Launch a local stdio server |
+| `type: "http"` + `url` | Connect to a remote server (HTTP is recommended; SSE is deprecated) |
+| `env`, `headers` | Credentials and settings, ideally via `${VAR}` expansion |
 
-| Field | Purpose | Example |
-|-------|---------|---------|
-| `command` | Executable to launch | `"node"`, `"python"`, `"npx"` |
-| `args` | CLI arguments passed to the command | `["./server.js"]`, `["-y", "@mcp/pkg"]` |
-| `env` | Environment variables for the process | `{ "TOKEN": "${MY_TOKEN}" }` |
-| `transport` | Communication protocol | Always `"stdio"` |
+<div class="note-important"><strong>Environment variable expansion</strong> works in <code>command</code>, <code>args</code>, <code>env</code>, <code>url</code>, and <code>headers</code>: <code>${VAR}</code> or <code>${VAR:-default}</code>. Secrets stay in each developer's shell or CI secret store, never in the committed file. An unset variable with no default stays as the literal text and Claude Code shows a warning.</div>
 
-<div class="note-important"><strong>The <code>env</code> field uses <code>${VAR}</code> syntax</strong> to pull values from the host shell environment. This means secrets stay in your shell profile or CI secrets — never hardcoded in settings.json.</div>
-
-<div class="note-trap"><strong>TRAP:</strong> The exam may show <code>"transport": "http"</code> or <code>"transport": "sse"</code> in a local configuration. For Claude Code local development, the answer is ALWAYS <code>"stdio"</code>.</div>
-
-### Use Case: "The Secrets-Safe Config"
-
-A junior dev hardcodes their GitHub token in `.claude/settings.json` and commits it. **Wrong.**
-
-The correct pattern uses shell variable interpolation:
-```json
-"env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
-```
-The `${GITHUB_TOKEN}` resolves from the developer's shell environment at runtime — it's never stored in the file.
-
-<div class="note-scribble">MCP config lives in .claude/settings.json — not CLAUDE.md, not .claude/rules/. Different file, different purpose. settings.json = runtime infrastructure. CLAUDE.md = behavioral rules.</div>
+<div class="note-trap"><strong>TRAP:</strong> MCP servers are configured in <code>.mcp.json</code> (project) or <code>~/.claude.json</code> (local/user), not in CLAUDE.md, not in <code>.claude/rules/</code>, and not via a <code>mcpServers</code> block you hand-write into <code>.claude/settings.json</code>.</div>
 
 ---
 
-## 2.4 Headless Mode (-p Flag)
+## 2.4 Non-Interactive Mode (-p Flag)
 
 ### 📖 The Story
 
-It's 2 AM. A pull request lands. Your CI pipeline needs to review the diff for security issues — but there's no human at the keyboard. Claude Code needs to run **non-interactively**, read the diff, produce a review, and exit. No prompts, no confirmations, no "press Y to continue."
-
-This is **headless mode**: Claude Code as a CLI tool in automated pipelines. And the exam has a devastating trap about exit codes.
+It's 2 AM. A pull request lands. Your CI pipeline needs to review the diff with no human at the keyboard. Claude Code must run **non-interactively**, read the diff, produce a review, and exit.
 
 ### 🧠 Mental Model: The Silent Consultant
 
-Headless mode turns Claude from an interactive pair programmer into a **consultant you mail a question to**:
 - You send a letter (the `-p` prompt)
-- They write back (stdout)
+- They write back (stdout, optionally JSON)
 - They leave (exit code)
-- They never ask clarifying questions
-
-```mermaid
-sequenceDiagram
-    participant CI as CI Pipeline
-    participant CC as Claude Code
-    participant Out as stdout
-    
-    CI->>CC: claude -p "Review this diff..."
-    CC->>CC: Process (no interaction)
-    CC->>Out: Text result
-    Out->>CI: Capture output → next step
-```
+- They never ask clarifying questions (anything that would need a permission prompt is denied unless you pre-approved it)
 
 ### Usage Patterns
 
@@ -332,50 +261,38 @@ sequenceDiagram
 # Basic: prompt in, text out
 claude -p "List all TODO comments in src/"
 
-# Pipe to file
-claude -p "Review this code for security issues" > review.txt
+# Pipe input to Claude + prompt
+git diff origin/main | claude -p "Find bugs in this diff"
 
-# Pipe input TO Claude + prompt
-DIFF=$(git diff HEAD~1)
-echo "$DIFF" | claude -p "Find bugs in this diff. Output JSON."
+# Machine-parseable, schema-validated output
+claude -p "Review this diff" --output-format json \
+  --json-schema '{"type":"object","properties":{"findings":{"type":"array"}},"required":["findings"]}' \
+  | jq '.structured_output'
+
+# Pre-approve exactly the tools the job needs
+claude -p "Run the tests and fix failures" --allowedTools "Bash(npm test *),Read,Edit"
 ```
 
-### Use Case: "The Automated PR Reviewer"
+| Flag | What it does |
+|---|---|
+| `-p` / `--print` | Non-interactive: run, print, exit |
+| `--output-format text\|json\|stream-json` | JSON includes `result`, `session_id`, cost; with `--json-schema` the validated object is in `structured_output` |
+| `--allowedTools` | Tools that run **without a permission prompt** (it doesn't restrict the tool set; `--tools` does) |
+| `--bare` | Skip auto-discovery of hooks, skills, plugins, MCP servers, and CLAUDE.md for reproducible CI runs |
+| `--max-turns`, `--max-budget-usd` | Cap turns or estimated spend in print mode |
 
-Your team wants every pull request reviewed by Claude before a human looks at it. Here's the GitHub Actions workflow:
+<div class="note-trap"><strong>TRAP:</strong> There is no <code>--headless</code>, <code>--batch</code> or <code>CLAUDE_HEADLESS</code>. The documented non-interactive mode is <code>-p</code>.</div>
 
-```yaml
-name: AI Code Review
-on: [pull_request]
-jobs:
-  review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Claude Review
-        run: |
-          DIFF=$(git diff ${{ github.event.pull_request.base.sha }} HEAD)
-          echo "$DIFF" | claude -p "Review for security issues. Output JSON: {issues: [{file, line, severity, description}]}" > review.json
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-```
+### The Exit Code Trap
 
-### The Exit Code Trap (Exam Critical!)
-
-This is arguably the **most-tested trap** in Domain 2. Read this carefully:
-
-| Code | Actually Means | What Students Wrongly Think |
+| Code | Means | What students wrongly think |
 |------|-------|----------------|
-| **0** | Claude ran the command successfully | ❌ "No bugs found" |
-| **1** | Claude command itself FAILED (auth error, bad args) | ❌ "Bugs were found" |
+| **0** | The run succeeded | ❌ "No bugs found" |
+| **non-zero** | The run failed (invalid flag, missing authentication, an error that ended the run) | ❌ "Bugs were found" |
 
-<div class="note-important"><strong>Exit 0 = "Claude successfully completed its task."</strong> If Claude finds 47 critical security bugs, it STILL exits 0 — because it successfully ran the review. Exit 1 means Claude itself crashed (wrong API key, malformed arguments, network failure).</div>
+<div class="note-important"><strong>Exit 0 = "Claude Code completed the run."</strong> If Claude finds 47 critical security bugs, the run still succeeded. Gate the pipeline on the <em>content</em> (for example a <code>severity</code> field in <code>structured_output</code>), not on the exit code.</div>
 
-**The analogy:** You ask a doctor to examine a patient. The doctor says "this patient has cancer." Did the *doctor* fail? No — the doctor succeeded at their job. Exit 0. The doctor failing would be: they didn't show up (wrong address, expired license). Exit 1.
-
-<div class="note-trap"><strong>TRAP:</strong> An exam question might say "Your CI pipeline uses Claude to find bugs. Which exit code indicates bugs were found?" The answer is NOT 1. It's 0 — Claude succeeded at finding bugs. The content of stdout tells you WHAT was found. The exit code tells you whether CLAUDE ITSELF worked.</div>
-
-<div class="note-scribble">Think of it this way: exit codes describe the MESSENGER, not the MESSAGE. Exit 0 = messenger delivered successfully. Exit 1 = messenger got lost.</div>
+<div class="note-scribble">Exit codes describe the MESSENGER, not the MESSAGE.</div>
 
 ---
 
@@ -383,41 +300,26 @@ This is arguably the **most-tested trap** in Domain 2. Read this carefully:
 
 ### 📖 The Story
 
-Your team does code reviews every day. Every time, someone types the same 8-line prompt: "Review this file for security issues, check error handling, look for N+1 queries, format as a table..." Tedious. Error-prone. Someone always forgets the performance check.
+Your team does code reviews every day, and every time someone retypes the same 8-line prompt. Slash commands save reusable prompts as Markdown files: type `/review` instead.
 
-Slash commands let you save reusable prompts as markdown files. Type `/review` instead of 8 lines. Everyone on the team gets the same thorough review.
-
-### 🧠 Mental Model: Shell Aliases
-
-Slash commands are like bash aliases but for Claude prompts:
-- `alias ll='ls -la'` → saves a shell command
-- `.claude/commands/review.md` → saves a Claude prompt
-
-<mark>Slash commands live in `.claude/commands/{name}.md` and are invoked as `/{name}`.</mark>
-
-```mermaid
-graph LR
-    U["User types /review"] --> F[".claude/commands/review.md"]
-    F --> CC[Claude Code loads as prompt]
-    CC --> R[Executes the review task]
-```
-
-### File Structure
+<mark>A file at `.claude/commands/{name}.md` is invoked as `/{name}`. Custom commands have been merged into skills: `.claude/skills/{name}/SKILL.md` creates the same command and adds supporting files and frontmatter. Existing command files keep working.</mark>
 
 ```
 .claude/
   commands/
     review.md      → /review
     commit.md      → /commit
-    test.md        → /test
-    migrate.md     → /migrate
+  skills/
+    scaffold/
+      SKILL.md     → /scaffold
 ```
 
-The mapping is dead simple: the filename (minus `.md`) becomes the command name. No registration, no config, no manifest. Drop a markdown file, get a command.
+| Location | Scope |
+|---|---|
+| `.claude/commands/` or `.claude/skills/` | Project: shared through version control |
+| `~/.claude/commands/` or `~/.claude/skills/` | Personal: only you, all projects |
 
 ### Use Case: "The Consistent Commit Message"
-
-Every developer on your team writes commit messages differently. Some use past tense, some use emoji, some write novels. You standardize with a slash command:
 
 ```markdown
 <!-- .claude/commands/commit.md -->
@@ -425,33 +327,13 @@ Generate a git commit message for staged changes.
 
 Rules:
 1. Conventional Commits: type(scope): description
-2. Types: feat, fix, refactor, docs, test, chore, perf
-3. Scope: primary directory or module
-4. Imperative mood, lowercase, no period
-5. Multi-concern changes → suggest splitting into multiple commits
+2. Imperative mood, lowercase, no period
+3. Multi-concern changes → suggest splitting into multiple commits
 
 Output ONLY the commit message.
 ```
 
-Now everyone types `/commit` and gets a properly formatted message. No arguments about style.
-
-### Use Case: "The Security-First Review"
-
-```markdown
-<!-- .claude/commands/review.md -->
-Review current file for:
-1. 🔴 Security: injection, XSS, auth bypass, secrets in code
-2. 🟡 Errors: unhandled promises, swallowed errors
-3. 🔵 Performance: N+1, missing memoization
-4. ⚪ Types: any usage, missing return types
-
-Format: Line number + Severity emoji + Fix recommendation
-If no issues: "No issues detected" (don't fabricate)
-```
-
-<div class="note-scribble">Slash commands are version-controlled (they're in .claude/commands/ in the repo). This means the whole team shares them via git. Unlike global CLAUDE.md which is per-machine.</div>
-
-<div class="note-trap"><strong>TRAP:</strong> Slash commands live in <code>.claude/commands/</code> — NOT <code>.claude/rules/</code> (that's for scoped rules). Don't confuse the two directories. commands = reusable prompts. rules = automatic context injection.</div>
+<div class="note-trap"><strong>TRAP:</strong> Commands live in <code>.claude/commands/</code> (or as skills in <code>.claude/skills/</code>), not in <code>.claude/rules/</code>, not in CLAUDE.md, and not in a <code>commands</code> array in a config file. <code>~/.claude/commands/</code> is personal and isn't shared with teammates.</div>
 
 ---
 
@@ -459,55 +341,51 @@ If no issues: "No issues detected" (don't fabricate)
 
 ### 📖 The Story
 
-Your company has four environments where Claude Code runs:
-1. **Local dev** — developers using Claude interactively on their laptops
-2. **CI review** — Claude reviews PRs automatically in GitHub Actions
-3. **Deploy pipeline** — Claude runs deployment scripts
-4. **Security audit** — Claude analyzes code for compliance reporting
+Claude Code runs in four places at your company: developer laptops, a CI review job, a deploy pipeline, and a compliance audit. Each needs different limits. You don't want the CI review bot editing source, and you don't want the audit job making network calls.
 
-Each environment needs different **permissions**. You don't want the CI review bot accidentally modifying source code. You don't want the audit tool making network calls to external services. Permissions control what Claude Code is *allowed to do*.
+### 🧠 Mental Model: Hotel Key Cards, Checked at the Door
 
-### 🧠 Mental Model: Hotel Key Cards
+- **deny** rules = doors that never open for this guest
+- **ask** rules = doors that need the front desk's approval each time
+- **allow** rules = doors the card opens without asking
 
-Think of permissions as hotel key cards:
-- **Read** = you can enter the lobby and look around
-- **Write** = you can enter your room and rearrange furniture
-- **Execute** = you can use the gym equipment (things that DO stuff)
-- **Network** = you can use the hotel phone to call outside
+The hotel checks **deny first, then ask, then allow**; the first match decides. An allow rule can't carve an exception out of a deny rule.
 
-Different guests (environments) get different cards.
+### Permission Rules
 
-### Permission Categories
+```json
+// .claude/settings.json (project, shared) — .claude/settings.local.json for personal, ~/.claude/settings.json for user-wide
+{
+  "permissions": {
+    "allow": ["Bash(npm run test *)", "Read"],
+    "ask":   ["Bash(git push *)"],
+    "deny":  ["Edit", "Write", "WebFetch", "Read(./.env)"]
+  }
+}
+```
 
-| Permission | Controls | When to Deny |
-|------------|----------|----------|
-| `read` | File reading, directory listing | Rarely denied |
-| `write` | Create, modify, delete files | CI review bots, audits |
-| `execute` | Shell commands, scripts | Read-only audits |
-| `network` | HTTP requests, API calls | Sandboxed / air-gapped environments |
+| Rule | Effect |
+|---|---|
+| `Edit`, `Write` in deny | Claude can't change files |
+| `Bash` in deny | Removes the shell entirely |
+| `Bash(rm *)` in deny | Blocks matching commands (it matches command text, so pair with other controls for real security) |
+| `WebFetch(domain:github.com)` in allow | Allows fetches to that domain only |
+| `Read(./.env)` in deny | Blocks reading secrets files |
 
-<mark>The exam tests you on matching environments to permission sets.</mark>
+Reads inside the working directory and a built-in set of read-only commands (such as `ls`, `cat`, and `head`) need no approval. Permission modes (`default`/Manual, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`) set the baseline for everything not covered by a rule.
+
+<div class="note-important"><strong>CLAUDE.md can't grant or revoke access.</strong> The permissions docs say it outright: instructions shape what Claude tries, but they don't change what Claude Code allows. Use rules, a permission mode, or a PreToolUse hook.</div>
 
 ### Environment Presets
 
-| Environment | Permissions | Rationale |
+| Environment | Sensible setup | Rationale |
 |-------------|------------|-----------|
-| 🏠 Local dev | All allowed | Developer needs full capability |
-| 🔍 CI review | Read only | Must NOT change code during review |
-| 🚀 Deploy | Read + Execute | Run scripts, but don't edit source |
-| 🛡️ Audit | Read only | Analysis only — no side effects |
+| 🏠 Local dev | Default mode, allow common test/build commands | Developer is there to approve the rest |
+| 🔍 CI review | Deny `Edit`/`Write`; pre-approve only read-only tools | The bot reports; humans decide what to change |
+| 🚀 Deploy | Allow only the specific deploy scripts, deny edits | Run known scripts, don't edit source |
+| 🛡️ Audit | Read-only, deny `WebFetch` and network commands | Analysis only, no side effects |
 
-<div class="note-important"><strong>CI review = read-only.</strong> This is the most tested preset. A review bot that can write to files could accidentally modify code during review — a security risk and a correctness issue.</div>
-
-### Use Case: "The Overpowered Review Bot"
-
-A team sets up Claude in CI with full permissions. During a PR review, Claude finds a bug and *automatically fixes it* — modifying the PR branch without the developer's knowledge. Chaos. The fix introduced a regression.
-
-**Lesson:** CI review environments should be **read-only**. Claude reports findings; humans decide what to fix.
-
-<div class="note-trap"><strong>TRAP:</strong> "Deploy" permission includes Execute but NOT Write. This seems counterintuitive — doesn't deploying require creating files? No. Deploy runs existing scripts (execute) that handle the deployment. Claude itself shouldn't be editing source files during a deploy.</div>
-
-<div class="note-scribble">Memory aid: "RWXN" — Read, Write, eXecute, Network. Same concept as Unix file permissions, extended to network access. If you know chmod, you know this.</div>
+<div class="note-trap"><strong>TRAP:</strong> There's no <code>--read-only</code> flag and no "read/write/execute/network" category switch. Read-only is built from deny rules (or plan mode for interactive exploration).</div>
 
 ---
 
@@ -515,106 +393,97 @@ A team sets up Claude in CI with full permissions. During a PR review, Claude fi
 
 | Concept | Key Fact |
 |---------|----------|
-| Hierarchy winner | Scoped (`.claude/rules/`) > Project (`./CLAUDE.md`) > Global (`~/.claude/CLAUDE.md`) |
-| YAML frontmatter | ONLY `path:` is valid. Not `glob`, `scope`, `applies_to`, `files` |
-| Skills | Markdown knowledge files (read-only context injection) |
-| Tools | Functions with runtime execution (produce side effects) |
-| Skill vs Tool test | "Does it EXECUTE?" → Tool. "Does it INFORM?" → Skill |
-| MCP config location | `.claude/settings.json` under `mcpServers` |
-| MCP transport | Always `"stdio"` for local tools |
-| MCP env vars | `${VAR}` syntax — resolved from host shell |
-| Headless mode | `claude -p "prompt"` — non-interactive, for CI/CD |
-| Exit code 0 | Command completed successfully (NOT "no issues found") |
-| Exit code 1 | Claude itself FAILED (auth, bad args, crash) |
-| Slash commands location | `.claude/commands/{name}.md` → invoked as `/{name}` |
-| Slash commands vs rules | `commands/` = reusable prompts. `rules/` = auto-injected context |
-| CI review permissions | Read only — never allow write in review bots |
-| Deploy permissions | Read + Execute — no source file edits |
+| How instructions combine | All loaded CLAUDE.md files and rules are concatenated; none overrides another |
+| User vs project | `~/.claude/CLAUDE.md` is personal and not shared; `./CLAUDE.md` is shared via git |
+| Subdirectory CLAUDE.md | Loads on demand when Claude reads/edits a file in that directory |
+| Rule frontmatter | Only `paths` (plural) is read; other keys are ignored silently |
+| Modular CLAUDE.md | `@path/to/file` imports; `.claude/rules/` topic files |
+| Skills | `.claude/skills/<name>/SKILL.md`; on demand; frontmatter controls invocation |
+| MCP scopes | local (default, `~/.claude.json`), project (`.mcp.json`), user (`~/.claude.json`) |
+| MCP secrets | `${VAR}` / `${VAR:-default}` expansion in `.mcp.json` |
+| MCP transports | stdio (local), HTTP (remote, recommended); SSE deprecated |
+| Non-interactive mode | `claude -p "prompt"`; `--output-format json` + `--json-schema` → `structured_output` |
+| Exit codes | 0 = run succeeded (not "no issues"); non-zero = run failed |
+| Commands | `.claude/commands/{name}.md` → `/{name}`; merged into skills |
+| Permissions | `.claude/settings.json` allow/ask/deny; deny → ask → allow |
+| Inspect memory | `/memory` lists/opens memory files; `/context` shows what loaded |
 
 ---
 
 ## 🧩 Domain 2 Decision Flowchart
 
-Use this when the exam gives you a scenario and asks "where does this belong?"
-
 ```mermaid
 flowchart TD
-    Q["What are you configuring?"] --> B1{"Behavioral rule<br/>or runtime infra?"}
-    B1 -->|"Behavioral"| B2{"Who does it apply to?"}
-    B1 -->|"Runtime infra<br/>(MCP, servers)"| CF[".claude/settings.json"]
-    
-    B2 -->|"Just me,<br/>all projects"| GL["~/.claude/CLAUDE.md<br/>(Global)"]
-    B2 -->|"Whole team,<br/>this project"| PR["./CLAUDE.md<br/>(Project)"]
-    B2 -->|"Specific files<br/>matching a pattern"| SC[".claude/rules/*.md<br/>(Scoped, path: glob)"]
-    
-    Q --> R{"Reusable prompt<br/>or always-on rule?"}
-    R -->|"Reusable<br/>(user invokes)"| CMD[".claude/commands/*.md<br/>(/name slash command)"]
-    R -->|"Always-on<br/>(auto-injected)"| SC
-    
-    style CF fill:#1e293b,stroke:#f59e0b
+    Q["What are you configuring?"] --> B1{"Instructions,<br/>enforcement,<br/>or a capability?"}
+    B1 -->|"Instructions"| B2{"Who and when?"}
+    B1 -->|"Enforcement"| EN["Permission rules in settings.json<br/>or a hook"]
+    B1 -->|"New capability<br/>(tools)"| CF{"Team or just me?"}
+    CF -->|"Team"| MJ[".mcp.json (project scope)"]
+    CF -->|"Just me"| UJ["~/.claude.json (local/user scope)"]
+
+    B2 -->|"Just me,<br/>all projects"| GL["~/.claude/CLAUDE.md"]
+    B2 -->|"Whole team,<br/>every session"| PR["./CLAUDE.md"]
+    B2 -->|"Only for matching files"| SC[".claude/rules/*.md<br/>with paths"]
+    B2 -->|"Only when a task needs it"| SK[".claude/skills/&lt;name&gt;/SKILL.md"]
+
+    style EN fill:#1e293b,stroke:#f59e0b
     style GL fill:#1e293b,stroke:#64748b
     style PR fill:#1e293b,stroke:#a78bfa
     style SC fill:#1e293b,stroke:#22c55e
-    style CMD fill:#1e293b,stroke:#3b82f6
+    style SK fill:#1e293b,stroke:#3b82f6
 ```
 
-<div class="note-scribble">When in doubt on exam day: "Is it about RUNNING something external?" → settings.json. "Is it about BEHAVIOR?" → CLAUDE.md hierarchy. "Is it a user-triggered prompt?" → commands/.</div>
+<div class="note-scribble">On exam day: "Must it be guaranteed?" → permissions/hooks. "Is it a capability?" → MCP (.mcp.json for the team). "Is it knowledge?" → CLAUDE.md, rules, or skills, chosen by when it's needed.</div>
 
 ---
 
-## 3.6 Agent Skills: context:fork, allowed-tools, argument-hint
+## 3.6 Agent Skills: context: fork, allowed-tools, argument-hint
 
-<div class="note-important"><strong>Explicitly tested in the exam guide.</strong> Skills in .claude/skills/ support frontmatter that controls isolation, tool access, and parameter prompting.</div>
+<div class="note-important"><strong>Explicitly tested in the exam guide.</strong> Skills in <code>.claude/skills/</code> support frontmatter that controls isolation, tool permissions, and argument prompting.</div>
 
 ### Skills vs Commands vs CLAUDE.md
 
 | | Commands (.claude/commands/) | Skills (.claude/skills/) | CLAUDE.md |
 |---|---|---|---|
-| Invocation | User types /name | User types /name | Always loaded automatically |
-| Isolation | Runs in main context | Can fork to isolated sub-agent | N/A |
-| Tool restriction | No | Yes (allowed-tools) | No |
-| Parameter prompting | No | Yes (argument-hint) | No |
+| Invocation | User types /name | User types /name, or Claude loads it when relevant | Always loaded |
+| Isolation | Same frontmatter as skills (`context: fork` works) | `context: fork` runs it in a subagent | N/A |
+| Supporting files | No | Yes (scripts, templates in the skill folder) | Via @imports |
+| Best for | Simple saved prompts | Task-specific workflows | Universal standards |
 
 ### Frontmatter Options
 
 ```markdown
 ---
+description: Scaffold a new module with tests and docs. Use when creating a module.
 context: fork
 allowed-tools: Write, Edit
-argument-hint: "Enter the module name to scaffold"
+disallowed-tools: Bash
+argument-hint: "[module-name]"
 ---
 # Scaffold Module Skill
 
-Generate a new module with tests and documentation.
+Generate a new module named $ARGUMENTS with tests and documentation.
 ```
 
 #### `context: fork`
 
-Runs the skill in an **isolated sub-agent context** — outputs don't pollute your main conversation. Essential for:
-- **Verbose exploratory output** (e.g., codebase analysis that dumps 200 lines)
-- **Brainstorming alternatives** you don't want in main context
-- **Destructive-adjacent tasks** where you want a clean boundary
+Runs the skill in a **subagent** (the type set by `agent`, `general-purpose` by default) whose prompt is the skill content. The subagent doesn't see your conversation history, and its verbose output stays out of the main session; only its result comes back. Despite the name, it isn't a fork of your current conversation, so the skill's instructions must stand on their own.
 
-<div class="note-trap"><strong>TRAP:</strong> An exam question shows a skill that produces verbose output and asks why the main conversation is filling up. Answer: the skill is missing `context: fork`.</div>
+Good for:
+- **Verbose output** (codebase analysis that dumps hundreds of lines)
+- **Exploratory work** (brainstorming alternatives you don't want in the main context)
 
-#### `allowed-tools`
+<div class="note-trap"><strong>TRAP:</strong> A skill produces verbose output and the main conversation fills up. The fix is <code>context: fork</code>.</div>
 
-Restricts which Claude Code built-in tools the skill can use during execution.
+#### `allowed-tools` (and `disallowed-tools`)
 
-```yaml
-# Only allow file writing — no Bash, no reads outside scope
-allowed-tools: Write, Edit
-```
+`allowed-tools` lists tools Claude can use **without asking permission** during the turn that invokes the skill. It does **not** restrict which tools are available: every tool stays callable, and your permission settings govern the rest. To remove a tool while the skill is active, use `disallowed-tools` (or a permissions deny rule).
 
-Use when a skill should be write-only, or when you want to prevent accidental destructive operations.
+<div class="note-trap"><strong>TRAP (exam vs docs):</strong> The exam guide describes allowed-tools as "restricting tool access during skill execution". On the exam, pick allowed-tools when the question is about scoping a skill's tools. In practice, remember the documented behaviour: it pre-approves; <code>disallowed-tools</code> or deny rules actually block.</div>
 
 #### `argument-hint`
 
-Displayed to the developer when they invoke the skill without arguments — prompts for required input.
-
-```yaml
-argument-hint: "Module name (e.g. payments, auth, notifications)"
-```
+An autocomplete hint showing what to pass, for example `[issue-number]` or `[module-name]`. The arguments arrive in the skill body as `$ARGUMENTS` (or `$0`, `$1`...).
 
 ### Personal vs Project Skills
 
@@ -623,7 +492,7 @@ argument-hint: "Module name (e.g. payments, auth, notifications)"
 | `.claude/skills/` (project) | Whole team, version-controlled | Shared workflows (scaffold, review) |
 | `~/.claude/skills/` (personal) | Just you | Personal variants, experiments |
 
-Create a personal variant in `~/.claude/skills/` with a different name to avoid affecting teammates.
+When names collide, personal skills take precedence over project skills, so create your personal variant under a **different name** to avoid shadowing the team's version.
 
 ---
 
@@ -631,41 +500,97 @@ Create a personal variant in `~/.claude/skills/` with a different name to avoid 
 
 ### Explore Subagent
 
-The `Explore` subagent is a built-in sub-agent you can spawn to handle **verbose discovery phases** — isolating long output from your main conversation context.
+`Explore` is a built-in, read-only subagent for searching and analysing a codebase. It isolates verbose discovery output and returns a summary to the main conversation.
 
 ```
-Use the Explore subagent to find all callers of the authenticate() function
+Use the Explore subagent to find all callers of authenticate()
 and return a summary — not the raw output.
 ```
-
-**Why it matters:** Without Explore, a discovery phase that reads 50 files and produces 5,000 tokens of output fills your context window, degrading quality for the rest of the session.
 
 ```mermaid
 graph LR
     M["Main Agent<br/>(high-level coordination)"] -->|"Spawn"| E["Explore Subagent<br/>(verbose discovery)"]
-    E -->|"Structured summary only"| M
+    E -->|"Summary only"| M
     M --> I["Implementation<br/>(context still clean)"]
 ```
 
-<div class="note-important"><strong>Combine with plan mode:</strong> Use plan mode to design, Explore subagent to investigate, then direct execution to implement. This preserves context at every phase.</div>
+<div class="note-important"><strong>Combine with plan mode:</strong> plan mode to design, Explore to investigate, then direct execution to implement. Context stays clean at every phase.</div>
 
 ### /compact
 
-The `/compact` command **reduces context usage** during an extended session by summarising the conversation so far, freeing up context window for continued work.
+`/compact` summarises the conversation so far to free context while you keep working in the same session. `/clear`, by contrast, starts over with an empty context.
 
-```
-/compact
-```
+<div class="note-trap"><strong>TRAP:</strong> An agent gives inconsistent answers mid-session and references "typical patterns" rather than specific classes it found earlier. That's context degradation. The fix is /compact (to summarise) plus scratchpad files (to persist key findings).</div>
 
-**Use when:** Working on a long investigation session and context window is near capacity — but you want to continue without starting over.
+### /memory and /context
 
-<div class="note-trap"><strong>TRAP:</strong> An exam question describes an agent giving inconsistent answers mid-session and "referencing typical patterns rather than specific classes discovered earlier." This is context degradation. The fix is /compact (to summarise) plus scratchpad files (to persist key findings).</div>
+- `/memory` lists your CLAUDE.md, CLAUDE.local.md and other memory file locations across user and project scopes, opens them for editing, and toggles auto memory.
+- `/context` shows what's in the current context window, including which memory files actually loaded at launch.
 
-### /memory Command
+Both help diagnose "it works on my machine" behaviour, such as a teammate whose instructions live in their own `~/.claude/CLAUDE.md`.
 
-Use `/memory` to inspect which CLAUDE.md files and configuration sources are currently loaded — helpful for diagnosing inconsistent behaviour across sessions.
+---
 
-```
-/memory
-# Shows: user-level, project-level, and scoped rules currently active
-```
+## 3.8 Plan Mode vs Direct Execution
+
+### Key Concept
+
+**Plan mode is for decisions; direct execution is for changes you already understand.**
+
+Plan mode lets Claude explore the codebase and design an approach before touching anything: it's built for large-scale or multi-file changes, architectural decisions, and tasks with several valid approaches. Direct execution suits a well-scoped change such as one validation check in one function.
+
+The two combine naturally: plan the migration, approve the plan, then execute it directly. **Plan mode is the architect's drawing; direct execution is the builder working from it.**
+
+### In Practice
+
+**What breaks without this**: Restructuring a monolith in direct mode means discovering service boundaries halfway through dozens of edits, then rewriting them.
+
+**Decision trigger**: Ask whether the stem already states complexity (45+ files, competing integration approaches, "decide service boundaries"). If it does, plan first.
+
+**When you'd choose differently**: A single-file fix with a clear stack trace goes straight to direct execution; planning it is overhead.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"Start directly and switch to plan mode if it gets complicated" is a distractor when the complexity is already stated in the requirements. The exam wants plan mode up front for architectural work, and direct execution for clearly scoped edits.</div>
+
+---
+
+## Deep Dive
+
+### 1. The connective narrative
+
+Domain 2 is one question asked many ways: **where does this piece of configuration belong?** Start by splitting context from enforcement. CLAUDE.md files, rules, and skills are context: they're concatenated into Claude's window and Claude tries to follow them, but nothing guarantees it. Permissions and hooks are enforcement: Claude Code applies them whatever the model decides.
+
+Within context, the choice is about *who* and *when*. Personal preferences go in `~/.claude/CLAUDE.md`, which is never shared. Team standards go in the project CLAUDE.md, split into `@imports` or `.claude/rules/` topic files when it grows. Conventions for one file type go in a rule with `paths`, so they load only when matching files are touched; that beats subdirectory CLAUDE.md files when the files are scattered (tests next to the code they test). Procedures needed only for certain tasks become skills, which load on demand and can fork into a subagent.
+
+Capabilities come from MCP: `.mcp.json` for the team (with `${VAR}` for secrets), `~/.claude.json` for you. Automation uses `-p` with JSON output and a schema, and session isolation means the reviewer should be a fresh instance, not the session that wrote the code.
+
+### 2. Worked scenario
+
+> **Scenario.** A platform team rolls Claude Code out to 40 developers. Complaints: new hires don't get the API conventions; Terraform rules clutter every session; a "safe" skill still runs shell commands; CI review jobs hang.
+>
+> **Step 1 — new hires.** The conventions were in one lead's `~/.claude/CLAUDE.md`. Move them to the project CLAUDE.md (or `.claude/rules/api-conventions.md`) and commit.
+>
+> **Step 2 — Terraform clutter.** Move the Terraform section to `.claude/rules/terraform.md` with `paths: ["terraform/**/*"]`, so it loads only when Terraform files are touched.
+>
+> **Step 3 — the "safe" skill.** Its `allowed-tools: Write` only pre-approved writes. Add `disallowed-tools: Bash`, and a `Bash(rm *)` deny rule in `.claude/settings.json` for good measure.
+>
+> **Step 4 — CI hangs.** The job ran `claude "review..."` interactively. Switch to `claude -p ... --output-format json --json-schema ...`, read `structured_output`, and gate on finding severity, not the exit code.
+>
+> **Outcome:** each problem was a placement error. The fix in every case was moving configuration to the mechanism that matches its scope, timing, and need for enforcement.
+
+### 3. Memory aid
+
+**SCOPE** — questions to place any Claude Code configuration:
+- **S**hared or personal? (project files vs `~/.claude/...`)
+- **C**ontext or control? (CLAUDE.md/rules/skills vs permissions/hooks)
+- **O**n demand or always? (skills and `paths` rules vs CLAUDE.md)
+- **P**ipeline? (`-p`, `--output-format json`, `--json-schema`)
+- **E**xternal capability? (MCP: `.mcp.json` or `~/.claude.json`)
+
+### 4. Exam strategy for this domain
+
+- Most questions name a symptom ("new teammate doesn't get the rules", "the job hangs", "rules load everywhere") and test whether you can trace it to a location or flag.
+- Distractors invent mechanisms: `--headless`, `--batch`, `--read-only`, `CLAUDE_HEADLESS`, `.claude/config.json`, `applyTo`. If you've never seen it in the docs, it's probably a distractor.
+- When an option says a CLAUDE.md instruction will *guarantee* behaviour, it's wrong; guarantees come from permissions and hooks.
+- Five minutes before the exam: **who sees it, when does it load, and does it have to be enforced?**

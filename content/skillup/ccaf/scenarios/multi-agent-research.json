@@ -1,17 +1,126 @@
 {
+  "schemaVersion": "2.0",
   "id": "multi-agent-research",
-  "title": "Multi-Agent Research System",
-  "description": "Build a research system where a coordinator agent manages: a web_searcher (searches the web), a data_analyzer (processes and synthesizes findings), and a report_writer (formats the final output). The system must handle hour-long research sessions, be resumable if interrupted, and produce structured reports. Data from searches can be very large — some search results return 20,000+ tokens.",
-  "architecture_notes": "Sequential execution is required (search → analyze → report, each depending on prior). Persist agent state to external storage after each phase completion for resumability. Implement tool result trimming in the search tool handler — extract only relevant fields before appending to context. Use progressive summarization when conversation history exceeds 80% of context window, preserving all quantitative data verbatim. Implement structured error propagation: if data_analyzer fails, return typed error with retryable flag so coordinator can retry or reroute. Trace all calls with a shared trace_id for debugging.",
-  "key_patterns": [
-    "sequential execution for dependent tasks",
-    "state persistence for resumability",
-    "tool result trimming before context append",
-    "progressive summarization with verbatim numeric preservation",
-    "structured error propagation",
-    "distributed tracing with trace_id"
+  "title": "Resumable Multi-Agent Research Pipeline",
+  "description": "A policy research institute is building a Claude Agent SDK system in which a coordinator delegates to search, analysis, synthesis and report-writing subagents to produce cited reports. The scenario tests orchestration order, passing context to subagents explicitly, trimming oversized tool results, persisting state so long sessions can resume, preserving exact figures through summarisation, and propagating structured errors.",
+  "examId": "ccaf",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    1,
+    4,
+    5
   ],
-  "questionIds": ["d1-002", "d1-003", "d1-005", "d1-008", "d5-002", "d5-003", "d1-016", "d1-017", "d4-017"],
+  "scenario": {
+    "background": "Research sessions run for up to an hour, and when one fails at minute 45, the whole run and its spend are lost; reports have also shipped with statistics that no longer matched their sources. Meridian Policy Institute's system uses a coordinator agent that delegates to a `web_searcher`, a `data_analyzer`, a `synthesizer` and a `report_writer`, with each phase depending on the previous one. Some individual search results exceed 20,000 tokens. Analysts need every figure in a final report to trace back to a cited source.",
+    "characters": [
+      {
+        "name": "Dr. Hannah Cole",
+        "role": "Research Director",
+        "concern": "She will not publish a report whose numbers differ from its sources or whose claims lack citations."
+      },
+      {
+        "name": "Omar Haddad",
+        "role": "Platform Engineer",
+        "concern": "He needs hour-long runs to survive interruptions and failures without starting over, and needs failures to be diagnosable."
+      },
+      {
+        "name": "Grace Kim",
+        "role": "Data Analyst",
+        "concern": "She wants results faster and suspects the pipeline does too much work one step at a time."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "multi-agent-research-q1",
+      "stem": "A typical request covers four independent subtopics. Each subtopic must be searched; the analysis needs all the search results; and the report needs the analysis. Grace wants the pipeline to be faster. How should the coordinator orchestrate the work?",
+      "options": [
+        "Run everything sequentially, one subtopic search after another, then analysis, then the report, because the phases depend on each other",
+        "Run all subagents in parallel, including the analyzer and report writer, to minimise total time",
+        "Run the four subtopic searches as parallel `web_searcher` subagents, wait for all of them, then run analysis, synthesis and the report in sequence",
+        "Have a single agent do all the work in one conversation, to avoid coordination overhead"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: work that has no dependencies can run in parallel, and the SDK docs note that parallel subagents finish in the time of the slowest one rather than the sum of all of them. Phases that consume earlier output must still run in order. A is wrong because it serialises searches that don't depend on each other, so it wastes the time Grace is trying to save. B is wrong because the analyzer and report writer would start before their inputs exist. D is wrong because one conversation that accumulates four sets of large search results plus analysis bloats the context and gives up the isolation that subagents provide."
+    },
+    {
+      "id": "multi-agent-research-q2",
+      "stem": "The `data_analyzer` subagent keeps producing analyses that ignore the search findings. The team assumed it could see everything the coordinator had gathered. What is actually happening, and what is the fix?",
+      "options": [
+        "Subagents inherit the parent's full history, so the analyzer prompt must be at fault; rewrite its system prompt",
+        "Unless it is a fork, a subagent starts with fresh context, and the only content passed from the parent is the Agent tool's prompt; the coordinator must include the findings, or references to where they are stored, in that delegation prompt",
+        "Give the analyzer its own web search tool, so it can redo the searches itself",
+        "Raise the analyzer's `maxTurns`, so it has time to find the findings on its own"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: the Agent SDK docs say a non-fork subagent's context starts fresh with no parent conversation, and the only content passed from parent to subagent is the Agent tool's prompt string. The coordinator must therefore pass the findings, or pointers to persisted findings, explicitly. A is wrong because its premise is false; subagents don't receive the parent's history or tool results. C is wrong because repeating the searches doubles cost and latency, and the results may differ from the ones the coordinator already holds. D is wrong because no number of turns lets the analyzer read a conversation it can't access."
+    },
+    {
+      "id": "multi-agent-research-q3",
+      "stem": "Some search results return more than 20,000 tokens, mostly navigation, boilerplate and unrelated sections, and a few results can exhaust the coordinator's context. Where should the problem be solved?",
+      "options": [
+        "In the search tool handler: extract only the high-signal fields (title, URL, publication date, relevant excerpts) before returning the result to the model",
+        "Rely on compaction to summarise the oversized results after they have been added to the context",
+        "Raise `max_tokens` on every request, so there is room for the large results",
+        "Tell the model in its system prompt to ignore irrelevant parts of search results"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: Anthropic's tool-design guidance is to return only high-signal information that Claude needs for its next step, because bloated responses waste context and make it harder to extract what matters. Trimming in the handler means the noise never enters the context. B is wrong because compaction runs after the damage is done; the tokens have already been paid for and have already competed for attention. C is wrong because `max_tokens` limits output, not the input context window. D is wrong because the model still has to read and pay for every token in order to ignore it."
+    },
+    {
+      "id": "multi-agent-research-q4",
+      "stem": "Omar needs a run that crashes at minute 45, during synthesis, to resume without repeating search and analysis. What design achieves this?",
+      "options": [
+        "Keep all intermediate results in the coordinator's in-memory conversation, and restart the process if it fails",
+        "Rerun the whole pipeline from the beginning, but with a cheaper model to reduce the cost of retries",
+        "Persist each phase's output and a phase marker to external storage when the phase completes; on restart, the coordinator loads the saved state and resumes at the first incomplete phase",
+        "Rely on the compaction summary to reconstruct earlier phases after a restart"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: checkpointing completed phases to durable storage makes the pipeline resumable at phase granularity, so only the interrupted phase is redone. The stored outputs also give auditors the evidence trail Hannah needs. A is wrong because in-memory state is lost exactly when the process fails. B is wrong because it still repeats 45 minutes of work, and swapping models changes the quality of the output. D is wrong because a summary is lossy by design; it can't stand in for the actual search results and analysis that later phases and citations depend on."
+    },
+    {
+      "id": "multi-agent-research-q5",
+      "stem": "Long sessions compact older turns, and Hannah has found reports where \"37.4% of respondents\" became \"about a third.\" How should the system manage context to stop this?",
+      "options": [
+        "Summarise more aggressively and more often, so the context stays small",
+        "Never summarise, and keep every raw search result in context for the whole session",
+        "Drop the oldest turns entirely once the context passes 80% of its limit",
+        "Store quantitative facts and their citations verbatim in a structured findings store that is passed forward intact, and use a custom summarisation prompt that compresses narrative while keeping figures and source references exact"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: exact figures and citations are kept outside lossy summarisation and carried forward unchanged, while the narrative can still be compressed. Anthropic's compaction docs describe writing your own summarisation prompt for cases where the default summary drops something a later turn needs. A is wrong because more aggressive summarisation causes more of the rounding Hannah is complaining about. B is wrong because hour-long sessions with 20,000-token results would overflow the context window. C is wrong because dropping turns silently loses the facts and their sources, which is worse than rounding them."
+    },
+    {
+      "id": "multi-agent-research-q6",
+      "stem": "Occasionally the `data_analyzer` fails partway through, for example on a malformed dataset or a rate-limited API, and returns \"No significant findings.\" The coordinator then writes a confident report with gaps. How should failures be propagated?",
+      "options": [
+        "Have the subagent return a structured error to the coordinator, with an error type, a retryable flag, what was attempted, and any partial results, all tagged with the run's shared trace ID; the coordinator then retries, reroutes or proceeds while explicitly flagging the gap",
+        "Keep returning empty results on failure, so the pipeline never stops",
+        "Abort the entire run on any subagent error, so a partial report can never be produced",
+        "Have the coordinator retry every failed subagent indefinitely until it succeeds"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: typed errors with a retryable flag let the coordinator make an informed decision, such as retrying a rate limit, rerouting around a bad dataset, or publishing with an explicit caveat. A shared trace ID ties the failure to the specific calls involved, which helps Omar diagnose it. B is wrong because disguising a failure as 'no findings' is the most dangerous outcome: the report looks authoritative but is silently incomplete. C is wrong because aborting discards up to an hour of valid work over a single recoverable error. D is wrong because unbounded retries never resolve non-retryable errors, such as malformed data, and can run up cost without limit."
+    }
+  ],
+  "keyLearnings": [
+    "Parallelise only independent work, such as subtopic searches, and keep dependent phases in sequence; subagents give each task an isolated context.",
+    "Non-fork subagents start with fresh context, and the Agent tool's prompt is the only thing passed to them, so delegation prompts must carry the data or pointers to it.",
+    "Trim tool results to high-signal fields at the source, checkpoint phase outputs to durable storage so runs can resume, and keep exact figures and citations out of lossy summarisation.",
+    "Propagate typed, retryable-aware errors tagged with a shared trace ID, rather than masking failures as empty results."
+  ],
   "officialDescription": "You are building a multi-agent research system using the Claude Agent SDK. A coordinator agent delegates to specialized subagents: one searches the web, one analyzes documents, one synthesizes findings, and one generates reports. The system researches topics and produces comprehensive, cited reports.",
-  "primaryDomains": ["Agentic Architecture & Orchestration", "Tool Design & MCP Integration", "Context Management & Reliability"]
+  "questionIds": [
+    "d1-002",
+    "d1-003",
+    "d1-005",
+    "d1-008",
+    "d5-002",
+    "d5-003",
+    "d1-016",
+    "d1-017",
+    "d4-017"
+  ]
 }

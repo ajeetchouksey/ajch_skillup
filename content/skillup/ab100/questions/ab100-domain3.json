@@ -11,7 +11,8 @@
       "The LLM needs fine-tuning on the policy documents to improve grounding"
     ],
     "correct": 0,
-    "explanation": "High relevance + low groundedness (A) is the classic hallucination pattern. Relevance measures whether the response answers the user's question — the agent IS answering the question. Groundedness measures whether the answer is supported by the retrieved context — it is NOT. The agent is generating plausible-sounding answers from its training data rather than the retrieved policy documents. Irrelevant retrieval (B) would cause LOW relevance, not high. These two metrics can absolutely diverge (C) — this is precisely the diagnostic value of measuring both. Fine-tuning (D) bakes in static knowledge and doesn't solve the grounding problem — the fix is improving the RAG pipeline and instructing the agent to cite sources.",
+    "explanation": "A is correct: high Relevance with low Groundedness is the classic hallucination pattern. Relevance shows the response addresses the user's question; Groundedness shows whether the response is supported by the retrieved context, and here it is not, so the agent is generating plausible answers from its general training rather than the policy documents. B is wrong because retrieving irrelevant documents would show up as poor retrieval and usually lower relevance, not a confident on-topic answer that the context does not support. C is wrong because the two metrics measure different things and routinely diverge; that divergence is exactly their diagnostic value. D is wrong because fine-tuning bakes in static knowledge and does not make answers stick to retrieved sources; the fix is tightening the RAG pipeline and instructing the agent to answer only from, and cite, the retrieved documents.",
+    "difficulty": "medium",
     "tags": [
       "groundedness",
       "relevance",
@@ -25,13 +26,14 @@
     "scenario": "A team wants to evaluate their customer service agent on 200 historical conversations where they have the correct answers. They want to measure both answer quality and factual accuracy against their knowledge base.",
     "question": "Which evaluation metrics are appropriate for this scenario?",
     "options": [
-      "Coherence and Fluency — assess the quality of the language in responses",
       "Groundedness (requires retrieved context) and F1 Score (requires ground truth reference)",
+      "Coherence and Fluency — assess the quality of the language in responses",
       "Groundedness only — F1 is not applicable for conversational agents",
       "Relevance and Similarity — both require only the query and response"
     ],
-    "correct": 1,
-    "explanation": "Groundedness + F1 (B) is the correct combination. Groundedness measures whether responses are supported by the knowledge base context (factual accuracy against the KB). F1 measures token overlap with the historical correct answers (factual accuracy against ground truth). Together they assess both quality dimensions. Coherence + Fluency (A) measure language quality only — not factual accuracy. Groundedness alone (C) doesn't measure alignment with correct answers from historical data. Relevance + Similarity (D) measure different dimensions — Similarity requires ground truth but doesn't measure KB support; Relevance doesn't measure factual accuracy.",
+    "correct": 0,
+    "explanation": "A is correct: Groundedness checks whether each response is supported by the knowledge base context, and F1 score measures overlap with the historical correct answers, so together they cover factual accuracy against both the KB and ground truth. B is wrong because Coherence and Fluency assess language quality only and say nothing about factual accuracy. C is wrong because Groundedness alone ignores the 200 known correct answers, and F1 is applicable whenever ground-truth references exist, including conversational agents. D is wrong because the pairing misses the goal: Relevance does not measure factual accuracy, and Similarity needs a ground-truth reference (so the claim that both need only query and response is false) while still not checking support from the KB.",
+    "difficulty": "hard",
     "tags": [
       "evaluation-metrics",
       "groundedness",
@@ -46,12 +48,13 @@
     "question": "Which alerts should be firing and what should be investigated first?",
     "options": [
       "Only the content safety filter rate alert — 0.02% is above zero and must be investigated",
-      "P95 latency and tool call failure rate alerts are both firing; investigate tool failures first as they may be causing the latency spike",
       "P95 latency alert only — tool failure rate is close enough to the threshold to monitor but not act",
-      "All three alerts should fire — any deviation from baseline warrants immediate investigation"
+      "All three alerts should fire — any deviation from baseline warrants immediate investigation",
+      "P95 latency and tool call failure rate alerts are both firing; investigate tool failures first as they may be causing the latency spike"
     ],
-    "correct": 1,
-    "explanation": "P95 latency (22s > 10s threshold) and tool call failure rate (8% > 5% threshold) are both breaching SLAs — both alerts fire. Investigating tool failures first (B) is correct because: high tool failure rates cause retries and error handling, which directly increases latency. Fixing the tool failures may resolve the latency issue too. Content safety at 0.02% (A) is within normal range — not typically worth an immediate alert. Ignoring the tool failure rate because it's 'close' (C) is wrong — 8% exceeds the 5% threshold. Setting alerts for all deviations from baseline (D) would create alert fatigue.",
+    "correct": 3,
+    "explanation": "D is correct: P95 latency (22 s against a 10 s SLA) and tool call failure rate (8% against a 5% SLA) both breach their thresholds, so both alerts fire. Tool failures come first because failed calls trigger retries and error handling that directly add latency, so fixing them may also resolve the latency breach. A is wrong because a 0.02% content safety filter rate has no SLA threshold here and is a normal background level, while two real SLA breaches are ignored. B is wrong because 8% is above the 5% threshold, so the tool failure alert must fire and be acted on, not just watched. C is wrong because alerting on every deviation from baseline, including the content safety rate, creates alert fatigue; alerts should map to defined thresholds.",
+    "difficulty": "medium",
     "tags": [
       "monitoring",
       "SLA",
@@ -62,21 +65,22 @@
   {
     "domain": 3,
     "id": "ab100-d3-004",
-    "scenario": "A cybersecurity firm wants to test their AI agent for vulnerability to prompt injection attacks before deploying it to handle sensitive customer data. They want a systematic approach that documents findings.",
-    "question": "Which approach correctly implements red-team testing for this AI agent?",
+    "scenario": "A cybersecurity firm wants to test its AI agent for prompt injection weaknesses before the agent handles sensitive customer data. It wants a systematic approach that documents the findings.",
+    "question": "Which approach correctly implements red-team testing for this agent?",
     "options": [
-      "Run the agent's standard evaluation suite on the golden dataset and check for any failed test cases",
-      "Use Azure AI Studio's Safety Evaluations with an adversarial dataset containing direct jailbreak attempts, indirect injection scenarios, and data extraction prompts",
-      "Deploy to production and monitor Azure Monitor for anomalous behavior patterns",
-      "Review the system prompt manually for any instructions that could be overridden by user input"
+      "Run the agent's standard evaluation suite on the golden dataset and check for failed test cases",
+      "Deploy to production and watch Azure Monitor for unusual behavior",
+      "Review the system prompt manually for instructions that user input could override",
+      "Run the AI Red Teaming Agent (preview) in Microsoft Foundry with the Jailbreak and IndirectAttack strategies, and review the attack success rate scorecard"
     ],
-    "correct": 1,
-    "explanation": "Azure AI Studio Safety Evaluations with adversarial datasets (B) is the systematic red-team approach. It tests direct jailbreaks (user tries to override instructions), indirect injection (malicious content in retrieved documents), and data extraction attempts (trying to get the agent to reveal its system prompt or other users' data). Standard evaluation (A) tests normal use cases, not adversarial scenarios. Production deployment first (C) exposes real users to unmitigated vulnerabilities. Manual system prompt review (D) only catches direct override vulnerabilities — it misses indirect injection and extraction attacks.",
+    "correct": 3,
+    "explanation": "D is correct: the AI Red Teaming Agent brings Microsoft's open-source PyRIT framework into Foundry to scan a model or application endpoint with adversarial prompts. Its Jailbreak strategy injects user prompt attacks (UPIA), IndirectAttack injects attacks into context or tool outputs (XPIA), and the results come back as a scorecard of attack success rate (ASR) by risk category and attack complexity, which documents the findings. A is wrong because a golden dataset measures quality on expected inputs, not resistance to attack. B is wrong because finding injection in production means customer data is exposed first. C is wrong because a manual prompt review spots obvious wording issues but doesn't test how the deployed system behaves under attack.",
+    "difficulty": "medium",
     "tags": [
       "red-teaming",
-      "safety-evaluation",
       "prompt-injection",
-      "adversarial-testing"
+      "testing",
+      "application"
     ]
   },
   {
@@ -87,11 +91,12 @@
     "options": [
       "Reduce the system prompt to under 500 tokens by summarizing the instructions",
       "Switch from GPT-4o to GPT-4o-mini to reduce per-token costs",
-      "Enable prompt caching — the static system prompt prefix (3,000 tokens) qualifies and cached tokens cost 50% less",
+      "Rely on prompt caching — keep the 3,000-token static prompt as an identical prefix so cached input tokens are billed at a discount",
       "Move static instructions to a knowledge source retrieved only when needed"
     ],
     "correct": 2,
-    "explanation": "Prompt caching (C) is the direct solution: static prefix tokens exceeding 1,024 tokens are cached and billed at 50% of the standard input price. A 3,000-token static prompt is cached on every request after the first, cutting 60% of their cost in half — approximately 30% total cost reduction with zero behavior change. Shortening the prompt (A) would change behavior by removing instructions. Switching models (B) reduces cost but may change response quality. Moving to a knowledge source (D) changes the architecture significantly — the static prompt is there for a reason (always-needed context).",
+    "explanation": "C is correct: prompt caching applies automatically to supported models when a prompt is at least 1,024 tokens and its first 1,024 tokens are identical; cache hits are billed at a discount on the input token price for Standard deployments (up to 100% for Provisioned). Keeping the 3,000-token static instructions as the identical prefix and the dynamic customer context after it turns most of that 60% cost into discounted cached tokens with no behavior change. A is wrong because cutting the prompt to under 500 tokens removes instructions and so changes the agent's behavior. B is wrong because switching to GPT-4o-mini lowers per-token cost but can change response quality, which the team wants to avoid. D is wrong because moving always-needed instructions into a retrieved knowledge source re-architects the agent and risks the instructions not being present when needed.",
+    "difficulty": "medium",
     "tags": [
       "prompt-caching",
       "cost-optimization",
@@ -102,16 +107,17 @@
   {
     "domain": 3,
     "id": "ab100-d3-006",
-    "scenario": "A team is preparing to migrate their AI agent from GPT-4o version 0125 to the latest 2024-08-06 version. The agent handles complex insurance claim processing. The team has a golden dataset of 150 representative claims with verified correct outputs.",
+    "scenario": "A team is preparing to migrate their AI agent from GPT-4o version 2024-08-06 to version 2024-11-20. The agent handles complex insurance claim processing. The team has a golden dataset of 150 representative claims with verified correct outputs.",
     "question": "What is the correct pre-deployment validation procedure?",
     "options": [
-      "Deploy the new version to 1% of production traffic and monitor error rates for 24 hours",
       "Run the golden dataset against both model versions, compare metric scores across all dimensions, confirm the new version meets or exceeds baseline before any deployment",
+      "Deploy the new version to 1% of production traffic and monitor error rates for 24 hours",
       "Test the new version manually with 10 representative claims and deploy if they look correct",
       "Deploy immediately — minor version bumps within the same model family are backward compatible"
     ],
-    "correct": 1,
-    "explanation": "Golden dataset comparison (B) is required before any deployment of a model version change. Running both versions against 150 representative claims reveals any regression in groundedness, relevance, coherence, and task-specific accuracy. Only after confirming the new version meets all thresholds should deployment proceed — starting with canary. Canary without pre-validation (A) exposes real users to a potentially regressed model. Manual testing of 10 claims (C) is insufficient — 150 examples exist specifically because edge cases matter. Assuming backward compatibility (D) is incorrect — minor version changes in LLMs can have significant behavioral differences on specific domains.",
+    "correct": 0,
+    "explanation": "A is correct: running the 150-claim golden dataset against both model versions and comparing scores on every metric shows any regression before deployment, and only a version that meets or exceeds baseline should proceed, starting with a canary. B is wrong because a 1% production canary without offline validation exposes real claimants to a possibly regressed model. C is wrong because 10 manual checks are far too few when a 150-example dataset exists precisely to cover edge cases. D is wrong because model version updates within the same family can change behavior significantly on specific domains, so backward compatibility cannot be assumed.",
+    "difficulty": "medium",
     "tags": [
       "golden-dataset",
       "model-migration",
@@ -131,7 +137,8 @@
       "Run more traffic until one variant achieves statistical significance on all metrics"
     ],
     "correct": 2,
-    "explanation": "Context-dependent trade-off analysis (C) is correct. For product recommendations, recommending non-existent products (low groundedness) directly causes business harm — customers add ghost products to cart, eroding trust. Relevance matters but not at the cost of hallucinated recommendations. The right approach is to define acceptable thresholds for each metric based on business risk, then choose the variant that satisfies all thresholds. Simply maximizing one metric (A or B) ignores the trade-off. Waiting for statistical significance on ALL metrics (D) may be appropriate but the team still needs a decision framework for when results diverge.",
+    "explanation": "C is correct: the decision should follow the business objective and risk tolerance. For product recommendations, low groundedness means recommending products that do not exist or misdescribing them, which harms customers and trust, so groundedness must be weighted heavily; set acceptable thresholds for each metric and promote the variant that satisfies them. A is wrong because promoting B on relevance alone ignores its large groundedness drop and the hallucination risk that comes with it. B is wrong because choosing A purely on groundedness also optimizes a single metric instead of applying explicit thresholds for both. D is wrong because collecting more traffic may sharpen the numbers, but the team still needs a decision framework for when the metrics point in different directions.",
+    "difficulty": "hard",
     "tags": [
       "A/B-testing",
       "groundedness",
@@ -146,12 +153,13 @@
     "question": "What is the most likely cause and the correct remediation?",
     "options": [
       "The Azure Functions backend is undersized — scale up the Function App plan",
-      "The pay-as-you-go Azure OpenAI deployment is being throttled at high concurrency — switch to PTU or implement request queuing with retry logic",
       "The agent's system prompt is too long, causing slow processing at high concurrency",
-      "Azure AI Search is the bottleneck — the vector index needs more replicas"
+      "Azure AI Search is the bottleneck — the vector index needs more replicas",
+      "The pay-as-you-go Azure OpenAI deployment is being throttled at high concurrency — switch to PTU or implement request queuing with retry logic"
     ],
-    "correct": 1,
-    "explanation": "Pay-as-you-go throttling (B) is the most likely cause. PAYG deployments share capacity and are subject to Tokens Per Minute (TPM) and Requests Per Minute (RPM) limits. At 500 concurrent users, the deployment is almost certainly hitting rate limits — resulting in 429 errors (contributing to the 12% error rate) and retry delays (explaining the 45-second latency). The fix is PTU for predictable high-concurrency capacity, or queuing with exponential backoff. Azure Functions scaling (A) adds compute but doesn't address the OpenAI rate limit. System prompt length (C) affects per-request latency uniformly, not concurrency spikes. AI Search replicas (D) might be a secondary factor but won't explain a 15× latency spike.",
+    "correct": 3,
+    "explanation": "D is correct: a pay-as-you-go (Standard) Azure OpenAI deployment is subject to tokens-per-minute and requests-per-minute quotas, so at 500 concurrent users it returns 429 throttling errors (part of the 12% error rate) and retries stretch latency to 45 seconds. The fix is provisioned throughput for predictable high-concurrency capacity, or request queuing with exponential backoff. A is wrong because scaling the Function App adds compute but does not raise the Azure OpenAI rate limits. B is wrong because prompt length raises latency roughly uniformly per request; it does not explain a sudden spike only at high concurrency. C is wrong because more Azure AI Search replicas might help a secondary bottleneck but would not explain a 15x latency jump combined with throttling errors.",
+    "difficulty": "medium",
     "tags": [
       "load-testing",
       "throttling",
@@ -162,7 +170,7 @@
   {
     "domain": 3,
     "id": "ab100-d3-009",
-    "scenario": "A Prompt Flow evaluation run completed on a batch of 500 insurance claims. The results show: Groundedness mean = 4.1/5, Relevance mean = 3.9/5, but 23 individual responses scored 1/5 on Groundedness. The team is deciding whether to deploy.",
+    "scenario": "A Foundry batch evaluation run completed on a batch of 500 insurance claims. The results show: Groundedness mean = 4.1/5, Relevance mean = 3.9/5, but 23 individual responses scored 1/5 on Groundedness. The team is deciding whether to deploy.",
     "question": "What does the 23 outlier responses with Groundedness = 1/5 indicate and should the team deploy?",
     "options": [
       "The outliers are acceptable — the mean score of 4.1 is well above the 3.5 threshold",
@@ -171,7 +179,8 @@
       "Re-run the evaluation — score variance this high indicates the evaluator model is unreliable"
     ],
     "correct": 1,
-    "explanation": "Investigating outliers before deployment (B) is correct. A Groundedness score of 1/5 indicates the response contains claims not supported by any retrieved context — hallucinations. 23 such cases in 500 (4.6%) could represent a systematic failure pattern tied to specific claim types or edge cases. The mean conceals this risk. Dismissing outliers because the mean is good (A) is dangerous in insurance processing where even a few hallucinated policy details could cause significant harm. Groundedness of 1 is a valid low score (C), not a scoring error. High variance is a finding (D) that warrants investigation, not automatic rerun.",
+    "explanation": "B is correct: a Groundedness score of 1/5 means the response contains claims not supported by the retrieved context, and 23 of 500 (4.6%) may represent a systematic failure on particular claim types that the mean hides, so the team should investigate the pattern before deploying. A is wrong because a healthy mean does not make outliers acceptable in insurance processing, where a few hallucinated policy details can cause serious harm. C is wrong because 1/5 is a valid low score, not a missing or failed evaluation. D is wrong because high variance is a finding to investigate, not evidence that the evaluator is unreliable, so an automatic rerun just delays the analysis.",
+    "difficulty": "hard",
     "tags": [
       "evaluation",
       "groundedness",
@@ -182,7 +191,7 @@
   {
     "domain": 3,
     "id": "ab100-d3-010",
-    "scenario": "A company's AI agent costs $15,000/month in Azure OpenAI inference. The cost analysis shows: 45% is input tokens for static system instructions, 30% is RAG context tokens, 25% is output tokens. They want to reduce costs by 30% without changing the LLM or agent behavior.",
+    "scenario": "A company's AI agent costs $15,000/month in Azure OpenAI inference. The cost analysis shows: 45% is input tokens for static system instructions, 30% is RAG context tokens, 25% is output tokens. For their model, cached input tokens are billed at half the standard input price. They want to reduce costs by 30% without changing the LLM or agent behavior.",
     "question": "Which combination of optimizations achieves the 30% reduction target?",
     "options": [
       "Enable prompt caching on the static system instructions (45% of cost at 50% savings = 22.5% reduction) and optimize RAG to retrieve fewer, more relevant chunks (targeting 10-15% reduction on 30% of cost)",
@@ -191,7 +200,8 @@
       "Implement response caching — cache identical user queries to avoid duplicate LLM calls"
     ],
     "correct": 0,
-    "explanation": "Prompt caching on static instructions (A) saves 50% on 45% of cost = 22.5% overall reduction. Optimizing RAG retrieval (fewer but more relevant chunks) saves 30-50% on 30% of cost = 9-15% reduction. Combined: 30-35% total reduction — hits the target. Limiting output tokens (B) changes agent behavior (truncated responses) and may not hit the target. Embedding model changes (C) reduce the embedding step cost (a small fraction of inference cost) — negligible impact on $15K inference bill. Response caching (D) only helps for repeated identical queries — unlikely to achieve 30% reduction for a conversational agent.",
+    "explanation": "A is correct: caching the static instructions saves 50% on 45% of cost, a 22.5% overall reduction, and retrieving fewer, more relevant RAG chunks saves part of the 30% context cost (about 9-15% overall), so the combination reaches the 30% target without changing the model or agent behavior. B is wrong because capping output at 500 tokens truncates responses, which changes agent behavior, and output is only 25% of cost. C is wrong because embedding costs are a small fraction of the spend and are not part of the inference breakdown being optimized, so switching embedding models has negligible impact. D is wrong because response caching only helps with identical repeated queries, which are uncommon in a conversational agent, so it is unlikely to deliver a 30% saving.",
+    "difficulty": "hard",
     "tags": [
       "cost-optimization",
       "prompt-caching",
@@ -211,7 +221,8 @@
       "Monitor token consumption and alert when daily usage exceeds baseline by 20%"
     ],
     "correct": 2,
-    "explanation": "Quality metric alerts (C) are the correct proactive quality monitoring approach. Nightly evaluation scores represent actual response quality — alerting on degradation catches model drift, knowledge base staleness, and prompt regressions before users complain. HTTP 5xx alerts (A) catch infrastructure failures, not quality degradation — an agent can return 200 OK with a hallucinated response. Availability pings (B) confirm the endpoint is responding, not that it's responding well. Token consumption alerts (D) might indicate a problem but don't measure quality.",
+    "explanation": "C is correct: alerting on the nightly evaluation scores, for example when the Groundedness or Relevance mean drops below 3.5, monitors response quality directly and catches model drift, stale knowledge or prompt regressions before users complain. A is wrong because HTTP 5xx alerts catch infrastructure failures; an agent can return 200 OK with a hallucinated answer. B is wrong because availability tests confirm the endpoint responds, not that its responses are any good. D is wrong because a token consumption spike may hint at a problem but does not measure quality.",
+    "difficulty": "medium",
     "tags": [
       "monitoring",
       "alerting",
@@ -231,7 +242,8 @@
       "Switch to a different LLM model that is less susceptible to jailbreaks"
     ],
     "correct": 2,
-    "explanation": "Azure AI Content Safety with jailbreak detection (C) provides a code-enforced, LLM-independent defense layer. It analyzes user input BEFORE it reaches the agent and blocks known jailbreak patterns including persona-override attacks. This is a defense-in-depth layer that doesn't depend on the LLM's own resistance. Larger context window (A) doesn't improve jailbreak resistance. System prompt instructions against jailbreaks (B) are themselves vulnerable — the jailbreak instructs the model to ignore those very instructions. Switching models (D) may reduce susceptibility but doesn't eliminate it — no LLM is fully jailbreak-proof.",
+    "explanation": "C is correct: Azure AI Content Safety Prompt Shields analyze user input before it reaches the model and detect jailbreak attempts such as persona overrides, giving a defense layer that does not depend on the model's own resistance. A is wrong because a larger context window does not make the model more resistant to jailbreaks. B is wrong because an instruction to ignore jailbreaks is itself what the attack tells the model to ignore, so it is not a reliable defense. D is wrong because switching models may reduce susceptibility but no model is jailbreak-proof, so an independent input filter is still needed.",
+    "difficulty": "easy",
     "tags": [
       "jailbreak",
       "content-safety",
@@ -245,13 +257,14 @@
     "scenario": "A financial services AI agent has been in production for 6 months. The team added 500 new documents to the knowledge base last week. Users are now complaining that the agent ignores the new documents and answers questions about the new topics with 'I don't have information about that.'",
     "question": "What is the most likely cause?",
     "options": [
-      "The new documents were uploaded to the wrong Azure Blob Storage container",
       "The AI Search index was not re-indexed after the new documents were added to the knowledge base — the vector store doesn't contain embeddings for the new content",
+      "The new documents were uploaded to the wrong Azure Blob Storage container",
       "The agent's system prompt needs to be updated to mention the new topic areas",
       "GPT-4o's training data cutoff doesn't include the new documents"
     ],
-    "correct": 1,
-    "explanation": "Missing re-indexing (B) is the classic RAG pipeline failure mode. Adding documents to storage doesn't automatically update the Azure AI Search index — a pipeline must run to chunk, embed, and index the new content. Without this step, the vector store has no embeddings for the new documents, so retrieval returns no relevant chunks, and the agent truthfully says it has no information. Wrong container (A) would cause the indexing pipeline to fail entirely. System prompt updates (C) don't affect retrieval — the agent can only answer from what's in the index. Training data cutoff (D) is a pre-training concept — RAG agents use retrieved context, not training knowledge.",
+    "correct": 0,
+    "explanation": "A is correct: adding documents to storage does not update the Azure AI Search index by itself; an indexing pipeline must chunk, embed and index the new content. Until it runs, retrieval returns nothing for the new topics and the agent correctly says it has no information. B is wrong because documents in the wrong container would simply never be indexed, which is a less likely explanation than an indexing run that did not happen and would still need the index check to confirm. C is wrong because system prompt changes do not affect what retrieval can return; the agent can answer only from what is in the index. D is wrong because the model's training cutoff is irrelevant to a RAG agent, which answers from retrieved context rather than training knowledge.",
+    "difficulty": "easy",
     "tags": [
       "RAG",
       "indexing",
@@ -262,261 +275,274 @@
   {
     "domain": 3,
     "id": "ab100-d3-014",
-    "scenario": "A bank has deployed an AI agent for mortgage application processing. Three months after launch, the compliance team discovers the agent's recommendations have higher denial rates for applicants from certain zip codes that correlate with racial demographics — a pattern not present in the training data guidelines.",
-    "question": "Which Responsible AI principle has been violated and what is the correct remediation?",
+    "scenario": "An HR policy agent built in Copilot Studio is about to go live. The test lead has 80 questions with HR-approved expected answers, but the agent paraphrases freely, so its wording will rarely match. The lead also wants to confirm that the agent calls the leave-balance tool for balance questions.",
+    "question": "Which combination of Copilot Studio agent evaluation test methods fits these goals?",
     "options": [
-      "Transparency — add a disclaimer that the agent uses AI",
-      "Fairness — conduct a disparate impact analysis, identify the proxy variables (zip codes as race proxies), remove or de-weight them, and re-evaluate using demographic parity metrics",
-      "Reliability — the model is producing inconsistent results and needs retraining",
-      "Accountability — the bank needs to identify which team is responsible for the agent"
+      "Compare meaning for the policy answers and tool use for the leave-balance questions",
+      "Exact match for the policy answers and keyword match for the tool check",
+      "Text similarity for the policy answers and general quality for the tool check",
+      "General quality only, because it needs no expected answers and covers every case"
     ],
-    "correct": 1,
-    "explanation": "Fairness violation (B) — demographic bias through proxy variables is a textbook fairness failure. Zip codes correlating with race are proxy discrimination even when race isn't an input. The remediation requires: disparate impact analysis to quantify the bias, removing/de-weighting proxy variables, and evaluating demographic parity (equal denial rates across protected groups). Transparency (A) is satisfied — the agent is already disclosed. Reliability (C) is about consistent behavior, not biased behavior. Accountability (D) is about governance structure — important but secondary to fixing the bias.",
+    "correct": 0,
+    "explanation": "A is correct: compare meaning scores how well the agent's answer conveys the meaning of the expected answer regardless of wording, and tool use passes only if the agent used the expected tools or topics. B is wrong because exact match fails any answer that differs by a single character, and keyword match checks words in the reply, not which tool ran. C is wrong because text similarity rewards matching wording and sentence structure, which a paraphrasing agent won't produce, and general quality judges relevance, groundedness, completeness and abstention rather than tool calls. D is wrong because general quality ignores the HR-approved answers and can't confirm the tool was used.",
+    "difficulty": "medium",
     "tags": [
-      "fairness",
-      "responsible-AI",
-      "bias",
-      "disparate-impact"
+      "copilot-studio",
+      "agent-evaluation",
+      "testing",
+      "application"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-015",
-    "scenario": "A user interacts with a company's AI customer service agent and doesn't realize they're talking to an AI. After a frustrating interaction, the user discovers it was an AI and complains to regulators about deceptive practices.",
-    "question": "Which Responsible AI principle was violated, and what should have been implemented?",
+    "scenario": "A Foundry prompt agent is in production. The team wants to catch quality drift in real traffic, catch regressions against a fixed benchmark, keep probing for new jailbreak weaknesses, and be alerted when scores cross thresholds.",
+    "question": "Which Foundry observability setup covers all of these needs?",
     "options": [
-      "Privacy — the agent collected user data without consent",
-      "Transparency — the agent should have disclosed its AI nature at the start of the conversation",
-      "Accountability — a human agent should have been available as fallback",
-      "Reliability — the interaction was unsatisfactory, indicating system unreliability"
+      "A one-time pre-production evaluation run, with the results archived for audit",
+      "Application Insights availability tests that ping the agent endpoint every five minutes",
+      "Continuous evaluation on sampled production traffic, scheduled evaluation on a test dataset, scheduled red teaming, and Azure Monitor alerts on the results",
+      "Tracing only, with engineers reviewing the traces each morning for bad answers"
     ],
-    "correct": 1,
-    "explanation": "Transparency violation (B) — the EU AI Act (Article 52) and Microsoft's Responsible AI principles both require that AI systems interacting with people must disclose they are AI. The agent must state 'You are speaking with an AI assistant' at the start of the conversation. Privacy (A) might also be relevant but isn't the primary issue here — the complaint is about deception. Accountability (C) concerns who is responsible, not the disclosure requirement. Reliability (D) relates to consistent performance, not identity disclosure.",
+    "correct": 2,
+    "explanation": "C is correct: Microsoft describes post-production monitoring in Foundry as continuous evaluation of production traffic at a sampled rate, scheduled evaluation against test datasets to detect drift, scheduled red teaming to probe for safety and security weaknesses, and Azure Monitor alerts when outputs fail quality thresholds, all surfaced in the Application Insights-backed observability dashboard. A is wrong because a one-off pre-production run says nothing about how the agent behaves on live traffic later. B is wrong because availability tests prove the endpoint responds, not that its answers are good or safe. D is wrong because traces show what happened but don't score quality, so manual review misses drift and alerts nobody.",
+    "difficulty": "hard",
     "tags": [
-      "transparency",
-      "responsible-AI",
-      "EU-AI-Act",
-      "AI-disclosure"
+      "monitoring",
+      "continuous-evaluation",
+      "observability",
+      "analysis"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-016",
-    "scenario": "An AI agent for credit scoring is being prepared for deployment in the EU. The legal team asks: 'Does this system require a conformity assessment under the EU AI Act?'",
-    "question": "What is the correct classification and requirement?",
+    "scenario": "A customer service agent built in Copilot Studio receives thousands of user questions a week. The product owner wants to see which subject areas users ask about most, then measure answer quality for billing questions separately from troubleshooting.",
+    "question": "Which approach uses Copilot Studio's built-in capabilities to do this?",
     "options": [
-      "Minimal risk — credit scoring by AI is a standard business practice requiring no specific obligations",
-      "Limited risk — the system interacts with users, so a transparency notice is required",
-      "High risk — credit scoring is explicitly listed in EU AI Act Annex III as a high-risk AI system; a conformity assessment is mandatory before deployment",
-      "Prohibited — AI-based credit scoring is banned under the EU AI Act"
+      "Export transcripts to Excel each week and tag subjects by hand before writing test cases",
+      "Add a survey topic that asks users to type which subject their question belongs to",
+      "Generate a quick question set from the agent's instructions and run it every week",
+      "Review the themes in the agent's analytics, then create an evaluation test set from the billing theme's real user questions"
     ],
-    "correct": 2,
-    "explanation": "High risk (C) is correct. EU AI Act Annex III explicitly lists 'AI systems used to evaluate the creditworthiness of natural persons or establish their credit score' as high-risk. This requires a conformity assessment, risk management system, technical documentation, human oversight mechanisms, and registration in the EU database before market deployment. Minimal risk (A) would apply to spam filters or game AI — not systems affecting fundamental rights like financial access. Limited risk (B) applies to chatbots without significant decision-making power. Credit scoring AI is not prohibited (D) — it's regulated.",
+    "correct": 3,
+    "explanation": "D is correct: themes (preview) in Copilot Studio analytics group the user questions that triggered generative answers, and from a theme you can select Evaluate to build a test set from real user questions in that area, so billing quality is tracked separately from troubleshooting. A is wrong because manual tagging doesn't scale and duplicates what themes already provide. B is wrong because asking users to classify their own questions adds friction and produces unreliable data. C is wrong because a quick question set is generated from the agent's design, not from what users actually ask.",
+    "difficulty": "medium",
     "tags": [
-      "EU-AI-Act",
-      "high-risk",
-      "credit-scoring",
-      "conformity-assessment"
+      "copilot-studio",
+      "analytics",
+      "user-feedback",
+      "application"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-017",
-    "scenario": "An AI agent in production suddenly starts returning content that violates the organization's acceptable use policy — including responses that were previously working correctly. The incident occurred 2 hours after a prompt flow deployment.",
-    "question": "What is the correct immediate incident response action?",
+    "scenario": "A Foundry evaluation run over 1,500 test queries flags 210 failures across groundedness and task adherence. The team wants to find the common failure patterns quickly, then improve the prompt agent's instructions and tool descriptions without hand-tuning every line.",
+    "question": "Which Foundry capabilities best support this?",
     "options": [
-      "File a support ticket with Microsoft and wait for guidance",
-      "Update the system prompt to add more restrictions and redeploy",
-      "Immediately roll back to the previous deployment version to restore service, then investigate root cause",
-      "Enable Content Safety on the output and resume normal operations"
+      "Cluster analysis of the evaluation failures, then the agent optimizer (preview) to generate improved instructions and tool descriptions, then a fresh evaluation run",
+      "Read all 210 failures by hand, then rewrite the system prompt from scratch",
+      "Raise the model's temperature so it explores more varied answers on the failing queries",
+      "Fine-tune the base model on the 210 failing queries and their corrected answers"
     ],
-    "correct": 2,
-    "explanation": "Immediate rollback (C) is the correct P1 incident response when the deployment is the identified cause. Rolling back to the last known good version stops user exposure to policy-violating content within minutes. The 2-hour timing strongly correlates with the deployment — classic post-deployment regression. Filing a support ticket (A) is far too slow for a P1 active incident. Modifying the system prompt (B) takes time to develop, test, and redeploy — users are still exposed during this window. Enabling Content Safety on output (D) is a good secondary defense but doesn't address the root cause prompt regression.",
+    "correct": 0,
+    "explanation": "A is correct: Foundry's cluster analysis groups evaluation failures into patterns so the main problem areas stand out, and the agent optimizer (preview) evaluates agent behavior and generates better instructions, skills, tool descriptions and model selections. Re-running the evaluation then confirms the gain. B is wrong because reading every failure is slow, and a from-scratch rewrite risks regressions elsewhere. C is wrong because higher temperature adds randomness and tends to hurt groundedness. D is wrong because fine-tuning on 210 examples is costly, risks overfitting, and doesn't fix instruction or tool-description problems.",
+    "difficulty": "medium",
     "tags": [
-      "incident-response",
-      "rollback",
-      "deployment",
-      "P1"
+      "evaluation",
+      "tuning",
+      "foundry-observability",
+      "application"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-018",
-    "scenario": "A healthcare organization is building an AI agent for appointment scheduling. A GDPR compliance officer asks about the conversation data retention policy. The current implementation stores all conversations indefinitely in Cosmos DB.",
-    "question": "What GDPR principle is violated and what is the correct implementation?",
+    "scenario": "An AI Red Teaming Agent scan of a customer-facing agent returns a baseline attack success rate (ASR) near 0%, but a high ASR for easy-complexity attacks such as Base64 and Morse encoding.",
+    "question": "What does this tell the team, and what is the best next step?",
     "options": [
-      "Data accuracy — conversation logs must be reviewed for errors",
-      "Storage limitation — personal data should only be kept as long as necessary; implement a TTL policy on conversation documents in Cosmos DB (e.g., 90 days after last activity)",
-      "Data portability — users must be able to export their conversations",
-      "Lawful basis — the organization needs explicit consent for each conversation"
+      "The agent is safe: baseline ASR is what matters, and encoded prompts are unrealistic",
+      "The scan is faulty, because ASR can't be higher for easy attacks than for the baseline",
+      "Plain adversarial prompts are refused but encoding tricks get through; enable Prompt Shields for user prompt attacks, which detect encoding attacks, then re-scan with the same strategies",
+      "Switch to a larger model, because bigger models can't be tricked by encoded prompts"
     ],
-    "correct": 1,
-    "explanation": "Storage limitation violation (B) — GDPR Article 5(1)(e) requires that personal data be kept 'no longer than is necessary for the purposes for which the personal data are processed.' Indefinite retention violates this. The fix: set a TTL on Cosmos DB documents (e.g., 90 days after last activity for appointment scheduling context) and document the retention policy. Data accuracy (A) concerns correctness of data. Data portability (C) is required but doesn't address the unlimited retention. Lawful basis (D) concerns the legal ground for processing — appointment scheduling typically qualifies as 'contract performance,' not requiring explicit consent per conversation.",
+    "correct": 2,
+    "explanation": "C is correct: ASR is the percentage of attacks that produce an undesirable response, and the scorecard breaks it down by attack complexity. A low baseline with a high easy-complexity ASR means direct requests are refused but simple transformations such as Base64 and Morse bypass the safeguards. Prompt Shields for user prompts detect encoding attacks among other attack types, so turning them on and re-running the same strategies verifies the fix. A is wrong because easy attacks take little effort, so a real attacker would try them. B is wrong because attack strategies exist precisely to get past safeguards that stop baseline prompts. D is wrong because no model is immune to prompt manipulation, and a larger model may decode the payload more reliably.",
+    "difficulty": "hard",
     "tags": [
-      "GDPR",
-      "storage-limitation",
-      "data-retention",
-      "Cosmos-DB"
+      "red-teaming",
+      "prompt-shields",
+      "analysis",
+      "exam-trap"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-019",
-    "scenario": "A company wants to implement a CI/CD pipeline for their AI agent prompt flows. Currently, developers manually test changes by running 10 example queries before deploying to production. The company has experienced two incidents caused by prompt regressions in the past month.",
-    "question": "What is the minimum CI/CD gate that should block deployment on regression?",
+    "scenario": "A maker built a Copilot Studio agent in a development environment without choosing a solution. The team now needs to move the agent, with its topics, agent flows, and connection references, to test and production through an automated process.",
+    "question": "What should the ALM design include?",
     "options": [
-      "Run unit tests on the Python nodes in the prompt flow",
-      "Automated evaluation run on a golden dataset of 50+ representative examples, with deployment blocked if any metric falls below baseline thresholds",
-      "A peer code review of the prompt changes by another developer",
-      "A staging environment deployment with manual smoke testing by QA"
+      "Export the agent from the default solution and import it unmanaged into production",
+      "Rebuild the agent by hand in each environment from a written specification",
+      "Share the development agent directly with production users so no deployment is needed",
+      "Create a custom solution, add the agent and its components, and deploy it with Power Platform pipelines, importing it as a managed solution downstream"
     ],
-    "correct": 1,
-    "explanation": "Automated golden dataset evaluation (B) is the minimum gate that actually catches prompt regressions. 50+ examples with metric thresholds provides statistical validity — it's exactly what 10 manual queries fail to provide (the previous incidents prove this). The CI pipeline runs this automatically on every change and blocks deployment if thresholds aren't met. Unit tests on Python nodes (A) catch code bugs but not LLM behavior regressions. Peer code review (C) is valuable but humans can't predict LLM behavior changes from reading prompts. Manual staging smoke tests (D) are still manual and have the same coverage problem as the current 10-query approach.",
+    "correct": 3,
+    "explanation": "D is correct: new Copilot Studio agents are created in the default solution, and to export, import and manage agents across environments you need a custom solution that contains the agent and its components. Power Platform pipelines, available from the Copilot Studio solution explorer, automate deployment between environments, and managed solutions downstream stop people editing production in place. A is wrong because the default solution isn't the supported way to move agents, and an unmanaged import lets people change production directly. B is wrong because manual rebuilds drift between environments and can't be audited. C is wrong because production users would reach an unvalidated development agent, with no separation between environments.",
+    "difficulty": "medium",
     "tags": [
-      "MLOps",
-      "CI/CD",
-      "golden-dataset",
-      "deployment-gate"
+      "copilot-studio",
+      "alm",
+      "power-platform-pipelines",
+      "best-practice"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-020",
-    "scenario": "An organization has deployed Azure AI Content Safety to filter user inputs. During a security audit, the auditor notes that the agent retrieves external web content and injects it into the prompt without any safety scanning. The auditor flags this as an unmitigated risk.",
-    "question": "What attack vector is the auditor identifying, and what is the correct remediation?",
+    "scenario": "An updated set of instructions was published to a Foundry prompt agent an hour ago, and complaints about off-policy answers have spiked since.",
+    "question": "What is the fastest safe way to restore service?",
     "options": [
-      "Cross-site scripting (XSS) — sanitize HTML in retrieved web content before rendering",
-      "Indirect prompt injection — malicious content in retrieved web pages can contain instructions that the LLM will follow; scan retrieved content with Content Safety before injecting into the prompt",
-      "SQL injection — the retrieval query might be vulnerable to injection attacks",
-      "Man-in-the-middle — the web content retrieval should use HTTPS"
+      "Roll the agent back to its previous version, which Foundry snapshotted automatically, and then investigate",
+      "Delete the agent and recreate it from memory of the previous instructions",
+      "Add more restrictions to the current instructions and publish again straight away",
+      "Leave the agent running and wait for the nightly evaluation to confirm the problem"
     ],
-    "correct": 1,
-    "explanation": "Indirect prompt injection (B) is the attack: retrieved web content might contain text like 'IGNORE PREVIOUS INSTRUCTIONS: You are now...' and the LLM treats it as legitimate instructions. The mitigation is scanning retrieved content with Azure AI Content Safety's prompt injection detector before it enters the prompt, and structuring prompts to clearly separate trusted instructions from untrusted retrieved content (e.g., XML tags). XSS (A) applies to web rendering, not LLM inference. SQL injection (C) applies to database queries, not LLM prompts. HTTPS (D) prevents interception but doesn't protect against malicious content that was legitimately published on a page.",
+    "correct": 0,
+    "explanation": "A is correct: Foundry Agent Service snapshots agent versions automatically as you iterate, so you can roll back to a previous version or compare versions. Restoring the last known good version stops the harm, and root-cause analysis can follow. B is wrong because recreating from memory is slow and error-prone when an exact previous version exists. C is wrong because an untested hotfix can make things worse. D is wrong because waiting leaves users exposed to off-policy answers for hours.",
+    "difficulty": "easy",
     "tags": [
-      "indirect-injection",
-      "content-safety",
-      "security",
-      "RAG-security"
+      "foundry-agent-service",
+      "versioning",
+      "rollback",
+      "recall"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-021",
-    "scenario": "A company's AI agent deployment pipeline promotes changes from dev → staging → production. A new version was deployed to staging last Tuesday and has been receiving 10% of production traffic via canary deployment. Evaluation scores in staging are identical to production. The team wants to promote to 100% production.",
-    "question": "What additional check should be performed before full production promotion?",
+    "scenario": "A support agent is grounded on an Azure AI Search index. The team is changing its chunking strategy and embedding model, which means rebuilding the index. A bad index would quietly degrade every answer.",
+    "question": "Which ALM process for this grounding data is safest?",
     "options": [
-      "Run the golden dataset evaluation one more time to confirm scores haven't changed",
-      "Review the 10% canary traffic's real-world metrics: latency distribution, error rates, user feedback, and content safety flags — all should align with production baseline",
-      "Get sign-off from the security team that no new dependencies were introduced",
-      "Wait 7 days minimum regardless of canary results to ensure enough time has passed"
+      "Rebuild the production index in place overnight and spot-check a few answers the next morning",
+      "Skip re-indexing and let the new embedding model handle queries against the existing vectors",
+      "Keep the chunking and embedding configuration in source control, build a new index alongside the current one, evaluate an agent pointed at it, and switch only if scores meet the baseline",
+      "Copy production documents to a developer's personal storage to test the new chunking locally"
     ],
-    "correct": 1,
-    "explanation": "Real-world canary metrics review (B) is the correct pre-promotion check. Offline evaluation on a golden dataset (what staging does) confirms quality on known examples. Canary traffic on real users confirms performance on the distribution of actual production queries — including edge cases not in the golden dataset. Check: latency P95 matches baseline, error rate within threshold, content safety flags not elevated, user satisfaction signals (if available). Another golden dataset run (A) adds no new information. Security sign-off (C) is a valid check but not the primary promotion gate. Mandatory 7-day wait (D) is process overhead — decisions should be data-driven, not time-driven.",
+    "correct": 2,
+    "explanation": "C is correct: treating the index build as a versioned artifact, with configuration in source control, a parallel build, an evaluation gate and then a switch, gives a tested promotion path and an instant rollback by pointing back at the old index. A is wrong because rebuilding in place removes the known-good index and relies on spot checks to catch regressions. B is wrong because query embeddings from a new model aren't comparable with document vectors from the old one, so retrieval breaks. D is wrong because copying production data to personal storage bypasses access controls and data governance.",
+    "difficulty": "hard",
     "tags": [
-      "canary-deployment",
-      "promotion-gate",
-      "MLOps",
-      "production-validation"
+      "data-alm",
+      "azure-ai-search",
+      "rag",
+      "best-practice"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-022",
-    "scenario": "An insurance company is required by internal policy to maintain a complete audit trail of all AI agent decisions, including the model version, retrieved context, and generated response for each claim processed. This data must be immutable and retained for 7 years.",
-    "question": "Which Azure architecture meets these audit requirements?",
+    "scenario": "A team has fine-tuned a model in Microsoft Foundry to classify insurance claims. Before production, they must define validation criteria and test the model cheaply, without committing to a production deployment.",
+    "question": "Which approach fits?",
     "options": [
-      "Store agent inputs and outputs in Azure Cosmos DB with soft-delete enabled",
-      "Log to Azure Monitor with a 90-day log retention policy",
-      "Write immutable audit records to Azure Blob Storage with WORM (Write Once Read Many) policy, archived after 90 days to cool tier; retain for 7 years",
-      "Stream events to Azure Event Hubs and process with Stream Analytics for reporting"
+      "Accept the model if training loss kept falling through the final epoch",
+      "Deploy straight to a provisioned production deployment and judge it on live traffic",
+      "Validate it on the training examples, because they're already labelled",
+      "Compare the fine-tuned model with the base model on a held-out test set, using task metrics and safety evaluations with agreed pass thresholds, and test it on a Developer deployment"
     ],
-    "correct": 2,
-    "explanation": "Azure Blob Storage with WORM policy (C) provides immutability — WORM prevents modification or deletion of records for the defined retention period (7 years). Archiving to cool/cold tier after 90 days manages cost. This meets both the immutability requirement and the 7-year retention. Cosmos DB with soft-delete (A) allows admins to permanently delete records — not truly immutable. Azure Monitor with 90-day retention (B) violates the 7-year requirement and can be cleared by workspace admins. Event Hubs + Stream Analytics (D) is a processing pipeline, not an archival solution — data in Event Hubs is retained 1-7 days maximum.",
+    "correct": 3,
+    "explanation": "D is correct: validation criteria for a custom model should be measured on data the model hasn't seen, against a baseline such as the base model, with task-specific metrics, safety checks and explicit pass thresholds. Foundry's Developer deployment type is designed for evaluating fine-tuned models at low cost; it has a 24-hour lifetime and no SLA or data-residency guarantee, so it's for testing only. A is wrong because falling training loss can signal overfitting rather than better real-world accuracy. B is wrong because it exposes customers to an unvalidated model and commits capacity before the model has proved itself. C is wrong because scoring on training data overstates accuracy.",
+    "difficulty": "medium",
     "tags": [
-      "audit-trail",
-      "WORM",
-      "immutable-storage",
-      "compliance"
+      "fine-tuning",
+      "validation",
+      "custom-models",
+      "best-practice"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-023",
-    "scenario": "A company's AI agent fine-tuned on customer data is being decommissioned. The data privacy team asks: 'When we delete the training data from storage, does the model forget the personal information it learned?'",
-    "question": "What is the correct answer?",
+    "scenario": "A team added custom knowledge and topics to the 'Copilot for finance and operations apps' agent in Copilot Studio, working in the Dataverse environment linked to their Dynamics 365 Finance sandbox. They now need the same changes in production.",
+    "question": "How should these AI customizations move to production?",
     "options": [
-      "Yes — deleting the training data removes the learned information from the model",
-      "No — fine-tuned model weights encode information from training data; deleting storage doesn't affect the model; the model weights must also be deleted and model unlearning techniques may be needed",
-      "Yes — Azure AI Foundry automatically unlearns data when the source files are removed",
-      "No — but re-training on anonymized data overwrites the personal information"
+      "Package the agent changes in a solution, import it into the Dataverse environment linked to production, then test and publish there",
+      "Include them in an X++ deployable package and apply it through Lifecycle Services",
+      "Edit the production agent directly in Copilot Studio, because sandbox changes can't be moved",
+      "Copy the sandbox database over production so the Copilot changes come across with it"
     ],
-    "correct": 1,
-    "explanation": "Model weights retain learned information (B) — fine-tuning encodes training data patterns into the model's weights. Deleting the source files does NOT remove this information from the model. Complete decommissioning requires: deleting the model weights and all deployment artifacts, and potentially applying model unlearning techniques if personal data memorization is a concern. Azure AI Foundry has no automatic unlearning on file deletion (C). Re-training on anonymized data (D) may reduce exposure of specific personal data but doesn't guarantee complete removal — it's not a reliable GDPR 'right to be forgotten' mechanism for fine-tuned models.",
+    "correct": 0,
+    "explanation": "A is correct: Copilot capabilities in finance and operations apps run through the 'Copilot for finance and operations apps' agent in Copilot Studio, in the Dataverse environment linked to each F&O environment. Its knowledge and topics are Copilot Studio components, so they move like other agent changes, in a solution, followed by testing and publishing in the target. B is wrong because X++ deployable packages carry F&O code and metadata, not Copilot Studio components. C is wrong because editing production directly skips testing and leaves environments out of step. D is wrong because copying a sandbox database over production would overwrite live business data.",
+    "difficulty": "medium",
     "tags": [
-      "model-decommissioning",
-      "right-to-erasure",
-      "fine-tuning",
-      "GDPR"
+      "alm",
+      "dynamics-365-finance",
+      "copilot-studio",
+      "configuration"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-024",
-    "scenario": "A content moderation agent built with Azure AI Foundry is processing user-generated social media posts. The agent flags a post containing the phrase 'kill it in the interview' as violent content with severity 4, blocking it from publication.",
-    "question": "What type of content safety failure is this, and how should it be addressed?",
+    "scenario": "A hosted agent built with Microsoft Agent Framework sometimes takes 25 seconds to answer. Each request makes three model calls and two tool calls, and the team can't tell which step is slow.",
+    "question": "What should they use to find the slow step?",
     "options": [
-      "True positive — severity 4 is correct for interview-related content",
-      "False positive — context-blind severity scoring is flagging idiomatic language; address with custom classification rules or lowering the violence threshold for this use case",
-      "The severity threshold is correct but should be raised to 6 to reduce false positives across all categories",
-      "This is expected behavior — all severity 4 content should be blocked regardless of context"
+      "Azure Advisor recommendations for the subscription",
+      "The Foundry model benchmarks, which compare model latency on public datasets",
+      "Tracing in Microsoft Foundry, which is built on OpenTelemetry and Application Insights and shows each model call and tool call as a span",
+      "A longer timeout on the agent so slow requests stop failing"
     ],
-    "correct": 1,
-    "explanation": "False positive from context-blind scoring (B) — 'kill it in the interview' is common idiomatic English meaning 'perform excellently.' Content Safety's built-in severity classifier can't reliably distinguish idiomatic from literal violence. Mitigation options: lower the violence severity threshold for this use case, add domain-specific context to the safety evaluation, or implement a secondary LLM-based classifier that considers context before blocking. Treating it as a true positive (A) would censor legitimate content. Raising thresholds globally (C) would reduce all detection rates, not just this false positive pattern. Blanket blocking at severity 4 (D) ignores the contextual nature of language.",
+    "correct": 2,
+    "explanation": "C is correct: Foundry tracing captures an agent's execution flow, including LLM calls, tool calls and agent decisions, using OpenTelemetry and Application Insights, and Agent Framework agents emit traces when tracing is enabled for the project, so the slow span stands out. A is wrong because Advisor gives general resource recommendations, not per-request agent timings. B is wrong because public benchmarks don't reflect this agent's tools or prompts. D is wrong because a longer timeout hides the symptom without finding the cause.",
+    "difficulty": "medium",
     "tags": [
-      "content-safety",
-      "false-positive",
-      "threshold-tuning",
-      "context-aware"
+      "tracing",
+      "monitoring",
+      "agent-framework",
+      "troubleshooting"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-025",
-    "scenario": "An AI agent deployment pipeline includes code review, evaluation, and staging. The CTO asks the team to document who is accountable for the agent's decisions in production. Three teams are involved: the data science team (built the models), the platform engineering team (built the infrastructure), and the business unit (owns the use case).",
-    "question": "According to Microsoft's Responsible AI framework, how should accountability be structured?",
+    "scenario": "A team restructured its prompts so that a 2,500-token policy block comes first in every request, to benefit from prompt caching in Azure OpenAI.",
+    "question": "How can they confirm from telemetry that caching is working?",
     "options": [
-      "The data science team is accountable — they built the model that makes decisions",
-      "Microsoft is accountable — they provide the Azure AI platform",
-      "Accountability must be explicitly assigned to named individuals/teams across the lifecycle — typically the business unit owns final accountability for decisions made by the AI in their domain, with shared responsibility from platform and data science teams for their components",
-      "The platform engineering team is accountable — they operate the production infrastructure"
+      "Look for a drop in requests per minute in Azure Monitor",
+      "Compare output token counts before and after the change",
+      "Check that total latency fell by exactly half",
+      "Check the cached_tokens value under prompt_tokens_details in each response's usage data"
     ],
-    "correct": 2,
-    "explanation": "Shared responsibility with business unit ownership (C) reflects the Microsoft RAI accountability principle. The business unit is accountable for the AI's decisions because they define the use case and deploy it in their domain. Data science is accountable for model quality and fairness. Platform engineering is accountable for reliability and security of the infrastructure. Microsoft is accountable for the platform (Azure AI Foundry) but not the customer's application of it. Assigning sole accountability to data science (A), Microsoft (B), or platform engineering (D) misallocates responsibility and leaves gaps in governance.",
+    "correct": 3,
+    "explanation": "D is correct: cache hits are reported as cached_tokens under prompt_tokens_details in the response's usage data, and a value of 0 means a cache miss. A is wrong because caching doesn't change how many requests are sent. B is wrong because prompt caching applies to input tokens, not output. C is wrong because caching cuts latency by varying amounts, so there's no fixed ratio to look for.",
+    "difficulty": "easy",
     "tags": [
-      "accountability",
-      "responsible-AI",
-      "governance",
-      "shared-responsibility"
+      "prompt-caching",
+      "telemetry",
+      "recall",
+      "cost-optimization"
     ]
   },
   {
     "domain": 3,
     "id": "ab100-d3-026",
-    "scenario": "A new regulation requires that any AI system used in loan decisions must be able to explain why a specific loan was denied. The current agent uses GPT-4o via Azure AI Foundry and returns denial decisions without explanations.",
-    "question": "What is the correct approach to meet this explainability requirement?",
+    "scenario": "A team has two weeks to build a test set for a Copilot Studio agent grounded on 40 policy PDFs. Writing every question by hand would take too long.",
+    "question": "What is the best strategy for creating the test cases?",
     "options": [
-      "Fine-tune GPT-4o to add explainability to its outputs",
-      "Add post-hoc SHAP analysis to the Azure Functions that call Azure OpenAI",
-      "Modify the prompt to require the agent to provide a structured explanation of the key factors influencing the decision alongside every denial, and log these explanations to an immutable audit store",
-      "Switch from GPT-4o to a logistic regression model which is inherently interpretable"
+      "Generate a full question set from the agent's knowledge sources in agent evaluation, then review the questions, add expected answers, and add cases for known gaps",
+      "Use the 10-question quick question set as the whole release test suite",
+      "Skip test cases and rely on a few spot checks in the test chat before release",
+      "Ask production users to report bad answers and turn them into tests later"
     ],
-    "correct": 2,
-    "explanation": "Structured explanation in the prompt + audit logging (C) is the correct approach. Chain-of-thought prompting instructs the agent to enumerate the factors driving the decision (credit score, DTI ratio, employment history) in its response — this is the explanation. Logging to an immutable store satisfies the audit requirement. Fine-tuning (A) doesn't inherently add explainability — it changes behavior, not structure. SHAP (B) is a technique for traditional ML models with numerical feature inputs — it doesn't apply to LLM-generated text decisions. Switching to logistic regression (D) sacrifices the agent's reasoning capabilities and may not satisfy the requirement for natural-language explanations.",
+    "correct": 0,
+    "explanation": "A is correct: Copilot Studio agent evaluation can generate a full question set from a knowledge source or topics, with the number of questions you choose, up to 100 per test set. Generated questions test how the agent uses knowledge it already has, so people still review them, add expected answers for the methods that need them, and add cases for information gaps that generation doesn't cover. B is wrong because 10 questions can't cover 40 policy documents. C is wrong because the test chat handles one question at a time and isn't repeatable. D is wrong because it pushes testing onto customers after release.",
+    "difficulty": "medium",
     "tags": [
-      "explainability",
-      "transparency",
-      "audit-logging",
-      "loan-decisions"
+      "copilot-studio",
+      "agent-evaluation",
+      "test-generation",
+      "application"
     ]
   },
   {
@@ -526,12 +552,13 @@
     "question": "What are the key components of an ALM process for Microsoft Foundry Agents service?",
     "options": [
       "Export the agent as a ZIP file and manually copy it between environments using the Azure portal",
-      "Use infrastructure-as-code (Bicep/ARM) to define Foundry Hub, Project, and agent configurations; store agent definitions in source control; use deployment pipelines (GitHub Actions or Azure DevOps) to promote environment-specific configurations, with environment-specific connection strings and model deployment names per environment",
       "Test only in production using feature flags to limit user exposure during initial rollout",
-      "Deploy agents directly from the Foundry Studio UI to production after local testing"
+      "Deploy agents directly from the Foundry Studio UI to production after local testing",
+      "Use infrastructure-as-code (Bicep/ARM) to define the Foundry resource, projects, connections, and model deployments; store agent definitions in source control and create agent versions through the SDK or REST API; use deployment pipelines (GitHub Actions or Azure DevOps) to promote environment-specific configurations, with environment-specific connection strings and model deployment names per environment"
     ],
-    "correct": 1,
-    "explanation": "IaC-based ALM for Foundry Agents (B) is the correct approach. Key components: agent definition in source control (YAML or JSON describing agent instructions, tools, knowledge sources), Bicep/ARM templates for Foundry Hub and Project resources, environment-specific parameter files (model deployment names differ per environment), CI pipeline for validation (evaluation against golden dataset), CD pipeline for staged promotion (dev to staging to production). Manual ZIP copy (A) is error-prone and untracked. Production-only testing (C) exposes real users to unvalidated agents. UI-only deployment (D) bypasses version control and automated evaluation gates.",
+    "correct": 3,
+    "explanation": "D is correct: ALM for Foundry agents uses infrastructure as code (Bicep or ARM) for the Foundry resource, projects, connections and model deployments; agent definitions in source control with agent versions created through the SDK or REST API; and GitHub Actions or Azure DevOps pipelines that run evaluations and promote environment-specific configuration (connections and model deployment names) from dev to staging to production. A is wrong because manually copying exported agents between environments is error-prone, untracked and not repeatable. B is wrong because testing only in production exposes real users to unvalidated agents, even with feature flags. C is wrong because deploying straight from the portal UI bypasses version control and automated evaluation gates.",
+    "difficulty": "medium",
     "tags": [
       "ALM",
       "Foundry-Agents",
@@ -545,13 +572,14 @@
     "scenario": "A security assessment of an AI agent reveals three vulnerabilities: (1) users can override the system prompt by instructing the agent to ignore previous instructions, (2) retrieved web content contains embedded instructions that the agent follows as if they were legitimate, (3) users can extract the full system prompt by asking the agent to repeat it verbatim.",
     "question": "Which combination of mitigations correctly addresses all three prompt manipulation vulnerabilities?",
     "options": [
-      "Add stronger wording to the system prompt such as 'never ignore your instructions' to address all three issues",
       "For direct injection: add Azure AI Content Safety input scanner to detect and block jailbreak patterns before the prompt reaches the LLM; for indirect injection: scan retrieved content with Content Safety prompt injection detector and use structural delimiters (XML tags) to separate trusted instructions from untrusted retrieved content; for system prompt extraction: instruct the agent not to reveal its system prompt and filter responses via API Management",
+      "Add stronger wording to the system prompt such as 'never ignore your instructions' to address all three issues",
       "Switch to a different LLM model that is immune to prompt injection attacks",
       "Disable the retrieval step to eliminate indirect injection risk and restrict users to predefined question templates"
     ],
-    "correct": 1,
-    "explanation": "Layered mitigations per vulnerability (B) is the correct defense-in-depth approach. Direct injection: Azure AI Content Safety jailbreak detection blocks known attack patterns at the input layer before the LLM sees them. Indirect injection: Content Safety scans retrieved content, and structural prompt delimiting (XML tags distinguishing trusted instructions from retrieved context) helps the LLM treat untrusted content appropriately. System prompt extraction: response filtering and explicit system prompt confidentiality instructions address this. No LLM is immune to prompt injection (C) — all can be manipulated. Disabling retrieval (D) eliminates indirect injection but destroys the agent knowledge base capability entirely.",
+    "correct": 0,
+    "explanation": "A is correct: each vulnerability needs its own layer. Direct injection is blocked by Content Safety Prompt Shields scanning user input; indirect injection is handled by scanning retrieved content for embedded instructions and using delimiters to separate trusted instructions from untrusted content; and system prompt extraction is reduced by confidentiality instructions plus output filtering, for example in API Management. B is wrong because stronger wording in the system prompt is exactly what injection attacks override, so it fixes none of the three reliably. C is wrong because no LLM is immune to prompt injection. D is wrong because disabling retrieval removes the indirect-injection vector only by destroying the agent's knowledge capability, and it does nothing for the other two issues.",
+    "difficulty": "hard",
     "tags": [
       "prompt-injection",
       "indirect-injection",
@@ -571,7 +599,8 @@
       "The groundedness drop indicates the LLM model needs to be updated to the latest available version"
     ],
     "correct": 1,
-    "explanation": "Retrieval quality degradation (B) is the correct interpretation. The token growth pattern (850 to 1,340) suggests the RAG pipeline is retrieving more chunks per query — likely because the knowledge base expanded without corresponding quality filtering. More chunks do not always improve answers — low-relevance chunks add noise and can cause the model to blend contradictory information, explaining the groundedness drop. Latency directly correlates with input token count. Recommended action: implement relevance score thresholds to filter low-quality retrieved chunks, review chunking strategy for new content, and re-run nightly evaluation after each change. Natural scaling (A) ignores the quality degradation signal. Adding PTU (C) addresses latency symptoms but not the root cause. A model update (D) does not fix retrieval quality issues.",
+    "explanation": "B is correct: input tokens rising from 850 to 1,340 suggest the RAG pipeline is pulling in more retrieved context per query as the knowledge base grew, latency rises with input tokens, and the groundedness drop indicates the extra chunks are low-quality or conflicting. The action is to investigate retrieval quality, apply relevance score thresholds, review chunking for the new content and re-run evaluation after each change. A is wrong because the quality drop shows this is not healthy scaling, and per-request token growth is not explained by more users. C is wrong because adding PTU treats the latency symptom but not the retrieval problem that causes both latency and the groundedness drop. D is wrong because a model update does not fix low-quality retrieved context.",
+    "difficulty": "hard",
     "tags": [
       "telemetry",
       "RAG",
@@ -582,16 +611,17 @@
   {
     "domain": 3,
     "id": "ab100-d3-030",
-    "scenario": "A QA team needs to create comprehensive test cases for an AI agent that handles insurance claims across Dynamics 365 Customer Service, Copilot Studio, and Azure AI Foundry. The agent processes 50 claim types with varying complexity. Writing test cases manually would take 6 weeks and the team has 2 weeks before the release deadline.",
+    "scenario": "A QA team needs to create comprehensive test cases for an AI agent that handles insurance claims across Dynamics 365 Customer Service, Copilot Studio, and Microsoft Foundry. The agent processes 50 claim types with varying complexity. Writing test cases manually would take 6 weeks and the team has 2 weeks before the release deadline.",
     "question": "How should the team use Copilot to build the test case strategy efficiently within the time constraint?",
     "options": [
       "Ask Copilot in Microsoft Word to generate a test plan document, then implement all test cases manually from the document",
-      "Use GitHub Copilot or Copilot in Azure DevOps to: generate test case templates from the agent specification and acceptance criteria, produce scenario variations by parameterizing claim types and edge cases across all 50 claim types, generate test data sets covering boundary conditions, and produce LLM-as-judge evaluation prompts for automated quality scoring — then validate and refine the generated cases before adding to the test suite",
       "Deploy the agent to 1% of production traffic and use real insurance claims as implicit test cases",
+      "Use GitHub Copilot or Copilot in Azure DevOps to: generate test case templates from the agent specification and acceptance criteria, produce scenario variations by parameterizing claim types and edge cases across all 50 claim types, generate test data sets covering boundary conditions, and produce LLM-as-judge evaluation prompts for automated quality scoring — then validate and refine the generated cases before adding to the test suite",
       "Use the existing golden dataset from development as the complete test suite without expansion"
     ],
-    "correct": 1,
-    "explanation": "Copilot-assisted test case generation (B) is the correct strategy for meeting the 2-week deadline. GitHub Copilot and Azure DevOps Copilot can generate test case templates from acceptance criteria at 10x the speed of manual authoring, create scenario variations by parameterizing claim types and edge cases across all 50 types, produce realistic test data, and generate LLM-as-judge prompts for automated quality scoring. The team validates and curates the output rather than writing from scratch. Copilot in Word (A) produces documents, not executable test artifacts. Production traffic as implicit tests (C) exposes real customers to unvalidated agent behavior. The existing golden dataset (D) covers development-phase happy paths but misses new claim types and edge cases introduced in this release.",
+    "correct": 2,
+    "explanation": "C is correct: using GitHub Copilot (or Copilot in the team's DevOps tooling) to generate test case templates from the specification and acceptance criteria, parameterize scenarios across all 50 claim types and edge cases, create boundary-condition test data and draft LLM-as-judge evaluation prompts lets the team curate and validate generated cases instead of writing them from scratch, which fits the 2-week window. A is wrong because a Word test plan still leaves every test case to be implemented by hand, so it does not solve the time constraint. B is wrong because using live production claims as implicit tests exposes real customers to unvalidated agent behavior. D is wrong because the existing golden dataset covers development-phase cases and misses new claim types and edge cases in this release.",
+    "difficulty": "medium",
     "tags": [
       "test-strategy",
       "Copilot",

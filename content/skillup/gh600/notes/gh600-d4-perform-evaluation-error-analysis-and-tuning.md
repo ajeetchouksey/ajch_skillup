@@ -1,6 +1,6 @@
 # D4: Perform Evaluation, Error Analysis, and Tuning
 
-> **Exam weight**: 18% · **Questions**: ~22 of 120
+> **Exam weight**: 18% · **Questions**: ~22 of 133
 
 ## Overview
 

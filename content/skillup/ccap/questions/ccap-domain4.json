@@ -302,5 +302,37 @@
     "explanation": "**The principle**: Alerting on aggregate drift metrics (rising escalation rate, rising tool-error rate, falling retrieval hit rate, rising p99 latency) is what lets a team find out about degradation from the system's own signals, rather than depending on the much slower and less complete signal of individual users deciding to escalate a complaint to a manager.\n\n**Why B is correct**: The team's current practice is purely reactive — it depends on a frustrated employee's decision to escalate, which is a slow, incomplete, and delayed signal (many degraded interactions never get formally escalated at all). Tracking escalation-to-human and tool-error rates continuously and alerting on a defined drift threshold surfaces the same underlying problem proactively, often before it accumulates into enough individual complaints to reach a manager.\n\n**Why the distractors fail**:\n- A: Production monitoring and pre-launch evaluation serve different purposes — pre-launch eval validates the system against a controlled dataset before real users are exposed to it, while production monitoring tracks whether that validated quality holds up over time; one doesn't substitute for the other, and dropping pre-launch evaluation entirely would mean shipping unvalidated changes straight to users.\n- C: Aggregate drift metrics tell you *that* something has degraded and roughly where (which category of failure), but diagnosing the specific root cause of a failure still requires structured per-request logs (what was retrieved, what instructions were sent, what the model output) to reconstruct the actual trace — aggregate numbers alone can't replace that level of detail.\n- D: An alerting system surfaces a rising escalation rate faster; it doesn't prevent escalations from happening or guarantee zero future escalations — some tasks will always legitimately need human handling, and the alert's value is faster detection of an abnormal *rate*, not elimination of escalation itself.\n\n**In practice**: The shift from 'find out when a manager complains' to 'find out when the metric crosses a threshold' is what converts quality monitoring from reactive incident response into proactive detection — the goal is catching drift within hours or days of onset rather than waiting for it to accumulate into enough individual complaints to be noticed informally.",
     "tags": ["monitoring", "observability", "logging", "scenario-based", "comprehension"],
     "difficulty": "easy"
+  },
+  {
+    "domain": 4,
+    "id": "ccap-d4-020",
+    "scenario": "A team is building an eval suite for a support-reply assistant. It plans 40 test cases, each graded by a senior support agent against a detailed rubric, because human judgment is the gold standard. Releases ship weekly, and grading one run takes two days.",
+    "question": "Which change best follows Anthropic's guidance for designing evals?",
+    "options": [
+      "Keep the 40 hand-graded cases, since a small set of high-quality human grades gives a more reliable release signal than any larger automated set",
+      "Replace the rubric with exact string matching against one ideal reply per case, since fully automated grading is always the preferable method",
+      "Grow to several hundred task-specific cases with edge cases, auto-grade with code checks and an LLM rubric grader, and keep humans for spot-checks",
+      "Have the same model and prompt that wrote each reply grade it afterwards, asking whether its own answer was correct and complete"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: Anthropic's eval-design guidance has three rules: be task-specific (mirror the real distribution, including edge cases), automate grading when possible, and prioritize volume over quality, because more cases with slightly lower-signal automated grading beat a few hand-graded ones.\n\n**Why C is correct**: Several hundred cases that mirror real traffic and edge cases give far better coverage than 40. Code-based checks handle anything deterministic, an LLM grader with a clear rubric handles open-ended reply quality, and human review becomes a sampled calibration step instead of a two-day bottleneck on every weekly release.\n\n**Why the distractors fail**:\n- A: Forty cases can't cover the variety of real support traffic, and a two-day manual grading cycle means the suite can't gate a weekly release in practice.\n- B: Exact matching against one ideal reply fails every equally good reply worded differently, so it measures wording, not quality, on an open-ended task.\n- D: Self-grading with no rubric and no independent grader inherits the generator's own blind spots; Anthropic's examples note it is generally best practice to grade with a different model from the one that produced the output.\n\n**In practice**: Mixed methodology means each grading method covers what it is good at. Teams calibrate the LLM grader against a human-graded sample before trusting it, then re-check that agreement periodically.",
+    "tags": ["evaluation", "best-practice", "scenario-based", "application"],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "ccap-d4-021",
+    "scenario": "Users of a report-drafting service occasionally receive reports that end mid-sentence. The service logs only the final response text and the request latency, so the team can't tell how often it happens or which report types are affected.",
+    "question": "What should the team add to its logging and monitoring first?",
+    "options": [
+      "Log the full prompt and response text for every request, and have an analyst read a weekly sample of reports looking for truncation",
+      "Raise max_tokens to the model's maximum on every request, so no response can ever be cut off and monitoring becomes unnecessary",
+      "Log each response's stop_reason and token usage together with the report type, and alert when the share of max_tokens stops rises",
+      "Add a p99 latency alert, since a response that ends mid-sentence is the result of the request timing out before Claude finished"
+    ],
+    "correct": 2,
+    "explanation": "**The principle**: Monitor the structured signals the API already returns, not just the text. Every Messages API response carries a stop_reason and token usage that say why and where generation stopped.\n\n**Why C is correct**: A stop_reason of max_tokens means the response hit the request's max_tokens limit. Logging it per request, with usage and the report type, turns 'occasionally' into a rate the team can trend, segment and alert on, and shows which report types need a larger limit or a shorter design.\n\n**Why the distractors fail**:\n- A: Manual reading is slow and samples too little to give a reliable rate, and it ignores a field that answers the question directly.\n- B: Raising the limit may be part of the fix, but doing it blindly raises cost on every request, and without measurement the team can't confirm the cause or catch other stop reasons such as model_context_window_exceeded.\n- D: A max_tokens stop is a normal completed response, not a timeout, so latency alerts won't detect it.\n\n**In practice**: Anthropic's guidance is to always check stop_reason in response handling. Production code should also act on it, for example by continuing the response or flagging it as incomplete instead of shipping a cut-off report silently.",
+    "tags": ["monitoring", "observability", "troubleshooting", "scenario-based", "application"],
+    "difficulty": "medium"
   }
 ]

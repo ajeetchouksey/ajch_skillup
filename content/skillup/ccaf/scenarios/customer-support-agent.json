@@ -1,18 +1,124 @@
 {
+  "schemaVersion": "2.0",
   "id": "customer-support-agent",
-  "title": "Customer Support Resolution Agent",
-  "officialDescription": "You are building a customer support resolution agent using the Claude Agent SDK. The agent handles high-ambiguity requests like returns, billing disputes, and account issues. It has access to your backend systems through custom Model Context Protocol (MCP) tools (get_customer, lookup_order, process_refund, escalate_to_human). Your target is 80%+ first-contact resolution while knowing when to escalate.",
-  "primaryDomains": ["Agentic Architecture & Orchestration", "Tool Design & MCP Integration", "Context Management & Reliability"],
-  "tools": ["get_customer", "lookup_order", "process_refund", "escalate_to_human"],
-  "description": "Build a coordinator agent that handles customer support requests across refunds, billing disputes, and account issues. The agent must route tasks to the correct tools, enforce business rules (identity verification before financial operations), and escalate when policy is ambiguous or the customer requests it. Target: 80%+ first-contact resolution.",
-  "architecture_notes": "Use programmatic prerequisites to block process_refund until get_customer has returned a verified customer ID — prompt instructions alone have non-zero failure rate for critical business logic. Implement escalation criteria with explicit few-shot examples in the system prompt. Use structured handoff summaries (customer ID, root cause, recommended action) when escalating. Return structured MCP error context including errorCategory, isRetryable, and what was attempted.",
-  "key_patterns": [
-    "programmatic prerequisite gates (not just prompt instructions)",
-    "explicit escalation criteria with few-shot examples",
-    "structured handoff summaries for human escalation",
-    "MCP error taxonomy: transient / validation / permission / business",
-    "tool description differentiation (get_customer vs lookup_order)",
-    "identity verification before financial operations"
+  "title": "Support Agent That Knows When to Escalate",
+  "description": "An e-commerce company is building a customer-support resolution agent on the Claude Agent SDK, with MCP tools for customer lookup, order lookup, refunds and human escalation. The scenario tests enforcing business prerequisites in code rather than in the prompt, writing tool descriptions that route calls correctly, defining escalation criteria, producing structured handoffs, designing MCP error responses, and keeping case facts intact across long conversations.",
+  "examId": "ccaf",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    1,
+    4,
+    5
   ],
-  "questionIds": ["d1-001", "d1-007", "d4-001", "d5-005", "d1-014", "d4-016", "d1-015"]
+  "scenario": {
+    "background": "The business case depends on resolving at least 80% of contacts on first contact, but a single refund issued to an unverified caller would be a reportable fraud incident. Halcyon Home Goods is replacing its scripted chatbot with a Claude Agent SDK agent that handles returns, billing disputes and account issues. The agent reaches backend systems through a custom MCP server named `support` that exposes `get_customer`, `lookup_order`, `process_refund` and `escalate_to_human`. In the pilot, the agent occasionally confused order and account lookups, escalated simple returns, and handed human agents cases with no context.",
+    "characters": [
+      {
+        "name": "Aisha Rahman",
+        "role": "Director of Customer Experience",
+        "concern": "She is measured on first-contact resolution and wants the agent to resolve more contacts itself and escalate less."
+      },
+      {
+        "name": "Tom Becker",
+        "role": "Head of Payments Risk",
+        "concern": "He needs a guarantee that no refund is ever issued before the customer's identity is verified, and that refunds above policy limits always reach a human."
+      },
+      {
+        "name": "Lin Zhou",
+        "role": "Agent Platform Engineer",
+        "concern": "She has to make the agent's failures diagnosable and recoverable without bloating the prompt or the context window."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "customer-support-agent-q1",
+      "stem": "Tom wants a guarantee that `process_refund` never runs unless `get_customer` has already returned a verified customer ID in the current session. What should Lin implement?",
+      "options": [
+        "A bolded rule at the top of the system prompt: \"ALWAYS call get_customer and confirm verification before process_refund.\"",
+        "Several few-shot examples in the system prompt that show the agent verifying identity before every refund",
+        "A `PreToolUse` hook matching `mcp__support__process_refund` that returns `permissionDecision: \"deny\"` with a reason unless session state records a verified customer ID from `get_customer`",
+        "Removing `process_refund` from the agent's tools, so that all refunds are handled by humans"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: a `PreToolUse` hook runs in your code before the tool executes, and it can deny the call deterministically with a reason the model sees and can act on, here by verifying identity first. MCP tools are matched by the `mcp__<server>__<tool>` naming pattern. A is wrong because a prompt instruction, however emphatic, has a non-zero failure rate, and a critical financial control can't rely on the model choosing to comply. B is wrong for the same reason: few-shot examples make compliance more likely, but they don't guarantee it. D is wrong because it gives up the first-contact resolution target to buy safety that a programmatic gate provides without that cost."
+    },
+    {
+      "id": "customer-support-agent-q2",
+      "stem": "In the pilot, when customers asked to change their account email, the agent often called `lookup_order`. Each tool currently has a one-line description, such as \"Gets customer info\" and \"Gets order info.\" What is the most effective fix?",
+      "options": [
+        "Shorten the descriptions further, to save tokens and reduce confusion",
+        "Rewrite each description to say what the tool returns, when to use it and when not to use it, what its parameters mean (for example, email address or order number format), and its limitations",
+        "Add a fifth tool, `get_account_email`, so there is a dedicated tool for this request",
+        "Set `tool_choice` to force `get_customer` on the first turn of every conversation"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: Anthropic's tool-use docs call detailed descriptions 'by far the most important factor in tool performance', and recommend covering what the tool does, when to use it and when not to, what each parameter means, and its caveats, in at least 3–4 sentences. Clear boundaries between `get_customer` and `lookup_order` fix the misrouting at its source. A is wrong because terse descriptions caused the ambiguity in the first place. C is wrong because adding overlapping tools increases selection ambiguity; the docs favour fewer, well-described tools. D is wrong because forcing a tool on the first turn doesn't help with later routing decisions, removes the agent's judgement for contacts that start with an order question, and returns a 400 error on models that don't support forced tool use, such as Claude Opus 5.5 and Sonnet 5.5."
+    },
+    {
+      "id": "customer-support-agent-q3",
+      "stem": "The agent escalates routine returns whenever a customer sounds frustrated, yet it sometimes keeps going after a customer explicitly says \"let me talk to a person.\" Aisha wants fewer needless escalations, and Tom wants refunds over the $500 policy limit always escalated. What should Lin change?",
+      "options": [
+        "Escalate whenever a sentiment score falls below a threshold, so that frustrated customers always reach a human",
+        "Have the agent rate its own confidence from 1 to 10 on each turn and escalate when the rating is below 7",
+        "Escalate automatically after a fixed number of turns, so that long conversations always reach a human",
+        "Define explicit escalation criteria in the system prompt (explicit request for a human, a policy gap or exception, an amount above the limit) with few-shot examples of borderline cases, and also enforce the $500 limit in code"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: explicit, example-backed criteria tell the agent what actually warrants a human. A frustrated customer with a standard return can still be resolved, while an explicit request for a person is honoured immediately. The $500 limit is a hard business rule, so it belongs in code, such as a hook or a server-side check, as well as in the prompt. A is wrong because frustration doesn't measure complexity; it produces the needless escalations Aisha is complaining about and misses calm customers with policy exceptions. B is wrong because self-reported confidence is poorly calibrated and doesn't map to policy. C is wrong because conversation length is a weak signal: it escalates resolvable long chats and ignores a request for a human on the first turn."
+    },
+    {
+      "id": "customer-support-agent-q4",
+      "stem": "Human agents complain that escalated cases arrive with no context, so they have to re-ask the customer everything. What should `escalate_to_human` receive?",
+      "options": [
+        "A structured handoff with the customer ID and verification status, the issue category, the order IDs and amounts involved, what the agent already tried and the results, the suspected root cause, and a recommended next action",
+        "The raw conversation transcript, so the human agent has every detail",
+        "A one-line free-text note, such as \"Customer upset about refund, please help\"",
+        "Only the customer ID; the human agent can look everything else up in the CRM"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: a structured summary lets the human pick up the case in seconds, avoids repeating steps that already failed, and preserves the facts (IDs, amounts) that matter for the decision. B is wrong because a full transcript makes the human dig through the whole conversation to rebuild the case, which is the context problem the team is trying to solve; it can be attached, but it doesn't replace a summary. C is wrong because it discards the facts and the history of what was attempted. D is wrong because the CRM doesn't record what the agent tried during this conversation or why it escalated, so the human still has to re-interview the customer."
+    },
+    {
+      "id": "customer-support-agent-q5",
+      "stem": "`process_refund` can fail because the payment gateway timed out, because the order ID is malformed, because the caller lacks permission, or because the refund violates policy. Today every failure returns the text \"Error.\" How should the MCP server report these failures?",
+      "options": [
+        "Raise a JSON-RPC protocol error for every failure, so the client treats them all as transport problems",
+        "Return a successful result with empty content, so the agent can continue without being interrupted",
+        "Return a tool execution error with `isError: true` and structured content such as `errorCategory` (transient, validation, permission or business), `isRetryable`, a human-readable message, and what was attempted",
+        "Keep returning \"Error\", but tell the agent in its system prompt to retry every error three times"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: the MCP specification reserves tool execution errors, reported in the result with `isError: true`, for API failures, invalid input and business-logic errors, and that content reaches the model. A category and a retryable flag let the agent retry a transient timeout, fix a malformed ID, explain a policy refusal, or escalate a permission problem. A is wrong because the spec uses protocol errors for problems such as unknown tools or invalid arguments; reporting business failures that way hides the actionable detail from the model. B is wrong because returning success hides the failure, so the agent may tell the customer a refund went through when it didn't. D is wrong because retrying a policy violation or a permission error three times can never succeed, and it wastes turns while frustrating the customer."
+    },
+    {
+      "id": "customer-support-agent-q6",
+      "stem": "In long billing disputes, the agent starts misquoting order IDs and amounts it confirmed 30 turns earlier, especially after older turns have been summarised. What design fixes this?",
+      "options": [
+        "Raise `max_tokens`, so the agent has more room to reproduce earlier details",
+        "Keep a structured case-facts block (customer ID, verification status, order IDs, amounts, commitments made) outside the summarised history, and include it verbatim on every turn",
+        "Start a fresh conversation every 10 turns, to keep the context small",
+        "Rely on the default summary, and tell the agent to ask the customer again whenever it is unsure of a number"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: facts that must stay exact are stored once, outside the summarised history, and re-supplied each turn, so summarisation can compress the narrative without degrading IDs and amounts. A is wrong because `max_tokens` limits output length; it does nothing to stop details in the input from being lost or blurred. C is wrong because a fresh conversation discards the very facts the agent needs, unless they are carried over explicitly, which is what B does. D is wrong because re-asking the customer for information they already gave works against first-contact resolution and customer satisfaction, and it still leaves the agent free to quote a wrong number confidently."
+    }
+  ],
+  "keyLearnings": [
+    "Enforce critical business rules, such as identity verification before refunds, with programmatic gates like `PreToolUse` hooks; prompts and few-shot examples improve compliance but can't guarantee it.",
+    "Detailed tool descriptions that say what the tool returns, when to use it and when not to, and what its parameters mean are the most effective lever for correct tool routing.",
+    "Make escalation criteria explicit and example-backed, and hand off with a structured summary of facts, attempts, root cause and recommended action.",
+    "Return MCP tool failures as `isError: true` results with a category and a retryable flag, and keep exact case facts in a persistent block that summarisation can't erode."
+  ],
+  "officialDescription": "You are building a customer support resolution agent using the Claude Agent SDK. The agent handles high-ambiguity requests like returns, billing disputes, and account issues. It has access to your backend systems through custom Model Context Protocol (MCP) tools (get_customer, lookup_order, process_refund, escalate_to_human). Your target is 80%+ first-contact resolution while knowing when to escalate.",
+  "questionIds": [
+    "d1-001",
+    "d1-007",
+    "d4-001",
+    "d5-005",
+    "d1-014",
+    "d4-016",
+    "d1-015"
+  ]
 }

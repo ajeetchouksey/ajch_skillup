@@ -6,12 +6,13 @@
     "question": "Why does deleting a file in a subsequent commit NOT remove the credentials from the repository?",
     "options": [
       "The file is cached in GitHub's CDN and takes 24 hours to expire",
-      "Git history is immutable — the commit containing the credentials still exists and is retrievable by anyone who can clone the repository",
-      "The deletion commit creates a new reference but doesn't overwrite the old object",
+      "Deleted files are only purged after GitHub's next server-side garbage collection run",
+      "Git history keeps every commit; the commit that added the credentials is still retrievable by anyone who can clone or browse the repository",
       "GitHub requires a security scan to complete before old commits are purged"
     ],
-    "correct": 1,
-    "explanation": "Git stores all history immutably. Deleting a file creates a new commit that doesn't include it, but the original commit still exists. Anyone with git access can run `git checkout <old-commit-sha> -- config.yml` to retrieve the deleted file with credentials. The only remediation is a full history rewrite (git filter-branch or git-filter-repo), followed by force-pushing, and rotating the compromised credentials immediately. This is why .gitignore is a Critical control — it prevents the commit entirely.",
+    "correct": 2,
+    "explanation": "Git stores all history. Deleting a file creates a new commit that doesn't include it, but the original commit still exists, and anyone with access can run `git show <old-sha>:config.yml` to read the credentials. Treat the credentials as compromised and rotate them first; rewriting history (for example with git-filter-repo) is a secondary clean-up step. The CDN (A), garbage collection (B) and security scan (D) explanations are not how Git history works: the old commit is still referenced by the branch history, so nothing purges it. This is why .gitignore and push protection matter: they stop the commit or push from happening at all.",
+    "difficulty": "easy",
     "tags": ["git-history", "secrets", "gitignore", "history-rewrite"]
   },
   {
@@ -27,6 +28,7 @@
     ],
     "correct": 1,
     "explanation": "By default, GitHub admins and repository owners can bypass branch protection rules. If 'Do not allow bypassing the above settings' is not enabled, an admin can push directly to main regardless of the configured protections. This is one of the most common compliance findings in SOC 2 audits. Deploy keys (A) have write access but are still subject to branch protection unless admin-level. The timing window explanation (C) would appear in audit logs but is not the most likely cause. Required reviews apply to all PR merges, not just forks (D).",
+    "difficulty": "hard",
     "tags": ["admin-bypass", "SOC2", "compliance", "audit", "branch-protection"]
   },
   {
@@ -36,12 +38,13 @@
     "question": "What is the PRIMARY harm caused by the lack of a SECURITY.md and Private Vulnerability Reporting configuration?",
     "options": [
       "The researcher's report is not tracked in the repository's issue system",
-      "The vulnerability is now publicly disclosed before the maintainer has had time to develop and release a patch — exposing all users to active exploitation",
+      "The reporter cannot receive bug bounty payment without a SECURITY.md",
       "GitHub will not scan the repository for the vulnerability",
-      "The reporter cannot receive bug bounty payment without a SECURITY.md"
+      "The vulnerability is now publicly disclosed before the maintainer has had time to develop and release a patch — exposing all users to active exploitation"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "A public issue immediately exposes the vulnerability to malicious actors who monitor repositories for security disclosures. This is called premature/irresponsible disclosure. The maintainer now faces a race condition: patch and release before attackers exploit the vulnerability. SECURITY.md + Private Vulnerability Reporting provides a confidential channel so the researcher can share details privately, allowing a coordinated disclosure (patch first, publish disclosure with the fix). Tracking (A) is a minor concern compared to immediate exploitation risk.",
+    "difficulty": "medium",
     "tags": ["SECURITY.md", "responsible-disclosure", "CVD", "private-vulnerability-reporting"]
   },
   {
@@ -50,13 +53,14 @@
     "scenario": "A large PR is opened containing 800 lines of changes across 12 files. The PR description says: 'Various fixes and improvements'. Three reviewers spend 45 minutes each reviewing it, eventually approving it despite not understanding all the changes. Two weeks later, a regression is traced back to this PR.",
     "question": "Which repository governance control would have been MOST effective at preventing low-quality PR descriptions?",
     "options": [
-      "Requiring all PRs to pass a word count check on the description",
       "Configuring a .github/pull_request_template.md that structures what the author must provide: summary, linked issue, type of change, test plan, and checklist",
+      "Requiring all PRs to pass a word count check on the description",
       "Setting a maximum PR size limit via a GitHub Actions check",
       "Requiring the author to leave a review comment on their own PR explaining each file change"
     ],
-    "correct": 1,
-    "explanation": "A PR template pre-populates the description field with a structured form when a PR is opened. The author must fill in each section — what changed, why, how it was tested, and a review checklist. This dramatically improves review quality because reviewers understand intent without reading every line. A word count check (A) incentivizes padding, not clarity. PR size limits (C) are useful but don't improve description quality. Self-review comments (D) add overhead without the structured clarity of a template.",
+    "correct": 0,
+    "explanation": "B PR template pre-populates the description field with a structured form when a PR is opened. The author must fill in each section — what changed, why, how it was tested, and a review checklist. This dramatically improves review quality because reviewers understand intent without reading every line. A word count check (B) incentivizes padding, not clarity. PR size limits (C) are useful but don't improve description quality. Self-review comments (D) add overhead without the structured clarity of a template.",
+    "difficulty": "easy",
     "tags": ["PR-template", "code-review", "governance", "pull-request"]
   },
   {
@@ -72,6 +76,7 @@
     ],
     "correct": 2,
     "explanation": "In Conventional Commits, appending `!` after the type (or scope) — e.g., `feat!:` — indicates a BREAKING CHANGE regardless of the type prefix. Breaking changes always trigger a MAJOR version bump. Removing Node.js 16 support breaks existing users who rely on that runtime. The `feat` prefix alone (B) would trigger MINOR. A plain `feat:` without `!` would be MINOR. `fix:` without `!` would be PATCH. The `!` is the critical signal here.",
+    "difficulty": "easy",
     "tags": ["conventional-commits", "semantic-versioning", "breaking-change", "MAJOR"]
   },
   {
@@ -82,11 +87,12 @@
     "options": [
       "A pinned issue in each repository listing the current owner",
       "GitHub Teams configured at the organization level with repository access",
-      "A .github/CODEOWNERS file that maps file paths and directories to GitHub users or teams, automatically updated when files move",
+      "A CODEOWNERS file that maps paths to users or teams, versioned with the code and used to request reviews automatically",
       "Repository topics set to include the owning team's name"
     ],
     "correct": 2,
-    "explanation": "CODEOWNERS maps paths directly to owners inside the repository. Because it's a file in the repo, it evolves with the code — when a new directory is created or ownership changes, the CODEOWNERS file is updated in the same PR. It's also automatically enforced for review assignment, not just documentation. GitHub Teams (B) control access but don't map to file paths. Pinned issues (A) and topics (D) are documentation-only with no enforcement mechanism.",
+    "explanation": "CODEOWNERS maps paths directly to owners inside the repository. Because it is a file in the repo, ownership changes are made in pull requests alongside the code, and GitHub uses it to request reviews automatically (and to require them when 'Require review from Code Owners' is on). It does not update itself when files move; someone must edit the patterns. GitHub Teams (B) control access but don't map to file paths. Pinned issues (A) and topics (D) are documentation with no enforcement.",
+    "difficulty": "medium",
     "tags": ["CODEOWNERS", "ownership", "review-routing", "team-management"]
   },
   {
@@ -102,6 +108,7 @@
     ],
     "correct": 2,
     "explanation": "OIDC federation with AWS completely eliminates static credentials. The workflow uses GitHub's OIDC provider to obtain a short-lived JWT, presents it to AWS STS's AssumeRoleWithWebIdentity API, and receives temporary credentials scoped to a specific IAM role with a short TTL (typically 1 hour). No AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY is ever stored. The IAM role trust policy can restrict which GitHub org, repo, and branch can assume it. Environment secrets (A) still store long-lived keys. There is no per-run key encryption built in (B). Lambda credential generation (D) adds infrastructure complexity and still needs initial credentials.",
+    "difficulty": "medium",
     "tags": ["OIDC", "AWS", "federated-identity", "no-secrets", "IAM"]
   },
   {
@@ -111,12 +118,13 @@
     "question": "What is the correct order of response operations for the maintainer in this scenario?",
     "options": [
       "1. Close the public issue, 2. Patch the vulnerability, 3. Publish a new release, 4. Post a public security advisory",
-      "1. Lock the public issue immediately, 2. Contact the reporter privately to remove details, 3. Develop patch, 4. Release patch, 5. Enable private vulnerability reporting, 6. Publish CVE with coordinated disclosure",
       "1. Publish a new release with a patch, 2. Delete the public issue, 3. Add SECURITY.md",
+      "1. Lock the public issue immediately, 2. Contact the reporter privately to remove details, 3. Develop patch, 4. Release patch, 5. Enable private vulnerability reporting, 6. Publish CVE with coordinated disclosure",
       "1. Temporarily take the repository private, 2. Patch, 3. Make it public again, 4. Release the fix"
     ],
-    "correct": 1,
-    "explanation": "The correct response is to immediately minimize further public visibility (lock the issue), contact the reporter privately to get full details without further public exposure, develop and release the patch, then enable proper infrastructure for future disclosures, and finally publish a coordinated CVE. Deleting issues (C) is ineffective once indexed and destroys transparency. Taking a repository private (D) breaks all users' dependency resolution. Simply closing the issue (A) without addressing the public exploit details leaves the information visible.",
+    "correct": 2,
+    "explanation": "The correct response is to immediately minimize further public visibility (lock the issue), contact the reporter privately to get full details without further public exposure, develop and release the patch, then enable proper infrastructure for future disclosures, and finally publish a coordinated CVE. Deleting issues (B) is ineffective once indexed and destroys transparency. Taking a repository private (D) breaks all users' dependency resolution. Simply closing the issue (A) without addressing the public exploit details leaves the information visible.",
+    "difficulty": "hard",
     "tags": ["incident-response", "security-disclosure", "CVE", "SECURITY.md"]
   },
   {
@@ -132,6 +140,7 @@
     ],
     "correct": 1,
     "explanation": "Each governance file targets a specific triage cost: CONTRIBUTING.md tells contributors how to work before they open anything; issue templates structure bug reports and feature requests, eliminating 'what version?' follow-up cycles; PR templates ensure descriptions include context; commitlint enforces message standards. Together they reduce malformed issues, undescribed PRs, and unusable commit messages. README updates (A) and code of conduct (C) improve documentation and community standards but don't address the triage mechanics. CHANGELOG (D) is for consumers, not contributors.",
+    "difficulty": "medium",
     "tags": ["CONTRIBUTING", "issue-templates", "PR-templates", "commitlint", "governance"]
   },
   {
@@ -141,27 +150,29 @@
     "question": "What is the BEST approach to standardize repository topics across an organization?",
     "options": [
       "Create a Wiki page listing all approved topics and ask teams to update their repositories",
-      "Use the GitHub API or a GitHub Actions workflow triggered on repository creation to enforce a baseline taxonomy of topics (language, type, team, status) — with a required-topics check in each repository",
+      "Use GitHub's built-in topic suggestions which automatically detect the technology stack",
       "Require all repositories to have at least 1 topic as a branch protection condition",
-      "Use GitHub's built-in topic suggestions which automatically detect the technology stack"
+      "Use the GitHub API or a GitHub Actions workflow triggered on repository creation to enforce a baseline taxonomy of topics (language, type, team, status) — with a required-topics check in each repository"
     ],
-    "correct": 1,
-    "explanation": "Standardization at scale requires automation. Using the GitHub API (programmatically via a workflow or a governance bot) allows you to audit all repositories for required topics and either apply defaults or flag non-compliant repos via issues. A Wiki page (A) is purely advisory and degrades immediately. Branch protection (C) cannot enforce repository metadata — it only gates branch merges. GitHub's topic suggestions (D) are unstructured and vary widely — they generate tags like 'hacktoberfest' alongside technical topics, not a curated taxonomy.",
+    "correct": 3,
+    "explanation": "Standardization at scale requires automation. Using the GitHub API (programmatically via a workflow or a governance bot) allows you to audit all repositories for required topics and either apply defaults or flag non-compliant repos via issues. A Wiki page (A) is purely advisory and degrades immediately. Branch protection (C) cannot enforce repository metadata — it only gates branch merges. GitHub's topic suggestions (B) are unstructured and vary widely — they generate tags like 'hacktoberfest' alongside technical topics, not a curated taxonomy.",
+    "difficulty": "medium",
     "tags": ["repository-topics", "organization-governance", "API", "discoverability"]
   },
   {
     "domain": 3,
     "id": "ghbp-d3-011",
     "scenario": "A developer tries to commit an AWS secret access key to a repository. Before the push completes, they receive an error from GitHub: 'Push cannot contain secrets.' The secret never reaches the remote repository.",
-    "question": "What GitHub Advanced Security feature blocked the commit at push time rather than after?",
+    "question": "Which GitHub feature blocked the secret at push time rather than alerting afterwards?",
     "options": [
-      "Secret Scanning — detects secrets in repository history and alerts the team",
       "Secret Scanning with Push Protection enabled — evaluates pushed commits for known secret patterns before they are accepted by GitHub",
+      "Secret Scanning — detects secrets in repository history and alerts the team",
       "Dependabot — monitors dependencies for known vulnerable packages",
       "CodeQL — performs semantic code analysis to detect security vulnerabilities"
     ],
-    "correct": 1,
-    "explanation": "Push Protection is an extension of Secret Scanning that evaluates commits at push time — before they are accepted into the repository. If a commit contains a pattern matching a known secret type (AWS keys, GitHub tokens, Azure credentials, etc.), the push is rejected with an explanation. Standard Secret Scanning (A) runs after the commit is already in the repository and alerts the team retroactively. Dependabot (C) monitors dependencies, not secrets. CodeQL (D) performs static analysis, not secret detection.",
+    "correct": 0,
+    "explanation": "Push protection is part of secret scanning (sold for private repositories as GitHub Secret Protection) that checks content at push time, before it is accepted. If a push contains a supported secret type (AWS keys, GitHub tokens, Azure credentials, etc.), it is rejected with an explanation. It also covers web UI commits, file uploads and REST API requests. Secret scanning on its own (B) finds secrets already in the repository and raises alerts after the fact. Dependabot (C) monitors dependencies, not secrets. CodeQL (D) performs static analysis of code, not secret detection.",
+    "difficulty": "easy",
     "tags": ["push-protection", "secret-scanning", "GitHub-Advanced-Security", "prevention"]
   },
   {
@@ -177,6 +188,7 @@
     ],
     "correct": 1,
     "explanation": "The `actions/dependency-review-action` is a GitHub-maintained action that compares the before/after state of package manifests on a PR and fails the check if any newly introduced dependency has a known vulnerability in the GitHub Advisory Database. When this workflow is listed as a required status check, PRs cannot merge until the dependency review passes. Dependabot alerts (A) inform but don't block. CODEOWNERS review (C) requires humans to evaluate CVEs manually. Code scanning (D) analyzes code patterns, not dependency vulnerability databases.",
+    "difficulty": "medium",
     "tags": ["dependency-review", "CVE", "required-status-check", "supply-chain"]
   },
   {
@@ -186,12 +198,13 @@
     "question": "What is the correct tool and approach for permanently removing a file from ALL git history?",
     "options": [
       "Delete the file with `git rm` and push — the file is removed from the repository",
-      "Use `git-filter-repo --path private.key --invert-paths` to rewrite all commits that contain the file, then force-push and have all collaborators re-clone or run `git fetch --all` with a reflog expiry",
       "Use `git revert` to create a new commit that removes the file",
+      "Use `git-filter-repo --path private.key --invert-paths` to rewrite all commits that contain the file, then force-push and have all collaborators re-clone or run `git fetch --all` with a reflog expiry",
       "Contact GitHub Support to delete the specific commit from the repository"
     ],
-    "correct": 1,
-    "explanation": "git-filter-repo (the modern successor to git filter-branch) rewrites the entire repository history, removing the specified file from every commit that contained it. After running it, force-push all branches and tags to GitHub (requires admin bypass of branch protection temporarily). All existing clones must re-clone or carefully reset — their local copies still have the compromised history. Also rotate the key immediately — assume it's compromised since pushes to GitHub are server-logged. `git rm` (A) only removes from the working tree and latest commit. `git revert` (C) adds a new commit but leaves the original. GitHub Support (D) can delete repository forks but not rewrite commit history.",
+    "correct": 2,
+    "explanation": "git-filter-repo (the recommended replacement for git filter-branch) rewrites history to remove the file from every commit, after which you force-push the rewritten branches and tags and have collaborators re-clone. First, though, revoke and rotate the key: once it was pushed, treat it as compromised, and the rewrite does not undo exposure. GitHub's guidance also says to contact GitHub Support to remove cached views and references in pull requests after the rewrite. `git rm` (A) only removes the file from the latest commit. `git revert` (B) adds a new commit and leaves the original intact. GitHub Support (D) can help clean cached data after you rewrite, but it does not rewrite your repository history for you.",
+    "difficulty": "medium",
     "tags": ["git-filter-repo", "history-rewrite", "secret-removal", "remediation"]
   },
   {
@@ -207,6 +220,7 @@
     ],
     "correct": 0,
     "explanation": "Signed commits use public-key cryptography to bind the commit to the committer's private key. When 'Require signed commits' is enabled on the branch and the contributor's public key is associated with their GitHub account, GitHub verifies the signature and shows a 'Verified' badge. Unsigned commits are rejected. This prevents identity spoofing — a developer cannot commit as another person without their private key. Vigilant Mode (B) only marks commits, it doesn't require signing. GitHub Desktop (C) doesn't sign by default. CODEOWNERS (D) requires review but doesn't verify commit author identity.",
+    "difficulty": "medium",
     "tags": ["signed-commits", "GPG", "SSH-signing", "identity-verification"]
   },
   {
@@ -216,12 +230,13 @@
     "question": "Which GitHub repository visibility setting is designed for this enterprise use case?",
     "options": [
       "Private — restrict access to specific teams within the organization",
-      "Internal — visible to all authenticated members of the GitHub Enterprise organization or enterprise, but not to the public or non-members",
+      "Private with 'Everyone' team access at the organization level",
       "Public — anyone can view; add branch protection to restrict contributions",
-      "Private with 'Everyone' team access at the organization level"
+      "Internal — visible to all authenticated members of the GitHub Enterprise organization or enterprise, but not to the public or non-members"
     ],
-    "correct": 1,
-    "explanation": "Internal visibility is a GitHub Enterprise Cloud and Server feature. Internal repositories are accessible to all authenticated members of the enterprise (across organizations in an enterprise account) but are hidden from the public and non-members. This is the correct model for inner-source: sharing code across the organization without external exposure. Private repositories (A) require explicit team grants — not automatic org-wide access. Public repositories (C) expose code to everyone on the internet. Private with Everyone team (D) is private + manual grant, not true internal visibility.",
+    "correct": 3,
+    "explanation": "Internal visibility is a GitHub Enterprise Cloud and Server feature. Internal repositories are accessible to all authenticated members of the enterprise (across organizations in an enterprise account) but are hidden from the public and non-members. This is the correct model for inner-source: sharing code across the organization without external exposure. Private repositories (A) require explicit team grants — not automatic org-wide access. Public repositories (C) expose code to everyone on the internet. Private with Everyone team (B) is private + manual grant, not true internal visibility.",
+    "difficulty": "easy",
     "tags": ["repository-visibility", "internal", "enterprise", "inner-source"]
   },
   {
@@ -236,7 +251,8 @@
       "Store a PAT in GitHub Secrets and rotate it annually"
     ],
     "correct": 1,
-    "explanation": "GitHub Apps are the modern standard for automation credentials. They authenticate as the app installation (not a user), have granular permission scopes (e.g., read Contents + write Pull Requests only), generate short-lived JWT installation tokens (1-hour expiry), and are tied to the organization — not any individual's account. When a developer leaves, the app is unaffected. A bot account (A) is against GitHub Terms of Service and creates a personal account with all associated risks. Deploy keys (C) are per-repo and only support read/write repository access — not API operations. Annual PAT rotation (D) still ties automation to a personal account.",
+    "explanation": "GitHub Apps are the recommended credential for organization automation. They are not tied to a user account, don't consume a seat, use fine-grained permissions on selected repositories, and authenticate with short-lived installation access tokens (one hour) generated from the app's private key. When a developer leaves, the app keeps working. A machine (bot) account (A) is permitted by GitHub's Terms of Service, but it consumes a seat, needs a human owner, and its PAT is still a long-lived user credential; granting it organization owner is far beyond least privilege. Deploy keys (C) are SSH keys for Git access to a single repository and can't call the API to create releases. Annual PAT rotation (D) still ties automation to a person.",
+    "difficulty": "hard",
     "tags": ["GitHub-Apps", "automation", "PAT", "non-human-identity"]
   },
   {
@@ -251,7 +267,8 @@
       "The repository's Security tab — shows vulnerability alerts and code scanning results"
     ],
     "correct": 1,
-    "explanation": "The Organization Audit Log is GitHub's forensic record. It captures events including: member additions/removals, repository visibility changes, branch protection modifications, secret access, OAuth app authorizations, SAML sessions, and more. Each entry includes the actor, timestamp, IP address, and event details. For GitHub Enterprise, the audit log can be streamed to a SIEM (Splunk, Datadog, etc.) for real-time monitoring. The git log (A) records commits, not access events. GitHub Insights (C) shows productivity metrics. The Security tab (D) shows vulnerability status.",
+    "explanation": "The organization audit log is GitHub's forensic record of administrative and security events: membership and permission changes, repository visibility changes, branch protection and ruleset changes, secret creation and updates, OAuth and GitHub App authorizations, push protection bypasses and more, each with actor and timestamp. On GitHub Enterprise Cloud the audit log can also be streamed to a SIEM. The git log (A) records commits, not access events. Insights (C) show activity metrics. The Security tab (D) shows vulnerability and scanning alerts.",
+    "difficulty": "easy",
     "tags": ["audit-log", "forensics", "incident-response", "organization-security"]
   },
   {
@@ -267,6 +284,7 @@
     ],
     "correct": 1,
     "explanation": "HMAC-SHA256 signature validation is the cryptographic proof that a webhook payload originated from GitHub and was not tampered with in transit. The receiver computes `HMAC-SHA256(secret, body)` and compares it to the `X-Hub-Signature-256` header. If they match, the payload is authentic. IP allowlisting (A) provides some protection but GitHub's IP ranges change and are public — an attacker on GitHub's infrastructure could still forge requests. TLS (C) protects confidentiality in transit but doesn't authenticate the sender. The Event header (D) can be set by anyone making an HTTP request.",
+    "difficulty": "medium",
     "tags": ["webhook-security", "HMAC", "signature-validation", "X-Hub-Signature"]
   },
   {
@@ -276,12 +294,13 @@
     "question": "What automated control prevents incompatible licenses from being introduced in future PRs?",
     "options": [
       "Add a comment to the CONTRIBUTING.md listing prohibited licenses",
-      "Add the `licensee` or `license-checker` tool as a GitHub Actions workflow step that fails the check when newly added dependencies have prohibited license types — configure it as a required status check",
+      "Run `actions/dependency-review-action` with an `allow-licenses` list in a PR workflow and make that check required before merging",
       "Enable GitHub Dependency Graph which shows all dependency licenses",
       "Use Dependabot to flag license violations in pull request comments"
     ],
     "correct": 1,
-    "explanation": "License compliance tools like `licensee` or `license-checker` analyze dependency manifests, resolve the license type for each package, and can be configured to fail on a blocklist (e.g., GPL, AGPL, LGPL for commercial software). Running this as a required status check on PRs prevents incompatible licenses from being introduced. CONTRIBUTING.md (A) is advisory — developers may not read it. The Dependency Graph (C) shows licenses but doesn't block PRs. Dependabot (D) manages vulnerability patches, not license compliance.",
+    "explanation": "The dependency review action compares dependency changes in a pull request and can fail the check when a newly added dependency uses a license outside the `allow-licenses` list (or inside a `deny-licenses` list; you use one or the other). Making that check required blocks the merge. CONTRIBUTING.md (A) is advisory. The dependency graph (C) shows dependencies but doesn't block PRs. Dependabot (D) raises vulnerability alerts and update PRs; it does not police licenses.",
+    "difficulty": "medium",
     "tags": ["license-compliance", "licensee", "legal", "required-status-check"]
   },
   {
@@ -297,6 +316,7 @@
     ],
     "correct": 1,
     "explanation": "Rulesets support tag protection by targeting `refs/tags/` patterns. Enabling 'Restrict deletions' on a `refs/tags/v*` pattern prevents anyone (including admins, unless on the bypass list) from deleting tags matching the pattern. 'Block force pushes' prevents moving the tag to a different commit. Classic branch protection (A) only protects branches, not tags. Storing the SHA (C) is a backup for recovery, not prevention. Signed commits (D) verify integrity but don't prevent deletion by authorized users.",
+    "difficulty": "medium",
     "tags": ["tag-protection", "rulesets", "restrict-deletions", "release-management"]
   },
   {
@@ -312,6 +332,7 @@
     ],
     "correct": 1,
     "explanation": "Archiving is GitHub's purpose-built mechanism for repository preservation. An archived repository is completely read-only: no new commits, issues, PRs, wiki edits, or project changes can be made. Existing content is preserved and the repository is cloneable. GitHub displays a prominent 'Archived' banner so visitors understand the repository is no longer maintained. Branch lock (A) prevents pushes to specific branches but still allows issue creation and other activity. Permission removal (C) requires ongoing management. A private viewer account (D) restricts access unnecessarily.",
+    "difficulty": "easy",
     "tags": ["repository-archiving", "read-only", "preservation", "discontinued"]
   },
   {
@@ -321,12 +342,13 @@
     "question": "How do you integrate third-party SARIF results into GitHub's Security tab and make them a PR gate?",
     "options": [
       "Email the SARIF file to the GitHub security team for manual review",
-      "Use `actions/upload-sarif` in the workflow to upload the SARIF file to GitHub Code Scanning; configure the check as a required status check in branch protection to block PRs with critical findings",
+      "Upload it with `github/codeql-action/upload-sarif` (with `security-events: write`), then gate merges with a ruleset 'Require code scanning results' rule or a required check",
       "Store the SARIF file as a workflow artifact and parse it in a subsequent workflow step",
       "Convert the SARIF findings to GitHub Issues using the GitHub API"
     ],
     "correct": 1,
-    "explanation": "`actions/upload-sarif` is the GitHub-native mechanism for ingesting SARIF results from any tool into Code Scanning. Once uploaded, findings appear in the Security → Code Scanning tab with severity, location, and description. GitHub creates a check run for the upload — if configured as a required status check, PRs with high-severity findings cannot merge. This enables a unified security posture across multiple tools (CodeQL + Snyk + custom scanners) in one interface. Artifacts (C) store files but don't integrate with Code Scanning. GitHub Issues (D) lose the SARIF structure and context.",
+    "explanation": "`github/codeql-action/upload-sarif` uploads SARIF from any tool into code scanning; the job needs `security-events: write`. Findings then appear as code scanning alerts next to CodeQL's. To block merges, use a ruleset with 'Require code scanning results' (which blocks on alerts at chosen severities for the named tool) or make the code scanning check a required status check. Emailing GitHub (A) is not a product feature. Artifacts (C) store files but don't create alerts. Issues (D) lose the alert lifecycle and the merge gate.",
+    "difficulty": "hard",
     "tags": ["SARIF", "code-scanning", "upload-sarif", "third-party-integration"]
   },
   {
@@ -336,12 +358,13 @@
     "question": "What GitHub feature enables organization administrators to enforce security settings across all repositories as non-overridable policies?",
     "options": [
       "Require all repository owners to sign a security policy agreement",
-      "Configure organization-level security policies in GitHub Enterprise Cloud settings — administrators can enforce Secret Scanning, Dependabot, and other security features organization-wide, preventing individual repositories from disabling them",
+      "Apply a custom security configuration to all repositories and set its policy to 'Enforce configuration' so repository owners cannot change those settings",
       "Create a GitHub Actions workflow in each repository that verifies settings and opens issues for violations",
-      "Use the GitHub Security Overview dashboard to identify non-compliant repositories and remediate manually"
+      "Use the security overview dashboard to identify non-compliant repositories and remediate manually"
     ],
     "correct": 1,
-    "explanation": "GitHub Enterprise Cloud organization security policies allow administrators to enforce security features at the organization level. When 'Secret Scanning' is set to 'Enabled for all repositories' at the org level, individual repository owners cannot override this setting. The same applies to Dependabot alerts, code scanning, and other security features. Policy agreements (A) are non-technical controls. Workflow checks (C) detect but don't enforce preventively — a repository owner could still disable settings between checks. Security Overview (D) is a monitoring dashboard, not an enforcement mechanism.",
+    "explanation": "Security configurations are collections of security enablement settings that an organization applies to its repositories. A custom configuration can enable secret scanning, push protection, Dependabot alerts and private vulnerability reporting, and its 'Enforce configuration' policy blocks repository owners from changing any feature the configuration enables or disables (features left unset aren't enforced). A signed agreement (A) is a non-technical control. Per-repo workflows (C) only detect drift after the fact. Security overview (D) is for visibility and reporting, not enforcement.",
+    "difficulty": "hard",
     "tags": ["organization-policies", "security-enforcement", "enterprise", "baseline-security"]
   },
   {
@@ -357,6 +380,7 @@
     ],
     "correct": 1,
     "explanation": "Two compounding risks: (1) Least-privilege violation — a deployment script that only pulls code needs read-only access. A write-capable key grants the deployment server the ability to push arbitrary code to the repository if the server is compromised. (2) Key reuse across servers — one key per server is the security principle. A single compromised server exposes the key, granting attackers access to all servers using that key plus write access to the repository. The remediation: generate read-only deploy keys, one per server. Deploy keys don't expire automatically (A). Branch scoping (C) is limited but not the primary issue here. Deploy keys work on private repositories (D).",
+    "difficulty": "hard",
     "tags": ["deploy-keys", "least-privilege", "key-reuse", "access-control"]
   },
   {
@@ -372,6 +396,55 @@
     ],
     "correct": 1,
     "explanation": "GitHub Packages uses a separate permission model from repository access. Even if a user has Read access to the repository, their PAT must explicitly include the `read:packages` scope to authenticate against the package registry. For publishing, `write:packages` is required. PATs are created in GitHub Settings → Developer Settings → Personal Access Tokens, where scopes must be explicitly granted. The npm registry URL (A) must be `https://npm.pkg.github.com` — but a URL error would typically produce a different error. Admin access (C) is not required for package consumption. GitHub Packages is accessible from anywhere with a valid token (D).",
+    "difficulty": "medium",
     "tags": ["GitHub-Packages", "PAT-scopes", "read-packages", "npm-registry"]
+  },
+  {
+    "domain": 3,
+    "id": "ghbp-d3-026",
+    "scenario": "Push protection blocks a developer's push because it contains a token. The developer has write access, no delegated bypass is configured, and they choose the bypass reason 'I'll fix it later'.",
+    "question": "What happens next?",
+    "options": [
+      "The push stays blocked until an organization owner approves the bypass request",
+      "The push is allowed and a closed secret scanning alert is created",
+      "The push is allowed, an open secret scanning alert is created, and the bypass is logged and notified",
+      "The push is allowed and GitHub automatically revokes the token with the provider"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: by default anyone with write access can bypass by giving a reason. 'I'll fix it later' creates an open alert; the bypass is recorded in the audit log and emailed to owners, security managers and repository admins who watch the repository. A is wrong because approval requests only exist when delegated bypass is configured. B is wrong because closed alerts come from the 'used in tests' and 'false positive' reasons. D is wrong because a bypass doesn't revoke the secret; the team still has to rotate it.",
+    "difficulty": "medium",
+    "tags": ["concept", "comprehension", "exam-trap"]
+  },
+  {
+    "domain": 3,
+    "id": "ghbp-d3-027",
+    "scenario": "A company on GitHub Team with private repositories wants secret scanning and push protection on all of them. It has no budget this year for code scanning or Copilot Autofix.",
+    "question": "Which product should it buy?",
+    "options": [
+      "GitHub Code Security",
+      "GitHub Secret Protection",
+      "Nothing, because push protection for users already covers private repositories",
+      "GitHub Copilot Business"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: GitHub Secret Protection includes secret scanning, push protection, custom patterns, AI-detected secrets and delegated bypass. Since 2025 it has been sold separately from GitHub Code Security, and both are available on GitHub Team and Enterprise plans. A is wrong because Code Security covers code scanning, Copilot Autofix, dependency review and related features, not secret scanning. C is wrong because push protection for users is tied to a personal account and covers pushes to public repositories only. D is wrong because Copilot licences don't include repository secret scanning.",
+    "difficulty": "hard",
+    "tags": ["comparison", "analysis", "edge-case"]
+  },
+  {
+    "domain": 3,
+    "id": "ghbp-d3-028",
+    "scenario": "The maintainer of a public library enables private vulnerability reporting in the repository settings but hasn't written a SECURITY.md yet. A contributor claims the feature won't work until the file exists.",
+    "question": "Which statement is accurate?",
+    "options": [
+      "Reporters can now submit a private report from the Security tab; SECURITY.md is recommended to set expectations but isn't required",
+      "The 'Report a vulnerability' option stays hidden until SECURITY.md is committed to the default branch",
+      "Private vulnerability reporting only works once a CVE has been requested for the repository",
+      "Reports are sent to GitHub's security team, who forward them to the maintainer"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: once owners or admins enable private vulnerability reporting on a public repository, reporters can privately submit details (as a draft security advisory) and maintainers are notified immediately. A security policy (SECURITY.md) tells reporters what to expect and is good practice, but it is not a prerequisite. B is wrong because the feature doesn't depend on the file. C is wrong because a CVE is requested later, when publishing an advisory, if at all. D is wrong because reports go directly and privately to the repository maintainers.",
+    "difficulty": "medium",
+    "tags": ["concept", "comprehension", "exam-trap"]
   }
 ]

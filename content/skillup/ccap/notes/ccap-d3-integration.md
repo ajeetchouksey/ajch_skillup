@@ -1,6 +1,6 @@
 # D3: Integration
 
-> **Exam weight**: 19% · **Questions**: ~23 of 120
+> **Exam weight**: 19% · **Questions**: ~25 of 139
 
 ## Overview
 
@@ -22,7 +22,7 @@ The architectural response is **least-privilege tool scoping**: give each agent 
 
 ### In Practice
 
-**What breaks without this**: Tool-selection accuracy degrades measurably once an agent's active tool list crosses roughly 15–20 concurrently exposed tools, especially when several tools act on the same object type (e.g., three different "update ticket" variants). The failure mode isn't a crash — it's silent: the agent picks a plausible-but-wrong tool, and the error surfaces downstream as a data-quality or audit problem, not an exception.
+**What breaks without this**: Tool-selection accuracy degrades measurably as an agent's active tool list grows (Anthropic's tool search documentation puts the drop-off at roughly 30–50 available tools), and look-alike tools make it worse, especially when several act on the same object type (e.g., three different "update ticket" variants). The failure mode isn't a crash — it's silent: the agent picks a plausible-but-wrong tool, and the error surfaces downstream as a data-quality or audit problem, not an exception.
 
 **Decision trigger**: Ask — do any two tools in this agent's active set act on the same object type, or do more than ~15 tools need to be visible in a single turn? If yes, split by domain (billing agent, ticketing agent, inventory agent) and route between them with a coordinator, or use MCP server-level segmentation so only the relevant tool subset loads into context at a time.
 
@@ -64,7 +64,7 @@ Common distractor: questions conflate "we use OAuth" (authentication is solved) 
 
 **Justify your position on the accuracy/latency/cost frontier against the real SLA — don't default to "most accurate" or "fastest."**
 
-Every integration decision — model choice, RAG retrieval depth, number of tool calls in a chain, extended thinking budget, prompt caching strategy — sits on an accuracy/latency/cost frontier, and no configuration maximizes all three simultaneously. Architects are expected to justify a chosen point on that frontier against the actual SLA and failure cost of the use case.
+Every integration decision — model choice, RAG retrieval depth, number of tool calls in a chain, thinking effort level, prompt caching strategy — sits on an accuracy/latency/cost frontier, and no configuration maximizes all three simultaneously. Architects are expected to justify a chosen point on that frontier against the actual SLA and failure cost of the use case.
 
 Retrieving 20 chunks and reranking them is more accurate than retrieving 5 and skipping reranking, but costs an extra round trip. A multi-step agentic tool chain (search → fetch → verify → summarize) is more accurate than a single-shot answer but multiplies latency roughly by the number of sequential steps. **There's no free lunch on this frontier** — every accuracy gain is paid for somewhere in latency, cost, or both, and the job is picking where the use case actually needs to sit.
 
@@ -229,9 +229,9 @@ Monolithic context is simpler to reason about and guarantees the model always "s
 
 **What breaks without this**: This isn't a one-time cost, it's a permanent tax on every request — a monolithic system prompt that inlines full descriptions for 60 tools and 40 policy documents "just in case" consumes tens of thousands of tokens before the user's actual question is even read, inflating cost and latency on every single turn, including the 95% of turns that only need 2 of those 60 tools.
 
-**Decision trigger**: Ask — does the total candidate set of tools/documents/instructions exceed what's relevant to a typical single turn by a wide margin (e.g., 60 tools available, ~3 typically used)? If yes, progressive discovery (list → describe → invoke, or search → fetch) pays for itself in reduced per-turn cost and improved selection accuracy, despite the added round-trip latency.
+**Decision trigger**: Ask — does the total candidate set of tools/documents/instructions exceed what's relevant to a typical single turn by a wide margin (e.g., 60 tools available, ~3 typically used)? If yes, progressive discovery (list → describe → invoke, or search → fetch) pays for itself in reduced per-turn cost and improved selection accuracy, despite the added round-trip latency. On the Claude API this is built in: the tool search tool plus `defer_loading: true` keeps deferred definitions out of context until Claude searches for them, and Anthropic recommends it once you have 10 or more tools or more than 10k tokens of definitions, keeping the 3–5 most-used tools loaded up front. Agent Skills apply the same idea to instructions.
 
-**When you'd choose differently**: For a small, stable, always-relevant capability set (a dedicated agent with 4 tools it uses on nearly every turn), monolithic context is correct — progressive discovery would add latency (extra round trips) for information the agent needed anyway on almost every call.
+**When you'd choose differently**: For a small, stable, always-relevant capability set (a dedicated agent with 4 tools it uses on nearly every turn), monolithic context is correct — progressive discovery would add latency (extra round trips) for information the agent needed anyway on almost every call. Anthropic's tool search guidance draws the same line: standard tool calling fits better under 10 tools, when every tool is used on every request, or when definitions are tiny.
 
 ### Exam Trap ⚠️
 
@@ -269,7 +269,7 @@ The unifying discipline is **proportionality**: every mechanism in this domain �
 
 | Concept | Key Rule |
 |---------|----------|
-| Capability bloat | Tool-selection accuracy degrades past ~15–20 concurrently exposed tools or when tools overlap on object type — scope by role, split with a coordinator |
+| Capability bloat | Tool-selection accuracy degrades as the exposed tool list grows (Anthropic cites 30–50 tools) and when tools overlap on object type — scope by role, split with a coordinator, or defer with tool search |
 | Authentication vs. authorization | Authentication = who is calling; authorization = what that identity may do. Check authorization per-call against the *acting user*, not a broad service credential |
 | Accuracy-latency trade-off | No universal "most accurate" default — justify against the scenario's stated SLA and the cost of a wrong answer |
 | Observability at scale | Tool calls can succeed (200 OK) while being semantically wrong — add output-quality sampling and drift detection, not just uptime monitoring |

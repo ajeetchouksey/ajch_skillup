@@ -1,6 +1,6 @@
 # D5: Governance, Safety & Risk Management
 
-> **Exam weight**: 14% · **Questions**: ~17 of 120
+> **Exam weight**: 14% · **Questions**: ~19 of 139
 
 ## Overview
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.2",
-  "contentUpdatedAt": "2026-10-26",
+  "contentVersion": "1.2.0",
+  "contentUpdatedAt": "2026-10-27",
   "provider": "Microsoft",
   "palette": {
     "color": "#60a5fa",
@@ -28,6 +28,18 @@
       "date": "2026-10-26",
       "type": "patch",
       "summary": "Replaced all 5 diagram PNGs in d1 notes with AaryaAI-branded SVGs (decision framework, hub vs project, model selection, PTU capacity, event-trigger patterns) — 680px, embedded Barlow fonts, descriptive alt text; old PNGs removed. Fixed the event-driven trigger diagram's alt text, which was mislabelled as PTU."
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Syllabus refresh to the AB-100 skills measured as of November 16, 2026: domain weights now Plan 35-40%, Design 30-35%, Deploy 20-25% (platform weights 40/35/15/10). Tagged difficulty on all questions; added 16 questions (10 D1, 5 D2, 1 D4) and rewrote 32, including the 13 D3 questions that duplicated D4 (now cover Copilot Studio agent evaluation, Foundry observability, red-team scoring, Copilot Studio and F&O ALM, and data ALM). Updated product names and facts to current Microsoft Learn (Microsoft Foundry resource and projects, Foundry Agent Service, model router, deployment types and data residency, prompt flow retirement, Agent Framework orchestrations, F&O Copilot knowledge via Copilot Studio, Power Platform VNet support, Copilot Studio voice agents). Reordered options in 67 existing questions so correct answers are spread evenly across A-D (previously 78% were B). Remapped task-statement question IDs and added Deep Dive sections to all domain notes."
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Converted the 3 legacy scenarios (compliance monitoring, HR onboarding, invoice processing) to RichScenario v2.0 walkthroughs: background, conflicting characters, 5 decision questions each and key learnings, with facts updated to current Microsoft Learn (groundedness detection rather than harm filters for fabricated citations, model retirement handling, Document Intelligence extracts rather than generates documents, Entra Lifecycle Workflows for joiner provisioning, locked WORM policies). Restructured every topic section in the D1-D4 notes into Key Concept / In Practice / Exam Trap. Rewrote 87 question explanations into the 'X is correct: ... A is wrong because ...' shape, covering every distractor, and corrected facts in several (EU AI Act medical-device classification via Article 6(1)/Annex I, Azure AI Search data sources, PTU billing, Copilot Studio deep reasoning)."
     }
   ],
   "id": "ab100",
@@ -35,8 +47,8 @@
   "title": "Agentic AI Business Solutions Architect Expert",
   "shortTitle": "AB-100",
   "contentLevel": "301",
-  "description": "Validate your expertise in planning, designing, and deploying agentic AI solutions using Azure AI Foundry, Copilot Studio, Dynamics 365, and Microsoft Power Platform. Aligned to the July 22, 2026 exam syllabus.",
-  "questions": 119,
+  "description": "Validate your expertise in planning, designing, and deploying agentic AI solutions using Microsoft Foundry, Copilot Studio, Dynamics 365, and Microsoft Power Platform. Aligned to the AB-100 skills measured as of November 16, 2026.",
+  "questions": 135,
   "duration": "100 min",
   "passScore": "700/1000",
   "passThreshold": 70,
@@ -48,7 +60,7 @@
     {
       "id": 1,
       "title": "Plan AI-Powered Business Solutions",
-      "weight": 28,
+      "weight": 40,
       "color": "bg-blue-600",
       "notesFile": "content/skillup/ab100/notes/ab100-d1-plan-ai-solutions.md",
       "taxonomyIds": [
@@ -74,7 +86,7 @@
     {
       "id": 2,
       "title": "Design AI-Powered Business Solutions",
-      "weight": 28,
+      "weight": 35,
       "color": "bg-cyan-600",
       "notesFile": "content/skillup/ab100/notes/ab100-d2-design-agentic.md",
       "taxonomyIds": [
@@ -98,7 +110,7 @@
     {
       "id": 3,
       "title": "Deploy AI-Powered Business Solutions",
-      "weight": 28,
+      "weight": 15,
       "color": "bg-teal-600",
       "notesFile": "content/skillup/ab100/notes/ab100-d3-deploy-ai-solutions.md",
       "taxonomyIds": [
@@ -122,10 +134,10 @@
     {
       "id": 4,
       "title": "Responsible AI & Lifecycle Governance",
-      "weight": 16,
+      "weight": 10,
       "color": "bg-purple-600",
       "notesFile": "content/skillup/ab100/notes/ab100-d4-lifecycle-responsible.md",
-      "officialNote": "Tested within Domain 3 (Deploy 40-45%) on the official AB-100 exam",
+      "officialNote": "Tested within Domain 3 (Deploy 20-25%) on the official AB-100 exam",
       "taxonomyIds": [
         "responsible-ai",
         "content-safety",
@@ -165,8 +177,8 @@
       "url": "https://learn.microsoft.com/en-us/training/paths/architect-agentic-ai-business-solutions/"
     },
     {
-      "label": "Azure AI Foundry Docs",
-      "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/"
+      "label": "Microsoft Foundry Docs",
+      "url": "https://learn.microsoft.com/en-us/azure/foundry/"
     },
     {
       "label": "Microsoft Copilot Studio Docs",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.1",
-  "contentUpdatedAt": "2026-09-02",
+  "contentVersion": "1.1.0",
+  "contentUpdatedAt": "2026-10-27",
   "provider": "GitHub",
   "palette": {
     "color": "#4ade80",
@@ -22,6 +22,12 @@
       "date": "2026-09-02",
       "type": "patch",
       "summary": "Added taxonomyIds to 3 domain(s) — cross-vertical relationship discovery metadata (IDEA-0008 Phase 4), aggregated + alias-resolved from each domain's own question tags. No question/notes/scenario content changed."
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-10-27",
+      "type": "minor",
+      "summary": "Difficulty tagged on all questions; 9 new questions (rulesets layering and bypass modes, CODEOWNERS base-branch rule, script injection, OIDC sub conditions, SHA-pinning policy, push protection bypass, Secret Protection vs Code Security, private vulnerability reporting); 23 existing questions corrected against current GitHub docs (tag rulesets, custom-property targeting, fork token behaviour, job-level timeouts, upload-sarif action, security configurations, machine accounts, PVR); all three domain notes rewritten to the Key Concept / In Practice / Exam Trap standard with Deep Dives and new sections on rulesets, OIDC, script injection, runners, push protection, GHAS products, dependency review and audit log. Correct-answer positions rebalanced (B had been correct in 81%)."
     }
   ],
   "id": "ghbp",
@@ -30,7 +36,7 @@
   "shortTitle": "GH-BP",
   "contentLevel": "101",
   "description": "Build expertise in GitHub repository governance, branch protection, GitHub Actions security, CI/CD best practices, and team collaboration workflows.",
-  "questions": 75,
+  "questions": 84,
   "duration": "60 min",
   "passScore": "750/1000",
   "passThreshold": 75,
@@ -102,7 +108,7 @@
     },
     {
       "label": "GitHub Actions Security Hardening",
-      "url": "https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions"
+      "url": "https://docs.github.com/en/actions/reference/security/secure-use"
     },
     {
       "label": "Conventional Commits",

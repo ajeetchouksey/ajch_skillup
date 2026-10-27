@@ -7,12 +7,12 @@ def register(api):
 
     def products(f):
         D = Diagram(f, 620, "Who Uses Which Microsoft AI Product",
-                    "Business users work in Copilot products; developers and IT build on Azure AI Foundry.",
+                    "Business users work in Copilot products; developers and IT build on Microsoft Foundry.",
                     "Two audiences. Business users use three products: Microsoft 365 Copilot (AI in Word, Excel, "
                     "Teams and Outlook), Microsoft Copilot (free, Bing-based, consumer; no access to org data) and "
                     "Copilot Studio (build custom copilots and agents). Microsoft 365 Copilot and Copilot Studio "
                     "connect to Microsoft Graph, your organisation's data connector. Developers and IT professionals "
-                    "use Azure AI Foundry to build enterprise AI, which in turn uses Azure AI Search and Azure Vision "
+                    "use Microsoft Foundry to build enterprise AI, which in turn uses Azure AI Search and Azure Vision "
                     "in Foundry Tools.")
         D.text(24, 110, "BUSINESS USERS", "title", 12, SLATE4, track=0.12)
         user = D.box(340, 132, 200, "Business user", kind="start")
@@ -30,7 +30,7 @@ def register(api):
         D.front.append(f'<line x1="24" y1="420" x2="{W - 24}" y2="420" stroke="{SLATE7}" stroke-width="1"/>')
         D.text(24, 448, "DEVELOPERS / IT", "title", 12, SLATE4, track=0.12)
         dev = D.box(110, 516, 170, "Developer / IT professional", kind="start", h=64)
-        fd = D.box(330, 516, 180, "Azure AI Foundry", "Build enterprise AI", h=64)
+        fd = D.box(330, 516, 180, "Microsoft Foundry", "Build enterprise AI", h=64)
         se = D.box(562, 476, 188, "Azure AI Search", h=52)
         vi = D.box(562, 556, 188, "Azure Vision in Foundry Tools", h=52)
         D.edge([(dev["r"], 516), (fd["l"], 516)])
@@ -117,7 +117,7 @@ def register(api):
         D = Diagram(f, 578, "Choosing a Foundry Model",
                     "Match model capability to the task; bigger is not always better.",
                     "Decision tree. Is it complex reasoning or a long document? If yes, choose a proprietary solution "
-                    "such as GPT-4 or Claude. If no, is it budget-sensitive or an edge deployment? If yes, choose "
+                    "such as GPT-4o. If no, is it budget-sensitive or an edge deployment? If yes, choose "
                     "Phi-3, a lightweight model. If no, is open source or cost control wanted? If yes, choose an "
                     "open-source solution such as Llama 3 or Mistral; if no, choose the proprietary solution.")
         cx = 200
@@ -130,7 +130,7 @@ def register(api):
         D.edge([(cx, q[2]["b"]), (cx, osb["t"])], label="yes", at=(cx + 12, 472), anchor="start")
         phi = D.box(510, 276, 200, "Phi-3", "Lightweight", h=56)
         D.edge([(q[1]["r"], 276), (phi["l"], 276)], label="yes", at=(364, 267))
-        pr = D.box(510, 408, 200, "Proprietary solution", "GPT-4 / Claude", h=56)
+        pr = D.box(510, 408, 200, "Proprietary solution", "Large frontier model (e.g. GPT-4o)", h=56)
         D.edge([(q[2]["r"], 408), (pr["l"], 408)], dashed=True, label="no", at=(364, 399))
         D.edge([(q[0]["r"], 144), (640, 144), (640, 408), (pr["r"], 408)], label="yes", at=(560, 135))
         D.legend(562, [("solid", "yes"), ("dashed", "no")])

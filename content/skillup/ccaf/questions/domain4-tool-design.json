@@ -5,18 +5,19 @@
     "scenario": "You are writing a tool description for a send_email tool that can both draft and send emails. Claude keeps using it to send emails when users only want to draft them.",
     "question": "What is missing from this tool description?",
     "options": [
-      "The tool needs a more creative name",
       "The tool description must include WHAT it does, WHEN to use it, and explicitly WHEN NOT to use it (e.g., 'Do not use this tool to send an email if the user only asked to draft or preview it')",
+      "The tool needs a more creative name",
       "The tool needs more parameters so Claude can infer intent better",
       "The tool_choice should be set to 'auto' to give Claude full discretion"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "A complete tool description must include: (1) WHAT the tool does mechanically, (2) WHEN to use it (triggering conditions), and (3) WHEN NOT to use it (exclusion conditions). The third element is most commonly omitted and causes exactly the described problem — Claude uses a capable tool when it shouldn't. Adding an explicit 'Do not call this tool when the user only wants to draft or preview' rule eliminates the ambiguity. More parameters (C) and tool_choice auto (D) won't help if the description doesn't establish the boundary.",
     "tags": [
       "tool-description",
       "when-not-to-use",
       "tool-design"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -25,38 +26,40 @@
     "question": "Which tool_choice setting enforces this?",
     "options": [
       "tool_choice: { type: 'auto' } — Claude decides whether to use a tool",
-      "tool_choice: { type: 'any' } — Claude must call one of the available tools",
       "tool_choice: { type: 'tool', name: 'specific_tool' } — forces a specific tool call",
+      "tool_choice: { type: 'any' } — Claude must call one of the available tools",
       "Remove tool_choice from the request — Claude will always use tools if available"
     ],
-    "correct": 1,
-    "explanation": "tool_choice: { type: 'any' } forces Claude to call at least one tool from the available set, but gives it freedom to choose which one. tool_choice: auto (A) is the default — Claude may respond with plain text if it judges no tool is needed. Forcing a specific tool (C) would work only if there's exactly one appropriate tool. Omitting tool_choice (D) defaults to auto. The three modes: auto (Claude decides), any (must call a tool, Claude picks), specific tool (must call that exact tool).",
+    "correct": 2,
+    "explanation": "tool_choice: { type: 'any' } forces Claude to call at least one tool from the available set, but gives it freedom to choose which one. tool_choice: auto (A) is the default — Claude may respond with plain text if it judges no tool is needed. Forcing a specific tool (B) would work only if there's exactly one appropriate tool. Omitting tool_choice (D) defaults to auto. The three modes: auto (Claude decides), any (must call a tool, Claude picks), specific tool (must call that exact tool). Platform note: Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject forced tool_choice ('any' or a named tool) with a 400 error; on those models use 'auto' with strict tool use, or structured outputs.",
     "tags": [
       "tool_choice",
       "any",
       "auto",
       "tool-design"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
     "id": "d4-003",
-    "scenario": "You have built a customer service agent with 25 tools covering account management, billing, shipping, returns, and technical support. You notice Claude is frequently calling the wrong tool.",
+    "scenario": "A single customer service agent has 25 tools covering account management, billing, shipping, returns, and technical support. The descriptions are already detailed and clearly differentiated, yet logs show Claude still picks a tool from the wrong area for about one request in five.",
     "question": "What architectural change will most improve tool selection accuracy?",
     "options": [
-      "Improve the tool descriptions with more detailed parameter explanations",
-      "Increase the system prompt size to explain each tool more thoroughly",
-      "Split the 25 tools across multiple specialized MCP servers (5-8 tools each), and use a coordinator that delegates to the appropriate server",
-      "Switch to a higher-temperature setting to encourage Claude to explore more tool options"
+      "Add few-shot examples for every tool to the system prompt",
+      "Lengthen the system prompt to restate each tool's purpose",
+      "Give a coordinator a small routing tool set and delegate to specialized subagents that hold only their own area's tools",
+      "Raise the temperature so Claude explores more tool options"
     ],
     "correct": 2,
-    "explanation": "Tool selection accuracy degrades significantly beyond ~18 tools in context. With 25 tools, you're well past the degradation cliff. The architectural fix is MCP server segmentation: create specialized servers (billing-server, shipping-server, returns-server, etc.) each with 5-8 focused tools. A coordinator routes to the right server, which then has a much smaller and focused tool set. Better descriptions (A, B) help marginally but don't address the fundamental cognitive load issue. Temperature (D) doesn't improve selection accuracy.",
+    "explanation": "C is correct: once descriptions are already good, the remaining problem is the size of the decision. The exam guide's principle is that too many tools on one agent (its example: 18 instead of 4-5) degrades selection reliability, and the fix is scoped tool distribution, so each specialized subagent chooses among its own handful of tools while the coordinator routes. A is wrong because examples help with ambiguous cases but don't shrink the choice set, and they add prompt tokens. B is wrong because restating what the tool descriptions already say adds context without new information. D is wrong because temperature adds randomness and does nothing for selection accuracy. Anthropic's tool docs suggest related levers: consolidate overlapping operations, namespace tool names, and use tool search to load tools on demand.",
     "tags": [
-      "18-tool-cliff",
-      "MCP-segmentation",
-      "tool-degradation",
+      "tool-segmentation",
+      "tool-distribution",
+      "coordinator-subagent",
       "architecture"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -77,7 +80,8 @@
       "is_error",
       "structured-errors",
       "graceful-failure"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -86,17 +90,18 @@
     "question": "How should you differentiate these in MCP server design?",
     "options": [
       "Implement all of them as tools — tools are the universal MCP primitive",
-      "Implement write_file and delete_file as tools (actions that change state), and list_files / get_file_metadata as resources (read-only data access)",
+      "Use prompts for list_files and tools for write_file and delete_file",
       "Implement all as resources with a read_only: true flag on informational ones",
-      "Use prompts for list_files and tools for write_file and delete_file"
+      "Implement write_file and delete_file as tools (actions that change state), and list_files / get_file_metadata as resources (read-only data access)"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "MCP has three primitives with distinct purposes: Tools = actions that execute code and change state (write, delete, send); Resources = read-only data access (metadata, catalogs, listings); Prompts = reusable prompt templates. Using resources for reads and tools for writes is the correct semantic split. It also enables clients to understand that resource calls are safe/read-only while tool calls may have side effects. Implementing everything as tools (A) works but loses semantic clarity and safety guarantees.",
     "tags": [
       "MCP-primitives",
       "tools-vs-resources",
       "MCP-design"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -104,19 +109,20 @@
     "scenario": "You need Claude to query two independent data sources in one turn: one to get customer data and another to get order history. These queries have no dependency on each other.",
     "question": "What is the most efficient implementation?",
     "options": [
-      "Sequential: query customer data first, then query order history in the next turn",
       "Submit both tool calls in the same assistant turn as parallel tool calls, then collect both results in one user turn",
+      "Sequential: query customer data first, then query order history in the next turn",
       "Combine both queries into a single tool that accepts both IDs",
       "Use streaming to interleave the two queries"
     ],
-    "correct": 1,
-    "explanation": "Parallel tool calls — submitting multiple tool_use blocks in a single assistant turn — is exactly designed for independent operations. Claude sends both requests simultaneously, you execute them in parallel, and return both tool_results in a single user turn. This halves the round-trip latency vs. sequential. A combined tool (C) is a valid approach but tightly couples two concerns and is less flexible. Streaming (D) reduces time-to-first-token but doesn't parallelize execution. Sequential (A) wastes time when there's no dependency.",
+    "correct": 0,
+    "explanation": "Parallel tool calls — submitting multiple tool_use blocks in a single assistant turn — is exactly designed for independent operations. Claude sends both requests simultaneously, you execute them in parallel, and return both tool_results in a single user turn. This halves the round-trip latency vs. sequential. A combined tool (C) is a valid approach but tightly couples two concerns and is less flexible. Streaming (D) reduces time-to-first-token but doesn't parallelize execution. Sequential (B) wastes time when there's no dependency.",
     "tags": [
       "parallel-tool-calls",
       "parallel-tools",
       "tool-design",
       "performance"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -136,7 +142,8 @@
       "enum-design",
       "other-escape",
       "schema-design"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -145,17 +152,18 @@
     "question": "Which MCP primitive should expose the operations catalog?",
     "options": [
       "A tool called list_available_operations",
-      "A resource — resources are designed for metadata and catalog reads before actions are taken",
       "A prompt template that lists all operations",
+      "A resource — resources are designed for metadata and catalog reads before actions are taken",
       "Embed the catalog in every tool description"
     ],
-    "correct": 1,
-    "explanation": "MCP Resources are specifically designed for read-only data that informs decision-making — exactly what a catalog is. Claude can read the resource to understand what's available before deciding which tool to call. This is the 'resources for metadata reads before actions' pattern. A tool (A) would work but is semantically wrong — tools are for actions with side effects. Prompt templates (C) are for reusable prompt patterns, not dynamic catalogs. Embedding in every description (D) bloats the tool context unnecessarily.",
+    "correct": 2,
+    "explanation": "MCP Resources are specifically designed for read-only data that informs decision-making — exactly what a catalog is. Claude can read the resource to understand what's available before deciding which tool to call. This is the 'resources for metadata reads before actions' pattern. A tool (A) would work but is semantically wrong — tools are for actions with side effects. Prompt templates (B) are for reusable prompt patterns, not dynamic catalogs. Embedding in every description (D) bloats the tool context unnecessarily.",
     "tags": [
       "MCP-resources",
       "MCP-primitives",
       "catalog-pattern"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -164,18 +172,19 @@
     "question": "What JSON Schema configuration enforces this?",
     "options": [
       "Mark all fields as optional and validate server-side",
-      "Set strict: true in the tool schema and define all required fields in the 'required' array",
+      "Validate inputs in a PreToolUse hook and return an error if invalid",
       "Add descriptions to each field explaining they are required",
-      "Validate inputs in a PreToolUse hook and return an error if invalid"
+      "Set strict: true on the tool, list the required fields, and set additionalProperties: false"
     ],
-    "correct": 1,
-    "explanation": "strict: true in the tool schema does two things: (1) enforces that all 'required' fields are present, and (2) disallows additional properties not defined in the schema. This is the API-level enforcement mechanism. Descriptions (C) are guidance for Claude, not constraints. PreToolUse hooks (D) can catch this but it's the wrong layer — the schema should prevent invalid calls before they happen. Making fields optional (A) defeats the purpose. Always define your required fields in the 'required' array AND set strict: true.",
+    "correct": 3,
+    "explanation": "D is correct: strict: true turns on strict tool use, which guarantees Claude's tool inputs validate against your input_schema, so every field in the required array is present and types match; additionalProperties: false (required for strict schemas) rules out undeclared fields. C is wrong because descriptions are guidance, not constraints. B is wrong because a hook can reject bad input after the fact, but the schema prevents it from being generated in the first place. A is wrong because making everything optional removes the guarantee you want.",
     "tags": [
       "JSON-schema",
       "strict-mode",
       "required-fields",
       "tool-design"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -189,13 +198,14 @@
       "Use tool_choice: auto and trust Claude to improve with a better system prompt"
     ],
     "correct": 2,
-    "explanation": "This is a direct manifestation of the 18-tool degradation cliff. When tool count exceeds ~18, selection accuracy drops sharply regardless of description quality. The fix is architectural: split into focused MCP servers. Each server has 5-8 tools in a specific domain, so Claude's effective tool count per request is well below the threshold. Conciseness (A) and larger system prompts (B) marginally help but don't address the fundamental issue. tool_choice: auto (D) with a better prompt cannot overcome the underlying cognitive load problem.",
+    "explanation": "C is correct: when every feature must stay and tool count is the problem, distributing tools across focused servers or agents keeps each request's choice small; the exam guide's principle is that too many tools on one agent (18 instead of 4-5 in its example) degrades selection. There is no documented exact threshold; the risk rises with count and overlap. A is wrong because shorter descriptions remove the differentiating detail that Anthropic's tool docs call the most important factor in tool performance. B is wrong because restating tools in the system prompt doesn't reduce the choice. D is wrong because 'auto' is already the default and a prompt cannot remove the decision load. Tool search (deferred loading) is another documented way to keep a large library out of context until it is needed.",
     "tags": [
-      "18-tool-cliff",
+      "tool-segmentation",
+      "tool-distribution",
       "MCP-segmentation",
-      "tool-degradation",
       "architecture"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -203,39 +213,41 @@
     "scenario": "Your agent has 25 tools available. During testing, you notice Claude frequently selects the wrong tool or fails to use tools when it should, especially for similar-sounding tools.",
     "question": "What is the primary cause and recommended fix according to Anthropic's best practices?",
     "options": [
+      "Large, overlapping tool sets make selection harder; shrink each agent's active set by scoping tools to roles, consolidating related operations, or loading tools on demand",
       "Claude has a bug with large tool sets — file a support ticket and wait for a fix",
-      "Beyond ~18 tools, Claude's tool selection accuracy degrades significantly; reduce the active tool set by grouping related tools or dynamically loading only relevant tools per turn",
       "Add 'IMPORTANT: always use tools when available' to the system prompt to force usage",
       "Increase max_tokens to give Claude more space to reason about tool selection"
     ],
-    "correct": 1,
-    "explanation": "Anthropic documents that tool selection degrades beyond ~18 tools. The fix is architectural: reduce the active set through grouping, dynamic loading, or hierarchical tool organization (coordinator-subagent). It's not a bug — it's an attention-dilution effect. Forcing tool use creates false positives. max_tokens controls output length, not reasoning about tool selection.",
+    "correct": 0,
+    "explanation": "A is correct: Anthropic's tool-use guidance is to keep the tool surface easy to navigate: write detailed descriptions, consolidate related operations into fewer tools, namespace tool names, and use tool search so large libraries load on demand. The exam guide adds that agents with too many tools (18 instead of 4-5 in its example) select less reliably. It is a decision-complexity effect with no fixed published cut-off, not a bug. B is wrong because nothing is broken that a ticket would fix. C is wrong because an emphatic prompt doesn't help Claude pick the right tool and can trigger unnecessary calls. D is wrong because max_tokens caps output length and has no bearing on tool choice.",
     "tags": [
-      "18-tool-limit",
+      "tool-segmentation",
       "tool-selection",
       "tool-design",
       "best-practices"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
     "id": "d4-012",
-    "scenario": "You want Claude to ALWAYS call your 'log_interaction' tool after every response, regardless of conversation content. Claude should not decide whether to call it.",
-    "question": "Which tool_choice configuration enforces mandatory tool invocation of a specific tool?",
+    "scenario": "Compliance needs every interaction logged. A teammate proposes setting tool_choice to {type: 'tool', name: 'log_interaction'} on every request so Claude 'always' logs.",
+    "question": "What is the best way to meet the logging requirement?",
     "options": [
-      "tool_choice: {type: 'auto'} with a system prompt saying 'always use log_interaction'",
-      "tool_choice: {type: 'tool', name: 'log_interaction'} which forces Claude to call that specific tool",
-      "tool_choice: {type: 'any'} which forces Claude to call at least one tool but not necessarily log_interaction",
-      "tool_choice: {type: 'none'} to disable all other tools so only log_interaction remains"
+      "Adopt the proposal: forcing log_interaction on every request guarantees the log",
+      "Use tool_choice: {type: 'any'} so Claude calls some tool on every turn",
+      "Log from your application code or a hook around each request and tool call, so logging never depends on the model",
+      "Tell Claude in the system prompt to call log_interaction at the end of every reply"
     ],
-    "correct": 1,
-    "explanation": "tool_choice with type 'tool' and a specific name forces Claude to call exactly that tool. 'auto' lets Claude decide (unreliable for mandatory calls even with prompting). 'any' forces SOME tool but not a specific one — Claude picks whichever seems relevant. 'none' disables all tool use entirely, including the desired tool.",
+    "correct": 2,
+    "explanation": "C is correct: logging is a must-happen, deterministic requirement, so it belongs in code you control (your agent loop, or PreToolUse/PostToolUse hooks in Claude Code or the Agent SDK), not in a model decision. A is wrong because forcing a named tool makes that tool call the response itself: the model emits the tool_use block instead of answering and skips thinking, and Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject forced tool_choice with a 400 error. B is wrong because 'any' only guarantees that some tool is called, not log_interaction. D is wrong because a prompt instruction is probabilistic and will sometimes be skipped.",
     "tags": [
       "tool-choice",
       "forced-tool",
-      "API-parameter",
-      "tool-design"
-    ]
+      "hooks",
+      "prompt-vs-code"
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -244,18 +256,19 @@
     "question": "What is the recommended pattern for returning tool execution failures to Claude?",
     "options": [
       "Return an error message to the user and ask them to retry the entire conversation",
-      "Return a tool_result with is_error: true and a descriptive error message, allowing Claude to adapt its approach",
+      "Throw an unhandled exception to terminate the agentic loop immediately",
       "Catch the error silently and return an empty result so Claude doesn't worry about it",
-      "Throw an unhandled exception to terminate the agentic loop immediately"
+      "Return a tool_result with is_error: true and a descriptive error message, allowing Claude to adapt its approach"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "Returning is_error: true with a descriptive message lets Claude reason about the failure and decide next steps (retry, use alternative, or inform user gracefully). Asking users to retry breaks flow entirely. Silent empty results mislead Claude into thinking the tool returned nothing. Throwing exceptions prevents graceful degradation.",
     "tags": [
       "graceful-failure",
       "error-handling",
       "tool-result",
       "resilience"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -263,19 +276,20 @@
     "scenario": "You need to expose a local SQLite database and a file system to Claude via MCP. You want to understand the protocol's capability model.",
     "question": "What are the three core MCP primitives that a server can expose to clients?",
     "options": [
-      "Functions, Variables, and Events",
       "Tools (model-initiated actions), Resources (app-loaded read-only data), and Prompts (user-selected templates)",
+      "Functions, Variables, and Events",
       "Endpoints, Schemas, and Hooks",
       "Commands, Queries, and Subscriptions"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "MCP defines three primitives: Tools (callable functions the model decides to invoke), Resources (read-only data the application loads into context), and Prompts (reusable templates the user explicitly selects). The other options use terminology from other protocols — GraphQL (subscriptions), REST (endpoints), event systems — that don't apply to MCP's design.",
     "tags": [
       "MCP-primitives",
       "tools",
       "resources",
       "prompts"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -284,18 +298,19 @@
     "question": "Which framework provides the most concise way to create an MCP server with tool registration?",
     "options": [
       "Write a raw JSON-RPC server from scratch with socket handling and protocol implementation",
-      "Use FastMCP which provides decorator-based tool registration like @mcp.tool() for rapid MCP server development",
       "Use Flask with a custom MCP middleware adapter layer",
+      "Use FastMCP which provides decorator-based tool registration like @mcp.tool() for rapid MCP server development",
       "Use the anthropic Python SDK's built-in MCP server class"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "FastMCP provides a high-level Python framework with decorator-based tool registration (@mcp.tool()), making MCP server creation as simple as writing a decorated function. Raw JSON-RPC requires implementing the full protocol manually. Flask isn't MCP-aware. The anthropic SDK is an API client library for calling Claude, not an MCP server framework.",
     "tags": [
       "FastMCP",
       "MCP-server",
       "Python",
       "rapid-prototyping"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -304,18 +319,19 @@
     "question": "What's the most effective first step to improve tool selection reliability?",
     "options": [
       "Add few-shot examples to the system prompt demonstrating correct tool selection patterns, with 5–8 examples showing order-related queries routing to lookup_order",
-      "Expand each tool's description to include input formats it handles, example queries, edge cases, and boundaries explaining when to use it versus similar tools",
+      "Consolidate both tools into a single lookup_entity tool that accepts any identifier and internally determines which backend to query",
       "Implement a routing layer that parses user input before each turn and pre-selects the appropriate tool based on detected keywords and identifier patterns",
-      "Consolidate both tools into a single lookup_entity tool that accepts any identifier and internally determines which backend to query"
+      "Expand each tool's description to include input formats it handles, example queries, edge cases, and boundaries explaining when to use it versus similar tools"
     ],
-    "correct": 1,
-    "explanation": "Tool descriptions are the primary mechanism LLMs use for tool selection. When descriptions are minimal, models lack the context to differentiate between similar tools. Option B directly addresses this root cause with a low-effort, high-leverage fix. Few-shot examples (A) add token overhead without fixing the underlying issue of ambiguous descriptions. A routing layer (C) is over-engineered and bypasses the LLM's natural language understanding. Consolidating tools (D) is a valid architectural choice but requires more effort than a 'first step' warrants.",
+    "correct": 3,
+    "explanation": "Tool descriptions are the primary mechanism LLMs use for tool selection. When descriptions are minimal, models lack the context to differentiate between similar tools. Option D directly addresses this root cause with a low-effort, high-leverage fix. Few-shot examples (A) add token overhead without fixing the underlying issue of ambiguous descriptions. A routing layer (C) is over-engineered and bypasses the LLM's natural language understanding. Consolidating tools (B) is a valid architectural choice but requires more effort than a 'first step' warrants.",
     "tags": [
       "tool-description",
       "tool-selection",
       "differentiation",
       "low-effort-fix"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -335,7 +351,8 @@
       "scoped-tools",
       "latency",
       "synthesis-agent"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -343,19 +360,20 @@
     "scenario": "A generic analyze_document tool is used for extraction, summarization, and claim verification, and results are inconsistent.",
     "question": "Which refactor improves reliability?",
     "options": [
-      "Add more text to the single tool's description",
       "Split it into purpose-specific tools (extract_data_points, summarize_content, verify_claim_against_source) with defined input/output contracts",
+      "Add more text to the single tool's description",
       "Remove the tool entirely",
       "Route all three uses through Grep"
     ],
-    "correct": 1,
-    "explanation": "Splitting an overloaded generic tool into purpose-specific tools with clear contracts improves selection and result quality. More description text (A) doesn't resolve the overload, removing it (C) loses capability, and Grep (D) can't perform these semantic operations.",
+    "correct": 0,
+    "explanation": "Splitting an overloaded generic tool into purpose-specific tools with clear contracts improves selection and result quality. More description text (B) doesn't resolve the overload, removing it (C) loses capability, and Grep (D) can't perform these semantic operations.",
     "tags": [
       "tool-design",
       "tool-splitting",
       "contracts",
       "specialization"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -364,18 +382,19 @@
     "question": "What should you review?",
     "options": [
       "Only the tool description",
-      "The system prompt for keyword-sensitive instructions that create unintended tool associations overriding good descriptions",
       "The model temperature",
+      "The system prompt for keyword-sensitive instructions that create unintended tool associations overriding good descriptions",
       "The user's phrasing only"
     ],
-    "correct": 1,
-    "explanation": "System-prompt wording can create keyword associations that override even good tool descriptions, so review it for such triggers. Focusing only on the description (A), temperature (C), or user phrasing (D) misses the actual cause in the system prompt.",
+    "correct": 2,
+    "explanation": "System-prompt wording can create keyword associations that override even good tool descriptions, so review it for such triggers. Focusing only on the description (A), temperature (B), or user phrasing (D) misses the actual cause in the system prompt.",
     "tags": [
       "tool-design",
       "system-prompt",
       "keyword-sensitivity",
       "tool-selection"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -384,18 +403,19 @@
     "question": "What is the recommended error-response design?",
     "options": [
       "Keep the generic message; less detail is safer",
-      "Return structured metadata: errorCategory (transient/validation/business/permission), isRetryable boolean, and a human-readable description",
+      "Throw an unstructured exception",
       "Return an empty success",
-      "Throw an unstructured exception"
+      "Return structured metadata: errorCategory (transient/validation/business/permission), isRetryable boolean, and a human-readable description"
     ],
-    "correct": 1,
-    "explanation": "Structured error metadata (errorCategory, isRetryable, human-readable description) lets the agent choose the right recovery. Generic messages (A) block informed decisions, empty success (C) hides failures, and unstructured exceptions (D) crash the loop.",
+    "correct": 3,
+    "explanation": "Structured error metadata (errorCategory, isRetryable, human-readable description) lets the agent choose the right recovery. Generic messages (A) block informed decisions, empty success (C) hides failures, and unstructured exceptions (B) crash the loop.",
     "tags": [
       "mcp",
       "error-handling",
       "structured-errors",
       "isError"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -403,19 +423,20 @@
     "scenario": "Your MCP tool blocked an action due to a business-rule violation (over-limit refund).",
     "question": "How should the error be represented so the agent responds appropriately?",
     "options": [
-      "isRetryable: true with a generic message",
       "A business-category error with retriable: false and a customer-friendly explanation so the agent communicates rather than retries",
+      "isRetryable: true with a generic message",
       "A transient error so the agent retries",
       "No error; silently succeed"
     ],
-    "correct": 1,
-    "explanation": "Business-rule violations are non-retryable; marking retriable: false with a clear explanation lets the agent communicate the outcome instead of pointlessly retrying. Marking it retryable/transient (A, C) causes wasted retries, and silent success (D) violates the rule.",
+    "correct": 0,
+    "explanation": "Business-rule violations are non-retryable; marking retriable: false with a clear explanation lets the agent communicate the outcome instead of pointlessly retrying. Marking it retryable/transient (B, C) causes wasted retries, and silent success (D) violates the rule.",
     "tags": [
       "mcp",
       "error-handling",
       "business-error",
       "retryable"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -424,18 +445,19 @@
     "question": "What is its role?",
     "options": [
       "It formats successful output",
-      "It signals to the agent that a tool call failed, so failures are communicated back distinctly from successful results",
       "It caches results",
+      "It signals to the agent that a tool call failed, so failures are communicated back distinctly from successful results",
       "It sets tool_choice"
     ],
-    "correct": 1,
-    "explanation": "The isError flag communicates tool failures back to the agent, distinguishing errors from successful results. It doesn't format success (A), cache (C), or configure tool_choice (D).",
+    "correct": 2,
+    "explanation": "The isError flag communicates tool failures back to the agent, distinguishing errors from successful results. It doesn't format success (A), cache (B), or configure tool_choice (D).",
     "tags": [
       "mcp",
       "isError",
       "error-handling",
       "tool-design"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -444,18 +466,19 @@
     "question": "Why does this distinction matter for error handling?",
     "options": [
       "It doesn't; both should be retried",
-      "Access failures may warrant retry decisions, while valid empty results are successful and should not trigger retries",
+      "Empty results should always raise exceptions",
       "Both should be treated as fatal",
-      "Empty results should always raise exceptions"
+      "Access failures may warrant retry decisions, while valid empty results are successful and should not trigger retries"
     ],
-    "correct": 1,
-    "explanation": "Access failures may need retries, but a valid empty result is a successful query with no matches and shouldn't be retried. Treating both as retryable (A) or fatal (C) is wrong, and raising exceptions on empty results (D) misrepresents success.",
+    "correct": 3,
+    "explanation": "Access failures may need retries, but a valid empty result is a successful query with no matches and shouldn't be retried. Treating both as retryable (A) or fatal (C) is wrong, and raising exceptions on empty results (B) misrepresents success.",
     "tags": [
       "mcp",
       "error-handling",
       "empty-results",
       "retryable"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -463,19 +486,20 @@
     "scenario": "An agent has been given 18 tools and its tool selection has become unreliable.",
     "question": "What does this illustrate and how do you fix it?",
     "options": [
-      "More tools always improve capability; keep all 18",
       "Too many tools degrade selection reliability; scope each agent to the 4-5 tools it actually needs",
+      "More tools always improve capability; keep all 18",
       "Reduce max_tokens",
       "Set tool_choice to 'any'"
     ],
-    "correct": 1,
-    "explanation": "Giving an agent too many tools (e.g., 18) increases decision complexity and degrades selection; scoping to the ~4-5 relevant tools restores reliability. More tools aren't always better (A), and max_tokens (C) or tool_choice (D) don't address selection overload.",
+    "correct": 0,
+    "explanation": "Giving an agent too many tools (e.g., 18) increases decision complexity and degrades selection; scoping to the ~4-5 relevant tools restores reliability. More tools aren't always better (B), and max_tokens (C) or tool_choice (D) don't address selection overload.",
     "tags": [
       "tool-design",
       "tool-distribution",
       "least-privilege",
       "tool-selection"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -484,18 +508,19 @@
     "question": "What principle guides the fix?",
     "options": [
       "Give every agent every tool for flexibility",
-      "Scope tool access to each agent's role; remove tools outside its specialization to prevent misuse",
       "Increase temperature so it self-corrects",
+      "Scope tool access to each agent's role; remove tools outside its specialization to prevent misuse",
       "Add a second synthesis agent"
     ],
-    "correct": 1,
-    "explanation": "Agents with tools outside their specialization tend to misuse them; scoping tools to role prevents this. Universal tool access (A) causes exactly this problem, temperature (C) doesn't fix scope, and adding agents (D) doesn't remove the misused tools.",
+    "correct": 2,
+    "explanation": "Agents with tools outside their specialization tend to misuse them; scoping tools to role prevents this. Universal tool access (A) causes exactly this problem, temperature (B) doesn't fix scope, and adding agents (D) doesn't remove the misused tools.",
     "tags": [
       "tool-design",
       "tool-distribution",
       "separation-of-concerns",
       "scoping"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -504,18 +529,19 @@
     "question": "Which replacement improves safety and reliability?",
     "options": [
       "Keep fetch_url but add a prompt warning",
-      "Replace it with a constrained load_document tool that validates document URLs",
+      "Give the agent Bash to curl URLs",
       "Remove URL loading entirely",
-      "Give the agent Bash to curl URLs"
+      "Replace it with a constrained load_document tool that validates document URLs"
     ],
-    "correct": 1,
-    "explanation": "Replacing a broad tool with a constrained alternative (load_document that validates URLs) reduces misuse while preserving the needed capability. A prompt warning (A) is probabilistic, removing loading (C) breaks the feature, and Bash/curl (D) widens the attack surface.",
+    "correct": 3,
+    "explanation": "Replacing a broad tool with a constrained alternative (load_document that validates URLs) reduces misuse while preserving the needed capability. A prompt warning (A) is probabilistic, removing loading (C) breaks the feature, and Bash/curl (B) widens the attack surface.",
     "tags": [
       "tool-design",
       "constrained-tools",
       "validation",
       "safety"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -523,19 +549,20 @@
     "scenario": "You want to guarantee the model calls a tool rather than replying with conversational text, though it may choose which tool.",
     "question": "Which tool_choice setting applies?",
     "options": [
-      "tool_choice: 'auto'",
       "tool_choice: 'any'",
+      "tool_choice: 'auto'",
       "tool_choice: 'none'",
       "tool_choice: {\"type\":\"tool\",\"name\":\"x\"}"
     ],
-    "correct": 1,
-    "explanation": "tool_choice: 'any' forces a tool call while leaving the choice to the model. 'auto' (A) permits text, 'none' (C) forbids tools, and forcing a named tool (D) removes choice.",
+    "correct": 0,
+    "explanation": "tool_choice: 'any' forces a tool call while leaving the choice to the model. 'auto' (B) permits text, 'none' (C) forbids tools, and forcing a named tool (D) removes choice. Platform note: Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject forced tool_choice ('any' or a named tool) with a 400 error; on those models use 'auto' with strict tool use, or structured outputs.",
     "tags": [
       "tool-design",
       "tool_choice",
       "any",
       "structured-output"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -544,18 +571,19 @@
     "question": "How do you configure it?",
     "options": [
       "Hard-code the token in .mcp.json and commit it",
-      "Configure the server in project-scoped .mcp.json using environment variable expansion (e.g., ${GITHUB_TOKEN}) for the credential",
       "Put it in ~/.claude.json so only you have it",
+      "Configure the server in project-scoped .mcp.json using environment variable expansion (e.g., ${GITHUB_TOKEN}) for the credential",
       "Store the token in CLAUDE.md"
     ],
-    "correct": 1,
-    "explanation": "Project-scoped .mcp.json with env-var expansion (${GITHUB_TOKEN}) shares the server team-wide while keeping secrets out of version control. Hard-coding secrets (A) leaks them, user scope (C) doesn't share with the team, and CLAUDE.md (D) is not for credentials.",
+    "correct": 2,
+    "explanation": "Project-scoped .mcp.json with env-var expansion (${GITHUB_TOKEN}) shares the server team-wide while keeping secrets out of version control. Hard-coding secrets (A) leaks them, user scope (B) doesn't share with the team, and CLAUDE.md (D) is not for credentials.",
     "tags": [
       "mcp",
       "server-config",
       "env-var-expansion",
       "project-scope"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -564,18 +592,19 @@
     "question": "Where should it be configured?",
     "options": [
       "Project-scoped .mcp.json committed to the repo",
-      "User-scoped ~/.claude.json for personal/experimental servers",
+      "In the root CLAUDE.md",
       "In every teammate's shell profile",
-      "In the root CLAUDE.md"
+      "User-scoped ~/.claude.json for personal/experimental servers"
     ],
-    "correct": 1,
-    "explanation": "Personal/experimental MCP servers belong in user-scoped ~/.claude.json so they don't affect the team. Project .mcp.json (A) would share them, teammates' profiles (C) is intrusive, and CLAUDE.md (D) is not an MCP config location.",
+    "correct": 3,
+    "explanation": "Personal/experimental MCP servers belong in user-scoped ~/.claude.json so they don't affect the team. Project .mcp.json (A) would share them, teammates' profiles (C) is intrusive, and CLAUDE.md (B) is not an MCP config location.",
     "tags": [
       "mcp",
       "server-config",
       "user-scope",
       "experimental"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -583,19 +612,20 @@
     "scenario": "You configure two MCP servers simultaneously and wonder whether the agent can use tools from both.",
     "question": "What is true about tool discovery across servers?",
     "options": [
-      "Only the first server's tools are available",
       "Tools from all configured MCP servers are discovered at connection time and available simultaneously",
+      "Only the first server's tools are available",
       "You must manually enable each tool per turn",
       "Servers are mutually exclusive"
     ],
-    "correct": 1,
-    "explanation": "All configured MCP servers have their tools discovered at connection time and available to the agent simultaneously. It isn't limited to the first server (A), doesn't require per-turn enabling (C), and servers aren't mutually exclusive (D).",
+    "correct": 0,
+    "explanation": "All configured MCP servers have their tools discovered at connection time and available to the agent simultaneously. It isn't limited to the first server (B), doesn't require per-turn enabling (C), and servers aren't mutually exclusive (D).",
     "tags": [
       "mcp",
       "server-config",
       "tool-discovery",
       "multi-server"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -604,18 +634,19 @@
     "question": "How do you encourage correct selection of the MCP tool?",
     "options": [
       "Delete the Grep tool",
-      "Enhance the MCP tool's description to clearly explain its capabilities and outputs so the agent prefers it when appropriate",
       "Lower temperature",
+      "Enhance the MCP tool's description to clearly explain its capabilities and outputs so the agent prefers it when appropriate",
       "Force tool_choice to Grep"
     ],
-    "correct": 1,
-    "explanation": "Improving the MCP tool's description to detail its capabilities/outputs helps the agent prefer it over built-ins like Grep when appropriate. Deleting Grep (A) removes a useful tool, temperature (C) doesn't change selection logic, and forcing Grep (D) is the opposite of the goal.",
+    "correct": 2,
+    "explanation": "Improving the MCP tool's description to detail its capabilities/outputs helps the agent prefer it over built-ins like Grep when appropriate. Deleting Grep (A) removes a useful tool, temperature (B) doesn't change selection logic, and forcing Grep (D) is the opposite of the goal.",
     "tags": [
       "mcp",
       "tool-descriptions",
       "tool-selection",
       "built-in-tools"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -624,18 +655,19 @@
     "question": "What is the recommended approach?",
     "options": [
       "Always build custom servers for full control",
-      "Prefer existing community MCP servers for standard integrations; reserve custom servers for team-specific workflows",
+      "Use Bash to call Jira's API directly",
       "Never use MCP for third-party tools",
-      "Use Bash to call Jira's API directly"
+      "Prefer existing community MCP servers for standard integrations; reserve custom servers for team-specific workflows"
     ],
-    "correct": 1,
-    "explanation": "For standard integrations like Jira, prefer existing community MCP servers and reserve custom builds for genuinely team-specific needs. Always-custom (A) wastes effort, avoiding MCP (C) forgoes its benefits, and raw Bash API calls (D) bypass structured tooling.",
+    "correct": 3,
+    "explanation": "For standard integrations like Jira, prefer existing community MCP servers and reserve custom builds for genuinely team-specific needs. Always-custom (A) wastes effort, avoiding MCP (C) forgoes its benefits, and raw Bash API calls (B) bypass structured tooling.",
     "tags": [
       "mcp",
       "community-servers",
       "integration",
       "build-vs-buy"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -643,19 +675,20 @@
     "scenario": "Your agents make many exploratory tool calls just to discover what data exists (issue lists, doc hierarchies, schemas).",
     "question": "Which MCP capability reduces these exploratory calls?",
     "options": [
-      "More tools",
       "MCP resources that expose content catalogs so agents can see available data without exploratory tool calls",
+      "More tools",
       "Higher max_tokens",
       "tool_choice: 'any'"
     ],
-    "correct": 1,
-    "explanation": "MCP resources expose content catalogs (issue summaries, doc hierarchies, schemas), giving agents visibility into available data and reducing exploratory tool calls. Adding tools (A) or tokens (C) doesn't provide a catalog, and tool_choice (D) doesn't expose data.",
+    "correct": 0,
+    "explanation": "MCP resources expose content catalogs (issue summaries, doc hierarchies, schemas), giving agents visibility into available data and reducing exploratory tool calls. Adding tools (B) or tokens (C) doesn't provide a catalog, and tool_choice (D) doesn't expose data.",
     "tags": [
       "mcp",
       "resources",
       "content-catalog",
       "efficiency"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -664,18 +697,19 @@
     "question": "Which mapping is correct?",
     "options": [
       "Use tools for content catalogs and resources for actions",
-      "Use resources for content catalogs (browsable data) and tools for actions (operations the agent performs)",
       "Tools and resources are interchangeable",
+      "Use resources for content catalogs (browsable data) and tools for actions (operations the agent performs)",
       "Always use tools; resources are deprecated"
     ],
-    "correct": 1,
-    "explanation": "Resources expose browsable content catalogs, while tools perform actions/operations. Option A inverts this. They aren't interchangeable (C), and resources are a first-class MCP concept, not deprecated (D).",
+    "correct": 2,
+    "explanation": "Resources expose browsable content catalogs, while tools perform actions/operations. Option A inverts this. They aren't interchangeable (B), and resources are a first-class MCP concept, not deprecated (D).",
     "tags": [
       "mcp",
       "resources",
       "tools",
       "design"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -684,18 +718,19 @@
     "question": "Which built-in tool is appropriate?",
     "options": [
       "Glob",
-      "Grep",
+      "Edit",
       "Write",
-      "Edit"
+      "Grep"
     ],
-    "correct": 1,
-    "explanation": "Grep searches file contents for patterns (like function names/callers), making it the right tool here. Glob (A) matches file paths by name/extension, and Write/Edit (C, D) modify files rather than search content.",
+    "correct": 3,
+    "explanation": "Grep searches file contents for patterns (like function names/callers), making it the right tool here. Glob (A) matches file paths by name/extension, and Write/Edit (C, B) modify files rather than search content.",
     "tags": [
       "built-in-tools",
       "grep",
       "content-search",
       "tool-selection"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -703,19 +738,20 @@
     "scenario": "You need to find all files matching a naming pattern like **/*.test.tsx.",
     "question": "Which built-in tool is appropriate?",
     "options": [
-      "Grep",
       "Glob",
+      "Grep",
       "Bash cat",
       "Read"
     ],
-    "correct": 1,
-    "explanation": "Glob matches file paths by name/extension patterns (**/*.test.tsx). Grep (A) searches contents, cat (C) prints a file, and Read (D) loads a specific file's contents - none of which enumerate files by pattern.",
+    "correct": 0,
+    "explanation": "Glob matches file paths by name/extension patterns (**/*.test.tsx). Grep (B) searches contents, cat (C) prints a file, and Read (D) loads a specific file's contents - none of which enumerate files by pattern.",
     "tags": [
       "built-in-tools",
       "glob",
       "file-matching",
       "tool-selection"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -724,18 +760,19 @@
     "question": "What is the recommended fallback?",
     "options": [
       "Give up on the change",
-      "Use Read to load the full file, then Write the updated contents",
       "Use Grep to overwrite the file",
+      "Use Read to load the full file, then Write the updated contents",
       "Use Glob to modify the file"
     ],
-    "correct": 1,
-    "explanation": "When Edit can't find a unique anchor, Read the full file then Write the modified contents as a reliable fallback. Giving up (A) is unnecessary, and Grep (C) / Glob (D) don't modify file contents.",
+    "correct": 2,
+    "explanation": "C is correct: when Edit can't find a unique anchor, reading the full file and writing back the modified contents is a reliable fallback. Edit itself also accepts a longer old_string with enough surrounding context to pin down one occurrence, or replace_all: true when every occurrence should change. A is wrong because the change is still achievable. B and D are wrong because Grep and Glob search; they don't modify files.",
     "tags": [
       "built-in-tools",
       "edit",
       "read-write-fallback",
       "file-modification"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -744,18 +781,19 @@
     "question": "Which incremental strategy is recommended?",
     "options": [
       "Read every file first, then reason",
-      "Start with Grep to find entry points, then Read to follow imports and trace flows incrementally",
+      "Use Bash to print the whole repo",
       "Glob all files and load them into context",
-      "Use Bash to print the whole repo"
+      "Start with Grep to find entry points, then Read to follow imports and trace flows incrementally"
     ],
-    "correct": 1,
-    "explanation": "Incremental understanding - Grep for entry points, then Read to follow imports and trace flows - avoids context exhaustion and builds a targeted mental model. Reading everything (A), loading all files (C), or dumping the repo (D) floods context and wastes budget.",
+    "correct": 3,
+    "explanation": "Incremental understanding - Grep for entry points, then Read to follow imports and trace flows - avoids context exhaustion and builds a targeted mental model. Reading everything (A), loading all files (C), or dumping the repo (B) floods context and wastes budget.",
     "tags": [
       "built-in-tools",
       "grep",
       "codebase-exploration",
       "context-management"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -763,19 +801,20 @@
     "scenario": "You must trace how a function is used across wrapper modules that re-export it under different names.",
     "question": "Which approach works?",
     "options": [
-      "Read one file and assume it's the only usage",
       "First identify all exported names, then Grep for each name across the codebase to trace usage",
+      "Read one file and assume it's the only usage",
       "Glob for the function's file only",
       "Rely on the model's memory of the code"
     ],
-    "correct": 1,
-    "explanation": "Tracing usage through wrappers requires identifying all exported names, then Grepping each across the codebase. Reading one file (A) misses re-exports, Glob for one file (C) doesn't trace usage, and relying on memory (D) is unreliable for specific code.",
+    "correct": 0,
+    "explanation": "Tracing usage through wrappers requires identifying all exported names, then Grepping each across the codebase. Reading one file (B) misses re-exports, Glob for one file (C) doesn't trace usage, and relying on memory (D) is unreliable for specific code.",
     "tags": [
       "built-in-tools",
       "grep",
       "usage-tracing",
       "wrappers"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -784,18 +823,19 @@
     "question": "How do you balance capability and least privilege?",
     "options": [
       "Give it all web tools",
-      "Provide a scoped verify_fact tool for high-frequency simple lookups while routing complex verifications through the coordinator",
       "Give it no verification ability",
+      "Provide a scoped verify_fact tool for high-frequency simple lookups while routing complex verifications through the coordinator",
       "Set tool_choice: 'none'"
     ],
-    "correct": 1,
-    "explanation": "A scoped cross-role tool (verify_fact) covers the common simple case without over-provisioning, while complex cases route through the coordinator. Full web tools (A) violate least privilege, no verification (C) breaks the need, and 'none' (D) disables tools.",
+    "correct": 2,
+    "explanation": "A scoped cross-role tool (verify_fact) covers the common simple case without over-provisioning, while complex cases route through the coordinator. Full web tools (A) violate least privilege, no verification (B) breaks the need, and 'none' (D) disables tools.",
     "tags": [
       "tool-design",
       "scoped-tools",
       "least-privilege",
       "verify_fact"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -804,18 +844,19 @@
     "question": "Which tool_choice configuration guarantees the first call?",
     "options": [
       "tool_choice: 'auto'",
-      "tool_choice: {\"type\":\"tool\",\"name\":\"extract_metadata\"}",
+      "tool_choice: 'none'",
       "tool_choice: 'any'",
-      "tool_choice: 'none'"
+      "tool_choice: {\"type\":\"tool\",\"name\":\"extract_metadata\"}"
     ],
-    "correct": 1,
-    "explanation": "Forcing the named tool (extract_metadata) guarantees it runs first; later steps proceed in follow-up turns. 'auto' (A) may return text, 'any' (C) may call a different tool, and 'none' (D) forbids tools.",
+    "correct": 3,
+    "explanation": "Forcing the named tool (extract_metadata) guarantees it runs first; later steps proceed in follow-up turns. 'auto' (A) may return text, 'any' (C) may call a different tool, and 'none' (B) forbids tools. Platform note: Claude Opus 5.5, Sonnet 5.5, and Fable 5.1 reject forced tool_choice ('any' or a named tool) with a 400 error; on those models use 'auto' with strict tool use, or structured outputs.",
     "tags": [
       "tool-design",
       "tool_choice",
       "forced-tool",
       "ordering"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -823,19 +864,20 @@
     "scenario": "An MCP tool experiences a timeout talking to a backend service.",
     "question": "Which errorCategory best fits, and what should isRetryable be?",
     "options": [
-      "validation; isRetryable false",
       "transient; isRetryable true",
+      "validation; isRetryable false",
       "business; isRetryable false",
       "permission; isRetryable false"
     ],
-    "correct": 1,
-    "explanation": "A backend timeout is a transient error and is typically retryable, so category 'transient' with isRetryable true is appropriate. Validation (A) and business (C) errors are input/policy issues (non-retryable), and permission (D) requires access changes, not a retry.",
+    "correct": 0,
+    "explanation": "A backend timeout is a transient error and is typically retryable, so category 'transient' with isRetryable true is appropriate. Validation (B) and business (C) errors are input/policy issues (non-retryable), and permission (D) requires access changes, not a retry.",
     "tags": [
       "mcp",
       "error-classification",
       "transient",
       "retryable"
-    ]
+    ],
+    "difficulty": "easy"
   },
   {
     "domain": 4,
@@ -844,18 +886,19 @@
     "question": "Which distribution strategy is better?",
     "options": [
       "Maximize tools on the coordinator",
-      "Scope tools per role with only limited cross-role tools for specific high-frequency needs",
       "Put all tools on every subagent",
+      "Scope tools per role with only limited cross-role tools for specific high-frequency needs",
       "Remove all tools from subagents"
     ],
-    "correct": 1,
-    "explanation": "Scoping tools per role, with only a few cross-role tools for genuine high-frequency needs, preserves selection quality. Maximizing tools (A) or putting all tools everywhere (C) degrades selection, and removing all subagent tools (D) breaks their function.",
+    "correct": 2,
+    "explanation": "Scoping tools per role, with only a few cross-role tools for genuine high-frequency needs, preserves selection quality. Maximizing tools (A) or putting all tools everywhere (B) degrades selection, and removing all subagent tools (D) breaks their function.",
     "tags": [
       "tool-design",
       "tool-distribution",
       "scoping",
       "coordinator"
-    ]
+    ],
+    "difficulty": "medium"
   },
   {
     "domain": 4,
@@ -864,18 +907,19 @@
     "question": "Which guidance is soundest?",
     "options": [
       "Always consolidate to reduce count",
-      "Split when responsibilities/contracts differ enough to cause ambiguity; consolidate only when they truly share one clear purpose",
+      "Tool boundaries don't affect selection",
       "Always split every tool as finely as possible",
-      "Tool boundaries don't affect selection"
+      "Split when responsibilities/contracts differ enough to cause ambiguity; consolidate only when they truly share one clear purpose"
     ],
-    "correct": 1,
-    "explanation": "Boundaries should follow clear, distinct contracts: split when consolidation causes ambiguity, consolidate only when there's a single clear purpose. Always-consolidate (A) reintroduces overload, always-split (C) creates needless fragmentation, and boundaries clearly affect selection (D).",
+    "correct": 3,
+    "explanation": "Boundaries should follow clear, distinct contracts: split when consolidation causes ambiguity, consolidate only when there's a single clear purpose. Always-consolidate (A) reintroduces overload, always-split (C) creates needless fragmentation, and boundaries clearly affect selection (B).",
     "tags": [
       "tool-design",
       "splitting-vs-consolidating",
       "contracts",
       "tool-selection"
-    ]
+    ],
+    "difficulty": "hard"
   },
   {
     "domain": 4,
@@ -883,18 +927,40 @@
     "scenario": "A tool description omits input format details, so the agent frequently passes malformed inputs.",
     "question": "What is the fix?",
     "options": [
-      "Add retries around the tool",
       "Include input formats, example queries, and edge cases in the tool description so the agent supplies correct inputs",
+      "Add retries around the tool",
       "Lower temperature",
       "Force the tool with tool_choice"
     ],
-    "correct": 1,
-    "explanation": "Documenting input formats, example queries, and edge cases in the description helps the agent supply correct inputs. Retries (A) don't teach correct inputs, temperature (C) doesn't fix format knowledge, and forcing the tool (D) doesn't ensure valid arguments.",
+    "correct": 0,
+    "explanation": "Documenting input formats, example queries, and edge cases in the description helps the agent supply correct inputs. Retries (B) don't teach correct inputs, temperature (C) doesn't fix format knowledge, and forcing the tool (D) doesn't ensure valid arguments.",
     "tags": [
       "tool-design",
       "descriptions",
       "input-formats",
       "reliability"
-    ]
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 4,
+    "id": "d4-046",
+    "scenario": "A developer runs claude mcp add --transport http jira https://mcp.example.com/jira with no scope flag and tells the team the Jira server is 'set up for everyone'.",
+    "question": "What did the command actually do?",
+    "options": [
+      "Added the server at local scope (the default) in ~/.claude.json, for this user and project only; --scope project writes .mcp.json for the team",
+      "Added the server to the project's .mcp.json, so teammates get it on their next pull",
+      "Added the server at user scope, so every developer on the team can use it",
+      "Added the server to .claude/settings.json, which is shared through the repository"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the Claude Code MCP docs define three scopes: local (the default, stored in ~/.claude.json, current project only, not shared), project (.mcp.json in the repo root, shared through version control), and user (~/.claude.json, all of your own projects). Sharing with the team takes --scope project and a commit. B is wrong because that only happens with --scope project. C is wrong because user scope is still personal: it spans your projects, not your teammates. D is wrong because claude mcp add writes to ~/.claude.json or .mcp.json depending on scope, not to .claude/settings.json.",
+    "tags": [
+      "mcp",
+      "server-config",
+      "scopes",
+      "claude-code"
+    ],
+    "difficulty": "medium"
   }
 ]

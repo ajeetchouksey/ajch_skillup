@@ -5,13 +5,13 @@
     "scenario": "An AI system used for employee performance reviews consistently gives lower scores to employees over age 50 compared to those under 35, despite similar performance metrics.",
     "question": "Which Responsible AI principle is being violated?",
     "options": [
-      "Transparency — employees are not told they are being evaluated by AI",
       "Fairness — the AI is discriminating based on age, producing inequitable outcomes",
+      "Transparency — employees are not told they are being evaluated by AI",
       "Reliability — the AI produces inconsistent scores",
       "Accountability — no human reviewed the AI's scoring"
     ],
-    "correct": 1,
-    "explanation": "Fairness requires that AI treats all people equitably regardless of characteristics like age, race, or gender. An AI that systematically disadvantages a protected group (age 50+) is violating the Fairness principle. While Transparency (A) and Accountability (D) might also be relevant issues, the primary violation described — discriminatory outcomes based on age — is a Fairness violation.",
+    "correct": 0,
+    "explanation": "Fairness requires that AI treats all people equitably regardless of characteristics like age, race, or gender. An AI that systematically disadvantages a protected group (age 50+) is violating the Fairness principle. While Transparency (B) and Accountability (D) might also be relevant issues, the primary violation described — discriminatory outcomes based on age — is a Fairness violation.",
     "tags": [
       "responsible-ai",
       "fairness",
@@ -27,11 +27,11 @@
     "question": "Which Responsible AI principle is being violated?",
     "options": [
       "Fairness — the AI may be denying loans based on protected characteristics",
-      "Transparency — users cannot understand how the AI made its decision",
       "Privacy — customer financial data is being processed without consent",
+      "Transparency — users cannot understand how the AI made its decision",
       "Accountability — the bank has removed human oversight from the process"
     ],
-    "correct": 1,
+    "correct": 2,
     "explanation": "Transparency requires that people understand when AI is making decisions that affect them and how those decisions are reached. A 'black box' denial with no explanation violates Transparency. Customers should be able to understand — at a high level — the factors that influenced the AI decision, especially in high-stakes contexts like financial services. (Note: Accountability (D) is also a concern, but the primary violation described is the lack of explainability = Transparency.)",
     "tags": [
       "responsible-ai",
@@ -60,7 +60,7 @@
       "ai-principles",
       "governance"
     ],
-    "difficulty": "medium"
+    "difficulty": "easy"
   },
   {
     "domain": 3,
@@ -69,12 +69,12 @@
     "question": "What governance structure should be established BEFORE the rollout?",
     "options": [
       "Let IT lead the deployment and manage all stakeholder concerns as they arise",
-      "Establish an AI Council with cross-functional representation (IT, Legal, HR, Finance, Business) to align strategy, governance, and rollout",
+      "Postpone deployment until all concerns are fully resolved, which may take 6–12 months",
       "Create a separate data governance committee focused only on compliance",
-      "Postpone deployment until all concerns are fully resolved, which may take 6–12 months"
+      "Establish an AI Council with cross-functional representation (IT, Legal, HR, Finance, Business) to align strategy, governance, and rollout"
     ],
-    "correct": 1,
-    "explanation": "An AI Council brings together all relevant stakeholders to address concerns holistically before deployment. IT alone cannot resolve HR, legal, and financial concerns. A cross-functional AI Council is the standard governance model — it sets policies, aligns on risks and ROI, and creates a shared deployment plan. A data-only committee (C) ignores change management and ROI issues. Indefinite postponement (D) blocks business value needlessly.",
+    "correct": 3,
+    "explanation": "An AI Council brings together all relevant stakeholders to address concerns holistically before deployment. IT alone cannot resolve HR, legal, and financial concerns. A cross-functional AI Council is the standard governance model — it sets policies, aligns on risks and ROI, and creates a shared deployment plan. A data-only committee (C) ignores change management and ROI issues. Indefinite postponement (B) blocks business value needlessly.",
     "tags": [
       "ai-council",
       "governance",
@@ -89,13 +89,13 @@
     "scenario": "During a Microsoft 365 Copilot pilot programme, IT reports that only 20% of participants are actively using Copilot after 4 weeks. Interviews reveal employees feel they 'don't know where to start' and worry that using AI 'might make them look lazy.'",
     "question": "What adoption barrier is primarily at play, and what is the best mitigation?",
     "options": [
-      "Technical barrier — the Copilot licence is not fully configured. Re-provision licences.",
       "Skills gap + cultural barrier — address through an AI champions programme where enthusiastic peer advocates coach colleagues",
+      "Technical barrier — the Copilot licence is not fully configured. Re-provision licences.",
       "Security concern — employees don't trust Microsoft's data handling. Share Microsoft's privacy documentation.",
       "Change fatigue — too many tools have been introduced. Remove other software tools first."
     ],
-    "correct": 1,
-    "explanation": "Two barriers are present: (1) Skills gap ('don't know where to start') and (2) Cultural/social concern ('look lazy'). The AI champions programme is the proven mitigation — empowered peer advocates in each team provide hands-on coaching and normalise AI use. Champions are trusted colleagues, not IT, making them more effective at changing social norms. Technical issues (A) are not described. Privacy concerns (C) are different from what's described. Change fatigue (D) might be a factor but is not the primary barrier identified.",
+    "correct": 0,
+    "explanation": "Two barriers are present: (1) Skills gap ('don't know where to start') and (2) Cultural/social concern ('look lazy'). The AI champions programme is the proven mitigation — empowered peer advocates in each team provide hands-on coaching and normalise AI use. Champions are trusted colleagues, not IT, making them more effective at changing social norms. Technical issues (B) are not described. Privacy concerns (C) are different from what's described. Change fatigue (D) might be a factor but is not the primary barrier identified.",
     "tags": [
       "adoption",
       "barriers",
@@ -107,16 +107,16 @@
   {
     "domain": 3,
     "id": "ab731-d3-006",
-    "scenario": "A company wants to run a 90-day pilot of Microsoft 365 Copilot with 50 users before deciding on a company-wide rollout of 2,000 users.",
-    "question": "Which Microsoft 365 Copilot licence model is most appropriate for the pilot?",
+    "scenario": "A company wants to run a 90-day pilot of the full Microsoft 365 Copilot experience — Copilot inside Word, Excel, PowerPoint, Outlook and Teams, grounded in each user's own work data — with 50 users before deciding on a company-wide rollout of 2,000 users.",
+    "question": "Which licensing approach is most appropriate for the pilot?",
     "options": [
-      "Annual commitment subscription at the full 2,000 user rate",
-      "Pay-as-you-go metered licensing for the 50 pilot users",
-      "Use the free Microsoft Copilot (Bing-based) for the pilot to avoid cost",
-      "Include Copilot at no extra cost because the company already pays for Microsoft 365"
+      "Buy Microsoft 365 Copilot licences for all 2,000 users now to secure the full rollout in advance",
+      "Enable pay-as-you-go billing for Copilot Chat agents, which gives unlicensed pilot users the full in-app Copilot experience at a metered rate",
+      "Assign Microsoft 365 Copilot per-user licences to just the 50 pilot users, and decide on the remaining seats after the pilot",
+      "Use the free consumer Microsoft Copilot app for the pilot to avoid any licence cost"
     ],
-    "correct": 1,
-    "explanation": "Pay-as-you-go is designed for variable workloads and pilots — you pay for actual usage without committing to a long-term subscription. This is ideal for a 50-user, 90-day pilot where the goal is to validate ROI before committing at scale. An annual commitment at 2,000 users (A) would mean paying for unused licences if the pilot fails. Free Copilot (C) lacks Microsoft Graph integration — it can't access org data, so the pilot would not represent real M365 Copilot value.",
+    "correct": 2,
+    "explanation": "C is correct: Microsoft 365 Copilot is licensed per user, so a pilot only needs licences for the 50 people taking part, and the company can measure value before buying the other 1,950. A is wrong because it commits to 2,000 seats before the pilot has shown any value. B is wrong because Microsoft's pay-as-you-go billing covers usage of agents in Copilot Chat (and SharePoint agents) for users without the licence. It does not provide the full Graph-grounded, in-app Word, Excel and PowerPoint experience the pilot is meant to test. D is wrong because the consumer Microsoft Copilot app has no access to the organisation's Microsoft 365 data, so the pilot wouldn't test the product being bought.",
     "tags": [
       "licensing",
       "pay-as-you-go",
@@ -128,16 +128,16 @@
   {
     "domain": 3,
     "id": "ab731-d3-007",
-    "scenario": "A company has been running Azure AI Foundry workloads in production for 6 months. The token consumption has been stable at approximately 500 million tokens per month. The finance team wants to reduce AI infrastructure costs.",
+    "scenario": "A contact-centre company has run a speech-to-text transcription workload on a dedicated Foundry Tools Speech resource, billed at Standard (pay-as-you-go) pricing, for 6 months. Monthly audio volume has been stable and predictable. The finance team wants to reduce the cost of this workload without changing what it does.",
     "question": "What subscription model change should be considered?",
     "options": [
-      "Switch to pay-as-you-go — it's always the cheapest option",
-      "Move to a Foundry Tools commitment tier (provisioned throughput) — reserved capacity at a discounted rate is more cost-efficient for stable, predictable workloads",
-      "Reduce the model size to cut token costs",
-      "Switch to Microsoft 365 Copilot to replace Azure AI Foundry"
+      "Stay on pay-as-you-go — it is always the cheapest option for any workload",
+      "Move the Speech resource to a commitment tier — a fixed monthly fee for a committed quantity at a discounted rate, with any overage billed at the tier's overage price",
+      "Switch the transcription workload to Microsoft 365 Copilot licences for the contact-centre agents",
+      "Buy a commitment tier on a multi-service Foundry resource so that every Foundry Tool in the account gets the discount"
     ],
     "correct": 1,
-    "explanation": "When workloads are stable and predictable, commitment tiers (provisioned throughput) offer a lower per-unit cost than pay-as-you-go in exchange for committing to a minimum usage level. After 6 months of stable usage data, the company has the evidence needed to commit confidently. Pay-as-you-go (A) is more expensive per unit at scale — it's for variable/pilot workloads. Reducing model size (C) may affect output quality. M365 Copilot (D) is a different product — not a substitute for custom Azure AI Foundry workloads.",
+    "explanation": "B is correct: Foundry Tools commitment tiers (available for features such as Speech to text, Translator, Language, Vision OCR and Document Intelligence) charge a fixed monthly fee for a committed quantity at a lower rate than Standard pricing. They suit stable, predictable volume like this, and usage above the quota is billed at the tier's overage rate. A is wrong because pay-as-you-go suits pilots and variable demand. At steady volume it usually costs more per unit than a matching commitment. C is wrong because Microsoft 365 Copilot is a productivity licence, not a replacement for a transcription API workload. D is wrong because commitment tiers can't be used with a multi-service Foundry Tools or Microsoft Foundry resource; they need a single-service resource such as a Speech resource.",
     "tags": [
       "foundry-tools",
       "commitment-tiers",
@@ -200,7 +200,7 @@
       "It depends on the privacy settings configured by the IT administrator"
     ],
     "correct": 1,
-    "explanation": "Microsoft has committed that Microsoft 365 Copilot does not use customer data (the content of emails, documents, Teams chats, etc.) to train its foundation models (GPT-4). Tenant data stays within the tenant boundary. This is a core Microsoft privacy commitment frequently tested to ensure business leaders can reassure employees about data privacy.",
+    "explanation": "B is correct: Microsoft states that prompts, responses and data accessed through Microsoft Graph aren't used to train foundation LLMs, including those used by Microsoft 365 Copilot. That content is processed and stored in line with the organisation's existing Microsoft 365 contractual commitments. A is wrong because it contradicts that commitment directly. C is wrong because there is no anonymised-training exception for this content. D is wrong because the commitment isn't an admin setting that can be switched on or off. Optional user feedback may be used to improve the service, but it isn't used to train the foundation LLMs either.",
     "tags": [
       "privacy",
       "data-training",
@@ -350,7 +350,7 @@
       "The 400 power users should use the free consumer Microsoft Copilot app, since it provides the same in-app Word, Excel, and PowerPoint capabilities as the paid add-on licence"
     ],
     "correct": 1,
-    "explanation": "Microsoft 365 Copilot licensing spans three distinct models: capabilities included at no extra cost within an existing Microsoft 365 subscription (baseline enterprise-protected Copilot Chat), the paid per-user Microsoft 365 Copilot add-on licence (full in-app generation and agentic features across Word, Excel, PowerPoint, and Teams), and metered pay-as-you-go consumption typically used for variable Azure AI Foundry-style workloads or short pilots rather than standing enterprise chat access. Matching the two segments correctly means the general population's basic-chat needs are already covered by their existing E3/E5 subscription at zero incremental licence cost, while the power users' requirement for deep in-app authoring and agentic actions specifically requires the paid add-on — the two needs are genuinely different products, not different tiers of the same thing. Option A over-licenses the entire organisation by assuming no Copilot capability is ever included with a standard subscription, ignoring the at-no-extra-cost Copilot Chat tier that already meets the general population's stated needs. Option C misapplies pay-as-you-go: that model is designed for variable or unpredictable workloads (like a short pilot or fluctuating Azure AI Foundry token consumption), not for provisioning standing, everyday chat access across an entire 3,000-person workforce, and it isn't inherently cheaper for steady, org-wide usage. Option D confuses the free consumer Microsoft Copilot app with the licensed Microsoft 365 Copilot add-on — the free consumer app lacks Microsoft Graph grounding in the organisation's own data and does not provide the in-app agentic generation capabilities inside Word, Excel, and PowerPoint that the power users specifically require.",
+    "explanation": "B is correct: Copilot licensing spans three models: Copilot Chat included at no extra cost for eligible Microsoft 365 users (web-grounded chat with enterprise data protection), the paid per-user Microsoft 365 Copilot licence (Graph-grounded Copilot across the user's own data, inside Word, Excel, PowerPoint, Outlook and Teams, plus agents such as Analyst), and pay-as-you-go billing for agent usage in Copilot Chat. The general population's needs are already met by Copilot Chat under their E3 subscription, and only the 400 power users need the paid licence. A is wrong because it ignores the included Copilot Chat tier and over-licenses 2,600 people. C is wrong because pay-as-you-go meters agent usage for unlicensed users; it isn't inherently cheaper and doesn't deliver the in-app experience the power users need. D is wrong because the consumer Microsoft Copilot app has no access to the organisation's Microsoft 365 data and doesn't provide in-app Copilot in the work versions of Word, Excel and PowerPoint.",
     "tags": [
       "licensing",
       "copilot-licence",
