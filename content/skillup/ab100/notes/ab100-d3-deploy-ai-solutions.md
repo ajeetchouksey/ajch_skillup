@@ -63,6 +63,15 @@ Define alerts on two tiers:
 | **PTU for stable high volume** | Reserve throughput — predictable capacity and low latency variance | Can cost less than pay-per-token at sustained high utilisation |
 | **Model routing** | Foundry model router sends simple prompts to cheaper models (Balanced, Cost or Quality mode) | Evaluate against your current baseline |
 
+#### Prompt Caching in Practice
+
+Caching only pays off when the prompt is built for it:
+- **Order the prompt for reuse**: static instructions, tool definitions and examples first, conversation history appended, the user's new question last. The cache covers the messages array, images, tool definitions and structured-output schemas.
+- **Verify hits, don't assume them**: check `usage.prompt_tokens_details.cached_tokens`; a value of 0 is a miss. One character of difference in the first 1,024 tokens causes a miss.
+- **Price is model-dependent**: the cache-read discount depends on the model and deployment type (Provisioned can reach 100%). On GPT-5.6 and later model families, cache **writes** on Standard deployments can also be charged and are reported in `cache_write_tokens`, so a prefix that changes on every request pays for writes it never reads back.
+- **Retention is short by default**: in-memory caches are usually cleared after 5–10 minutes of inactivity and always within an hour of last use; extended retention (up to 24 hours) exists for supported models. Caches aren't shared between Azure subscriptions.
+- **Group related traffic**: on GPT-5.6 and later, reuse the same `prompt_cache_key` for requests that share a prefix.
+
 ### In Practice
 
 **What breaks without this**: An agent returns HTTP 200 with hallucinated answers for weeks, because the only alerts watch latency and 5xx errors.
@@ -74,7 +83,7 @@ Define alerts on two tiers:
 ### Exam Trap ⚠️
 
 <div class="note-trap">
-Prompt caching needs an identical prompt prefix of at least 1,024 tokens, so putting variable content (user name, timestamp) at the start of the prompt defeats it. And cached reads on Standard deployments are discounted, not free; only Provisioned deployments can reach a 100% discount.
+Prompt caching needs an identical prompt prefix of at least 1,024 tokens, so putting variable content (user name, timestamp) at the start of the prompt defeats it. And cached reads on Standard deployments are discounted, not free; only Provisioned deployments can reach a 100% discount. The read discount varies by model, and on GPT-5.6 and later model families cache writes can be billed too, so don't assume a flat saving.
 </div>
 
 ---
@@ -96,10 +105,13 @@ Golden Dataset → Evaluate (both versions) → Compare Metrics → Meet Thresho
 ```
 
 **Golden dataset requirements:**
-- ≥ 50 representative examples (ideally 100-200)
+- Enough representative examples to cover each scenario, intent and failure mode you care about; Microsoft sets no minimum count, so grow it from a focused starter set rather than chasing a number
 - Covers edge cases, domain boundaries, adversarial inputs
 - Has verified correct outputs (ground truth) for F1 and Similarity metrics
 - Refreshed when new features or significant prompt changes are made
+- Includes every case a previous version got wrong and grows with new production failures, so a fixed regression stays fixed
+
+**Maintaining the dataset in Foundry**: upload it as JSONL or CSV to create a **versioned dataset** in the Foundry project, so every evaluation run and CI/CD gate points at a known version. The columns follow the evaluators you pick: `query` and `response` (or `messages`) for most, `context` for groundedness on string inputs, `ground_truth` for reference comparisons such as similarity, and `tool_definitions` for agent evaluators. Before launch or with little traffic, bootstrap with a **synthetic evaluation dataset**; once in production, **convert agent traces into evaluation datasets** so the test set reflects what users actually ask.
 
 #### A/B Test Decision Framework
 
@@ -146,6 +158,22 @@ For solutions spanning multiple D365 apps, design tests that:
 - Validate data consistency across apps (D365 Finance → D365 SCM → Power BI)
 - Include escalation paths from AI agent to human agent in D365 Contact Center
 
+#### Load Testing AI Endpoints
+
+Quality gates don't show whether the agent survives peak traffic. **Azure Load Testing** is a managed service that generates high-scale load from a URL-based quick test or an uploaded **JMeter** or **Locust** script, collects server-side metrics for Azure-hosted components through Azure Monitor, and can run in CI/CD with **test fail criteria** so a performance regression blocks the release.
+
+For model and agent endpoints:
+- Measure **token throughput** (tokens per minute) as well as requests per second and P95/P99 latency, because model capacity is allocated and throttled in tokens.
+- Push past quota on purpose to trigger **HTTP 429** throttling, and confirm the client retries with backoff instead of failing the user.
+- Use realistic, varied prompts: prompt length drives latency and token use, and one repeated prompt mostly measures cache hits.
+- Budget for it: every call to a pay-as-you-go model endpoint is billed, so stress tests get expensive. Options include spare PTU capacity in a test environment or simulating the endpoint with **Dev Proxy**.
+
+| Pattern | What it reveals |
+|---------|-----------------|
+| Ramp-up | The concurrency at which latency starts to degrade |
+| Spike | Error rate and recovery time after a sudden burst |
+| Soak | Quota exhaustion and slow degradation under sustained load |
+
 ### In Practice
 
 **What breaks without this**: A prompt variant with a better mean ships, and the 23 of 500 answers that scored 1/5 on groundedness turn out to cluster on one query type that matters most.
@@ -157,7 +185,7 @@ For solutions spanning multiple D365 apps, design tests that:
 ### Exam Trap ⚠️
 
 <div class="note-trap">
-Copilot-generated test cases are candidates, not ground truth, and they cover what the agent already knows, so they won't reveal knowledge gaps. For red teaming, a lower attack success rate (ASR) is the better result.
+Copilot-generated test cases are candidates, not ground truth, and they cover what the agent already knows, so they won't reveal knowledge gaps. For red teaming, a lower attack success rate (ASR) is the better result. Load tests prove capacity and throttling behaviour, not answer quality; size model capacity on token throughput, not request count alone.
 </div>
 
 ---
@@ -412,6 +440,25 @@ General quality needs no expected answers, so it's the only method that works on
 
 When something goes wrong, **cluster analysis** groups evaluation failures into patterns, and the **agent optimizer (preview)** can generate improved instructions, skills, tool descriptions and model selections, which you then re-evaluate. **It works like a hospital: tests diagnose, monitors catch changes overnight, and the patient chart explains what happened at each step.**
 
+#### Setting Up Tracing
+
+- **Connect Application Insights** to the Foundry project. Foundry stores traces there using the OpenTelemetry generative AI semantic conventions; retention and cost follow your Application Insights and Log Analytics settings.
+- **Server-side tracing comes first**: once connected, Foundry logs traces for prompt agents, hosted agents and workflows with no code changes, and the portal's Traces view covers the last 90 days. Agents built with Microsoft Agent Framework also emit traces when tracing is enabled for the project.
+- **Client-side instrumentation is the second step**, for your own code around the agent call. Call `configure_azure_monitor()` with the Application Insights connection string at application startup (spans emitted before the call are lost), then add custom spans for your own steps.
+- **Access**: querying telemetry needs the Log Analytics Reader role on the connected resource, plus Privileged Monitoring Data Reader if the tables are protected.
+- **Privacy**: traces can capture prompts, outputs and tool arguments. Keep secrets out of prompts and span attributes, redact personal data, and apply the same access controls and retention as production logs.
+
+```python
+from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry import trace
+
+configure_azure_monitor(connection_string=os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"])  # at startup
+tracer = trace.get_tracer(__name__)
+
+with tracer.start_as_current_span("lookup-customer"):  # your own step around the agent call
+    ...
+```
+
 ### In Practice
 
 **What breaks without this**: HTTP 200 responses hide hallucinations, latency spikes can't be pinned to a tool or model call, and quality drifts for weeks before users complain.
@@ -423,7 +470,7 @@ When something goes wrong, **cluster analysis** groups evaluation failures into 
 ### Exam Trap ⚠️
 
 <div class="note-trap">
-Availability tests and HTTP error alerts prove the endpoint is up, not that the answers are good. And evaluations in the Foundry agents playground are on by default and billed by consumption.
+Availability tests and HTTP error alerts prove the endpoint is up, not that the answers are good. And evaluations in the Foundry agents playground are on by default and billed by consumption. For Foundry-hosted agents, connecting Application Insights is enough for server-side traces; client-side OpenTelemetry code is only for your own logic around the agent.
 </div>
 
 ---
@@ -476,7 +523,7 @@ Responsible AI, security and governance wrap around the loop rather than sitting
 | Groundedness + Relevance | High Relevance + Low Groundedness = hallucination |
 | Quality alerts | HTTP 5xx alerts ≠ quality alerts; need separate metric-based alerts |
 | Prompt caching | ≥1,024 identical prefix tokens → cache reads at a discount; check cached_tokens in usage |
-| Golden dataset | ≥50 examples; validates quality before any deployment; refreshed per change |
+| Golden dataset | Representative cases incl. edge and past failures; validates quality before any deployment; refreshed per change |
 | A/B promotion | Define metric priorities; check outliers, not just means |
 | Red-team testing | AI Red Teaming Agent (PyRIT) → attack success rate by risk and complexity |
 | Copilot test generation | Generates templates + variations + eval prompts; humans validate |
@@ -491,3 +538,5 @@ Responsible AI, security and governance wrap around the loop rather than sitting
 | Data residency | EU region + Data Zone (EU) or Standard deployment + Azure Policy + Private Endpoints |
 | Copilot Studio testing | Agent evaluation test sets: general quality, compare meaning, tool use, content safety, and more |
 | Foundry monitoring | Continuous + scheduled evaluation, scheduled red teaming, Azure Monitor alerts |
+| Foundry tracing | Connect Application Insights → server-side traces with no code; `configure_azure_monitor()` for your own code |
+| Load testing | Azure Load Testing (JMeter/Locust) with fail criteria in CI/CD; watch tokens per minute and HTTP 429s |

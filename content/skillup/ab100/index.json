@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.2.0",
+  "contentVersion": "1.2.1",
   "contentUpdatedAt": "2026-10-27",
   "provider": "Microsoft",
   "palette": {
@@ -40,6 +40,12 @@
       "date": "2026-10-27",
       "type": "minor",
       "summary": "Converted the 3 legacy scenarios (compliance monitoring, HR onboarding, invoice processing) to RichScenario v2.0 walkthroughs: background, conflicting characters, 5 decision questions each and key learnings, with facts updated to current Microsoft Learn (groundedness detection rather than harm filters for fabricated citations, model retirement handling, Document Intelligence extracts rather than generates documents, Entra Lifecycle Workflows for joiner provisioning, locked WORM policies). Restructured every topic section in the D1-D4 notes into Key Concept / In Practice / Exam Trap. Rewrote 87 question explanations into the 'X is correct: ... A is wrong because ...' shape, covering every distractor, and corrected facts in several (EU AI Act medical-device classification via Article 6(1)/Annex I, Azure AI Search data sources, PTU billing, Copilot Studio deep reasoning)."
+    },
+    {
+      "version": "1.2.1",
+      "date": "2026-10-27",
+      "type": "patch",
+      "summary": "Merged the unreferenced ab100-d3-monitor-test.md into the D3 note (prompt caching in practice: cached_tokens checks, model-dependent read discount, GPT-5.6+ cache-write charges and cache retention; golden dataset maintenance with versioned Foundry datasets, evaluator-specific columns, synthetic and trace-derived datasets; Azure Load Testing for AI endpoints; Foundry tracing setup with Application Insights and OpenTelemetry; two quick-reference rows) and removed it. Softened the unsourced golden-dataset size rule (\"≥ 50 examples, ideally 100-200\"): Microsoft sets no minimum, so the note now asks for coverage of scenarios, edge cases and past failures instead."
     }
   ],
   "id": "ab100",

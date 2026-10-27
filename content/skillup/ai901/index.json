@@ -28,7 +28,7 @@
   "duration": "45 min",
   "passScore": "700/1000",
   "passThreshold": 70,
-  "examFee": "$99 USD",
+  "examFee": "",
   "available": true,
   "contentTypes": ["mcq", "notes", "scenario"],
   "prerequisites": [],

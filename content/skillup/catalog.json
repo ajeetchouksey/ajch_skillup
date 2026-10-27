@@ -5,7 +5,7 @@
   "exams": [
     {
       "schemaVersion": "1.0",
-      "contentVersion": "1.2.0",
+      "contentVersion": "1.2.1",
       "contentUpdatedAt": "2026-10-27",
       "provider": "Microsoft",
       "palette": {
@@ -45,6 +45,12 @@
           "date": "2026-10-27",
           "type": "minor",
           "summary": "Converted the 3 legacy scenarios (compliance monitoring, HR onboarding, invoice processing) to RichScenario v2.0 walkthroughs: background, conflicting characters, 5 decision questions each and key learnings, with facts updated to current Microsoft Learn (groundedness detection rather than harm filters for fabricated citations, model retirement handling, Document Intelligence extracts rather than generates documents, Entra Lifecycle Workflows for joiner provisioning, locked WORM policies). Restructured every topic section in the D1-D4 notes into Key Concept / In Practice / Exam Trap. Rewrote 87 question explanations into the 'X is correct: ... A is wrong because ...' shape, covering every distractor, and corrected facts in several (EU AI Act medical-device classification via Article 6(1)/Annex I, Azure AI Search data sources, PTU billing, Copilot Studio deep reasoning)."
+        },
+        {
+          "version": "1.2.1",
+          "date": "2026-10-27",
+          "type": "patch",
+          "summary": "Merged the unreferenced ab100-d3-monitor-test.md into the D3 note (prompt caching in practice: cached_tokens checks, model-dependent read discount, GPT-5.6+ cache-write charges and cache retention; golden dataset maintenance with versioned Foundry datasets, evaluator-specific columns, synthetic and trace-derived datasets; Azure Load Testing for AI endpoints; Foundry tracing setup with Application Insights and OpenTelemetry; two quick-reference rows) and removed it. Softened the unsourced golden-dataset size rule (\"\u2265 50 examples, ideally 100-200\"): Microsoft sets no minimum, so the note now asks for coverage of scenarios, edge cases and past failures instead."
         }
       ],
       "id": "ab100",
@@ -418,7 +424,7 @@
       "duration": "45 min",
       "passScore": "700/1000",
       "passThreshold": 70,
-      "examFee": "$99 USD",
+      "examFee": "",
       "available": true,
       "contentTypes": [
         "mcq",
@@ -2076,7 +2082,7 @@
     },
     {
       "schemaVersion": "1.0",
-      "contentVersion": "1.1.0",
+      "contentVersion": "1.2.0",
       "contentUpdatedAt": "2026-10-27",
       "provider": "GitHub",
       "palette": {
@@ -2104,6 +2110,12 @@
           "date": "2026-10-27",
           "type": "minor",
           "summary": "Difficulty tagged on all questions; 9 new questions (rulesets layering and bypass modes, CODEOWNERS base-branch rule, script injection, OIDC sub conditions, SHA-pinning policy, push protection bypass, Secret Protection vs Code Security, private vulnerability reporting); 23 existing questions corrected against current GitHub docs (tag rulesets, custom-property targeting, fork token behaviour, job-level timeouts, upload-sarif action, security configurations, machine accounts, PVR); all three domain notes rewritten to the Key Concept / In Practice / Exam Trap standard with Deep Dives and new sections on rulesets, OIDC, script injection, runners, push protection, GHAS products, dependency review and audit log. Correct-answer positions rebalanced (B had been correct in 81%)."
+        },
+        {
+          "version": "1.2.0",
+          "date": "2026-10-27",
+          "type": "minor",
+          "summary": "Converted the 2 legacy scenarios to RichScenario v2.0 walkthroughs (Migrating Jenkins Pipelines to GitHub Actions: 6 questions on GitHub Actions Importer audit/forecast/dry-run/migrate, Jenkinsfile-to-workflow syntax mapping, OIDC to AWS, reusable workflows with environments, ephemeral ARC runners and deploy concurrency; Securing a Large Monorepo: 6 questions on ruleset and branch protection layering, CODEOWNERS ordering, path-filtered required checks, push protection with delegated bypass, org-required dependency review and tag rulesets). Corrected legacy claims: required checks do not fail open (skipped path-filtered workflows leave them pending), push protection rejects pushes when they are attempted rather than at the client, dependency review gates on fail-on-severity rather than a CVSS score, and tag rulesets prevent deletion rather than making tags recoverable."
         }
       ],
       "id": "ghbp",
