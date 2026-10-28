@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant C as Claude
+    participant T1 as Tool 1
+    participant T2 as Tool 2
+    participant T3 as Tool 3
+    
+    Note over C: "I need 3 independent pieces of data"
+    par Parallel Execution
+        C->>T1: get_weather("NYC")
+        C->>T2: get_weather("London")
+        C->>T3: get_stock("AAPL")
+    end
+    T1-->>C: {"temp": 72}
+    T2-->>C: {"temp": 55}
+    T3-->>C: {"price": 189.50}
+    Note over C: Synthesize all results

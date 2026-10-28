@@ -1,0 +1,12 @@
+flowchart TD
+    W["Multi-agent workflow running"] --> M1{"Any agent producing<br/>no progress signal within<br/>expected window?"}
+    M1 -->|"Yes"| STALL["Stalled execution"]
+    M1 -->|"No"| M2{"Output quality trending down<br/>across recent sessions or handoffs?"}
+    M2 -->|"Yes"| DEGRADE["Degraded behavior"]
+    M2 -->|"No"| OK["Healthy — continue"]
+    STALL --> D1{"Recoverable in place?<br/>e.g. re-trigger the<br/>stalled handoff"}
+    D1 -->|"Yes"| RETRY["Resume / re-trigger"]
+    D1 -->|"No"| ROLL["Rollback to last known-good state"]
+    DEGRADE --> D2{"Root cause isolated to<br/>one agent's config?"}
+    D2 -->|"Yes"| TUNE["Tune that agent<br/>(D4 fix, matched to layer)"]
+    D2 -->|"No — spans coordinator<br/>decisions or unclear"| HITL["Human-in-the-loop:<br/>pause workflow, escalate"]

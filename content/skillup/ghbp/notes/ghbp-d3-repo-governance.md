@@ -394,16 +394,8 @@ Enforcement can live in CI (commitlint as a required check) or in a ruleset meta
 | `ci` | CI/CD configuration | `ci: add CodeQL scanning workflow` |
 | `!` / `BREAKING CHANGE:` | Breaking API change (MAJOR) | `feat!: remove deprecated v1 endpoints` |
 
-```mermaid
-graph TD
-    COMMIT["feat(payments): add refund webhook handler"] --> CHANGELOG["📋 Auto-generated CHANGELOG"]
-    COMMIT --> VERSION["🔖 Semantic version bump: MINOR"]
-    COMMIT --> RELEASE["🚀 Automated release notes"]
-
-    COMMIT2["fix!: correct rounding error in tax calc"] --> CHANGELOG2["📋 CHANGELOG — Breaking Changes section"]
-    COMMIT2 --> VERSION2["🔖 MAJOR version bump"]
-    COMMIT2 --> RELEASE2["⚠️ Release notes — highlights breaking change"]
-```
+![Flow diagram for "Key Concept": featpayments: add refundwebhook handler, Auto-generatedCHANGELOG, Semantic version bump:MINOR, Automated release notes, fix!: correct rounding errorin tax calc, CHANGELOG — BreakingChanges section, MAJOR version bump, Release notes — highlightsbreaking change](/content/skillup/ghbp/images/ghbp-d3-repo-governance-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d3-repo-governance-m1.mmd -->
 
 ```yaml
 # .github/workflows/commitlint.yml
@@ -491,19 +483,8 @@ A **GitHub App** is the recommended identity for organization automation. It isn
 
 For GitHub Packages, classic PATs need `read:packages` to install and `write:packages` to publish. Repository read access alone isn't enough. In Actions, prefer `GITHUB_TOKEN` with `packages: write`. **Think of a GitHub App as a company car with a fuel card limited to work routes**: it belongs to the organization, not to whoever happens to be driving.
 
-```mermaid
-graph TD
-    MAIN["main branch"] -->|"Auto-deploy"| STAGING["🟡 Staging env"]
-    STAGING -->|"Required approval"| PROD_GATE["👁️ Production approval gate"]
-    PROD_GATE -->|"Approved"| PROD["🟢 Production env"]
-
-    subgraph "Production environment settings"
-        R["Required reviewers: 2 team leads"]
-        T["Wait timer: 5 min"]
-        B["Deployment branches: main only"]
-        S["Environment secrets (not repo secrets)"]
-    end
-```
+![Flow diagram for "Key Concept": Auto-deploy, Required approval, Approved, Production environment settings, Required reviewers: 2 teamleads, Wait timer: 5 min, Deployment branches:main only, Environment secrets notrepo secrets, main branch, Staging env](/content/skillup/ghbp/images/ghbp-d3-repo-governance-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d3-repo-governance-m2.mmd -->
 
 | Credential | Scope | Lifetime | Use when |
 |---|---|---|---|

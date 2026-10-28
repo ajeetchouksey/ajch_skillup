@@ -1,0 +1,6 @@
+flowchart TD
+    F["Agent produced wrong result"] --> Q1{"Was the needed info,<br/>tool, or permission actually<br/>available to the agent?"}
+    Q1 -->|"No — missing context"| CTX["Context / environment issue<br/>(fix: memory scoping — D3,<br/>tool/MCP/firewall config — D2)"]
+    Q1 -->|"Yes, it was available"| Q2{"Did the agent invoke<br/>the right tool with the<br/>right inputs, and act on<br/>what it actually returned?"}
+    Q2 -->|"No — tool misuse"| TOOL["Tool misuse<br/>(fix: narrow/clarify tool access,<br/>tool-selection guidance)"]
+    Q2 -->|"Yes, tool use was correct"| REASON["Reasoning error<br/>(fix: revise instructions,<br/>tighten workflow/constraints)"]

@@ -1,0 +1,9 @@
+flowchart LR
+  D1[Discovery<br/>brief approved] --> D2[Design<br/>ADRs + sign-off]
+  D2 --> D3[Handoff<br/>docs + team briefed<br/>+ ownership transferred]
+  D3 --> D4[Monitoring<br/>SLA metrics, feedback register]
+  D4 --> D5{Gap found:<br/>drift, new need, feedback}
+  D5 -->|Minor, in-scope| D6[Iteration<br/>lightweight redesign]
+  D6 --> D3
+  D5 -->|Material, out-of-scope<br/>new use case or data source| D1
+  D5 -->|No gap| D4

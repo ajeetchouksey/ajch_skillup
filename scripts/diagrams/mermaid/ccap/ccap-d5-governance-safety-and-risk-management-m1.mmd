@@ -1,0 +1,8 @@
+flowchart LR
+  U[User / upstream request] --> IN[Input-side controls<br/>PII detection, injection filters]
+  IN --> SP[System-prompt controls<br/>scope, tone, refusal policy]
+  SP --> M[Model reasoning<br/>Claude built-in alignment]
+  M --> TP[Tool-permission controls<br/>least-privilege, scoped params]
+  TP --> OUT[Output-side controls<br/>validation, PII scrub, LLM-as-judge]
+  OUT --> R[Response / action]
+  TP -. hard ceiling enforced<br/>independent of prompt .-> LIMIT[Rate / scope limits<br/>max value, max calls, escalation threshold]

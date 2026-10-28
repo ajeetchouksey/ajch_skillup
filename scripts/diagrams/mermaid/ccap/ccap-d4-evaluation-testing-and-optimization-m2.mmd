@@ -1,0 +1,10 @@
+flowchart TD
+  Start([Wrong or unexpected output]) --> Q1{Was the correct grounding<br/>context retrieved and<br/>present in the prompt?}
+  Q1 -->|No / missing / stale context| Retrieval[Retrieval Issue<br/>fix: chunking, indexing,<br/>ranking, metadata filters]
+  Q1 -->|Yes, correct context was present| Q2{Did the model contradict<br/>or ignore the provided context?}
+  Q2 -->|Yes, fabricated beyond given context| Halluc[Hallucination<br/>fix: grounding constraints,<br/>citation requirements,<br/>verification step]
+  Q2 -->|No, it used the context faithfully| Q3{Were the instructions<br/>ambiguous, contradictory,<br/>or missing a constraint?}
+  Q3 -->|Yes| Prompt[Prompt Failure<br/>fix: clarify instructions,<br/>add constraints/examples,<br/>structured output]
+  Q3 -->|No, instructions were clear| Q4{Does the task require<br/>reasoning beyond the<br/>selected model's tier?}
+  Q4 -->|Yes, task exceeds model capability| Mismatch[Model Mismatch<br/>fix: route to higher-tier model]
+  Q4 -->|No| Other[Investigate tool-call errors,<br/>context truncation,<br/>or downstream system bug]

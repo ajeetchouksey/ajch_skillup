@@ -135,15 +135,8 @@ Text is split into **tokens** (words, sub-words or punctuation), and each token 
 
 A **transformer** processes these vectors. **Attention** lets each token take its context into account, which is why "bank" means something different next to "river" than next to "account", and **positional encoding** tells the model the order of the tokens. The decoder then predicts the most probable next token, appends it and repeats until it predicts the end. **Think of it as extremely well-read predictive text**: it writes fluently because it has seen a lot, not because it looks answers up.
 
-```mermaid
-graph LR
-  A[Prompt text] --> B[Tokens]
-  B --> C[Embeddings]
-  C --> D[Transformer with attention]
-  D --> E[Next-token prediction]
-  E -->|append and repeat| D
-  E --> F[Completion]
-```
+![Flow diagram for "Key Concept": append and repeat, Prompt text, Tokens, Embeddings, Transformer with attention, Next-token prediction, Completion](/content/skillup/ai901/images/ai901-d1-ai-concepts-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ai901/ai901-d1-ai-concepts-m1.mmd -->
 
 Two related terms: **large language models (LLMs)** are big and general, and **small language models (SLMs)**, such as the Phi family, are compact enough for constrained devices. Usage, limits and cost are all measured in tokens.
 

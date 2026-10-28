@@ -1,0 +1,12 @@
+flowchart TD
+    A["Candidate agent action"] --> B{"Operational risk?<br/>could break the build,<br/>degrade a running service"}
+    B -->|High| R1["High-risk tier"]
+    B -->|Low| C{"Security risk?<br/>touches secrets, credentials,<br/>or permission scope"}
+    C -->|High| R1
+    C -->|Low| D{"Compliance risk?<br/>data retention, licensing,<br/>Responsible AI policy"}
+    D -->|High| R1
+    D -->|Low| R2["Low-risk tier"]
+    R1 --> E{"Reversible?"}
+    E -->|"No — irreversible or<br/>compliance-sensitive"| F["Autonomy: none —<br/>explicit human authorization required"]
+    E -->|"Yes — reversible, but<br/>still elevated risk"| G["Autonomy: supervised —<br/>agent proposes; human approves"]
+    R2 --> H["Autonomy: full —<br/>agent executes, standard CI gate only"]

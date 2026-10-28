@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph IN[Inbound]
+        direction TB
+        I1[1 · Developer types a chat message or code comment]:::data
+        I1 --> I2[2 · HTTPS transmission + context gathering<br/>code around cursor, open tabs, instructions, history]
+        I2 --> I3[3 · Proxy filter in a GitHub-owned Azure tenant<br/>blocks prompt-hacking attempts]:::warn
+        I3 --> I4[4 · Toxicity filtering<br/>hate speech, inappropriate content, personal data]:::warn
+        I4 --> I5[5 · LLM generates the response]:::focus
+    end
+    subgraph OUT[Outbound]
+        direction TB
+        O6[6 · Post-processing: toxicity, code-quality checks,<br/>optional public-code matching ~150 chars]:::warn
+        O6 --> O7[7 · Response delivered;<br/>accept, edit or reject feeds the loop]
+        O7 --> O8[8 · Developer reviews and iterates]:::good
+    end
+    I5 --> O6
+    classDef focus fill:#5B4BD6,stroke:#A99BFF,color:#ffffff
+    classDef good fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+    classDef warn fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+    classDef risk fill:#2a1a1a,stroke:#fb7185,color:#e2e8f0
+    classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0

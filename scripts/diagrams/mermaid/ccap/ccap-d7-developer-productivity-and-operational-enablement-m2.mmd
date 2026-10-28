@@ -1,0 +1,15 @@
+flowchart TD
+  A[Claude Code workflow<br/>not behaving as expected] --> B{Was the tool call<br/>blocked or unexpectedly confirmed?}
+  B -->|Yes| C[Check resolved permissions<br/>which settings layer fired]
+  B -->|No| D{Did a tool/MCP call<br/>fail or return nothing?}
+  D -->|Yes| E[Check MCP server logs<br/>and connectivity]
+  D -->|No| F{Is this a long-running<br/>session with degrading quality?}
+  F -->|Yes| G[Inspect context usage<br/>reset / summarize / delegate to subagent]
+  F -->|No| H{Unexpected throttling<br/>or cost spike?}
+  H -->|Yes| I[Check usage/cost telemetry<br/>Console or OTel export]
+  H -->|No| J[Trace the session transcript<br/>reconstruct the actual tool-call sequence]
+  C --> K[Resolved]
+  E --> K
+  G --> K
+  I --> K
+  J --> K

@@ -1,0 +1,12 @@
+flowchart TD
+  A[Business ask<br/>often vague] --> B[Stakeholder interviews<br/>+ workshops]
+  A --> C[Current-state process review<br/>baseline metrics, artifacts]
+  A --> D[Data availability & quality audit]
+  A --> E[Integration & constraint landscape]
+  B --> F[Discovery brief]
+  C --> F
+  D --> F
+  E --> F
+  F --> G{Stakeholder sign-off?}
+  G -->|No, gaps found| B
+  G -->|Yes| H[Design phase begins<br/>on a stable target]

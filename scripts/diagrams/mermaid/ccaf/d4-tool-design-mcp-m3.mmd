@@ -1,0 +1,5 @@
+graph TD
+    TC["tool_choice"] --> A["auto<br/>(default)<br/>Claude MAY call tools"]
+    TC --> ANY["any<br/>Claude MUST call a tool<br/>(picks which one)"]
+    TC --> T["tool<br/>Claude MUST call<br/>THIS SPECIFIC tool"]
+    TC --> N["none<br/>Tools disabled<br/>(reasoning only)"]

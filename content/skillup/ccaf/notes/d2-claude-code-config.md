@@ -34,18 +34,8 @@ Think of every instruction file as a page in the same briefing pack handed to Cl
 
 <mark>All pages are read together. Later pages don't cancel earlier ones; if two pages contradict each other, Claude may follow either.</mark>
 
-```mermaid
-graph TD
-    M["Managed policy CLAUDE.md<br/>(org-wide, IT-deployed)"] --> U["~/.claude/CLAUDE.md<br/>USER (only you)"]
-    U --> P["./CLAUDE.md or ./.claude/CLAUDE.md<br/>PROJECT (shared via git)"]
-    P --> D["subdir/CLAUDE.md<br/>DIRECTORY (loads on demand)"]
-    P --> R[".claude/rules/*.md<br/>RULES (paths = conditional)"]
-
-    style U fill:#1e293b,stroke:#64748b
-    style P fill:#1e293b,stroke:#a78bfa
-    style D fill:#1e293b,stroke:#a78bfa
-    style R fill:#1e293b,stroke:#22c55e
-```
+![Flow diagram for "Mental Model: Layers in One Briefing Pack": Managed policyCLAUDE.mdorg-wide, IT-deployed, ~/.claude/CLAUDE.mdUSER only you, ./CLAUDE.md or./.claude/CLAUDE.mdPROJECT shared via git, subdir/CLAUDE.mdDIRECTORY loads ondemand, .claude/rules/*.mdRULES paths = conditional](/content/skillup/ccaf/images/d2-claude-code-config-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d2-claude-code-config-m1.mmd -->
 
 ### The Levels in Detail
 
@@ -412,26 +402,8 @@ Reads inside the working directory and a built-in set of read-only commands (suc
 
 ## 🧩 Domain 2 Decision Flowchart
 
-```mermaid
-flowchart TD
-    Q["What are you configuring?"] --> B1{"Instructions,<br/>enforcement,<br/>or a capability?"}
-    B1 -->|"Instructions"| B2{"Who and when?"}
-    B1 -->|"Enforcement"| EN["Permission rules in settings.json<br/>or a hook"]
-    B1 -->|"New capability<br/>(tools)"| CF{"Team or just me?"}
-    CF -->|"Team"| MJ[".mcp.json (project scope)"]
-    CF -->|"Just me"| UJ["~/.claude.json (local/user scope)"]
-
-    B2 -->|"Just me,<br/>all projects"| GL["~/.claude/CLAUDE.md"]
-    B2 -->|"Whole team,<br/>every session"| PR["./CLAUDE.md"]
-    B2 -->|"Only for matching files"| SC[".claude/rules/*.md<br/>with paths"]
-    B2 -->|"Only when a task needs it"| SK[".claude/skills/&lt;name&gt;/SKILL.md"]
-
-    style EN fill:#1e293b,stroke:#f59e0b
-    style GL fill:#1e293b,stroke:#64748b
-    style PR fill:#1e293b,stroke:#a78bfa
-    style SC fill:#1e293b,stroke:#22c55e
-    style SK fill:#1e293b,stroke:#3b82f6
-```
+![Flow diagram for "Domain 2 Decision Flowchart": Instructions, Enforcement, New capabilitytools, Team, Just me, Just me,all projects, Whole team,every session, Only for matching files, Only when a task needs it, What are you configuring?](/content/skillup/ccaf/images/d2-claude-code-config-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d2-claude-code-config-m2.mmd -->
 
 <div class="note-scribble">On exam day: "Must it be guaranteed?" → permissions/hooks. "Is it a capability?" → MCP (.mcp.json for the team). "Is it knowledge?" → CLAUDE.md, rules, or skills, chosen by when it's needed.</div>
 
@@ -507,12 +479,8 @@ Use the Explore subagent to find all callers of authenticate()
 and return a summary — not the raw output.
 ```
 
-```mermaid
-graph LR
-    M["Main Agent<br/>(high-level coordination)"] -->|"Spawn"| E["Explore Subagent<br/>(verbose discovery)"]
-    E -->|"Summary only"| M
-    M --> I["Implementation<br/>(context still clean)"]
-```
+![Flow diagram for "Explore Subagent": Spawn, Summary only, Main Agenthigh-level coordination, Explore Subagentverbose discovery, Implementationcontext still clean](/content/skillup/ccaf/images/d2-claude-code-config-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d2-claude-code-config-m3.mmd -->
 
 <div class="note-important"><strong>Combine with plan mode:</strong> plan mode to design, Explore to investigate, then direct execution to implement. Context stays clean at every phase.</div>
 

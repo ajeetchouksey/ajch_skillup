@@ -1,0 +1,9 @@
+flowchart LR
+  A[Stakeholder expectation<br/>often implicit] --> B[Made explicit &<br/>measurable: SLA]
+  B --> C[Regular feedback cadence<br/>demo, review, check-in]
+  C --> D[Feedback register<br/>logged, triaged]
+  D --> E{Within SLA?}
+  E -->|Yes| F[Continue / iterate normally]
+  E -->|No: SLA breach| G[Escalation path<br/>defined remediation]
+  G --> C
+  F --> C

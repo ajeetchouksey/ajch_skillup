@@ -1,0 +1,9 @@
+flowchart LR
+    Q{Does step B need<br/>the output of step A?}:::focus
+    Q -->|Yes| S[Sequential<br/>B must wait for A]
+    Q -.->|No| P[Parallel<br/>run them at the same time]:::good
+    classDef focus fill:#5B4BD6,stroke:#A99BFF,color:#ffffff
+    classDef good fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+    classDef warn fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+    classDef risk fill:#2a1a1a,stroke:#fb7185,color:#e2e8f0
+    classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0

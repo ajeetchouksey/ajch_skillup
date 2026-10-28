@@ -100,9 +100,8 @@ Red teaming and generated test cases widen coverage: the AI Red Teaming Agent re
 
 #### Pre-Deployment Validation Pipeline
 
-```
-Golden Dataset → Evaluate (both versions) → Compare Metrics → Meet Thresholds? → Staging → Canary (1-5%) → Production
-```
+![Flow diagram for "Key Concept": Yes, No, Golden dataset, Evaluate both versions, Compare metrics, Meet thresholds?, Staging, Fix and re-evaluate, Canary: 1-5% of traffic, Production](/content/skillup/ab100/images/ab100-d3-deploy-ai-solutions-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d3-deploy-ai-solutions-m1.mmd -->
 
 **Golden dataset requirements:**
 - Enough representative examples to cover each scenario, intent and failure mode you care about; Microsoft sets no minimum count, so grow it from a focused starter set rather than chasing a number
@@ -221,14 +220,8 @@ Key ALM considerations:
 #### Foundry Agents ALM
 
 Pipeline stages for Foundry Agents:
-```
-Source Control (agent YAML + Bicep)
-    → CI: lint + validate schema + run golden dataset evaluation
-    → Deploy to DEV Foundry Project (environment-specific model deployment names)
-    → Deploy to STAGING + run integration tests
-    → Canary to PRODUCTION (1-5% traffic)
-    → Full PRODUCTION promotion
-```
+![Flow diagram for "Key Concept": Source controlagent YAML + Bicep, CI: lint, validate schema,golden dataset evaluation, Deploy to DEV Foundryprojectenvironment-specificdeployment names, Deploy to STAGINGrun integration tests, Canary to PRODUCTION1-5% of traffic, Full PRODUCTIONpromotion](/content/skillup/ab100/images/ab100-d3-deploy-ai-solutions-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d3-deploy-ai-solutions-m2.mmd -->
 
 Foundry snapshots agent versions automatically, so rollback is a version change, and publishing promotes an agent to a stable endpoint.
 

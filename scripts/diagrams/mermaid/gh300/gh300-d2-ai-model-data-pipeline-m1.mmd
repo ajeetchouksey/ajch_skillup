@@ -1,0 +1,9 @@
+graph LR
+  A[Developer types] --> B[IDE Extension]
+  B --> C[Context Assembly]
+  C --> D[API Request to GitHub]
+  D --> E[LLM Inference]
+  E --> F[Suggestion Response]
+  F --> G[Rendered as ghost text]
+  G -->|Accept/Reject| H[Telemetry log]
+  H -->|Aggregate only| I[Product improvement]

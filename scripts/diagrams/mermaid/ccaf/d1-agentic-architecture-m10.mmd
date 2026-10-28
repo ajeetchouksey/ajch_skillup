@@ -1,0 +1,12 @@
+graph TD
+    Q["Exam Question:<br/>How to ensure X happens?"] --> M{MUST it happen<br/>every time?}
+    M -->|"Yes, guaranteed"| H[Use a HOOK]
+    M -->|"Best effort ok"| P[Use a PROMPT instruction]
+    H --> W{Which hook?}
+    W -->|"Before tool runs"| Pre[PreToolUse]
+    W -->|"After tool returns"| Post[PostToolUse]
+    W -->|"When Claude tries to finish"| Stop[Stop Hook]
+    P --> T{What kind?}
+    T -->|"Behavior/style"| Sys[System prompt]
+    T -->|"Format"| Few[Few-shot examples]
+    T -->|"File-specific"| Scope[Scoped rule]

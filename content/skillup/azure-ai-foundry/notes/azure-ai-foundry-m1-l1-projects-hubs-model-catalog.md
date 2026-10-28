@@ -29,28 +29,8 @@ Hub-based projects still exist, but only in the Foundry (classic) portal; the cu
 | Foundry project | Development boundary inside a Foundry resource: agents, files, evaluations | One per team or use case, recommended default for new work |
 | Hub-based project (classic) | A project under a Foundry hub, visible only in the Foundry (classic) portal | Only when you need a classic-only feature (Prompt flow, managed compute) |
 
-```mermaid
-flowchart TD
-  H[Foundry Resource]
-  P1[Support Bot Project]
-  P2[Search Assistant Project]
-  P3[Content Gen Project]
-  M1[Chat Model]
-  M2[Embedding Model]
-  M3[Reasoning Model]
-  H -->|shares governance| P1
-  H -->|shares governance| P2
-  H -->|shares governance| P3
-  P1 -->|uses| M1
-  P2 -->|uses| M2
-  P3 -->|uses| M3
-  classDef hub fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  classDef proj fill:#162236,stroke:#60a5fa,color:#e2e8f0
-  classDef model fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  class H hub
-  class P1,P2,P3 proj
-  class M1,M2,M3 model
-```
+![Flow diagram for "Key Concept": shares governance, uses, Foundry Resource, Support Bot Project, Search Assistant Project, Content Gen Project, Chat Model, Embedding Model, Reasoning Model](/content/skillup/azure-ai-foundry/images/azure-ai-foundry-m1-l1-projects-hubs-model-catalog-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/azure-ai-foundry/azure-ai-foundry-m1-l1-projects-hubs-model-catalog-m1.mmd -->
 *One Foundry resource, three team projects, three chosen models.*
 
 ### In Practice

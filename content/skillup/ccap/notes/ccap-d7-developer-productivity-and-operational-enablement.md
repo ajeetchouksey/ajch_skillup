@@ -21,17 +21,8 @@ Team-level configuration operates at layered scopes, and an architect needs to k
 - **Permissions configuration** — `allow`, `deny`, and `ask` rules that govern which tools and commands Claude Code can execute without prompting, which it can never execute, and which require explicit human confirmation each time. Team-wide permission defaults (e.g., allow read-only git commands and test runners, deny destructive shell commands like `rm -rf` or force-pushes, ask before any network call) reduce both friction (fewer needless confirmation prompts for safe actions) and risk (no developer accidentally grants blanket trust to a destructive action).
 - **Shared MCP server configuration (`.mcp.json`)** — connections to internal tools (ticketing systems, internal APIs, databases) that the whole team should have consistent access to, checked into the repo rather than configured ad hoc per developer, so onboarding a new engineer means cloning the repo, not manually wiring up five integrations from memory (cross-linking D3's integration patterns and D5's least-privilege scoping — the same permission-scoping discipline used for production agents applies to what a developer's local Claude Code session is allowed to touch).
 
-```mermaid
-flowchart TD
-  A[Enterprise managed policy<br/>IT/platform-deployed, non-overridable] --> B[Project settings.json<br/>+ CLAUDE.md + .mcp.json<br/>committed to repo]
-  B --> C[User-level settings<br/>personal preferences only]
-  A --> D{Security-relevant setting?}
-  D -->|Yes| A
-  D -->|No, team convention| B
-  D -->|No, personal preference| C
-  B --> E[New engineer clones repo]
-  E --> F[Consistent tools, permissions,<br/>and conventions from day one]
-```
+![Flow diagram for "Key Concept": Yes, No, team convention, No, personal preference, Enterprise managed policyIT/platform-deployed,non-overridable, Project settings.json+ CLAUDE.md + .mcp.jsoncommitted to repo, User-level settingspersonal preferences only, Security-relevant setting?, New engineer clones repo, Consistent tools,permissions,and conventions from dayone](/content/skillup/ccap/images/ccap-d7-developer-productivity-and-operational-enablement-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d7-developer-productivity-and-operational-enablement-m1.mmd -->
 
 ### In Practice
 
@@ -90,23 +81,8 @@ The recurring categories an architect needs to recognize:
 
 A large share of "Claude did something wrong" reports turn out to be a permission rule, a disconnected tool, or a saturated context window, not a model failure — checking the transcript and the configuration layer first is what separates fast resolution from prolonged confusion.
 
-```mermaid
-flowchart TD
-  A[Claude Code workflow<br/>not behaving as expected] --> B{Was the tool call<br/>blocked or unexpectedly confirmed?}
-  B -->|Yes| C[Check resolved permissions<br/>which settings layer fired]
-  B -->|No| D{Did a tool/MCP call<br/>fail or return nothing?}
-  D -->|Yes| E[Check MCP server logs<br/>and connectivity]
-  D -->|No| F{Is this a long-running<br/>session with degrading quality?}
-  F -->|Yes| G[Inspect context usage<br/>reset / summarize / delegate to subagent]
-  F -->|No| H{Unexpected throttling<br/>or cost spike?}
-  H -->|Yes| I[Check usage/cost telemetry<br/>Console or OTel export]
-  H -->|No| J[Trace the session transcript<br/>reconstruct the actual tool-call sequence]
-  C --> K[Resolved]
-  E --> K
-  G --> K
-  I --> K
-  J --> K
-```
+![Flow diagram for "Key Concept": Yes, No, Claude Code workflownot behaving as expected, Was the tool callblocked or unexpectedlyconfirmed?, Check resolvedpermissionswhich settings layer fired, Did a tool/MCP callfail or return nothing?, Check MCP server logsand connectivity, Is this a long-runningsession with degradingquality?, Inspect context usagereset / summarize /delegate to subagent, Unexpecte](/content/skillup/ccap/images/ccap-d7-developer-productivity-and-operational-enablement-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d7-developer-productivity-and-operational-enablement-m2.mmd -->
 
 ### In Practice
 

@@ -26,20 +26,8 @@ Discovery is the phase where an architect converts an ambiguous business request
 
 Discovery techniques include structured stakeholder interviews (open-ended first, then targeted), facilitated workshops with multiple stakeholders in the room simultaneously (surfaces disagreement early, when it's cheap to resolve), current-state process shadowing or artifact review (reading real support tickets beats a manager's summary of what support tickets look like), and reviewing existing documentation and system access. **The output is a discovery brief** — a written artifact stakeholders sign off on before design begins, so the design phase has a stable target instead of a moving one.
 
-```mermaid
-flowchart TD
-  A[Business ask<br/>often vague] --> B[Stakeholder interviews<br/>+ workshops]
-  A --> C[Current-state process review<br/>baseline metrics, artifacts]
-  A --> D[Data availability & quality audit]
-  A --> E[Integration & constraint landscape]
-  B --> F[Discovery brief]
-  C --> F
-  D --> F
-  E --> F
-  F --> G{Stakeholder sign-off?}
-  G -->|No, gaps found| B
-  G -->|Yes| H[Design phase begins<br/>on a stable target]
-```
+![Flow diagram for "Key Concept": No, gaps found, Yes, Business askoften vague, Stakeholder interviews+ workshops, Current-state processreviewbaseline metrics, artifacts, Data availability & qualityaudit, Integration & constraintlandscape, Discovery brief, Stakeholder sign-off?, Design phase beginson a stable target](/content/skillup/ccap/images/ccap-d6-stakeholder-communication-and-lifecycle-management-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d6-stakeholder-communication-and-lifecycle-management-m1.mmd -->
 
 ### In Practice
 
@@ -98,17 +86,8 @@ Expectations left implicit become disagreements later — the discipline here is
 
 A feedback loop without a cadence is reactive firefighting, and a quality commitment without a measurable SLA is a hope that becomes a dispute the first time reality disappoints someone's unstated assumption.
 
-```mermaid
-flowchart LR
-  A[Stakeholder expectation<br/>often implicit] --> B[Made explicit &<br/>measurable: SLA]
-  B --> C[Regular feedback cadence<br/>demo, review, check-in]
-  C --> D[Feedback register<br/>logged, triaged]
-  D --> E{Within SLA?}
-  E -->|Yes| F[Continue / iterate normally]
-  E -->|No: SLA breach| G[Escalation path<br/>defined remediation]
-  G --> C
-  F --> C
-```
+![Flow diagram for "Key Concept": Yes, No: SLA breach, Stakeholder expectationoften implicit, Made explicit &measurable: SLA, Regular feedback cadencedemo, review, check-in, Feedback registerlogged, triaged, Within SLA?, Continue / iterate normally, Escalation pathdefined remediation](/content/skillup/ccap/images/ccap-d6-stakeholder-communication-and-lifecycle-management-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d6-stakeholder-communication-and-lifecycle-management-m2.mmd -->
 
 ### In Practice
 
@@ -169,17 +148,8 @@ A Claude solution's lifecycle is not a one-time build-and-ship event — it's a 
 
 Designing before discovery produces a solution to the wrong problem; building before design sign-off produces rework when a late-surfaced stakeholder objection invalidates work already done; treating handoff as a formality produces a system nobody but the original architect can safely operate; and skipping the "return to discovery" step for a materially new requirement produces feature creep bolted onto an architecture that was never scoped for it.
 
-```mermaid
-flowchart LR
-  D1[Discovery<br/>brief approved] --> D2[Design<br/>ADRs + sign-off]
-  D2 --> D3[Handoff<br/>docs + team briefed<br/>+ ownership transferred]
-  D3 --> D4[Monitoring<br/>SLA metrics, feedback register]
-  D4 --> D5{Gap found:<br/>drift, new need, feedback}
-  D5 -->|Minor, in-scope| D6[Iteration<br/>lightweight redesign]
-  D6 --> D3
-  D5 -->|Material, out-of-scope<br/>new use case or data source| D1
-  D5 -->|No gap| D4
-```
+![Flow diagram for "Key Concept": Minor, in-scope, Material, out-of-scopenew use case or data source, No gap, Discoverybrief approved, DesignADRs + sign-off, Handoffdocs + team briefed+ ownership transferred, MonitoringSLA metrics, feedbackregister, Gap found:drift, new need, feedback, Iterationlightweight redesign](/content/skillup/ccap/images/ccap-d6-stakeholder-communication-and-lifecycle-management-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d6-stakeholder-communication-and-lifecycle-management-m3.mmd -->
 
 ### In Practice
 

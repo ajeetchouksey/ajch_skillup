@@ -97,14 +97,8 @@ This surface is NOT available on Copilot Business or Individual.
 Copilot is not a single product — it's a family of integrations across editors, the web, and the CLI. Each surface has slightly different capabilities, and the exam tests whether you can match the right surface to the right use case. The VS Code extension is the reference implementation; other surfaces are subsets.
 
 The hierarchy of capabilities (most → least):
-```
-VS Code (Chat + completions + slash commands + workspace context)
-  └─ JetBrains (Chat + completions + most slash commands)
-      └─ Visual Studio (Chat + completions)
-          └─ GitHub.com Enterprise (Chat in PR/Issues/Search)
-              └─ GitHub CLI (explain + suggest only)
-                  └─ Neovim (completions only)
-```
+![Flow diagram for "1. The connective narrative": VS CodeChat, completions, slashcommands, workspacecontext, JetBrainsChat, completions, mostslash commands, Visual StudioChat, completions, GitHub.com EnterpriseChat in PRs, issues,search, GitHub CLIexplain and suggest only, Neovimcompletions only](/content/skillup/gh300/images/gh300-d4-ide-integration-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh300/gh300-d4-ide-integration-m1.mmd -->
 
 ### 2. Worked scenario
 

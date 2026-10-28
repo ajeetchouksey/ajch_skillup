@@ -1,0 +1,11 @@
+graph TD
+    DOC[Source Documents<br/>PDF/Word/HTML] --> CHUNK[Chunking<br/>indexing pipeline]
+    CHUNK --> EMB[Embedding Model<br/>text-embedding-3-large]
+    EMB --> IDX[Azure AI Search<br/>Vector + Keyword Index]
+    
+    Q[User Query] --> QEMB[Query Embedding]
+    QEMB --> HYBRIDSEARCH[Hybrid Search<br/>Vector + BM25]
+    IDX --> HYBRIDSEARCH
+    HYBRIDSEARCH --> RERANK[Semantic Reranking<br/>Azure AI Search]
+    RERANK --> CTX2[Context injection<br/>into prompt]
+    CTX2 --> LLM[LLM Response]

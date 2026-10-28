@@ -1,0 +1,7 @@
+graph LR
+  A[Prompt text] --> B[Tokens]
+  B --> C[Embeddings]
+  C --> D[Transformer with attention]
+  D --> E[Next-token prediction]
+  E -->|append and repeat| D
+  E --> F[Completion]

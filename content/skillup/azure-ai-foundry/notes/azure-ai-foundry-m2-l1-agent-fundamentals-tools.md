@@ -33,20 +33,8 @@ If you've used the classic API, the mapping is direct: threads became conversati
 
 Editing an agent's **instructions** changes its tone/behavior without retraining or redeploying the model. Each change is saved as a new agent version, so you can compare versions or roll back.
 
-```mermaid
-flowchart LR
-  AG[Agent Version] -->|supplies config| R[Response]
-  CV[Conversation] -->|supplies history| R
-  U[User Input Item] -->|added to| CV
-  R -->|appends| OI[Output Items]
-  OI -->|stored in| CV
-  classDef control fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0
-  classDef output fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  class AG,R control
-  class CV,U data
-  class OI output
-```
+![Flow diagram for "Key Concept": supplies config, supplies history, added to, appends, stored in, Agent Version, Response, Conversation, User Input Item, Output Items](/content/skillup/azure-ai-foundry/images/azure-ai-foundry-m2-l1-agent-fundamentals-tools-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/azure-ai-foundry/azure-ai-foundry-m2-l1-agent-fundamentals-tools-m1.mmd -->
 *How agent, conversation, and response connect each turn.*
 
 ### In Practice

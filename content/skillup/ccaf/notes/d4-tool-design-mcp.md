@@ -35,16 +35,8 @@ Each tool adds **name + description + schema** to the context, and every extra o
 
 Your enterprise team built a monolith MCP server: 40 tools, one namespace. Three structural options:
 
-```mermaid
-graph TD
-    P["Problem: 40+ tools on one agent"] --> S1
-    P --> S2
-    P --> S3
-
-    S1["Option 1:<br/>Split MCP servers by domain"]
-    S2["Option 2:<br/>Coordinator + role-scoped subagents"]
-    S3["Option 3:<br/>Load only relevant tools<br/>(tool search / per-intent sets)"]
-```
+![Flow diagram for "Use Case: 'The 40-Tool Disaster'": Problem: 40+ tools on oneagent, Option 1:Split MCP servers bydomain, Option 2:Coordinator + role-scopedsubagents, Option 3:Load only relevant toolstool search / per-intentsets](/content/skillup/ccaf/images/d4-tool-design-mcp-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m1.mmd -->
 
 **Option 1: Multiple MCP Servers** --- split by domain.
 
@@ -91,14 +83,8 @@ Every tool description MUST have these three components, no exceptions:
 3. WHEN NOT to use it (negative --- prevents confusion)
 ```
 
-```mermaid
-graph TD
-    D["Tool Description"] --> W["WHAT: Primary purpose"]
-    D --> Y["WHEN: Use triggers"]
-    D --> N["WHEN NOT: Disambiguation"]
-    
-    style N fill:#1e293b,stroke:#ef4444
-```
+![Flow diagram for "The 3-Element Rule": Tool Description, WHAT: Primary purpose, WHEN: Use triggers, WHEN NOT:Disambiguation](/content/skillup/ccaf/images/d4-tool-design-mcp-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m2.mmd -->
 
 <div class="note-important"><strong>The WHEN NOT section is the most impactful element.</strong> Without it, Claude has no negative signal to reject a tool that looks 80% correct.</div>
 
@@ -158,13 +144,8 @@ def create_ticket(title: str, description: str, priority: str) -> dict:
 
 It's Friday afternoon. Your PM says: "Claude keeps chatting instead of calling the classifier. Just make it call the tool." You set `tool_choice: {"type": "tool", "name": "classify_intent"}`. Claude now **cannot refuse**---it must produce valid JSON matching that tool's schema. Problem solved. Ship it.
 
-```mermaid
-graph TD
-    TC["tool_choice"] --> A["auto<br/>(default)<br/>Claude MAY call tools"]
-    TC --> ANY["any<br/>Claude MUST call a tool<br/>(picks which one)"]
-    TC --> T["tool<br/>Claude MUST call<br/>THIS SPECIFIC tool"]
-    TC --> N["none<br/>Tools disabled<br/>(reasoning only)"]
-```
+![Flow diagram for "4.3 toolchoice Modes": tool_choice, autodefaultClaude MAY call tools, anyClaude MUST call a toolpicks which one, toolClaude MUST callTHIS SPECIFIC tool, noneTools disabledreasoning only](/content/skillup/ccaf/images/d4-tool-design-mcp-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m3.mmd -->
 
 ### When to Use Each
 
@@ -203,24 +184,8 @@ result = response.content[0].input  # {"intent": "complaint", "confidence": 0.92
 
 Claude is helping a user plan a trip. It needs the weather in NYC, the weather in London, and the AAPL stock price. These are *independent* --- no result depends on another. So Claude fires all three in a single response, as parallel `tool_use` blocks. Your code must handle all of them and send results back in one message.
 
-```mermaid
-sequenceDiagram
-    participant C as Claude
-    participant T1 as Tool 1
-    participant T2 as Tool 2
-    participant T3 as Tool 3
-    
-    Note over C: "I need 3 independent pieces of data"
-    par Parallel Execution
-        C->>T1: get_weather("NYC")
-        C->>T2: get_weather("London")
-        C->>T3: get_stock("AAPL")
-    end
-    T1-->>C: {"temp": 72}
-    T2-->>C: {"temp": 55}
-    T3-->>C: {"price": 189.50}
-    Note over C: Synthesize all results
-```
+![Sequence diagram for "4.4 Parallel Tool Calls": Tool 3, Tool 2, Tool 1, Claude, "I need 3, independent, pieces of data", par, Parallel Execution, Synthesize all](/content/skillup/ccaf/images/d4-tool-design-mcp-m4.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m4.mmd -->
 
 ### Your Code Must Handle Multiple Results
 
@@ -261,20 +226,8 @@ Your `get_customer` tool crashes with an unhandled `ConnectionRefusedError`. The
 
 <mark>A tool crash or None return is the number one cause of Claude hallucinating factual data in agentic systems.</mark>
 
-```mermaid
-graph TD
-    T[Tool Executes] --> R{Result?}
-    R -->|"Success"| S["OK: {success: true, data: {...}}"]
-    R -->|"Known error"| E["Error: {error: not_found, suggestion: ...}"]
-    R -->|"Crash"| F["CRASH: Generic error or None"]
-    
-    S --> CU[Claude uses data]
-    E --> CD[Claude follows suggestion]
-    F --> CC[Claude confused, may hallucinate]
-    
-    style F fill:#1e293b,stroke:#ef4444
-    style CC fill:#1e293b,stroke:#ef4444
-```
+![Flow diagram for "4.5 Graceful Tool Failure": Success, Known error, Crash, Tool Executes, Result?, OK: {success: true, data:{...}}, Error: {error: not_found,suggestion: ...}, CRASH: Generic error orNone, Claude uses data, Claude follows suggestion](/content/skillup/ccaf/images/d4-tool-design-mcp-m5.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m5.mmd -->
 
 ### Use Case: "The Null That Hallucinated"
 
@@ -322,14 +275,8 @@ Your team is designing an MCP server and someone asks: "Should we make the refun
 
 <mark>MCP Primitives: Tools = employee actions, Resources = reference books on the shelf, Prompts = forms the user fills out.</mark>
 
-```mermaid
-graph TD
-    subgraph "3 MCP Primitive Types"
-        T["Tools<br/>Model-initiated ACTIONS<br/>(Claude decides to call)"]
-        R["Resources<br/>App-loaded READ-ONLY data<br/>(Application decides to load)"]
-        P["Prompts<br/>User-selected TEMPLATES<br/>(User explicitly chooses)"]
-    end
-```
+![Flow diagram for "4.6 MCP Primitives": 3 MCP Primitive Types, ToolsModel-initiated ACTIONSClaude decides to call, ResourcesApp-loaded READ-ONLYdataApplication decides toload, PromptsUser-selected TEMPLATESUser explicitly chooses](/content/skillup/ccaf/images/d4-tool-design-mcp-m6.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m6.mmd -->
 
 ### The Initiation Model (Exam-Critical)
 
@@ -469,20 +416,8 @@ You integrate tool use for the first time. You define a `web_search` tool in you
 
 ### Two Categories of Tools
 
-```mermaid
-graph TD
-    subgraph "Client Tools (YOU execute)"
-        CT["User-defined tools<br/>+ Anthropic-schema tools<br/>(bash, text_editor)"]
-        CT --> SR["stop_reason: tool_use"]
-        SR --> YC["Your code executes"]
-        YC --> TR["Send tool_result back"]
-    end
-    
-    subgraph "Server Tools (ANTHROPIC executes)"
-        ST["web_search, code_execution,<br/>web_fetch, tool_search"]
-        ST --> AR["Results appear directly<br/>in response"]
-    end
-```
+![Flow diagram for "Two Categories of Tools": Server Tools ANTHROPIC executes, web_search,code_execution,web_fetch, tool_search, Results appear directlyin response, Client Tools YOU execute, User-defined tools+ Anthropic-schema toolsbash, text_editor, stop_reason: tool_use, Your code executes, Send tool_result back](/content/skillup/ccaf/images/d4-tool-design-mcp-m7.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m7.mmd -->
 
 <div class="note-important"><strong>Server tools need NO tool_result from you.</strong> The results are embedded in Claude's response. Client tools require your code to execute them and send a tool_result message.</div>
 
@@ -610,18 +545,8 @@ while True:
 
 Without resources, an agent exploring a knowledge base must call tools repeatedly (exploratory tool calls) just to discover what content exists. Resources give the agent **visibility upfront**.
 
-```mermaid
-graph LR
-    subgraph "Without MCP Resources"
-        A["Agent"] -->|"search for topics"| T1["tool call"]
-        T1 -->|"search again"| T2["tool call"]
-        T2 -->|"search again"| T3["tool call #N"]
-    end
-    subgraph "With MCP Resources"
-        B["Agent"] -->|"reads catalog at session start"| R["Resource: topic index"]
-        R -->|"knows what exists, targeted calls only"| T4["1-2 tool calls"]
-    end
-```
+![Flow diagram for "Why Resources Matter for Exams": With MCP Resources, reads catalog at session start, knows what exists, targetedcalls only, Agent, Resource: topic index, 1-2 tool calls, Without MCP Resources, search for topics, search again, tool call](/content/skillup/ccaf/images/d4-tool-design-mcp-m8.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d4-tool-design-mcp-m8.mmd -->
 
 <div class="note-trap"><strong>TRAP:</strong> Question asks how to reduce exploratory tool calls. Answer involves exposing a content catalog as an MCP resource — NOT adding more tools.</div>
 
@@ -661,10 +586,9 @@ return {
 
 When the `Edit` built-in tool fails because anchor text is non-unique:
 
-```
-Edit tool error: "Found multiple matches for anchor text"
-→ Fall back to: Read (full file) → Write (full file with changes)
-```
+| When this happens | Fall back to |
+|---|---|
+| Edit tool error: *"Found multiple matches for anchor text"* | **Read** the full file, then **Write** the full file with your changes |
 
 <div class="note-trap"><strong>TRAP:</strong> Edit requires <code>old_string</code> to appear exactly once. Claude Code's tool reference says to supply a longer string with enough surrounding context, or set <code>replace_all: true</code> to change every occurrence. When no unique anchor can be found, the exam guide's answer is the Read + Write fallback: read the full file, write it back with the change.</div>
 

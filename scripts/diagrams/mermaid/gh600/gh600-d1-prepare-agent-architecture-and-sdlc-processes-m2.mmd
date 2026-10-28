@@ -1,0 +1,12 @@
+flowchart TD
+    T["Task assigned<br/>(issue + acceptance criteria)"] --> P["Plan phase<br/>tools: read-only (grep / glob / view)"]
+    P --> A["Structured plan artifact<br/>(task list: target files + actions)"]
+    A --> V{"Human / gate validates plan:<br/>scope match? no destructive ops?<br/>correct target repo/files?"}
+    V -->|"Scope or safety issue"| Rev["Revise plan"]
+    Rev --> P
+    V -->|"Approved"| E["Execution phase<br/>tools unlocked: edit + bash"]
+    E --> C["Commits land on branch<br/>(each step = a viewable diff)"]
+    C --> PR["Draft pull request opened"]
+    PR --> HR{"Human review<br/>(PR comments / ready-for-review)"}
+    HR -->|"Changes requested"| E
+    HR -->|"Approved"| Merge["Merge<br/>(human-owned gate)"]

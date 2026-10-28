@@ -1,0 +1,6 @@
+graph LR
+    SRC[Source Data<br/>CRM, ERP, SharePoint] --> PURVIEW[Microsoft Purview<br/>Data Map and Catalog]
+    PURVIEW --> LINEAGE[Data Lineage<br/>Source → Transform → Agent]
+    PURVIEW --> CLASS[Data Classification<br/>PII, Confidential, Public]
+    PURVIEW --> POLICY[Data Policy<br/>Who can access what]
+    LINEAGE --> AUDIT[Audit Trail<br/>Who trained/used the data]

@@ -1,0 +1,11 @@
+graph TD
+    DETECT[Detection<br/>Azure Monitor alert fires] --> TRIAGE[Triage<br/>Severity: P1/P2/P3?]
+    TRIAGE --> P1{P1: Safety/data breach?}
+    P1 -->|Yes| ROLLBACK[Immediate rollback<br/>to last known good]
+    P1 -->|No| ANALYZE[Analyze<br/>Logs + traces in App Insights]
+    ROLLBACK --> ISOLATE[Isolate deployment]
+    ISOLATE --> NOTIFY2[Notify stakeholders<br/>+ regulators if required]
+    ANALYZE --> FIX[Root cause fix]
+    FIX --> STAGING2[Deploy to staging]
+    STAGING2 --> EVAL2[Eval golden dataset]
+    EVAL2 --> PROD2[Restore to production]

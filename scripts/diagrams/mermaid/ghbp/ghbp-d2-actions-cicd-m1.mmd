@@ -1,0 +1,7 @@
+graph LR
+    A["🔄 Workflow run"] --> B{Cache hit?}
+    B -->|"Yes — ~10s"| C["✅ Restore from cache"]
+    B -->|"No — ~3min"| D["📦 npm install"]
+    D --> E["💾 Save to cache"]
+    C --> F["▶️ Continue build"]
+    E --> F

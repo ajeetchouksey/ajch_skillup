@@ -1,0 +1,7 @@
+graph TD
+    T[Tool returns data] --> S{Size check}
+    S -->|"< 5KB"| OK["Send as-is"]
+    S -->|"> 5KB"| TRIM{Trimming Strategy}
+    TRIM --> SS["Server-side trim (in tool implementation)"]
+    TRIM --> CS["Client-side trim (before sending to Claude)"]
+    TRIM --> PG["Pagination (page-by-page)"]

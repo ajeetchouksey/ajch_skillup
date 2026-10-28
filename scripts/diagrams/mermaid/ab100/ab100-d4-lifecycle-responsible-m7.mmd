@@ -1,0 +1,8 @@
+graph TD
+    AI_SYSTEM[AI System] --> Q1{Prohibited use?<br/>e.g. social scoring, biometric surveillance}
+    Q1 -->|Yes| PROHIBIT[Prohibited<br/>Cannot deploy]
+    Q1 -->|No| Q2{High-risk category?<br/>HR, credit, safety, law enforcement}
+    Q2 -->|Yes| HIGH[High-Risk<br/>Conformity assessment required]
+    Q2 -->|No| Q3{Directly interacts with people?}
+    Q3 -->|Yes| LIMITED[Limited Risk<br/>Transparency obligations]
+    Q3 -->|No| MINIMAL[Minimal Risk<br/>No specific obligations]

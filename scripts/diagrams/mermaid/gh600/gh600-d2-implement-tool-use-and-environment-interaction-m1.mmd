@@ -1,0 +1,12 @@
+flowchart TD
+    Need["Identify capability gap:<br/>agent needs an external API/service"] --> Search{"Does an existing<br/>MCP server provide it?"}
+    Search -->|"Yes — GitHub-hosted"| Remote["Add GitHub remote MCP server<br/>(https://api.githubcopilot.com/mcp/)"]
+    Search -->|"Yes — registry/third-party"| Policy{"On the org's<br/>MCP allow list?"}
+    Search -->|"No"| Build["Stand up / run<br/>a custom MCP server"]
+    Policy -->|"No"| Blocked["Blocked by org policy —<br/>request allow-list addition"]
+    Policy -->|"Yes"| Configure["Add to mcpServers config<br/>type + url/command + auth"]
+    Remote --> Scope["Scope toolsets +<br/>read-only mode where supported"]
+    Configure --> Scope
+    Build --> Scope
+    Scope --> Grant["Expose only the needed<br/>tool names to the agent"]
+    Grant --> TestRun["Test in a sandboxed session<br/>before wider rollout"]

@@ -1,0 +1,9 @@
+graph LR
+  A[Source Documents] --> B[Ingest & Parse]
+  B --> C[Chunk<br/>fixed / semantic / structural]
+  C --> D[Embed + Index<br/>dense vector + sparse keyword]
+  D --> E[Metadata Tag<br/>ACL, date, source]
+  F[User Query] --> G[Retrieve<br/>hybrid search + ACL filter]
+  E --> G
+  G --> H[Rerank<br/>cross-encoder / LLM judge]
+  H --> I[Generate<br/>Claude + grounded citations]

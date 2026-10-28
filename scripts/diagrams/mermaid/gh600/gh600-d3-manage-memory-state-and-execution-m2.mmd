@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Human
+    participant PR as Pull Request (branch)
+    participant S1 as Session 1 (agent)
+    participant S2 as Session 2 (agent)
+
+    Human->>S1: Assign issue
+    S1->>PR: Plan artifact, commits, draft PR opened
+    S1--)S1: Session ends (ephemeral env discarded)
+    Human->>PR: Follow-up comment:<br/>"handle the empty-list case too"
+    Human->>S2: Trigger resume
+    S2->>PR: Read existing commits + PR thread (not a blank slate)
+    S2->>PR: New commit on the SAME branch,<br/>addressing only the feedback
+    S2--)S2: Session ends (state again lives only in PR/Git)
+    Human->>PR: Review, approve, merge

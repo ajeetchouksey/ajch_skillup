@@ -1,0 +1,9 @@
+graph TD
+    U[User or app] --> C[Conversation<br/>items]
+    C --> A[Agent version<br/>instructions + model + tools]
+    A -->|tool call| TB[Toolbox / tools]
+    TB --> FS[File search]
+    TB --> CI[Code interpreter]
+    TB --> WS[Web search]
+    TB --> MCP[MCP servers / functions / OpenAPI]
+    A -->|response| C

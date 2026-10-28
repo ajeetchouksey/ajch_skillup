@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant U as User
+    participant C as Claude
+    participant Pre as PreToolUse Hook
+    participant T as Tool
+    participant Post as PostToolUse Hook
+    participant Stop as Stop Hook
+    
+    U->>C: Request
+    C->>Pre: "I want to call write_file"
+    Pre-->>Pre: Check: allowed? safe?
+    alt Blocked
+        Pre->>C: ❌ "write_file blocked: read-only mode"
+    else Allowed
+        Pre->>T: ✅ Execute write_file
+        T->>Post: Result
+        Post-->>Post: Log, transform, validate
+        Post->>C: Processed result
+    end
+    C->>Stop: "I'm ready to respond"
+    Stop-->>Stop: Check: quality? complete?
+    alt Needs more work
+        Stop->>C: 🔄 "Add error handling before finishing"
+    else Acceptable
+        Stop->>U: ✅ Final response
+    end

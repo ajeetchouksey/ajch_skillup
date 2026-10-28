@@ -342,15 +342,8 @@ jobs:
 
 Scope is a security boundary. A run can restore caches created on its own branch or the default branch, and PR runs can also use the base branch's caches. Runs can't restore caches from child or sibling branches. Unused entries are evicted after 7 days, and each repository gets 10 GB by default. **Think of the cache like a family recipe box**: children can borrow from their parents' box, but nobody can slip a card into their sibling's.
 
-```mermaid
-graph LR
-    A["🔄 Workflow run"] --> B{Cache hit?}
-    B -->|"Yes — ~10s"| C["✅ Restore from cache"]
-    B -->|"No — ~3min"| D["📦 npm install"]
-    D --> E["💾 Save to cache"]
-    C --> F["▶️ Continue build"]
-    E --> F
-```
+![Flow diagram for "Key Concept": Yes — ~10s, No — ~3min, Workflow run, Cache hit?, Restore from cache, npm install, Save to cache, Continue build](/content/skillup/ghbp/images/ghbp-d2-actions-cicd-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d2-actions-cicd-m1.mmd -->
 
 ```yaml
 # Node.js with npm
@@ -547,17 +540,8 @@ A job opts in with `environment: production`. Before it is sent to a runner, eve
 
 Plan limits matter. On GitHub Free, environment secrets and protection rules work only in public repositories; on Pro and Team, required reviewers and wait timers are still limited to public repositories, while private repositories need GitHub Enterprise for them. **Think of an environment like a bank vault with a time lock and two keyholders**: the cash (secrets) is inside, and the door only opens when the clock and the people agree.
 
-```mermaid
-graph LR
-    PR["Any merged PR"] -->|"Automatic trigger"| PROD["🔴 Production deploy"]
-
-    PR2["Any merged PR"] -->|"Trigger"| STAGING["✅ Staging deploy"]
-    STAGING -->|"Required review"| GATE["👁️ Production Approval"]
-    GATE -->|"Approved"| PROD2["🟢 Production deploy"]
-
-    style PROD fill:#7f1d1d,color:#fca5a5
-    style PROD2 fill:#14532d,color:#86efac
-```
+![Flow diagram for "Key Concept": Automatic trigger, Trigger, Required review, Approved, Any merged PR, Production deploy, Staging deploy, Production Approval](/content/skillup/ghbp/images/ghbp-d2-actions-cicd-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d2-actions-cicd-m2.mmd -->
 
 ```yaml
 jobs:

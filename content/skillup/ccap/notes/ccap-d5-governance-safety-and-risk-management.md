@@ -23,16 +23,8 @@ Governance, Safety & Risk Management is the domain that decides whether a techni
 
 No single layer is sufficient alone: a system-prompt instruction ("never approve claims over $10,000") is a request, not an enforcement mechanism, unless the tool layer also enforces it structurally (a hard-coded ceiling on the claims-approval tool itself). **Prompted behavior is a strong default; structurally enforced behavior is the actual guarantee** — that's the exam's core distinction here.
 
-```mermaid
-flowchart LR
-  U[User / upstream request] --> IN[Input-side controls<br/>PII detection, injection filters]
-  IN --> SP[System-prompt controls<br/>scope, tone, refusal policy]
-  SP --> M[Model reasoning<br/>Claude built-in alignment]
-  M --> TP[Tool-permission controls<br/>least-privilege, scoped params]
-  TP --> OUT[Output-side controls<br/>validation, PII scrub, LLM-as-judge]
-  OUT --> R[Response / action]
-  TP -. hard ceiling enforced<br/>independent of prompt .-> LIMIT[Rate / scope limits<br/>max value, max calls, escalation threshold]
-```
+![Flow diagram for "Key Concept": hard ceiling enforcedindependent of prompt, User / upstream request, Input-side controlsPII detection, injectionfilters, System-prompt controlsscope, tone, refusal policy, Model reasoningClaude built-in alignment, Tool-permission controlsleast-privilege, scopedparams, Output-side controlsvalidation, PII scrub,LLM-as-judge, Response / action, Rate / scope limitsmax v](/content/skillup/ccap/images/ccap-d5-governance-safety-and-risk-management-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d5-governance-safety-and-risk-management-m1.mmd -->
 
 ### In Practice
 
@@ -95,18 +87,8 @@ Common HITL patterns, from lightest to heaviest:
 
 Over-applying HITL uniformly (gating every single output, including trivial ones) is itself a design failure — it produces automation bias (reviewers stop reading carefully because most gates are trivial) and destroys the throughput benefit the system was built for.
 
-```mermaid
-flowchart TD
-  A[Proposed action / output] --> B{Consequence severity<br/>if wrong?}
-  B -->|Low: internal, low-stakes| C{Reversible?}
-  C -->|Yes, easily| D[Autonomous execution<br/>+ post-hoc sampling review]
-  C -->|No| E[Confidence-threshold escalation]
-  B -->|High: financial, clinical,<br/>legal, regulatory| F{Is liability delegable<br/>to the system?}
-  F -->|No, ever| G[Full co-pilot mode<br/>human drafts/executes personally]
-  F -->|Action is well-defined<br/>and boundable| H[Approve-before-action gate<br/>human sign-off required, always]
-  E -->|Low confidence| H
-  E -->|High confidence,<br/>well-calibrated| D
-```
+![Flow diagram for "Key Concept": Low: internal, low-stakes, Yes, easily, No, High: financial, clinical,legal, regulatory, No, ever, Action is well-definedand boundable, Low confidence, High confidence,well-calibrated, Proposed action / output, Consequence severityif wrong?](/content/skillup/ccap/images/ccap-d5-governance-safety-and-risk-management-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d5-governance-safety-and-risk-management-m2.mmd -->
 
 ### In Practice
 

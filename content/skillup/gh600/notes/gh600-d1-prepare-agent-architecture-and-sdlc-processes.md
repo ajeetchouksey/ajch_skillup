@@ -18,24 +18,8 @@ An agent session works best on tasks that have a clear start state, a clear end 
 
 Some steps must stay human-owned regardless of how capable the agent is, because completing them isn't just execution — it's a judgment call the organization has to be accountable for. Merge approval is the clearest example: it's **the moment a proposed change becomes an accepted one, like signing a contract instead of drafting it**. Security-sensitive changes (credential rotation, access-control changes, anything with production blast radius and no easy rollback) and architecture decisions (adopting a new framework, choosing REST vs. GraphQL) require weighing trade-offs and organizational context that isn't the agent's to own.
 
-```mermaid
-graph LR
-    Start[New task] -->|reversible, reviewable| R
-    Start -->|irreversible or high-stakes| M
-    Start -->|irreversible or high-stakes| S
-    Start -->|irreversible or high-stakes| A
-    subgraph "Good delegation candidates"
-        R[Repo research] --> P[Draft implementation plan]
-        P --> B[Code changes on a branch]
-        B --> T[Tests / linters in ephemeral env]
-        T --> PR[Open pull request]
-    end
-    subgraph "Stays human-owned"
-        M[Merge approval]
-        S[Security-sensitive changes]
-        A[Architecture decisions]
-    end
-```
+![Flow diagram for "Key Concept": Stays human-owned, Good delegation candidates, reversible, reviewable, irreversible or high-stakes, New task, Repo research, Merge approval, Security-sensitive changes, Architecture decisions, Draft implementation plan](/content/skillup/gh600/images/gh600-d1-prepare-agent-architecture-and-sdlc-processes-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d1-prepare-agent-architecture-and-sdlc-processes-m1.mmd -->
 *What flows through agent delegation versus stays human-owned.*
 
 ### In Practice
@@ -98,20 +82,8 @@ A reviewable artifact exists before anything irreversible — a file edit, a com
 
 The plan-then-act boundary is the core conceptual model of this domain — the diagram below is the one worth memorizing cold.
 
-```mermaid
-flowchart TD
-    T["Task assigned<br/>(issue + acceptance criteria)"] --> P["Plan phase<br/>tools: read-only (grep / glob / view)"]
-    P --> A["Structured plan artifact<br/>(task list: target files + actions)"]
-    A --> V{"Human / gate validates plan:<br/>scope match? no destructive ops?<br/>correct target repo/files?"}
-    V -->|"Scope or safety issue"| Rev["Revise plan"]
-    Rev --> P
-    V -->|"Approved"| E["Execution phase<br/>tools unlocked: edit + bash"]
-    E --> C["Commits land on branch<br/>(each step = a viewable diff)"]
-    C --> PR["Draft pull request opened"]
-    PR --> HR{"Human review<br/>(PR comments / ready-for-review)"}
-    HR -->|"Changes requested"| E
-    HR -->|"Approved"| Merge["Merge<br/>(human-owned gate)"]
-```
+![Flow diagram for "Key Concept": Scope or safety issue, Approved, Changes requested, Task assignedissue + acceptancecriteria, Plan phasetools: read-only grep / glob/ view, Structured plan artifacttask list: target files +actions, Human / gate validatesplan:scope match? nodestructive ops?correct target repo/files?, Revise plan, Execution phasetools unlocked: edit + bash, Commits land on brancheach s](/content/skillup/gh600/images/gh600-d1-prepare-agent-architecture-and-sdlc-processes-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d1-prepare-agent-architecture-and-sdlc-processes-m2.mmd -->
 *Plan reviewed and gated before execution unlocks destructive tools.*
 
 ### In Practice

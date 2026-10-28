@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph RT[Blocking workflows: real-time API]
+        direction TB
+        R1[Pre-merge code review<br/>developer waits]
+        R2[Chatbot responses<br/>user waits]
+        R3[Any synchronous<br/>user-facing operation]
+    end
+    subgraph BT[Batch workflows: Message Batches API]
+        direction TB
+        B1[Overnight technical-debt reports]
+        B2[Bulk document classification]
+        B3[Daily content-moderation pipelines]
+        B4[Any fire-and-collect job<br/>with no latency SLA]
+    end
+    class R1,R2,R3 focus
+    class B1,B2,B3,B4 good
+    classDef focus fill:#5B4BD6,stroke:#A99BFF,color:#ffffff
+    classDef good fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+    classDef warn fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+    classDef risk fill:#2a1a1a,stroke:#fb7185,color:#e2e8f0
+    classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0

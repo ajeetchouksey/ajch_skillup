@@ -16,20 +16,8 @@ Every earlier domain assumed an agent is allowed to do what it's doing — D1 sc
 
 **Operational risk** is the chance an action breaks something that's currently working — a bad dependency bump fails a build, a misconfigured deploy takes a service down. It's usually the easiest to detect (tests fail, a health check trips) and often the cheapest to reverse (revert the commit, roll back the deploy). **Security risk** is the chance an action expands what someone or something can do or see beyond what it should — touching a secret, widening a permission, modifying an IAM policy or a credential. Security risk doesn't always announce itself the way operational risk does; a leaked credential can sit unnoticed for weeks before it's exploited. **Compliance risk** is the chance an action violates an obligation the organization is bound by regardless of whether the code technically works — a data-retention policy, a license restriction, a Responsible AI commitment about what an autonomous system is allowed to decide unsupervised. A single action can carry more than one of these at once (rotating a production secret is both operational and security risk). **A thermometer that only reads "sick" or "not sick" is useless to a doctor who needs to know if it's a fever, an infection, or a broken bone.**
 
-```mermaid
-flowchart TD
-    A["Candidate agent action"] --> B{"Operational risk?<br/>could break the build,<br/>degrade a running service"}
-    B -->|High| R1["High-risk tier"]
-    B -->|Low| C{"Security risk?<br/>touches secrets, credentials,<br/>or permission scope"}
-    C -->|High| R1
-    C -->|Low| D{"Compliance risk?<br/>data retention, licensing,<br/>Responsible AI policy"}
-    D -->|High| R1
-    D -->|Low| R2["Low-risk tier"]
-    R1 --> E{"Reversible?"}
-    E -->|"No — irreversible or<br/>compliance-sensitive"| F["Autonomy: none —<br/>explicit human authorization required"]
-    E -->|"Yes — reversible, but<br/>still elevated risk"| G["Autonomy: supervised —<br/>agent proposes; human approves"]
-    R2 --> H["Autonomy: full —<br/>agent executes, standard CI gate only"]
-```
+![Flow diagram for "Key Concept": High, Low, No — irreversible orcompliance-sensitive, Yes — reversible, butstill elevated risk, Candidate agent action, Operational risk?could break the build,degrade a running service, High-risk tier, Security risk?touches secrets,credentials,or permission scope, Compliance risk?data retention, licensing,Responsible AI policy, Low-risk tier](/content/skillup/gh600/images/gh600-d6-implement-guardrails-and-accountability-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d6-implement-guardrails-and-accountability-m1.mmd -->
 *Risk tier and reversibility together set an action's autonomy.*
 
 ### In Practice

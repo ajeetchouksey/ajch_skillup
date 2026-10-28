@@ -16,19 +16,8 @@ Delegating work to a coding agent (D1) only pays off if a team can reliably tell
 
 Before evaluating an agent's output, evaluation needs an explicit target — not just "did it work," but "did it produce the outcome the issue asked for, without crossing any boundary the issue also set." **Outcomes** describe what the change should accomplish: the behavior, the bug that should no longer reproduce, the feature that should now exist. **Constraints** describe what must stay untouched regardless of whether the outcome is achieved: scope (D1's stated file/path boundaries), API surface, performance budgets, or an explicit "do not modify X" instruction. Fixing the reported bug while also rewriting an unrelated module is a failed evaluation, not a partial success, because the constraint was as much a part of the task definition as the outcome was. **Passing the test while breaking the fence around it is still breaking the fence.**
 
-```mermaid
-flowchart LR
-    Issue["Issue + acceptance criteria<br/>(outcomes + constraints)"] --> Plan["Approved plan artifact (D1)"]
-    Plan --> Exec["Execution: diff, commits, PR"]
-    Exec --> Quant["Quantitative signals:<br/>tests, coverage, lint, CI status"]
-    Exec --> Scan["Automated scanning:<br/>code scanning, secret scanning,<br/>dependency review"]
-    Exec --> Qual["Qualitative signals:<br/>reviewer reads diff for<br/>readability, convention fit"]
-    Quant --> Verdict{"All signals + intent-alignment<br/>check out?"}
-    Scan --> Verdict
-    Qual --> Verdict
-    Verdict -->|"Yes"| Pass["Evaluated as successful —<br/>ready for merge"]
-    Verdict -->|"No"| Fail["Evaluated as a failure —<br/>proceed to root-cause analysis"]
-```
+![Flow diagram for "Key Concept": Yes, No, Issue + acceptance criteriaoutcomes + constraints, Approved plan artifact D1, Execution: diff, commits,PR, Quantitative signals:tests, coverage, lint, CIstatus, Automated scanning:code scanning, secretscanning,dependency review, Qualitative signals:reviewer reads diff forreadability, convention fit, All signals +intent-alignmentcheck out?, Evaluated as succ](/content/skillup/gh600/images/gh600-d4-perform-evaluation-error-analysis-and-tuning-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d4-perform-evaluation-error-analysis-and-tuning-m1.mmd -->
 *Outcomes and constraints both have to check out to pass.*
 
 ### In Practice
@@ -111,14 +100,8 @@ A **reasoning error** is a failure where the agent had accurate, sufficient info
 
 The diagnostic question that separates the three stays consistent even in a messy real trace: was the necessary information, tool, or permission actually available to the agent at the time? If not, it's a context/environment issue. If it was available, did the agent invoke the right tool with the right inputs and act on what it actually returned? If not, it's tool misuse. If it was available and used correctly, and the agent still reached the wrong conclusion, it's a reasoning error. **A patient's fever can come from three different infections — treating all three the same way cures none of them.**
 
-```mermaid
-flowchart TD
-    F["Agent produced wrong result"] --> Q1{"Was the needed info,<br/>tool, or permission actually<br/>available to the agent?"}
-    Q1 -->|"No — missing context"| CTX["Context / environment issue<br/>(fix: memory scoping — D3,<br/>tool/MCP/firewall config — D2)"]
-    Q1 -->|"Yes, it was available"| Q2{"Did the agent invoke<br/>the right tool with the<br/>right inputs, and act on<br/>what it actually returned?"}
-    Q2 -->|"No — tool misuse"| TOOL["Tool misuse<br/>(fix: narrow/clarify tool access,<br/>tool-selection guidance)"]
-    Q2 -->|"Yes, tool use was correct"| REASON["Reasoning error<br/>(fix: revise instructions,<br/>tighten workflow/constraints)"]
-```
+![Flow diagram for "Key Concept": No — missing context, Yes, it was available, No — tool misuse, Yes, tool use was correct, Agent produced wrongresult, Was the needed info,tool, or permission actuallyavailable to the agent?, Context / environmentissuefix: memory scoping — D3,tool/MCP/firewall config —D2, Did the agent invokethe right tool with theright inputs, and act onwhat it actually returned?, T](/content/skillup/gh600/images/gh600-d4-perform-evaluation-error-analysis-and-tuning-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d4-perform-evaluation-error-analysis-and-tuning-m2.mmd -->
 *Three distinct failure categories, each needing a different fix.*
 
 ### In Practice

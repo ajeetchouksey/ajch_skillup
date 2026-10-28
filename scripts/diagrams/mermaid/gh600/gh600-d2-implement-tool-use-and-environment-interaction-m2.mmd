@@ -1,0 +1,11 @@
+flowchart TD
+    Fail["Tool call or command fails"] --> Retryable{"Transient?<br/>(timeout, rate limit, flaky network)"}
+    Retryable -->|"Yes"| Retry["Bounded retry<br/>with backoff"]
+    Retry --> Success{"Succeeded?"}
+    Success -->|"Yes"| Continue["Continue session"]
+    Success -->|"No — retries exhausted"| Escalate
+    Retryable -->|"No — logic, permission,<br/>or genuine test failure"| Escalate["Escalate: stop,<br/>log reason, comment on issue/PR"]
+    Escalate --> HumanNow{"Human available now?"}
+    HumanNow -->|"Yes"| Live["Human resolves inline"]
+    HumanNow -->|"No"| Async["Session marked failed;<br/>notifies channel/dashboard"]
+    Async --> Rollback["Branch/PR stays isolated —<br/>no impact on protected branch;<br/>close, amend, or hand off later"]

@@ -1,0 +1,11 @@
+flowchart LR
+    Issue["Issue + acceptance criteria<br/>(outcomes + constraints)"] --> Plan["Approved plan artifact (D1)"]
+    Plan --> Exec["Execution: diff, commits, PR"]
+    Exec --> Quant["Quantitative signals:<br/>tests, coverage, lint, CI status"]
+    Exec --> Scan["Automated scanning:<br/>code scanning, secret scanning,<br/>dependency review"]
+    Exec --> Qual["Qualitative signals:<br/>reviewer reads diff for<br/>readability, convention fit"]
+    Quant --> Verdict{"All signals + intent-alignment<br/>check out?"}
+    Scan --> Verdict
+    Qual --> Verdict
+    Verdict -->|"Yes"| Pass["Evaluated as successful —<br/>ready for merge"]
+    Verdict -->|"No"| Fail["Evaluated as a failure —<br/>proceed to root-cause analysis"]
