@@ -20,16 +20,8 @@ The pattern table then names the shapes: sequential, parallel, hierarchical, deb
 
 #### Single-Agent vs Multi-Agent Decision
 
-```mermaid
-graph TD
-    T[Task] --> Q1{Parallelizable<br/>sub-tasks?}
-    Q1 -->|No| Q2{Fits in<br/>context window?}
-    Q2 -->|Yes| SA[Single Agent]
-    Q2 -->|No| CM[Coordinator + Memory]
-    Q1 -->|Yes| Q3{Independent<br/>domains?}
-    Q3 -->|Yes| MA[Multi-Agent<br/>Parallel]
-    Q3 -->|No| SC[Sequential<br/>Pipeline]
-```
+![Flow diagram for "Key Concept": No, Yes, Task, Parallelizablesub-tasks?, Fits incontext window?, Single Agent, Coordinator + Memory, Independentdomains?, Multi-AgentParallel, SequentialPipeline](/content/skillup/ab100/images/ab100-d2-design-agentic-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d2-design-agentic-m1.mmd -->
 
 #### Multi-Agent Patterns
 
@@ -67,17 +59,8 @@ Foundry Agent Service (formerly Azure AI Agent Service) hosts and scales agents 
 
 Agents act through **tools**: built-in ones such as web search, file search, code interpreter and memory, plus your own functions, OpenAPI specs and MCP servers. A **toolbox** curates a set of tools once and exposes them to many agents through one managed MCP-compatible endpoint, with central authentication, governance and versioning. Each agent can have its own Microsoft Entra identity, run inside your virtual network, use guardrails against prompt injection, publish to Microsoft Teams and Microsoft Copilot, and talk to other agents over the **A2A** protocol (v1.0 is generally available). **Think of the service as an airport: prompt agents are passengers on scheduled flights, hosted agents are private jets using the same runways, towers and security.**
 
-```mermaid
-graph TD
-    U[User or app] --> C[Conversation<br/>items]
-    C --> A[Agent version<br/>instructions + model + tools]
-    A -->|tool call| TB[Toolbox / tools]
-    TB --> FS[File search]
-    TB --> CI[Code interpreter]
-    TB --> WS[Web search]
-    TB --> MCP[MCP servers / functions / OpenAPI]
-    A -->|response| C
-```
+![Flow diagram for "Key Concept": tool call, response, User or app, Conversationitems, Agent versioninstructions + model + tools, Toolbox / tools, File search, Code interpreter, Web search, MCP servers / functions /OpenAPI](/content/skillup/ab100/images/ab100-d2-design-agentic-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d2-design-agentic-m2.mmd -->
 
 ### In Practice
 
@@ -107,17 +90,8 @@ Under classic orchestration the agent picks the topic whose trigger phrases best
 
 #### Copilot Studio Architecture
 
-```mermaid
-graph TD
-    U[User<br/>Teams/Web/Custom] --> C[Copilot]
-    C --> T{Topic<br/>matching}
-    T -->|Matched| TP[Topic Flow]
-    T -->|No match| FB[Fallback / Generative AI]
-    TP --> KB[Knowledge Source<br/>SharePoint/URLs/Dataverse]
-    TP --> AC[Actions<br/>Power Automate flows]
-    TP --> EXT[External APIs<br/>HTTP connector]
-    TP --> PA[Plugin<br/>OpenAPI spec]
-```
+![Flow diagram for "Key Concept": Matched, No match, UserTeams/Web/Custom, Copilot, Topicmatching, Topic Flow, Fallback / Generative AI, Knowledge SourceSharePoint/URLs/Dataverse, ActionsPower Automate flows, External APIsHTTP connector](/content/skillup/ab100/images/ab100-d2-design-agentic-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d2-design-agentic-m3.mmd -->
 
 #### Topics vs Actions vs Plugins
 
@@ -208,22 +182,8 @@ The design rule is lifetime and access pattern: fast and short for session state
 
 #### Memory Tiers for Agents
 
-```mermaid
-graph LR
-    subgraph "Working Memory"
-        CTX[Context Window<br/>Current conversation]
-    end
-    subgraph "Short-term Memory"
-        REDIS[Azure Cache for Redis<br/>Session state, tool results]
-    end
-    subgraph "Long-term Memory"
-        COSMOS[Cosmos DB<br/>Conversation history<br/>User preferences]
-        SEARCH[Azure AI Search<br/>Vector embeddings<br/>Knowledge base]
-    end
-    CTX <-->|in-context| REDIS
-    REDIS <-->|persist/retrieve| COSMOS
-    CTX <-->|RAG retrieval| SEARCH
-```
+![Flow diagram for "Key Concept": Long-term Memory, Short-term Memory, Working Memory, in-context, persist/retrieve, RAG retrieval, Context WindowCurrent conversation, Azure Cache for RedisSession state, tool results, Cosmos DBConversation historyUser preferences, Azure AI SearchVector embeddingsKnowledge base](/content/skillup/ab100/images/ab100-d2-design-agentic-m4.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d2-design-agentic-m4.mmd -->
 
 | Memory Type | Azure Service | TTL | Use For |
 |-------------|--------------|-----|---------|
@@ -260,19 +220,8 @@ Chunking decides what can be retrieved at all: fixed-size for uniform documents,
 
 #### Full RAG Architecture
 
-```mermaid
-graph TD
-    DOC[Source Documents<br/>PDF/Word/HTML] --> CHUNK[Chunking<br/>indexing pipeline]
-    CHUNK --> EMB[Embedding Model<br/>text-embedding-3-large]
-    EMB --> IDX[Azure AI Search<br/>Vector + Keyword Index]
-    
-    Q[User Query] --> QEMB[Query Embedding]
-    QEMB --> HYBRIDSEARCH[Hybrid Search<br/>Vector + BM25]
-    IDX --> HYBRIDSEARCH
-    HYBRIDSEARCH --> RERANK[Semantic Reranking<br/>Azure AI Search]
-    RERANK --> CTX2[Context injection<br/>into prompt]
-    CTX2 --> LLM[LLM Response]
-```
+![Flow diagram for "Key Concept": Source DocumentsPDF/Word/HTML, Chunkingindexing pipeline, Embedding Modeltext-embedding-3-large, Azure AI SearchVector + Keyword Index, User Query, Query Embedding, Hybrid SearchVector + BM25, Semantic RerankingAzure AI Search, Context injectioninto prompt, LLM Response](/content/skillup/ab100/images/ab100-d2-design-agentic-m5.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d2-design-agentic-m5.mmd -->
 
 #### Chunking Strategies
 

@@ -327,21 +327,14 @@ The trap answer is "content exclusions take effect instantly". Changes can take 
 
 ### Validation Workflow
 
-```
-1. Configure the exclusion rule (repo, org or enterprise)
-   ↓
-2. Wait up to 30 minutes OR reload the IDE
-   ↓
-3. Open a normal file and confirm a suggestion appears
-   ↓
-4. Make the same edit in an excluded file — no suggestion should be offered
-   ↓
-5. Hover the Copilot status bar icon — it should show the exclusion and its source
-   ↓
-6. In Copilot Chat (Ask mode), attach the excluded file and ask "explain this file"
-   ↓
-7. Confirm the file is not used and is not listed as a reference in the response
-```
+| Step | What to do | What you should see |
+|---|---|---|
+| 1 | Configure the exclusion rule (repo, org or enterprise) | The rule saved at the right level |
+| 2 | Wait up to 30 minutes, or reload the IDE | The new rule picked up |
+| 3 | Open a normal file and type | A suggestion appears |
+| 4 | Make the same edit in an excluded file | **No** suggestion |
+| 5 | Hover the Copilot status-bar icon | It names the exclusion and its source |
+| 6 | In Copilot Chat (Ask mode), attach the excluded file and ask "explain this file" | The file isn't used or listed as a reference |
 
 ---
 

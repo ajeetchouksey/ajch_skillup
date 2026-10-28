@@ -602,28 +602,8 @@ Using Copilot in Outlook to draft one onboarding email is assistive — someone 
 
 **Think of ad hoc Copilot chat as phoning a colleague for one favour at a time; a Copilot Studio process agent is handing that colleague a checklist and the authority to work through it unsupervised**, only interrupting you at the one step that genuinely needs a human decision.
 
-```mermaid
-flowchart TD
-  A[New hire added to HR system] -->|triggers agent| B[Copilot Studio agent starts]
-  B --> C[Create IT ticket]
-  B --> D[Initiate access request]
-  B --> E[Notify facilities]
-  C --> F{Approval required?}
-  D --> F
-  E --> F
-  F -->|yes: high-risk access| G[Route to manager]
-  F -->|no: standard request| H[Auto-complete step]
-  G --> I[Status tracked across steps]
-  H --> I
-  I --> J[Onboarding logged end-to-end]
-
-  style A fill:#162236,stroke:#60a5fa,color:#e2e8f0
-  style B fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  style F fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  style G fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
-  style H fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  style J fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-```
+![Flow diagram for "Key Concept": triggers agent, yes: high-risk access, no: standard request, New hire added to HRsystem, Copilot Studio agent starts, Create IT ticket, Initiate access request, Notify facilities, Approval required?, Route to manager](/content/skillup/ab731/images/d2-microsoft-ai-services-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab731/d2-microsoft-ai-services-m1.mmd -->
 
 *A Copilot Studio agent triggers on a new-hire event and orchestrates IT, access, and facilities steps, inserting a human approval gate only for high-risk requests.*
 

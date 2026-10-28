@@ -20,15 +20,8 @@ The skill being tested is mapping a scenario symptom to the principle it violate
 
 #### The Six Principles
 
-```mermaid
-graph TD
-    RAI[Responsible AI] --> F[Fairness<br/>Equal treatment across groups]
-    RAI --> R[Reliability & Safety<br/>Works consistently, fails safely]
-    RAI --> P[Privacy & Security<br/>Protects personal data]
-    RAI --> I[Inclusiveness<br/>Accessible to all users]
-    RAI --> T[Transparency<br/>Explainable, documented]
-    RAI --> A[Accountability<br/>Humans responsible for AI decisions]
-```
+![Flow diagram for "Key Concept": Responsible AI, FairnessEqual treatment acrossgroups, Reliability & SafetyWorks consistently, failssafely, Privacy & SecurityProtects personal data, InclusivenessAccessible to all users, TransparencyExplainable, documented, AccountabilityHumans responsible for AIdecisions](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m1.mmd -->
 
 #### Operationalizing Each Principle
 
@@ -72,19 +65,8 @@ Custom blocklists catch exact terms the classifiers wouldn't flag, such as compe
 
 #### Content Safety Architecture
 
-```mermaid
-graph TD
-    INPUT[User Input] --> CS[Azure AI Content Safety<br/>API]
-    CS --> CATS[Harm Categories]
-    CATS --> H1[Hate & Fairness<br/>Severity 0-7]
-    CATS --> H2[Sexual Content<br/>Severity 0-7]
-    CATS --> H3[Violence<br/>Severity 0-7]
-    CATS --> H4[Self-Harm<br/>Severity 0-7]
-    CS --> ACTION{Severity<br/>vs Threshold}
-    ACTION -->|Below threshold| PASS[Allow to agent]
-    ACTION -->|Above threshold| BLOCK[Block + log]
-    BLOCK --> ALERT[Azure Monitor Alert]
-```
+![Flow diagram for "Key Concept": Below threshold, Above threshold, User Input, Azure AI Content SafetyAPI, Harm Categories, Hate & FairnessSeverity 0-7, Sexual ContentSeverity 0-7, ViolenceSeverity 0-7, Self-HarmSeverity 0-7, Severityvs Threshold](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m2.mmd -->
 
 #### Severity Levels
 
@@ -151,16 +133,8 @@ Risk sets the ceremony: a minor prompt update deploys after evaluation, a model 
 
 Foundry has no "deployment slot" feature. Blue/green means two named model deployments (or two agent versions) and switching which one the application or agent calls, keeping the old one ready for rollback.
 
-```mermaid
-graph LR
-    subgraph "Two model deployments (blue/green)"
-        BLUE[Blue Slot<br/>gpt-4o v1.0<br/>100% traffic]
-        GREEN[Green Slot<br/>gpt-4o v1.1<br/>0% traffic]
-    end
-    TEST[Eval + Canary<br/>1% traffic] --> GREEN
-    GREEN -->|Passes eval gate| SWAP[Swap: 100% → v1.1]
-    BLUE --> ARCHIVE[Archive v1.0<br/>rollback ready]
-```
+![Flow diagram for "Key Concept": Two model deployments blue/green, Passes eval gate, Blue Slotgpt-4o v1.0100% traffic, Green Slotgpt-4o v1.10% traffic, Eval + Canary1% traffic, Swap: 100% → v1.1, Archive v1.0rollback ready](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m3.mmd -->
 
 #### Model Versioning Rules
 
@@ -173,17 +147,8 @@ graph LR
 
 #### Deployment Governance in Microsoft Foundry
 
-```mermaid
-graph TD
-    PR[Pull Request<br/>Prompt/Config Change] --> CI[CI Pipeline<br/>GitHub Actions]
-    CI --> EVAL[Automated Eval<br/>Golden dataset]
-    EVAL --> GATE{Score ≥ baseline?}
-    GATE -->|Yes| STAGING[Deploy to Staging]
-    GATE -->|No| FAIL[Block PR]
-    STAGING --> CANARY[Canary 1% traffic]
-    CANARY --> MONITOR[Monitor 24h]
-    MONITOR --> PROD[Full production rollout]
-```
+![Flow diagram for "Key Concept": Yes, No, Pull RequestPrompt/Config Change, CI PipelineGitHub Actions, Automated EvalGolden dataset, Score ≥ baseline?, Deploy to Staging, Block PR, Canary 1% traffic, Monitor 24h](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m4.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m4.mmd -->
 
 ### In Practice
 
@@ -272,14 +237,8 @@ The requirements table ties GDPR and EU AI Act duties to implementations: retent
 
 #### Microsoft Purview for AI Data Lineage
 
-```mermaid
-graph LR
-    SRC[Source Data<br/>CRM, ERP, SharePoint] --> PURVIEW[Microsoft Purview<br/>Data Map and Catalog]
-    PURVIEW --> LINEAGE[Data Lineage<br/>Source → Transform → Agent]
-    PURVIEW --> CLASS[Data Classification<br/>PII, Confidential, Public]
-    PURVIEW --> POLICY[Data Policy<br/>Who can access what]
-    LINEAGE --> AUDIT[Audit Trail<br/>Who trained/used the data]
-```
+![Flow diagram for "Key Concept": Source DataCRM, ERP, SharePoint, Microsoft PurviewData Map and Catalog, Data LineageSource → Transform →Agent, Data ClassificationPII, Confidential, Public, Data PolicyWho can access what, Audit TrailWho trained/used the data](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m5.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m5.mmd -->
 
 #### Data Governance Requirements for AI Agents
 
@@ -320,14 +279,8 @@ Power Automate approvals implement the gate, and every gate needs a timeout with
 
 #### HITL Decision Framework
 
-```mermaid
-graph TD
-    ACTION[Agent Proposed Action] --> RISK{Risk Assessment}
-    RISK -->|Low risk<br/>reversible| AUTO[Automated execution]
-    RISK -->|Medium risk<br/>business impact| NOTIFY[Execute + notify human]
-    RISK -->|High risk<br/>irreversible| APPROVE[Require human approval<br/>before execution]
-    RISK -->|Critical<br/>safety/legal| BLOCK2[Block + escalate<br/>to specialist]
-```
+![Flow diagram for "Key Concept": Low riskreversible, Medium riskbusiness impact, High riskirreversible, Criticalsafety/legal, Agent Proposed Action, Risk Assessment, Automated execution, Execute + notify human, Require human approvalbefore execution, Block + escalateto specialist](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m6.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m6.mmd -->
 
 #### Implementing HITL with Power Automate
 
@@ -383,16 +336,8 @@ High-risk systems then carry a set of obligations (risk management, data governa
 
 #### Risk Classification for AB-100 Exam
 
-```mermaid
-graph TD
-    AI_SYSTEM[AI System] --> Q1{Prohibited use?<br/>e.g. social scoring, biometric surveillance}
-    Q1 -->|Yes| PROHIBIT[Prohibited<br/>Cannot deploy]
-    Q1 -->|No| Q2{High-risk category?<br/>HR, credit, safety, law enforcement}
-    Q2 -->|Yes| HIGH[High-Risk<br/>Conformity assessment required]
-    Q2 -->|No| Q3{Directly interacts with people?}
-    Q3 -->|Yes| LIMITED[Limited Risk<br/>Transparency obligations]
-    Q3 -->|No| MINIMAL[Minimal Risk<br/>No specific obligations]
-```
+![Flow diagram for "Key Concept": Yes, No, AI System, Prohibited use?e.g. social scoring,biometric surveillance, ProhibitedCannot deploy, High-risk category?HR, credit, safety, lawenforcement, High-RiskConformity assessmentrequired, Directly interacts withpeople?, Limited RiskTransparency obligations, Minimal RiskNo specific obligations](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m7.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m7.mmd -->
 
 #### High-Risk AI Requirements
 
@@ -434,19 +379,8 @@ The rollback matrix sets the clock: under 15 minutes for a content safety violat
 
 #### AI Incident Response Flow
 
-```mermaid
-graph TD
-    DETECT[Detection<br/>Azure Monitor alert fires] --> TRIAGE[Triage<br/>Severity: P1/P2/P3?]
-    TRIAGE --> P1{P1: Safety/data breach?}
-    P1 -->|Yes| ROLLBACK[Immediate rollback<br/>to last known good]
-    P1 -->|No| ANALYZE[Analyze<br/>Logs + traces in App Insights]
-    ROLLBACK --> ISOLATE[Isolate deployment]
-    ISOLATE --> NOTIFY2[Notify stakeholders<br/>+ regulators if required]
-    ANALYZE --> FIX[Root cause fix]
-    FIX --> STAGING2[Deploy to staging]
-    STAGING2 --> EVAL2[Eval golden dataset]
-    EVAL2 --> PROD2[Restore to production]
-```
+![Flow diagram for "Key Concept": Yes, No, DetectionAzure Monitor alert fires, TriageSeverity: P1/P2/P3?, P1: Safety/data breach?, Immediate rollbackto last known good, AnalyzeLogs + traces in AppInsights, Isolate deployment, Notify stakeholders+ regulators if required, Root cause fix](/content/skillup/ab100/images/ab100-d4-lifecycle-responsible-m8.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ab100/ab100-d4-lifecycle-responsible-m8.mmd -->
 
 #### Rollback Decision Matrix
 

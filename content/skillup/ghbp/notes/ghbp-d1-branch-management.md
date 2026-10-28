@@ -28,22 +28,8 @@ A team ships a microservices platform with no branch protection on main. On a Fr
 
 The bug wasn't the root cause. The root cause was that **nothing stopped the direct push**.
 
-```mermaid
-graph TD
-    DEV["👨‍💻 Developer"] -->|"Direct push — no rules"| MAIN["🔴 main branch"]
-    MAIN --> PROD["💥 Production"]
-
-    DEV2["👨‍💻 Developer"] -->|"Open PR"| PR["🔀 Pull Request"]
-    PR -->|"CI must pass"| CI["✅ Status Checks"]
-    CI -->|"Review required"| REVIEW["👁️ Code Review"]
-    REVIEW -->|"Approved — merge"| MAIN2["🟢 main branch"]
-    MAIN2 --> PROD2["✅ Production"]
-
-    style MAIN fill:#7f1d1d,color:#fca5a5
-    style PROD fill:#7f1d1d,color:#fca5a5
-    style MAIN2 fill:#14532d,color:#86efac
-    style PROD2 fill:#14532d,color:#86efac
-```
+![Flow diagram for "The Story: 'The Midnight Push'": Direct push — no rules, Open PR, CI must pass, Review required, Approved — merge, Developer, main branch, Production, Pull Request, Status Checks](/content/skillup/ghbp/images/ghbp-d1-branch-management-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d1-branch-management-m1.mmd -->
 
 ### The Controls Every Protected Branch Needs
 
@@ -362,17 +348,8 @@ Every merged branch left behind is clutter that hides active work. "Automaticall
 
 Release tags deserve the same care: a **tag ruleset** on `refs/tags/v*` restricting updates and deletions stops anyone outside the bypass list from moving `v1.0.0` to a different commit. **Think of a locked branch as a museum exhibit**: everyone can look at it and photograph it, but nobody gets to rearrange it.
 
-```mermaid
-graph LR
-    A["✅ Feature merged"] -->|"No cleanup"| B["🗂️ Stale branch stays"]
-    B --> C["📦 Repo clutter builds"]
-    C --> D["🔍 Hard to find active work"]
-    D --> E["⚠️ Confusion about what's in production"]
-
-    A2["✅ Feature merged"] -->|"Auto-delete enabled"| F["🗑️ Branch auto-deleted"]
-    F --> G["🟢 Clean branch list"]
-    G --> H["✅ Only active work visible"]
-```
+![Flow diagram for "Key Concept": No cleanup, Auto-delete enabled, Feature merged, Stale branch stays, Repo clutter builds, Hard to find active work, Confusion about what's inproduction, Branch auto-deleted, Clean branch list, Only active work visible](/content/skillup/ghbp/images/ghbp-d1-branch-management-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d1-branch-management-m2.mmd -->
 
 | Layer | Mechanism | When |
 |---|---|---|

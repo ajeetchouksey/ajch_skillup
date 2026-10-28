@@ -1,0 +1,8 @@
+graph LR
+    subgraph "Two model deployments (blue/green)"
+        BLUE[Blue Slot<br/>gpt-4o v1.0<br/>100% traffic]
+        GREEN[Green Slot<br/>gpt-4o v1.1<br/>0% traffic]
+    end
+    TEST[Eval + Canary<br/>1% traffic] --> GREEN
+    GREEN -->|Passes eval gate| SWAP[Swap: 100% → v1.1]
+    BLUE --> ARCHIVE[Archive v1.0<br/>rollback ready]

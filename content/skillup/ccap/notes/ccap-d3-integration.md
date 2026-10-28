@@ -118,17 +118,8 @@ A RAG pipeline is a sequence of decisions, each of which trades off recall, prec
 - **Indexing**: dense vector embeddings capture semantic similarity ("cars" matches "automobiles") but underperform on exact-match needs (part numbers, error codes, legal citations). Sparse/keyword indexes (BM25) excel at exact-match and rare-term retrieval but miss paraphrase and synonym matches. **Hybrid indexing** (dense + sparse, combined via reciprocal rank fusion or a weighted score) is the production default for heterogeneous enterprise content because it covers both failure modes.
 - **Metadata filtering**: indexing structured metadata (document date, source system, access-control tags) alongside content allows retrieval to pre-filter before similarity search — critical for both relevance (don't retrieve a 2019 policy when a 2026 one exists) and authorization (don't retrieve documents the querying user can't access).
 
-```mermaid
-graph LR
-  A[Source Documents] --> B[Ingest & Parse]
-  B --> C[Chunk<br/>fixed / semantic / structural]
-  C --> D[Embed + Index<br/>dense vector + sparse keyword]
-  D --> E[Metadata Tag<br/>ACL, date, source]
-  F[User Query] --> G[Retrieve<br/>hybrid search + ACL filter]
-  E --> G
-  G --> H[Rerank<br/>cross-encoder / LLM judge]
-  H --> I[Generate<br/>Claude + grounded citations]
-```
+![Flow diagram for "Key Concept": Source Documents, Ingest & Parse, Chunkfixed / semantic /structural, Embed + Indexdense vector + sparsekeyword, Metadata TagACL, date, source, User Query, Retrievehybrid search + ACL filter, Rerankcross-encoder / LLM judge, GenerateClaude + groundedcitations](/content/skillup/ccap/images/ccap-d3-integration-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d3-integration-m1.mmd -->
 
 ### In Practice
 
@@ -188,18 +179,8 @@ Choosing how a Claude-based system connects to external capability is itself an 
 - **Direct API/CLI integration**: a hand-built, purpose-specific call to a known endpoint or command. Best when the integration is fixed, high-throughput, latency-sensitive, or when the overhead of a general discovery protocol isn't justified by a stable, small, well-known set of calls. Lower abstraction cost, less flexibility, more integration code to maintain per system.
 - **Agent-to-agent (A2A) communication**: one agent delegates a sub-task to another autonomous agent (potentially with its own tools, memory, and reasoning) rather than calling a stateless tool. Best when the sub-task genuinely requires independent reasoning, multi-step planning, or ownership of a distinct capability domain (e.g., a "billing agent" that owns billing logic end-to-end) — not just data retrieval or a single function call.
 
-```mermaid
-flowchart TD
-  Q{What does the caller need?} -->|"Discover/use many tools\nflexibly, reusable across clients"| MCP[MCP Server]
-  Q -->|"Fixed, known, high-throughput\nor latency-critical call"| API[Direct API / CLI]
-  Q -->|"Delegate an independent\nsub-task requiring its own\nreasoning/planning"| A2A[Agent-to-Agent]
-  MCP --> M1[Good: reusable, standardized,\ndiscoverable]
-  MCP --> M2[Cost: protocol overhead,\ntool-bloat risk]
-  API --> A1[Good: minimal overhead,\npredictable latency]
-  API --> A2[Cost: bespoke per integration,\nno discovery/reuse]
-  A2A --> AA1[Good: true task delegation,\nspecialized reasoning]
-  A2A --> AA2[Cost: highest complexity,\nneeds its own governance]
-```
+![Flow diagram for "Key Concept": Discover/use many toolsflexibly, reusable acrossclients, Fixed, known, high-throughputor latency-critical call, Delegate an independentsub-task requiring its ownreasoning/planning, What does the caller need?, MCP Server, Direct API / CLI, Agent-to-Agent, Good: reusable,standardized,discoverable, Cost: protocol overhead,tool-bloat risk, Good: minimal overhead,predict](/content/skillup/ccap/images/ccap-d3-integration-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d3-integration-m2.mmd -->
 
 ### In Practice
 

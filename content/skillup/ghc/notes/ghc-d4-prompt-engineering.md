@@ -339,27 +339,8 @@ Watch the order. Filtering happens on <b>both</b> sides of the model: proxy and 
 
 ### End-to-End Process
 
-```
-INBOUND
-1. Developer types a chat message or a code comment
-   ↓
-2. Secure transmission (HTTPS) + context gathering
-   (code before/after cursor, file name/type, open tabs, project structure,
-    attachments, custom instructions, chat history; FIM pre-processing)
-   ↓
-3. Proxy filter (GitHub-owned Azure tenant): blocks prompt-hacking attempts
-   ↓
-4. Toxicity filtering: hate speech, inappropriate content, personal data
-   ↓
-5. LLM generates the response
-OUTBOUND
-6. Post-processing: toxicity filter, code-quality checks (e.g. XSS, SQL injection),
-   optional public-code matching (~150 chars); failures truncated or discarded
-   ↓
-7. Suggestion/response delivered; your accept/edit/reject feeds the loop
-   ↓
-8. Developer reviews, iterates if needed
-```
+![Flow diagram for "End-to-End Process": Outbound, 6 · Post-processing:toxicity, code-qualitychecks,optional public-codematching ~150 chars, 7 · Response delivered;accept, edit or reject feedsthe loop, 8 · Developer reviews anditerates, Inbound, 1 · Developer types a chatmessage or codecomment, 2 · HTTPS transmission +context gatheringcode around cursor, opentabs, instructions, history, 3 · Proxy fi](/content/skillup/ghc/images/ghc-d4-prompt-engineering-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghc/ghc-d4-prompt-engineering-m1.mmd -->
 
 Source: [Microsoft Learn: GitHub Copilot user prompt process flow](https://learn.microsoft.com/en-us/training/modules/introduction-prompt-engineering-with-github-copilot/3-github-copilot-user-prompt-process-flow)
 

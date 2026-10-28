@@ -1,0 +1,10 @@
+flowchart TD
+  Q{What does the caller need?} -->|"Discover/use many tools\nflexibly, reusable across clients"| MCP[MCP Server]
+  Q -->|"Fixed, known, high-throughput\nor latency-critical call"| API[Direct API / CLI]
+  Q -->|"Delegate an independent\nsub-task requiring its own\nreasoning/planning"| A2A[Agent-to-Agent]
+  MCP --> M1[Good: reusable, standardized,\ndiscoverable]
+  MCP --> M2[Cost: protocol overhead,\ntool-bloat risk]
+  API --> A1[Good: minimal overhead,\npredictable latency]
+  API --> A2[Cost: bespoke per integration,\nno discovery/reuse]
+  A2A --> AA1[Good: true task delegation,\nspecialized reasoning]
+  A2A --> AA2[Cost: highest complexity,\nneeds its own governance]

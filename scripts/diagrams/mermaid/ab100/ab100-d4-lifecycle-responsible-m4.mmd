@@ -1,0 +1,9 @@
+graph TD
+    PR[Pull Request<br/>Prompt/Config Change] --> CI[CI Pipeline<br/>GitHub Actions]
+    CI --> EVAL[Automated Eval<br/>Golden dataset]
+    EVAL --> GATE{Score ≥ baseline?}
+    GATE -->|Yes| STAGING[Deploy to Staging]
+    GATE -->|No| FAIL[Block PR]
+    STAGING --> CANARY[Canary 1% traffic]
+    CANARY --> MONITOR[Monitor 24h]
+    MONITOR --> PROD[Full production rollout]

@@ -23,14 +23,8 @@ The team moved the account number into the system prompt's critical-context bloc
 
 ### The U-Shaped Attention Curve
 
-```mermaid
-graph LR
-    subgraph "Attention Distribution (U-Shaped)"
-        S["Start HIGH attention"]
-        M["... MIDDLE ... LOW attention"]
-        E["END HIGH attention"]
-    end
-```
+![Flow diagram for "The U-Shaped Attention Curve": Attention Distribution U-Shaped, Start HIGH attention, ... MIDDLE ... LOW attention, END HIGH attention](/content/skillup/ccaf/images/d5-context-management-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m1.mmd -->
 
 ```
 Attention Level
@@ -93,16 +87,8 @@ The summary said: "Customer had a billing issue with a recent order." The order 
 
 ### The Architecture
 
-```mermaid
-graph TD
-    subgraph "Context Window Management"
-        SYS["System Prompt (never compressed)"]
-        SUM["Summary of turns 1-20 (compressed 80%)"]
-        FULL["Full turns 21-30 (verbatim recent)"]
-        CUR["Current message (always full)"]
-    end
-    SYS --> SUM --> FULL --> CUR
-```
+![Flow diagram for "The Architecture": Context Window Management, System Prompt nevercompressed, Summary of turns 1-20compressed 80%, Full turns 21-30 verbatimrecent, Current message alwaysfull](/content/skillup/ccaf/images/d5-context-management-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m2.mmd -->
 
 ### What to Preserve vs Compress
 
@@ -166,15 +152,8 @@ The fix: return the top 5 results with a `total_count` and a pagination hint. Cl
 
 > A good tool is like a librarian. You don't dump all 10,000 books on someone's desk. You bring the 5 most relevant ones and say, "I have 10,000 more if these aren't right." Let the user ask for specifics.
 
-```mermaid
-graph TD
-    T[Tool returns data] --> S{Size check}
-    S -->|"< 5KB"| OK["Send as-is"]
-    S -->|"> 5KB"| TRIM{Trimming Strategy}
-    TRIM --> SS["Server-side trim (in tool implementation)"]
-    TRIM --> CS["Client-side trim (before sending to Claude)"]
-    TRIM --> PG["Pagination (page-by-page)"]
-```
+![Flow diagram for "Mental Model: The Librarian": < 5KB, 5KB, Tool returns data, Size check, Send as-is, Trimming Strategy, Server-side trim in toolimplementation, Client-side trim beforesending to Claude, Pagination page-by-page](/content/skillup/ccaf/images/d5-context-management-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m3.mmd -->
 
 ### Strategy 1: Server-Side Trim (Best Practice)
 
@@ -266,16 +245,8 @@ One engineer added `cache_control: {"type": "ephemeral"}` to the system prompt b
 
 > Cache = pre-printed name badges at a conference. Making the first badge costs time (design, print). But once the template exists, stamping out 999 more is nearly free. The badge expires after 5 minutes of no one picking it up (TTL). If someone grabs one every 4 minutes, it stays available forever.
 
-```mermaid
-graph TD
-    subgraph "First Request (Cache Write)"
-        R1[50K token system prompt] -->|"1.25x cost"| CACHE[(Cache)]
-    end
-
-    subgraph "Subsequent Requests (Cache Read)"
-        CACHE -->|"0.1x cost (lower on some current models)"| R2[System prompt from cache]
-    end
-```
+![Flow diagram for "Mental Model: Pre-Printed Name Badges": Subsequent Requests Cache Read, First Request Cache Write, 1.25x cost, 0.1x cost lower on somecurrent models, 50K token system prompt, Cache, System prompt from cache](/content/skillup/ccaf/images/d5-context-management-m4.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m4.mmd -->
 
 ### How to Use
 
@@ -350,13 +321,8 @@ A content team needed to classify 50,000 product descriptions into 12 categories
 
 > Batches API = choosing ground shipping. Same package arrives, costs half as much, but you wait up to 24 hours. Don't use it when the customer is standing at the counter waiting.
 
-```mermaid
-graph LR
-    subgraph "Batches API"
-        IN["JSONL Input (up to 100K requests)"] --> API[Anthropic Batch API]
-        API -->|"Processing (up to 24h)"| OUT["Results (50% cost)"]
-    end
-```
+![Flow diagram for "Mental Model: Overnight Shipping vs. Same-Day": Batches API, Processing up to 24h, JSONL Input up to 100Krequests, Anthropic Batch API, Results 50% cost](/content/skillup/ccaf/images/d5-context-management-m5.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m5.mmd -->
 
 ### Key Properties
 
@@ -420,20 +386,8 @@ An engineer's code retried every failed API call. Worked great for 429s (rate li
 
 > 429 = red light at a busy intersection. Wait, try again, you'll get through. 5xx = road construction. Come back in a few minutes. 4xx = you're driving the wrong way on a one-way street. No amount of waiting fixes that — turn around (fix your request).
 
-```mermaid
-graph TD
-    CALL[API Call] --> R{Response?}
-    R -->|"200 OK"| S["Success"]
-    R -->|"429 Rate Limit"| RL{Retries left?}
-    R -->|"5xx Server Error"| SE{Retries left?}
-    R -->|"Other 4xx Client Error"| F["Fail immediately (don't retry)"]
-
-    RL -->|"Yes"| BACK["Exponential backoff 2^attempt + jitter"]
-    SE -->|"Yes"| BACK
-    RL -->|"No"| F
-    SE -->|"No"| F
-    BACK --> CALL
-```
+![Flow diagram for "Mental Model: Traffic Lights": 200 OK, 429 Rate Limit, 5xx Server Error, Other 4xx Client Error, Yes, No, API Call, Response?, Success, Retries left?](/content/skillup/ccaf/images/d5-context-management-m6.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d5-context-management-m6.mmd -->
 
 ### Exponential Backoff + Jitter Pattern
 

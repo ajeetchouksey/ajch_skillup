@@ -1,0 +1,16 @@
+graph LR
+    Start[New task] -->|reversible, reviewable| R
+    Start -->|irreversible or high-stakes| M
+    Start -->|irreversible or high-stakes| S
+    Start -->|irreversible or high-stakes| A
+    subgraph "Good delegation candidates"
+        R[Repo research] --> P[Draft implementation plan]
+        P --> B[Code changes on a branch]
+        B --> T[Tests / linters in ephemeral env]
+        T --> PR[Open pull request]
+    end
+    subgraph "Stays human-owned"
+        M[Merge approval]
+        S[Security-sensitive changes]
+        A[Architecture decisions]
+    end

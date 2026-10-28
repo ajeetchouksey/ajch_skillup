@@ -1,0 +1,10 @@
+graph LR
+  A[Trigger in IDE] --> B[Gather context]
+  B --> C[Build prompt]
+  C --> D[Proxy and input filters]
+  D --> E[LLM generates]
+  E --> F[Post-processing filters]
+  F --> G[Ghost text shown]
+  G --> H{Developer}
+  H -->|Tab accept| I[Code inserted]
+  H -->|Esc or keep typing| J[Discarded]

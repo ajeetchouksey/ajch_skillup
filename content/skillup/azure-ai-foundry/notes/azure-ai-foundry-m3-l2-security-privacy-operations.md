@@ -82,18 +82,8 @@ Microsoft's current guidance for Foundry agents follows the pattern in the Micro
 
 You may still meet an older four-stage framing (Identify, Measure, Mitigate, Operate) in earlier Microsoft material. It covers the same ground; the current Foundry docs use the three stages above. **Think of it like a building's fire safety**: inspections find the hazards, sprinklers and fire doors contain them, and the alarm panel watches around the clock.
 
-```mermaid
-flowchart LR
-  DI[Discover Risks] --> PR[Protect with Guardrails]
-  PR --> GO[Govern in Production]
-  GO -->|system changes| DI
-  classDef stage1 fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  classDef stage2 fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
-  classDef stage3 fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  class DI stage1
-  class PR stage2
-  class GO stage3
-```
+![Flow diagram for "Key Concept": system changes, Discover Risks, Protect with Guardrails, Govern in Production](/content/skillup/azure-ai-foundry/images/azure-ai-foundry-m3-l2-security-privacy-operations-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/azure-ai-foundry/azure-ai-foundry-m3-l2-security-privacy-operations-m1.mmd -->
 *A cycle that restarts whenever inputs or the model change.*
 
 ### In Practice

@@ -16,16 +16,8 @@ A coding agent session runs inside an ephemeral, sandboxed environment (D2) that
 
 Not all information an agent uses lives the same way. **Short-term memory** is the session's own context window — the running record of what the agent has read, reasoned about, and called tools for during the current session. It's rich and immediately available, but it exists only for that one session; once the session ends and the ephemeral environment is discarded, it's gone unless something in it was externalized first. **Long-term memory** is what a team deliberately writes into the repository so that *every future session* loads it automatically without being told — repository custom instructions (`.github/copilot-instructions.md`) and narrower, path-scoped instruction files are the primary mechanism: they're version-controlled, apply from the first turn of a brand-new session, and don't depend on anyone re-explaining conventions each time. **External memory** is information the agent doesn't carry by default at all — it lives in a system of record (a linked issue, a project board, an MCP-connected knowledge store) and the agent retrieves it on demand through a tool call (D2) only when the current task actually needs it, rather than holding it in context the whole time. **Nothing survives past the session boundary unless it's written down first — like sticky notes on a desk that gets cleared every night.**
 
-```mermaid
-flowchart TD
-    Info["New piece of information<br/>the agent needs or produces"] --> Q1{"Does every future session<br/>on this repo need it by default?"}
-    Q1 -->|"Yes"| LT["Long-term memory:<br/>custom instructions / path-scoped<br/>instruction files (version-controlled)"]
-    Q1 -->|"No"| Q2{"Is it only relevant<br/>to finishing THIS task?"}
-    Q2 -->|"Yes"| ST["Short-term memory:<br/>stays in the session's context window,<br/>discarded when the session ends"]
-    Q2 -->|"No — relevant later,<br/>but only sometimes"| Q3{"Should it be retrieved<br/>on demand, not preloaded?"}
-    Q3 -->|"Yes"| EXT["External memory:<br/>issue/PR/project record or<br/>MCP-backed store, pulled via tool call"]
-    Q3 -->|"No, it must be preloaded"| LT
-```
+![Flow diagram for "Key Concept": Yes, No, No — relevant later,but only sometimes, No, it must be preloaded, New piece of informationthe agent needs orproduces, Does every future sessionon this repo need it bydefault?, Long-term memory:custom instructions /path-scopedinstruction filesversion-controlled, Is it only relevantto finishing THIS task?, Short-term memory:stays in the session'scontext windo](/content/skillup/gh600/images/gh600-d3-manage-memory-state-and-execution-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d3-manage-memory-state-and-execution-m1.mmd -->
 *Deciding which memory tier a piece of information belongs in.*
 
 ### In Practice
@@ -108,23 +100,8 @@ The structured plan artifact (D1) records what the agent intended to do before i
 
 Because progress is recorded in durable artifacts, an agent can pick up a task exactly where it left off instead of starting over. GitHub Copilot cloud agent supports this directly: a reviewer can leave a follow-up comment on the agent's existing pull request — "this breaks the edge case where the list is empty" — and the agent resumes on the *same branch*, reading the existing commits and the PR thread as its starting context, rather than opening a fresh session with no memory of the work already done. **Resuming on the same branch is picking up the same relay baton, not starting a new race.**
 
-```mermaid
-sequenceDiagram
-    participant Human
-    participant PR as Pull Request (branch)
-    participant S1 as Session 1 (agent)
-    participant S2 as Session 2 (agent)
-
-    Human->>S1: Assign issue
-    S1->>PR: Plan artifact, commits, draft PR opened
-    S1--)S1: Session ends (ephemeral env discarded)
-    Human->>PR: Follow-up comment:<br/>"handle the empty-list case too"
-    Human->>S2: Trigger resume
-    S2->>PR: Read existing commits + PR thread (not a blank slate)
-    S2->>PR: New commit on the SAME branch,<br/>addressing only the feedback
-    S2--)S2: Session ends (state again lives only in PR/Git)
-    Human->>PR: Review, approve, merge
-```
+![Sequence diagram for "Key Concept": Session 2, agent, Session 1, Pull Request, branch, Human, Assign issue, Plan artifact, commits,, draft PR opened, Session ends](/content/skillup/gh600/images/gh600-d3-manage-memory-state-and-execution-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d3-manage-memory-state-and-execution-m2.mmd -->
 *Resuming reads the same branch instead of starting cold.*
 
 ### In Practice

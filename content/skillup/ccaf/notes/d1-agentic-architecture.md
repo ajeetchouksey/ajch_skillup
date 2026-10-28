@@ -26,19 +26,8 @@ This is what happens when you give one agent 40+ tools. The exam guide's princip
 
 The fix is the same one any good engineering manager would use: **hire specialists**.
 
-```mermaid
-graph TD
-    U[👤 User Request] --> C[🧠 Coordinator Agent]
-    C -->|"Route: billing"| B[💰 Billing Subagent]
-    C -->|"Route: shipping"| S[📦 Shipping Subagent]
-    C -->|"Route: technical"| T[🔧 Technical Subagent]
-    B -->|"Tools: refund, invoice, credit"| B
-    S -->|"Tools: track, reroute, cancel"| S
-    T -->|"Tools: logs, restart, escalate"| T
-    B --> R[📋 Response to User]
-    S --> R
-    T --> R
-```
+![Flow diagram for "The Story: 'The Overwhelmed Intern'": Route: billing, Route: shipping, Route: technical, Tools: refund, invoice, credit, Tools: track, reroute, cancel, Tools: logs, restart, escalate, User Request, Coordinator Agent, Billing Subagent, Shipping Subagent](/content/skillup/ccaf/images/d1-agentic-architecture-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m1.mmd -->
 
 ### 🧠 Mental Model: "The Restaurant Host"
 
@@ -104,15 +93,8 @@ Think of the agentic loop like a detective working a case. They get a lead (user
 
 The loop is deceptively simple: **keep calling tools and feeding results back until Claude says "I'm done."** But the devil is in the control flow.
 
-```mermaid
-graph LR
-    A[📨 User Message] --> B{🤖 Claude Thinks}
-    B -->|"Needs info/action"| C[🔧 Tool Call]
-    C --> D[📊 Tool Result]
-    D --> B
-    B -->|"Task complete"| E[✅ Final Response]
-    B -->|"stop_reason: end_turn"| E
-```
+![Flow diagram for "The Story: 'The Stubborn Detective'": Needs info/action, Task complete, stop_reason: end_turn, User Message, Claude Thinks, Tool Call, Tool Result, Final Response](/content/skillup/ccaf/images/d1-agentic-architecture-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m2.mmd -->
 
 ### 🧠 Mental Model: "The While Loop You Don't Write"
 
@@ -202,34 +184,8 @@ That social engineer gets stopped cold. **Every. Single. Time.** Not 99.7% of th
 
 <mark>This is the core of hooks: **code that runs outside the model, inspecting or modifying every tool call deterministically.**</mark>
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant C as Claude
-    participant Pre as PreToolUse Hook
-    participant T as Tool
-    participant Post as PostToolUse Hook
-    participant Stop as Stop Hook
-    
-    U->>C: Request
-    C->>Pre: "I want to call write_file"
-    Pre-->>Pre: Check: allowed? safe?
-    alt Blocked
-        Pre->>C: ❌ "write_file blocked: read-only mode"
-    else Allowed
-        Pre->>T: ✅ Execute write_file
-        T->>Post: Result
-        Post-->>Post: Log, transform, validate
-        Post->>C: Processed result
-    end
-    C->>Stop: "I'm ready to respond"
-    Stop-->>Stop: Check: quality? complete?
-    alt Needs more work
-        Stop->>C: 🔄 "Add error handling before finishing"
-    else Acceptable
-        Stop->>U: ✅ Final response
-    end
-```
+![Sequence diagram for "The Story: 'The $50K Refund Incident'": Stop Hook, PostToolUse, Hook, Tool, PreToolUse, Claude, User, alt, Blocked, Allowed](/content/skillup/ccaf/images/d1-agentic-architecture-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m3.mmd -->
 
 ### 🧠 Mental Model: "Airport Security"
 
@@ -311,19 +267,11 @@ A Stop hook fires when Claude finishes responding. Returning `decision: "block"`
 
 ### 🎯 The Critical Distinction (Tested Heavily)
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  HOOKS = Code that ENFORCES behavior                    │
-│  • Cannot be bypassed by clever prompting               │
-│  • Runs deterministically every single time             │
-│  • Lives OUTSIDE the model                              │
-│                                                         │
-│  PROMPTS = Text that SUGGESTS behavior                  │
-│  • Can be "forgotten" in long conversations             │
-│  • May be overridden by contradicting user input        │
-│  • Lives INSIDE the model context                       │
-└─────────────────────────────────────────────────────────┘
-```
+| | Hooks: code that **enforces** behaviour | Prompts: text that **suggests** behaviour |
+|---|---|---|
+| Can it be bypassed? | No. Clever prompting can't get around it | Yes. It can be overridden by contradicting user input |
+| Consistency | Runs deterministically, every single time | Can be "forgotten" in long conversations |
+| Where it lives | Outside the model | Inside the model's context |
 
 <div class="note-important"><strong>Exam heuristic:</strong> If the question uses words like "ensure," "guarantee," "must always," or "cannot be bypassed" → the answer is a hook. If it says "encourage," "prefer," "should generally" → it's a prompt/instruction.</div>
 
@@ -339,18 +287,8 @@ Your agent has a `delete_records` tool. At 3 AM, a user (or an attacker posing a
 
 If your only protection is a system prompt saying "confirm destructive operations," you're one social-engineering attempt away from disaster. The right architecture uses a **PreToolUse hook as an HITL gate** — code that physically cannot proceed without a human pressing "Approve."
 
-```mermaid
-graph TD
-    C[🤖 Claude decides action] --> G{Gate Check}
-    G -->|"Low risk: < $50"| A[✅ Auto-approve]
-    G -->|"Medium risk: $50-500"| N[📱 Notify human]
-    G -->|"High risk: > $500"| B[🛑 Block until approved]
-    N --> E[Execute + Log]
-    B --> H{Human Decision}
-    H -->|Approve| E
-    H -->|Deny| D[❌ Inform Claude: denied]
-    A --> E
-```
+![Flow diagram for "The Story: 'The 3 AM Delete'": Low risk: < $50, Medium risk: $50-500, High risk: $500, Approve, Deny, Claude decides action, Gate Check, Auto-approve, Notify human, Block until approved](/content/skillup/ccaf/images/d1-agentic-architecture-m4.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m4.mmd -->
 
 ### 🧠 Mental Model: "The Three Checkbooks"
 
@@ -421,32 +359,15 @@ Each call takes ~9 seconds. Total: 45 seconds. But steps 1-5 are **completely in
 
 Now consider a DIFFERENT workflow: "Look up user Alice → get her order history → find her most recent order → check its shipment status." Here, each step's *input* comes from the previous step's *output*. This MUST be sequential.
 
-```mermaid
-graph TD
-    subgraph "✅ PARALLEL (Independent tasks)"
-        P1[Get weather NYC] 
-        P2[Get weather London]
-        P3[Get stock price]
-    end
-    
-    subgraph "🔗 SEQUENTIAL (Dependencies)"
-        S1[Get user ID] --> S2[Get user's orders]
-        S2 --> S3[Get order details]
-    end
-```
+![Flow diagram for "The Story: 'The Research Report That Took 5x Too Long'": SEQUENTIAL Dependencies, Get user ID, Get user's orders, Get order details, PARALLEL Independent tasks, Get weather NYC, Get weather London, Get stock price](/content/skillup/ccaf/images/d1-agentic-architecture-m5.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m5.mmd -->
 
 ### 🧠 Mental Model: "The Assembly Line Question"
 
 <div class="note-important">Ask yourself ONE question for every exam scenario about execution order:</div>
 
-```
-┌─────────────────────────────────────────────┐
-│  Does Step B need the OUTPUT of Step A?      │
-│                                              │
-│  YES → Sequential (must wait)               │
-│  NO  → Parallel (can run simultaneously)    │
-└─────────────────────────────────────────────┘
-```
+![Flow diagram for "Mental Model: 'The Assembly Line Question'": Yes, No, Does step B needthe output of step A?, SequentialB must wait for A, Parallelrun them at the same time](/content/skillup/ccaf/images/d1-agentic-architecture-m6.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m6.mmd -->
 
 **Analogy:** Ordering food at a restaurant. You can order appetizers, entrees, and drinks simultaneously (parallel) — none depends on the others. But you can't ask for "the same thing my friend ordered" until your friend has actually ordered (sequential dependency).
 
@@ -511,18 +432,8 @@ Now with **good error handling**:
 # Result: Coordinator routes around the failure gracefully
 ```
 
-```mermaid
-graph TD
-    T[🔧 Tool Call] --> R{Result?}
-    R -->|Success| S[✅ Continue normally]
-    R -->|Known Error| E[📋 Structured error to Claude]
-    R -->|Crash/Timeout| F[🚨 Generic failure to Claude]
-    E --> C{Claude decides}
-    F --> C
-    C -->|Retry viable| T
-    C -->|Alternative exists| A[🔄 Try different tool]
-    C -->|Unrecoverable| U[💬 Tell user + escalate]
-```
+![Flow diagram for "The Story: 'The Dead Subagent Problem'": Success, Known Error, Crash/Timeout, Retry viable, Alternative exists, Unrecoverable, Tool Call, Result?, Continue normally, Structured error to Claude](/content/skillup/ccaf/images/d1-agentic-architecture-m7.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m7.mmd -->
 
 ### 🧠 Mental Model: "The Doctor's Report"
 
@@ -565,23 +476,8 @@ A fintech company runs an agent that processes 1,000 invoices nightly. One night
 
 The problem wasn't the crash — crashes happen. The problem was **no checkpoint**. The agent had amnesia. It couldn't answer: "Where was I?"
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant C as Claude
-    participant S as State Store
-    
-    U->>C: "Process 1000 invoices"
-    C->>S: Save checkpoint: {processed: 0, total: 1000}
-    loop Every 50 items
-        C->>C: Process batch of 50
-        C->>S: Update checkpoint: {processed: 50...100...150}
-    end
-    Note over C: ⚡ Crash at item 350!
-    U->>C: "Resume processing"
-    C->>S: Load checkpoint: {processed: 300}
-    C->>C: Resume from item 301
-```
+![Sequence diagram for "The Story: 'The Invoice Processor That Started Over'": State Store, Claude, User, loop, Every 50, items, Crash at item, 350!, "Process 1000 invoices", Save checkpoint:](/content/skillup/ccaf/images/d1-agentic-architecture-m8.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m8.mmd -->
 
 ### 🧠 Mental Model: "The Bookmark"
 
@@ -642,15 +538,8 @@ Your coordinator keeps routing billing questions to the shipping subagent. Custo
 
 The fix is trivial once you can SEE it. The hard part is having instrumented your system to show you.
 
-```mermaid
-graph LR
-    subgraph "Trace (one request)"
-        A[Span: coordinator] --> B[Span: route_decision]
-        A --> C[Span: subagent_billing]
-        C --> D[Span: tool_lookup_invoice]
-        C --> E[Span: tool_issue_refund]
-    end
-```
+![Flow diagram for "The Story: 'The Wrong Subagent Mystery'": Trace one request, Span: coordinator, Span: route_decision, Span: subagent_billing, Span: tool_lookup_invoice, Span: tool_issue_refund](/content/skillup/ccaf/images/d1-agentic-architecture-m9.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m9.mmd -->
 
 ### 🧠 Mental Model: "The Receipt Number"
 
@@ -692,20 +581,8 @@ def handle_request(user_message: str):
 
 When you see an exam question asking "how to ensure/enforce/implement X" — run through this tree:
 
-```mermaid
-graph TD
-    Q["Exam Question:<br/>How to ensure X happens?"] --> M{MUST it happen<br/>every time?}
-    M -->|"Yes, guaranteed"| H[Use a HOOK]
-    M -->|"Best effort ok"| P[Use a PROMPT instruction]
-    H --> W{Which hook?}
-    W -->|"Before tool runs"| Pre[PreToolUse]
-    W -->|"After tool returns"| Post[PostToolUse]
-    W -->|"When Claude tries to finish"| Stop[Stop Hook]
-    P --> T{What kind?}
-    T -->|"Behavior/style"| Sys[System prompt]
-    T -->|"Format"| Few[Few-shot examples]
-    T -->|"File-specific"| Scope[Scoped rule]
-```
+![Flow diagram for "Quick-Reference: Exam Decision Tree": Yes, guaranteed, Best effort ok, Before tool runs, After tool returns, When Claude tries to finish, Behavior/style, Format, File-specific, Exam Question:How to ensure X happens?, MUST it happenevery time?](/content/skillup/ccaf/images/d1-agentic-architecture-m10.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m10.mmd -->
 
 ### Decision Shortcuts
 
@@ -789,14 +666,8 @@ Re-analyse that file and then proceed with the migration plan."
 
 Forking creates a new session (with its own session ID) that starts with a copy of the original's history; the original stays unchanged, so you can resume either branch separately. Forking branches the **conversation**, not the filesystem: file edits made in one branch are real and visible to the other.
 
-```mermaid
-graph TD
-    B["Shared Baseline Analysis<br/>(codebase explored)"] --> F["fork_session"]
-    F --> A1["Branch A: Approach 1<br/>Rewrite with async/await"]
-    F --> A2["Branch B: Approach 2<br/>Incremental refactor"]
-    A1 --> C["Compare results,<br/>pick winner"]
-    A2 --> C
-```
+![Flow diagram for "forksession: Parallel Branch Exploration": Shared Baseline Analysiscodebase explored, fork_session, Branch A: Approach 1Rewrite with async/await, Branch B: Approach 2Incremental refactor, Compare results,pick winner](/content/skillup/ccaf/images/d1-agentic-architecture-m11.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccaf/d1-agentic-architecture-m11.mmd -->
 
 **Use cases:** comparing testing strategies, evaluating two library migrations, trying different refactoring approaches — all from the same understood codebase.
 

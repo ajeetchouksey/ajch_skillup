@@ -1,0 +1,9 @@
+flowchart TD
+  A[Enterprise managed policy<br/>IT/platform-deployed, non-overridable] --> B[Project settings.json<br/>+ CLAUDE.md + .mcp.json<br/>committed to repo]
+  B --> C[User-level settings<br/>personal preferences only]
+  A --> D{Security-relevant setting?}
+  D -->|Yes| A
+  D -->|No, team convention| B
+  D -->|No, personal preference| C
+  B --> E[New engineer clones repo]
+  E --> F[Consistent tools, permissions,<br/>and conventions from day one]

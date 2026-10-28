@@ -1,0 +1,10 @@
+graph LR
+    subgraph "Without MCP Resources"
+        A["Agent"] -->|"search for topics"| T1["tool call"]
+        T1 -->|"search again"| T2["tool call"]
+        T2 -->|"search again"| T3["tool call #N"]
+    end
+    subgraph "With MCP Resources"
+        B["Agent"] -->|"reads catalog at session start"| R["Resource: topic index"]
+        R -->|"knows what exists, targeted calls only"| T4["1-2 tool calls"]
+    end

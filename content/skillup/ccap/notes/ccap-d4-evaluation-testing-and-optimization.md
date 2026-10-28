@@ -53,21 +53,8 @@ A single evaluation dataset or grading method cannot cover both breadth and dept
 
 **A single measurement method will systematically miss whatever it wasn't designed to catch** — golden + rule-based covers the deterministic core, synthetic + LLM-as-judge covers breadth on open-ended behavior, and adversarial + human review concentrates on the highest-consequence failure modes.
 
-```mermaid
-graph LR
-  A[Production traffic<br/>+ known edge cases] --> B[Golden Dataset<br/>human-verified baseline]
-  A --> C[Synthetic Expansion<br/>Claude-generated variants]
-  D[Threat modeling] --> E[Adversarial / Red-team Set]
-  B --> F{Grading method}
-  C --> F
-  E --> F
-  F -->|Deterministic task| G[Rule-based check]
-  F -->|Open-ended quality| H[LLM-as-judge]
-  F -->|High stakes / ambiguous| I[Human review]
-  G --> J[Eval Report:<br/>accuracy · latency · cost · safety · security]
-  H --> J
-  I --> J
-```
+![Flow diagram for "Key Concept": Deterministic task, Open-ended quality, High stakes / ambiguous, Production traffic+ known edge cases, Golden Datasethuman-verified baseline, Synthetic ExpansionClaude-generated variants, Threat modeling, Adversarial / Red-team Set, Grading method, Rule-based check](/content/skillup/ccap/images/ccap-d4-evaluation-testing-and-optimization-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d4-evaluation-testing-and-optimization-m1.mmd -->
 
 ### In Practice
 
@@ -122,18 +109,8 @@ The exam expects candidates to systematically distinguish between root causes th
 
 The diagnostic discipline is to inspect the trace in strict order — what context was actually retrieved, what instructions were actually sent, and what the model actually said — because the same visible symptom (a wrong fact in the final answer) has four different upstream traces depending on the real cause.
 
-```mermaid
-flowchart TD
-  Start([Wrong or unexpected output]) --> Q1{Was the correct grounding<br/>context retrieved and<br/>present in the prompt?}
-  Q1 -->|No / missing / stale context| Retrieval[Retrieval Issue<br/>fix: chunking, indexing,<br/>ranking, metadata filters]
-  Q1 -->|Yes, correct context was present| Q2{Did the model contradict<br/>or ignore the provided context?}
-  Q2 -->|Yes, fabricated beyond given context| Halluc[Hallucination<br/>fix: grounding constraints,<br/>citation requirements,<br/>verification step]
-  Q2 -->|No, it used the context faithfully| Q3{Were the instructions<br/>ambiguous, contradictory,<br/>or missing a constraint?}
-  Q3 -->|Yes| Prompt[Prompt Failure<br/>fix: clarify instructions,<br/>add constraints/examples,<br/>structured output]
-  Q3 -->|No, instructions were clear| Q4{Does the task require<br/>reasoning beyond the<br/>selected model's tier?}
-  Q4 -->|Yes, task exceeds model capability| Mismatch[Model Mismatch<br/>fix: route to higher-tier model]
-  Q4 -->|No| Other[Investigate tool-call errors,<br/>context truncation,<br/>or downstream system bug]
-```
+![Flow diagram for "Key Concept": No / missing / stale context, Yes, correct context waspresent, Yes, fabricated beyond givencontext, No, it used the contextfaithfully, Yes, No, instructions were clear, Yes, task exceeds modelcapability, No, Wrong or unexpectedoutput, Was the correct groundingcontext retrieved andpresent in the prompt?](/content/skillup/ccap/images/ccap-d4-evaluation-testing-and-optimization-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ccap/ccap-d4-evaluation-testing-and-optimization-m2.mmd -->
 
 ### In Practice
 

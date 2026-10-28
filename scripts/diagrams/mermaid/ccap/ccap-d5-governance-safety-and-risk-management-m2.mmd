@@ -1,0 +1,10 @@
+flowchart TD
+  A[Proposed action / output] --> B{Consequence severity<br/>if wrong?}
+  B -->|Low: internal, low-stakes| C{Reversible?}
+  C -->|Yes, easily| D[Autonomous execution<br/>+ post-hoc sampling review]
+  C -->|No| E[Confidence-threshold escalation]
+  B -->|High: financial, clinical,<br/>legal, regulatory| F{Is liability delegable<br/>to the system?}
+  F -->|No, ever| G[Full co-pilot mode<br/>human drafts/executes personally]
+  F -->|Action is well-defined<br/>and boundable| H[Approve-before-action gate<br/>human sign-off required, always]
+  E -->|Low confidence| H
+  E -->|High confidence,<br/>well-calibrated| D

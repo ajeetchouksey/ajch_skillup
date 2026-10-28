@@ -16,21 +16,8 @@ Once more than one agent works on the same codebase at the same time — whether
 
 A **sequential** pattern runs agents one after another, each consuming the previous one's output as its own input — a planning agent's approved plan becomes an executor agent's task, an executor's PR becomes a review agent's input. Risk here is a broken handoff: stage two starting from a stale or misread version of stage one's output. A **parallel** pattern runs multiple agents at the same time against independent (or assumed-independent) scopes — several Copilot cloud agent sessions, each assigned a different issue, running concurrently. Risk here is scope overlap: two agents that were assumed independent turn out to touch the same file or subsystem. A **coordinator-delegated** pattern (D1's planner/executor split, extended to multiple executors) has one agent — or a human — decompose a larger goal into subtasks and route each to a specialized agent or session, then reassemble the results. Risk here concentrates at the coordinator: a bad decomposition propagates into every downstream agent it dispatches to. **It's the difference between a relay race, sprinters on separate tracks, and a race director assigning each runner their leg** — the failure mode for each is different.
 
-```mermaid
-graph TD
-    U["Coordinator / human"] -->|decompose| T1["Subtask A"]
-    U -->|decompose| T2["Subtask B"]
-    U -->|decompose| T3["Subtask C"]
-    T1 --> A1["Agent session A<br/>isolated branch/env"]
-    T2 --> A2["Agent session B<br/>isolated branch/env"]
-    T3 --> A3["Agent session C<br/>isolated branch/env"]
-    A1 --> C{"Conflict detection:<br/>overlapping files?<br/>duplicated effort?<br/>contradictory outputs?"}
-    A2 --> C
-    A3 --> C
-    C -->|"clean"| M["Merge / reassemble results"]
-    C -->|"conflict found"| R["Resolution:<br/>rebase, re-scope,<br/>human arbitration"]
-    R --> M
-```
+![Flow diagram for "Key Concept": decompose, clean, conflict found, Coordinator / human, Subtask A, Subtask B, Subtask C, Agent session Aisolated branch/env, Agent session Bisolated branch/env, Agent session Cisolated branch/env](/content/skillup/gh600/images/gh600-d5-orchestrate-multi-agent-coordination-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d5-orchestrate-multi-agent-coordination-m1.mmd -->
 *Coordinator decomposes work, checks for conflicts, then merges.*
 
 ### In Practice
@@ -133,20 +120,8 @@ A common distractor treats "each agent has its own session log" as sufficient ob
 
 A **stalled execution** is an agent (or a whole coordinator-delegated workflow) that stops making forward progress without erroring out cleanly — a session waiting on a handoff that never arrives, a coordinator that dispatched a subtask to an agent that silently hung, or a dependency chain where agent B is blocked on agent A's output and A never completes. Because nothing "crashed," a stall doesn't trigger the same alerting a hard failure would — it has to be detected by absence (no progress signal within an expected window) rather than by presence of an error. **Degraded behavior** is different and arguably harder to catch: the workflow keeps producing outputs, but the outputs get progressively worse — a coordinator that keeps routing subtasks to an agent whose recent outputs have been failing evaluation more often, propagating a quality problem forward instead of catching it, or a chain of agents each building on the previous one's slightly-off output so errors compound across handoffs rather than staying contained to one session. **A frozen conversation and a slowly rambling one both look fine from any single sentence** — you only notice the problem by reading the whole transcript.
 
-```mermaid
-flowchart TD
-    W["Multi-agent workflow running"] --> M1{"Any agent producing<br/>no progress signal within<br/>expected window?"}
-    M1 -->|"Yes"| STALL["Stalled execution"]
-    M1 -->|"No"| M2{"Output quality trending down<br/>across recent sessions or handoffs?"}
-    M2 -->|"Yes"| DEGRADE["Degraded behavior"]
-    M2 -->|"No"| OK["Healthy — continue"]
-    STALL --> D1{"Recoverable in place?<br/>e.g. re-trigger the<br/>stalled handoff"}
-    D1 -->|"Yes"| RETRY["Resume / re-trigger"]
-    D1 -->|"No"| ROLL["Rollback to last known-good state"]
-    DEGRADE --> D2{"Root cause isolated to<br/>one agent's config?"}
-    D2 -->|"Yes"| TUNE["Tune that agent<br/>(D4 fix, matched to layer)"]
-    D2 -->|"No — spans coordinator<br/>decisions or unclear"| HITL["Human-in-the-loop:<br/>pause workflow, escalate"]
-```
+![Flow diagram for "Key Concept": Yes, No, No — spans coordinatordecisions or unclear, Multi-agent workflowrunning, Any agent producingno progress signal withinexpected window?, Stalled execution, Output quality trendingdownacross recent sessions orhandoffs?, Degraded behavior, Healthy — continue, Recoverable in place?e.g. re-trigger thestalled handoff](/content/skillup/gh600/images/gh600-d5-orchestrate-multi-agent-coordination-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d5-orchestrate-multi-agent-coordination-m2.mmd -->
 *Detecting workflow stalls and quality drift before they compound.*
 
 ### In Practice

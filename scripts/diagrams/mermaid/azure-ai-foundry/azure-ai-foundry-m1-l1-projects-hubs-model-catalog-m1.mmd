@@ -1,0 +1,20 @@
+flowchart TD
+  H[Foundry Resource]
+  P1[Support Bot Project]
+  P2[Search Assistant Project]
+  P3[Content Gen Project]
+  M1[Chat Model]
+  M2[Embedding Model]
+  M3[Reasoning Model]
+  H -->|shares governance| P1
+  H -->|shares governance| P2
+  H -->|shares governance| P3
+  P1 -->|uses| M1
+  P2 -->|uses| M2
+  P3 -->|uses| M3
+  classDef hub fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef proj fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  classDef model fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class H hub
+  class P1,P2,P3 proj
+  class M1,M2,M3 model

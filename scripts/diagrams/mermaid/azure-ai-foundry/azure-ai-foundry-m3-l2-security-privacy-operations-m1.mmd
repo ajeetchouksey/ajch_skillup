@@ -1,0 +1,10 @@
+flowchart LR
+  DI[Discover Risks] --> PR[Protect with Guardrails]
+  PR --> GO[Govern in Production]
+  GO -->|system changes| DI
+  classDef stage1 fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef stage2 fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+  classDef stage3 fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class DI stage1
+  class PR stage2
+  class GO stage3

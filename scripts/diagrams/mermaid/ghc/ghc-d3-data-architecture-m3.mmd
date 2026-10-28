@@ -1,0 +1,23 @@
+flowchart TD
+    subgraph IDE[In your IDE]
+        direction TB
+        S1[1 · Developer types code]:::data --> S2[2 · Extension detects a pause or trigger]
+        S2 --> S3[3 · Context snapshot: current file, open tabs]
+        S3 --> S4[4 · Prompt assembled: instructions + context]
+    end
+    subgraph SVC[GitHub Copilot service]
+        direction TB
+        S5[5 · Sent to the Copilot proxy over HTTPS] --> S6[6 · Pre-processing filters]:::warn
+        S6 --> S7[7 · LLM inference]:::focus
+        S7 --> S8[8 · Candidate completions generated]
+        S8 --> S9[9 · Post-processing filters<br/>incl. public-code filter]:::warn
+    end
+    S4 --> S5
+    S9 --> S10[10 · Suggestion returned to the extension]
+    S10 --> S11[11 · Ghost text shown in the IDE]
+    S11 --> S12[12 · Developer accepts with Tab or rejects with Esc]:::good
+    classDef focus fill:#5B4BD6,stroke:#A99BFF,color:#ffffff
+    classDef good fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+    classDef warn fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+    classDef risk fill:#2a1a1a,stroke:#fb7185,color:#e2e8f0
+    classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0

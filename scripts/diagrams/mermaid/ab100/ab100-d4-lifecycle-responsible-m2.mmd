@@ -1,0 +1,11 @@
+graph TD
+    INPUT[User Input] --> CS[Azure AI Content Safety<br/>API]
+    CS --> CATS[Harm Categories]
+    CATS --> H1[Hate & Fairness<br/>Severity 0-7]
+    CATS --> H2[Sexual Content<br/>Severity 0-7]
+    CATS --> H3[Violence<br/>Severity 0-7]
+    CATS --> H4[Self-Harm<br/>Severity 0-7]
+    CS --> ACTION{Severity<br/>vs Threshold}
+    ACTION -->|Below threshold| PASS[Allow to agent]
+    ACTION -->|Above threshold| BLOCK[Block + log]
+    BLOCK --> ALERT[Azure Monitor Alert]

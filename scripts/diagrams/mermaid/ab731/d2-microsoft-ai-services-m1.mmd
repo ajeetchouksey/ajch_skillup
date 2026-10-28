@@ -1,0 +1,20 @@
+flowchart TD
+  A[New hire added to HR system] -->|triggers agent| B[Copilot Studio agent starts]
+  B --> C[Create IT ticket]
+  B --> D[Initiate access request]
+  B --> E[Notify facilities]
+  C --> F{Approval required?}
+  D --> F
+  E --> F
+  F -->|yes: high-risk access| G[Route to manager]
+  F -->|no: standard request| H[Auto-complete step]
+  G --> I[Status tracked across steps]
+  H --> I
+  I --> J[Onboarding logged end-to-end]
+
+  style A fill:#162236,stroke:#60a5fa,color:#e2e8f0
+  style B fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  style F fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  style G fill:#2a1a22,stroke:#fbbf24,color:#e2e8f0
+  style H fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  style J fill:#1a2a12,stroke:#34d399,color:#e2e8f0

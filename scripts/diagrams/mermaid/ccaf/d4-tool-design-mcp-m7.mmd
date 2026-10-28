@@ -1,0 +1,12 @@
+graph TD
+    subgraph "Client Tools (YOU execute)"
+        CT["User-defined tools<br/>+ Anthropic-schema tools<br/>(bash, text_editor)"]
+        CT --> SR["stop_reason: tool_use"]
+        SR --> YC["Your code executes"]
+        YC --> TR["Send tool_result back"]
+    end
+    
+    subgraph "Server Tools (ANTHROPIC executes)"
+        ST["web_search, code_execution,<br/>web_fetch, tool_search"]
+        ST --> AR["Results appear directly<br/>in response"]
+    end

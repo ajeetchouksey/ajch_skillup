@@ -1,0 +1,6 @@
+graph TD
+    ACTION[Agent Proposed Action] --> RISK{Risk Assessment}
+    RISK -->|Low risk<br/>reversible| AUTO[Automated execution]
+    RISK -->|Medium risk<br/>business impact| NOTIFY[Execute + notify human]
+    RISK -->|High risk<br/>irreversible| APPROVE[Require human approval<br/>before execution]
+    RISK -->|Critical<br/>safety/legal| BLOCK2[Block + escalate<br/>to specialist]

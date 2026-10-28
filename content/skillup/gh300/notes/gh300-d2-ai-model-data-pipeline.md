@@ -45,17 +45,8 @@ GitHub Copilot is powered by models trained on:
 
 ## Data Flow Architecture
 
-```mermaid
-graph LR
-  A[Developer types] --> B[IDE Extension]
-  B --> C[Context Assembly]
-  C --> D[API Request to GitHub]
-  D --> E[LLM Inference]
-  E --> F[Suggestion Response]
-  F --> G[Rendered as ghost text]
-  G -->|Accept/Reject| H[Telemetry log]
-  H -->|Aggregate only| I[Product improvement]
-```
+![Flow diagram for "Data Flow Architecture": Accept/Reject, Aggregate only, Developer types, IDE Extension, Context Assembly, API Request to GitHub, LLM Inference, Suggestion Response, Rendered as ghost text, Telemetry log](/content/skillup/gh300/images/gh300-d2-ai-model-data-pipeline-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh300/gh300-d2-ai-model-data-pipeline-m1.mmd -->
 
 ## Copilot Subscription Tiers
 

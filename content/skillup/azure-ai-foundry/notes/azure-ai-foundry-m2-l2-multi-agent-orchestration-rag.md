@@ -97,22 +97,8 @@ Walking the tool/pattern choice for each requirement:
 }
 ```
 
-```mermaid
-flowchart TD
-  U[Customer Question] --> C[SupportCoordinator Agent]
-  C -->|policy question| FS[File Search Tool]
-  C -->|order status| OA[OpenAPI Tool]
-  C -->|billing dispute via A2A| BA[BillingSpecialist Agent]
-  FS -->|cites| ANS[Streamed Answer]
-  OA -->|returns status| ANS
-  BA -->|resolves| ANS
-  classDef control fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  classDef data fill:#162236,stroke:#60a5fa,color:#e2e8f0
-  classDef output fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  class C,BA control
-  class U,FS,OA data
-  class ANS output
-```
+![Flow diagram for "Worked Example: Choosing Tools and an Orchestration Pattern": policy question, order status, billing dispute via A2A, cites, returns status, resolves, Customer Question, SupportCoordinator Agent, File Search Tool, OpenAPI Tool](/content/skillup/azure-ai-foundry/images/azure-ai-foundry-m2-l2-multi-agent-orchestration-rag-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/azure-ai-foundry/azure-ai-foundry-m2-l2-multi-agent-orchestration-rag-m1.mmd -->
 *SupportCoordinator routing three request types to three tools.*
 
 **Common gotcha to notice**: nothing above required a code-first orchestration framework — most real support-bot scenarios resolve with File search + OpenAPI tool + (at most) one A2A handoff. Reach for Agent Framework only when the scenario actually describes multi-round or branching multi-agent orchestration, not just "the agent uses several tools."

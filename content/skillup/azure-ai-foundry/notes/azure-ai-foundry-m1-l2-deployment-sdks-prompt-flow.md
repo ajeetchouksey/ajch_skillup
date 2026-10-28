@@ -36,22 +36,8 @@ Each billing family also comes in **Global**, **Data Zone**, or regional flavour
 
 Managed compute deployments of open models have historically required a hub-based project in the Foundry (classic) portal; check the current docs before planning around them on a Foundry resource. Availability of every option varies by model and region.
 
-```mermaid
-flowchart TD
-  A{Urgent response needed?}
-  A -->|no, can wait| B[Batch]
-  A -->|yes| C{Traffic shape?}
-  C -->|flat and predictable| D{Need own hardware?}
-  C -->|spiky or unknown| E[Standard]
-  D -->|yes| F[Managed Compute]
-  D -->|no| G{Need guaranteed latency?}
-  G -->|yes| H[Provisioned]
-  G -->|no| E
-  classDef decision fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
-  classDef outcome fill:#1a2a12,stroke:#34d399,color:#e2e8f0
-  class A,C,D,G decision
-  class B,E,F,H outcome
-```
+![Flow diagram for "Key Concept": no, can wait, yes, flat and predictable, spiky or unknown, no, Urgent response needed?, Batch, Traffic shape?, Need own hardware?, Standard](/content/skillup/azure-ai-foundry/images/azure-ai-foundry-m1-l2-deployment-sdks-prompt-flow-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/azure-ai-foundry/azure-ai-foundry-m1-l2-deployment-sdks-prompt-flow-m1.mmd -->
 *Match your traffic to a deployment family, then pick the processing scope.*
 
 ### In Practice

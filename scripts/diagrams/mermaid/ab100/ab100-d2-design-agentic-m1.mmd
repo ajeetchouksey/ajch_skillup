@@ -1,0 +1,8 @@
+graph TD
+    T[Task] --> Q1{Parallelizable<br/>sub-tasks?}
+    Q1 -->|No| Q2{Fits in<br/>context window?}
+    Q2 -->|Yes| SA[Single Agent]
+    Q2 -->|No| CM[Coordinator + Memory]
+    Q1 -->|Yes| Q3{Independent<br/>domains?}
+    Q3 -->|Yes| MA[Multi-Agent<br/>Parallel]
+    Q3 -->|No| SC[Sequential<br/>Pipeline]

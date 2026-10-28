@@ -1,0 +1,8 @@
+graph TD
+    subgraph "Context Window Management"
+        SYS["System Prompt (never compressed)"]
+        SUM["Summary of turns 1-20 (compressed 80%)"]
+        FULL["Full turns 21-30 (verbatim recent)"]
+        CUR["Current message (always full)"]
+    end
+    SYS --> SUM --> FULL --> CUR

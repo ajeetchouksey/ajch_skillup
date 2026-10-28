@@ -1,0 +1,11 @@
+graph TD
+    subgraph "✅ PARALLEL (Independent tasks)"
+        P1[Get weather NYC] 
+        P2[Get weather London]
+        P3[Get stock price]
+    end
+    
+    subgraph "🔗 SEQUENTIAL (Dependencies)"
+        S1[Get user ID] --> S2[Get user's orders]
+        S2 --> S3[Get order details]
+    end

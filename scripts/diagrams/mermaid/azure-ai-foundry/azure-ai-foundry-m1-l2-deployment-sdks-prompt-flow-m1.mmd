@@ -1,0 +1,14 @@
+flowchart TD
+  A{Urgent response needed?}
+  A -->|no, can wait| B[Batch]
+  A -->|yes| C{Traffic shape?}
+  C -->|flat and predictable| D{Need own hardware?}
+  C -->|spiky or unknown| E[Standard]
+  D -->|yes| F[Managed Compute]
+  D -->|no| G{Need guaranteed latency?}
+  G -->|yes| H[Provisioned]
+  G -->|no| E
+  classDef decision fill:#1a2a42,stroke:#7c3aed,color:#e2e8f0
+  classDef outcome fill:#1a2a12,stroke:#34d399,color:#e2e8f0
+  class A,C,D,G decision
+  class B,E,F,H outcome

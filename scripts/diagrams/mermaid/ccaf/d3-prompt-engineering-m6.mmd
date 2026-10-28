@@ -1,0 +1,7 @@
+graph TD
+    G[Generate] --> V{Validate}
+    V -->|"✅ Valid"| S[Success!]
+    V -->|"❌ Error"| R{Retries < 3?}
+    R -->|"Yes"| F[Feed SPECIFIC error back]
+    F --> G
+    R -->|"No"| E[🚨 Raise exception]

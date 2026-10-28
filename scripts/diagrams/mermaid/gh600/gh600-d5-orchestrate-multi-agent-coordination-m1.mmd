@@ -1,0 +1,13 @@
+graph TD
+    U["Coordinator / human"] -->|decompose| T1["Subtask A"]
+    U -->|decompose| T2["Subtask B"]
+    U -->|decompose| T3["Subtask C"]
+    T1 --> A1["Agent session A<br/>isolated branch/env"]
+    T2 --> A2["Agent session B<br/>isolated branch/env"]
+    T3 --> A3["Agent session C<br/>isolated branch/env"]
+    A1 --> C{"Conflict detection:<br/>overlapping files?<br/>duplicated effort?<br/>contradictory outputs?"}
+    A2 --> C
+    A3 --> C
+    C -->|"clean"| M["Merge / reassemble results"]
+    C -->|"conflict found"| R["Resolution:<br/>rebase, re-scope,<br/>human arbitration"]
+    R --> M

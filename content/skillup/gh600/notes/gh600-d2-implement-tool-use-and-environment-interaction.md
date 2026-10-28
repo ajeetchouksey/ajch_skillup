@@ -70,20 +70,8 @@ The Model Context Protocol lets an agent call tools exposed by an external serve
 
 The JSON must contain an `mcpServers` object. Each entry names the server, its `type` (`local`, `stdio`, `http` or `sse`), how to reach it (`command`/`args` for local, `url` for remote), any required authentication, and, critically, a required `tools` array saying which of the server's tools are exposed to the agent. GitHub strongly recommends allowlisting specific read-only tools; `"*"` enables them all. The cloud agent uses only MCP **tools**: it doesn't support MCP resources or prompts, or remote servers that authenticate with OAuth. **It's a rented office suite where you only get keys cut for the rooms your team actually uses, not the whole floor.**
 
-```mermaid
-flowchart TD
-    Need["Identify capability gap:<br/>agent needs an external API/service"] --> Search{"Does an existing<br/>MCP server provide it?"}
-    Search -->|"Yes — GitHub-hosted"| Remote["Add GitHub remote MCP server<br/>(https://api.githubcopilot.com/mcp/)"]
-    Search -->|"Yes — registry/third-party"| Policy{"On the org's<br/>MCP allow list?"}
-    Search -->|"No"| Build["Stand up / run<br/>a custom MCP server"]
-    Policy -->|"No"| Blocked["Blocked by org policy —<br/>request allow-list addition"]
-    Policy -->|"Yes"| Configure["Add to mcpServers config<br/>type + url/command + auth"]
-    Remote --> Scope["Scope toolsets +<br/>read-only mode where supported"]
-    Configure --> Scope
-    Build --> Scope
-    Scope --> Grant["Expose only the needed<br/>tool names to the agent"]
-    Grant --> TestRun["Test in a sandboxed session<br/>before wider rollout"]
-```
+![Flow diagram for "Key Concept": Yes — GitHub-hosted, Yes — registry/third-party, No, Yes, Identify capability gap:agent needs an externalAPI/service, Does an existingMCP server provide it?, Add GitHub remote MCPserverhttps://api.githubcopilot.com/mcp/, On the org'sMCP allow list?, Stand up / runa custom MCP server, Blocked by org policy —request allow-list addition](/content/skillup/gh600/images/gh600-d2-implement-tool-use-and-environment-interaction-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d2-implement-tool-use-and-environment-interaction-m1.mmd -->
 *Deciding whether an MCP server is needed and scoped.*
 
 ### In Practice
@@ -234,19 +222,8 @@ A frequent distractor pairs "the agent's session log shows tests passing" with "
 
 Not every failure means the same thing, so a robust agent doesn't respond to every failure identically. Transient failures — a network timeout, a rate limit, a flaky test — are reasonable to retry a bounded number of times with backoff, because the underlying action is likely to succeed on a later attempt with no change in approach. Failures that reflect a logic error, a missing permission, or a genuinely failing test are not retry candidates — retrying the same failing action without changing anything just burns the session's execution budget and delays the point where a human actually needs to get involved. **It's banging on a stuck door harder instead of checking whether it's locked from the other side.**
 
-```mermaid
-flowchart TD
-    Fail["Tool call or command fails"] --> Retryable{"Transient?<br/>(timeout, rate limit, flaky network)"}
-    Retryable -->|"Yes"| Retry["Bounded retry<br/>with backoff"]
-    Retry --> Success{"Succeeded?"}
-    Success -->|"Yes"| Continue["Continue session"]
-    Success -->|"No — retries exhausted"| Escalate
-    Retryable -->|"No — logic, permission,<br/>or genuine test failure"| Escalate["Escalate: stop,<br/>log reason, comment on issue/PR"]
-    Escalate --> HumanNow{"Human available now?"}
-    HumanNow -->|"Yes"| Live["Human resolves inline"]
-    HumanNow -->|"No"| Async["Session marked failed;<br/>notifies channel/dashboard"]
-    Async --> Rollback["Branch/PR stays isolated —<br/>no impact on protected branch;<br/>close, amend, or hand off later"]
-```
+![Flow diagram for "Key Concept": Yes, No — retries exhausted, No — logic, permission,or genuine test failure, No, Tool call or command fails, Transient?timeout, rate limit, flakynetwork, Bounded retrywith backoff, Succeeded?, Continue session, Escalate: stop,log reason, comment onissue/PR](/content/skillup/gh600/images/gh600-d2-implement-tool-use-and-environment-interaction-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/gh600/gh600-d2-implement-tool-use-and-environment-interaction-m2.mmd -->
 *Transient failures retry; everything else escalates to a human.*
 
 ### In Practice

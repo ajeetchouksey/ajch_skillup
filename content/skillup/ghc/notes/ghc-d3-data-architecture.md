@@ -189,23 +189,8 @@ Copilot uses **open editor tabs** as context beyond the current file:
 
 ### Context Hierarchy
 
-```
-1. Current file (highest priority)
-   ├─ Before-cursor content
-   └─ After-cursor content (post-fill context)
-
-2. Open neighboring tabs
-   └─ Most recently interacted files
-
-3. Workspace search (#codebase in VS Code chat; older @workspace participant)
-   └─ Searches the workspace for relevant code; doesn't attach every file
-
-4. Custom instructions (.github/copilot-instructions.md, *.instructions.md, AGENTS.md)
-   └─ Added automatically to chat requests where the surface supports them
-
-5. Chat history
-   └─ Previous messages in current conversation
-```
+![Flow diagram for "Context Hierarchy": 1 · Current file: highestprioritybefore-cursor andafter-cursor content, 2 · Open neighbouringtabsmost recently used files, 3 · Workspace search#codebase in VS Codechat; finds relevant code, 4 · Custom instructionscopilot-instructions.md,*.instructions.md,AGENTS.md, 5 · Chat historyearlier messages in thisconversation](/content/skillup/ghc/images/ghc-d3-data-architecture-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghc/ghc-d3-data-architecture-m1.mmd -->
 
 ### The Context Window Limit
 
@@ -226,18 +211,8 @@ The lifecycle starts when you pause typing or write a comment. Copilot snapshots
 
 Nothing changes in your file until you explicitly accept, in full or in part. Your accept, edit or reject actions feed back into how future suggestions are shaped. **Think of it as a waiter's round trip**: take the order, check the kitchen's work at the pass, serve it, and wait for you to say whether to keep it.
 
-```mermaid
-graph LR
-  A[Trigger in IDE] --> B[Gather context]
-  B --> C[Build prompt]
-  C --> D[Proxy and input filters]
-  D --> E[LLM generates]
-  E --> F[Post-processing filters]
-  F --> G[Ghost text shown]
-  G --> H{Developer}
-  H -->|Tab accept| I[Code inserted]
-  H -->|Esc or keep typing| J[Discarded]
-```
+![Flow diagram for "Key Concept": Tab accept, Esc or keep typing, Trigger in IDE, Gather context, Build prompt, Proxy and input filters, LLM generates, Post-processing filters, Ghost text shown, Developer](/content/skillup/ghc/images/ghc-d3-data-architecture-m2.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghc/ghc-d3-data-architecture-m2.mmd -->
 
 ### In Practice
 
@@ -255,31 +230,8 @@ graph LR
 
 ### Complete Lifecycle of an Inline Suggestion
 
-```
-1. Developer types code
-   ↓
-2. Copilot extension detects pause/trigger
-   ↓
-3. Context snapshot taken (current file, open tabs)
-   ↓
-4. Prompt assembled with system instructions + context
-   ↓
-5. Prompt sent to GitHub Copilot proxy over HTTPS
-   ↓
-6. Pre-processing filters applied
-   ↓
-7. Prompt sent to LLM for inference
-   ↓
-8. LLM generates candidate completions
-   ↓
-9. Post-processing filters applied (public code filter, etc.)
-   ↓
-10. Suggestion returned to extension
-    ↓
-11. Ghost text displayed in IDE
-    ↓
-12. Developer accepts (Tab) or rejects (Esc)
-```
+![Flow diagram for "Complete Lifecycle of an Inline Suggestion": GitHub Copilot service, 5 · Sent to the Copilot proxyover HTTPS, 6 · Pre-processing filters, 7 · LLM inference, 8 · Candidate completionsgenerated, 9 · Post-processing filtersincl. public-code filter, In your IDE, 1 · Developer types code, 2 · Extension detects apause or trigger, 3 · Context snapshot:current file, open tabs](/content/skillup/ghc/images/ghc-d3-data-architecture-m3.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ghc/ghc-d3-data-architecture-m3.mmd -->
 
 ### Latency Factors
 

@@ -1,0 +1,8 @@
+flowchart TD
+    Info["New piece of information<br/>the agent needs or produces"] --> Q1{"Does every future session<br/>on this repo need it by default?"}
+    Q1 -->|"Yes"| LT["Long-term memory:<br/>custom instructions / path-scoped<br/>instruction files (version-controlled)"]
+    Q1 -->|"No"| Q2{"Is it only relevant<br/>to finishing THIS task?"}
+    Q2 -->|"Yes"| ST["Short-term memory:<br/>stays in the session's context window,<br/>discarded when the session ends"]
+    Q2 -->|"No — relevant later,<br/>but only sometimes"| Q3{"Should it be retrieved<br/>on demand, not preloaded?"}
+    Q3 -->|"Yes"| EXT["External memory:<br/>issue/PR/project record or<br/>MCP-backed store, pulled via tool call"]
+    Q3 -->|"No, it must be preloaded"| LT

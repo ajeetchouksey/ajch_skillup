@@ -1,0 +1,14 @@
+graph LR
+    subgraph "Working Memory"
+        CTX[Context Window<br/>Current conversation]
+    end
+    subgraph "Short-term Memory"
+        REDIS[Azure Cache for Redis<br/>Session state, tool results]
+    end
+    subgraph "Long-term Memory"
+        COSMOS[Cosmos DB<br/>Conversation history<br/>User preferences]
+        SEARCH[Azure AI Search<br/>Vector embeddings<br/>Knowledge base]
+    end
+    CTX <-->|in-context| REDIS
+    REDIS <-->|persist/retrieve| COSMOS
+    CTX <-->|RAG retrieval| SEARCH

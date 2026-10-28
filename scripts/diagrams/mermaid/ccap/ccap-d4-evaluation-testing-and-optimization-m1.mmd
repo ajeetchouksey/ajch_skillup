@@ -1,0 +1,13 @@
+graph LR
+  A[Production traffic<br/>+ known edge cases] --> B[Golden Dataset<br/>human-verified baseline]
+  A --> C[Synthetic Expansion<br/>Claude-generated variants]
+  D[Threat modeling] --> E[Adversarial / Red-team Set]
+  B --> F{Grading method}
+  C --> F
+  E --> F
+  F -->|Deterministic task| G[Rule-based check]
+  F -->|Open-ended quality| H[LLM-as-judge]
+  F -->|High stakes / ambiguous| I[Human review]
+  G --> J[Eval Report:<br/>accuracy · latency · cost · safety · security]
+  H --> J
+  I --> J
