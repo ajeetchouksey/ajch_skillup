@@ -1,443 +1,617 @@
 # D1: Identify AI concepts and capabilities
 
-> **Exam weight**: 40–45% · **Skills measured as of**: April 15, 2026
+> **Exam weight**: 40–45% · **Skills measured as of**: April 15, 2026 · One section per official task, 1.1 to 1.14
 
 ## Overview
 
-Domain 1 is the vocabulary of the exam. It covers three things: Microsoft's six responsible AI principles, how generative AI models work and how you choose, deploy and configure them, and the common AI workloads (generative and agentic AI, text analysis, speech, computer vision and information extraction). Domain 2 then asks you to build each of these in Microsoft Foundry, so almost every Domain 2 question quietly assumes the concepts here.
+Domain 1 is the vocabulary of the exam: the six responsible AI principles (1.1–1.6), how generative models work and are chosen, deployed and configured (1.7–1.9), and the common AI workloads (1.10–1.14). Domain 2 builds each of these in Microsoft Foundry.
 
-> 💡 **Human Angle**: Most questions in this domain are naming problems in disguise. If you can say what kind of input goes in and what kind of output comes out, you can usually name the workload, the model and the principle at stake.
+> 💡 **Human Angle**: Most questions here are naming problems in disguise. Say what goes in and what must come out, and you can usually name the workload, the model and the principle at stake.
 
-<div class="note-scribble"><strong>Naming note.</strong> Azure AI Foundry is now <strong>Microsoft Foundry</strong>, and Azure AI services are now <strong>Foundry Tools</strong> (for example "Azure Speech in Foundry Tools", "Azure Content Understanding in Foundry Tools"). AI-901 uses the new names and replaces AI-900. Older study material that says "Azure AI Studio" or "Cognitive Services" describes the same ideas under retired names.</div>
+<div class="note-scribble"><strong>Naming note.</strong> Azure AI Foundry is now <strong>Microsoft Foundry</strong>, and Azure AI services are now <strong>Foundry Tools</strong> (for example "Azure Speech in Foundry Tools"). "Azure AI Studio" and "Cognitive Services" are retired names.</div>
 
 ---
 
-## 1.1 The Six Responsible AI Principles
+## 1.1 Describe considerations for fairness in an AI solution
 
 ### Key Concept
 
-**Microsoft's six principles are fairness, reliability and safety, privacy and security, inclusiveness, transparency and accountability.**
+**A fair AI system gives comparable outcomes to comparable people, whatever group they belong to.**
 
-The principles are a checklist for any AI solution, not a feature of one product. Each one asks a different question: does the system treat people equally, does it behave safely, does it protect data, can everyone use it, do people understand it, and who answers for it?
+**Fairness asks whether the referee is biased**, not whether everyone wins.
 
-Exam questions describe a measure (captions, a confidence threshold, a disclosure, a review board) and ask which principle it supports. Map the measure to the question it answers, not to the most impressive-sounding principle. **Think of the six principles as six inspectors walking round the same building**: each one checks something different, and a building can pass one inspection and fail another.
+### Real use
 
-| Principle | The question it asks | Microsoft's own example |
+A lender compares loan approval and error rates by age band and region before launch. It finds one region rejected more often at equal income and retrains on rebalanced data before customers see it.
+
+### How it works
+
+- Bias usually starts in the data: a model trained on past decisions learns their bias.
+- Deleting a sensitive column doesn't help when other features (postcode, career gaps, clubs) act as proxies.
+- So fairness is measured: check training data for historical bias, then compare outcomes across groups.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| **Fairness** | Does it treat people equally? | A college admissions or loan model tested for bias |
-| **Reliability and safety** | Does it behave safely, even when unsure? | A robot that only acts above a confidence threshold |
-| **Privacy and security** | Is personal data protected? | Airport face images deleted after verification |
-| **Inclusiveness** | Is anyone excluded from using it? | Text captions for a speech-based agent |
-| **Transparency** | Do people know how it works and its limits? | A bank telling applicants AI is used in loan approval |
-| **Accountability** | Who is responsible for it? | A governance framework the organisation applies |
+| Rebalance or augment training data | Testing shows a gap | More data and effort |
+| Test outcomes per group (Fairlearn, RAI dashboard) | Always, before and after launch | Needs group labels for testing |
+| Human review of borderline cases | Decisions are high-impact | Slower, staff cost |
 
-### In Practice
+If people can't *use* the system at all, that's inclusiveness (1.4), not fairness.
 
-**What breaks without this**: teams fix the principle they thought of first, such as adding a disclaimer, and ship a system that is still biased, still leaks data or still excludes users.
+### How to do it
 
-**Decision trigger**: for every design decision, ask which of the six questions it answers. If a principle has no measure against it, that is the gap.
-
-**When you'd choose differently**: some measures serve two principles at once. Testing a speech app with diverse speakers supports both inclusiveness and fairness, and a human-review step supports both reliability and accountability. On the exam, pick the principle the measure most directly serves.
+1. List groups that could be harmed (age, gender, region, language).
+2. Measure outcomes and error rates per group on a held-out test set.
+3. Fix the biggest gap, re-measure, and keep monitoring in production.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Transparency and accountability are the most often swapped pair. <strong>Transparency = telling people</strong> (documentation, disclosure, limitations). <strong>Accountability = people answering for it</strong> (owners, governance, a board that can pause the system). If the measure is something users read, it is transparency; if it is someone with authority to act, it is accountability.
-</div>
+<div class="note-trap">"We removed the gender column, so the model is fair" is wrong: proxies carry the same bias, so outcomes must still be tested across groups.</div>
+
+### Go deeper
+
+- [What is Responsible AI (Microsoft Learn)](https://learn.microsoft.com/en-us/azure/machine-learning/concept-responsible-ai)
 
 ---
 
-## 1.2 Fairness and Inclusiveness
+## 1.2 Describe considerations for reliability and safety in an AI solution
 
 ### Key Concept
 
-**Fairness is about equal outcomes for people who use the system; inclusiveness is about nobody being shut out of using it.**
+**Models are probabilistic and can be confidently wrong, so a safe system plans for being wrong.**
 
-Fairness problems usually start in the data. A model trained on historical decisions learns whatever bias those decisions held, and removing a sensitive column does not help if other features act as proxies for it. Microsoft's guidance is to minimise bias in the training data and to test the system's outcomes across groups of people.
+**Reliability is the seatbelt**: you fit it because a crash is possible.
 
-Inclusiveness problems usually start in the design. A voice-only kiosk excludes people who cannot hear or speak clearly, and a speech model tested only on native speakers in a quiet room fails people with accents or in noisy places. **Fairness asks whether the referee is biased; inclusiveness asks whether everyone was allowed onto the pitch.**
+### Real use
 
-### In Practice
+A pharmacy chatbot answers medicine questions from approved leaflets. Low-confidence or risky dosage questions are routed to a pharmacist, and guardrails block harmful content.
 
-**What breaks without this**: a loan model approves equally qualified applicants at different rates by postcode, or a speech app has far higher error rates for older users, and nobody notices until complaints arrive.
+### How it works
 
-**Decision trigger**: ask who was in the training data and the test group, and who was not. Then ask whether any group gets worse outcomes, or cannot use the interface at all.
+- Test with expected *and* edge-case inputs before release.
+- Act only above a confidence threshold; route risky cases to a person.
+- **Guardrails** (content filters) check prompts and outputs for harmful content.
+- Keep monitoring in production: real users send inputs no test covered.
 
-**When you'd choose differently**: if the issue is that users do not understand a decision, that is transparency, not fairness. If the issue is that a person's data leaks, that is privacy.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Confidence threshold + human fallback | Wrong answers are costly | Reviewer workload |
+| Guardrails | Any public-facing generative app | Block harm, not factual errors |
+| Evaluation + production monitoring | Every app | Finds some issues only after launch |
+
+### How to do it
+
+1. Define what "unsafe" or "wrong" means for this app.
+2. Evaluate on realistic and adversarial prompts.
+3. Configure guardrails in the Foundry portal (**Build > Guardrails**).
+4. Route low-confidence outputs to a person; monitor and re-evaluate after changes.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"We removed the gender column, so the model is fair" is a classic wrong answer. Proxy features can carry the same bias, so fairness needs <em>outcome testing across groups</em>, not just deleting attributes. Fairness also does not mean everyone gets the same score.
-</div>
+<div class="note-trap">"Set temperature to 0 so testing can be skipped" is wrong: a deterministic model can repeat the same wrong answer every time.</div>
+
+### Go deeper
+
+- [Guardrails and controls overview in Microsoft Foundry](https://learn.microsoft.com/en-us/azure/foundry/guardrails/guardrails-overview)
 
 ---
 
-## 1.3 Reliability and Safety, Privacy and Security
+## 1.3 Describe considerations for privacy and security in an AI solution
 
 ### Key Concept
 
-**AI models are probabilistic, so reliable systems test widely, add guardrails and fall back safely; private systems protect data end to end.**
+**Protect personal and business data at every step: what goes into the model, what it stores and what it can reveal.**
 
-Reliability and safety means the system behaves as intended under expected and unexpected conditions. Because a model can be confidently wrong, safe designs act only above a confidence threshold, route risky or low-confidence cases to a person, apply content filters (guardrails) and keep monitoring in production.
+### Real use
 
-Privacy and security means personal and organisational data is protected throughout the lifecycle: redact personal data before it is used, restrict access, delete what is no longer needed, and make sure the model cannot be prompted into revealing private details. **Reliability is the seatbelt for when the model is wrong; privacy is the lock on what the model can reveal.**
+A support centre runs PII detection on call transcripts, so card numbers and addresses are masked before analysts read them. An airport deletes face images as soon as a traveller is verified.
 
-### In Practice
+### How it works
 
-**What breaks without this**: a medicines assistant gives a wrong dosage with full confidence, or a model customised on HR records reveals an employee's salary to a cleverly worded prompt.
+- Collect only what you need; redact personal data before it reaches a model, a log or a person.
+- Restrict access with Microsoft Entra ID and least-privilege roles.
+- A model can leak data in its output: remove or anonymise sensitive training or grounding records and filter outputs for personal data.
+- Prompts and completions sent to Foundry Models sold by Azure are not used to train the base models.
 
-**Decision trigger**: ask "what happens when the model is wrong?" (reliability) and "what personal data can reach the model or its output?" (privacy).
+### Choose when
 
-**When you'd choose differently**: a low temperature makes answers more repeatable, but it does not make them correct, so it is never a substitute for testing. Encryption protects stored data but does nothing about bias or bad answers.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| PII redaction (Azure Language) | Text contains personal data | Run it before storage |
+| Entra ID + RBAC, managed identity | Any production app | Setup vs shared keys |
+| Data minimisation and deletion | Data is sensitive (faces, health) | Decide retention up front |
+
+### How to do it
+
+1. Map where personal data appears (inputs, files, logs, outputs).
+2. Redact it with PII detection and restrict who can access the rest.
+3. Set retention rules and test whether prompts can extract private details.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Watch for "set temperature to 0 so testing can be skipped" or "evaluate once before launch, then monitoring is optional". Both are wrong: a deterministic model can repeat the same wrong answer every time, and real users send inputs that pre-release tests never covered.
-</div>
+<div class="note-trap">Masking PII or deleting images is <strong>privacy</strong>, not safety. Encryption protects stored data but does nothing about bias or bad answers.</div>
+
+### Go deeper
+
+- [Data, privacy and security for Foundry Models sold by Azure](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy)
 
 ---
 
-## 1.4 Transparency and Accountability
+## 1.4 Describe considerations for inclusiveness in an AI solution
 
 ### Key Concept
 
-**Transparency means people know they are dealing with AI and understand its limits; accountability means humans stay answerable for it.**
+**An inclusive AI system can be used by everyone, including people with disabilities, accents or limited connectivity.**
 
-Transparency measures are things users and stakeholders can see: a notice that AI is in use, an explanation of the factors a model considers, documentation of intended uses and known limitations, and citations showing where an answer came from.
+**Inclusiveness asks whether everyone was allowed onto the pitch.**
 
-Accountability measures are things the organisation does: name owners, set up governance and review, keep a human in the loop for consequential decisions, and be able to pause or fix the system. Responsibility never moves to the model or the model provider. **Transparency is the label on the medicine; accountability is the pharmacist who signs for it.**
+### Real use
 
-### In Practice
+A council's voice assistant also shows on-screen answers, accepts typed and touch input and supports several languages. It was tested with older residents and non-native speakers before launch.
 
-**What breaks without this**: users trust an AI answer they should have checked, or, after an incident, the team says "the model generated it" and nobody owns the fix.
+### How it works
 
-**Decision trigger**: ask "would a user know this is AI and what it can get wrong?" and "who can stop this system tomorrow if it causes harm?"
+- Exclusion usually starts in the design: a voice-only kiosk shuts out people who can't hear or speak clearly.
+- A speech model tested only on native speakers in a quiet room fails accents and noisy places.
+- The fix: several ways to interact, and test groups that look like real users.
 
-**When you'd choose differently**: a model provider's content filters help with reliability and safety, but they cannot be your accountability process. The deploying organisation still governs its own use case.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Captions, on-screen answers | Output is spoken | Small extra cost |
+| Touch/text input beside voice | Input is voice-only | More UI to maintain |
+| Diverse test groups | Always | Recruiting effort |
+
+If everyone can use it but one group gets worse *decisions*, that's fairness (1.1).
+
+### How to do it
+
+1. List who might struggle (vision, hearing, motor, language, connectivity).
+2. Offer at least two ways to interact and to receive output.
+3. Test with those users and track error rates per group.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"The model provider is accountable for everything its model outputs" is wrong. Accountability cannot be outsourced: the organisation that deploys the solution answers for how it is used.
-</div>
+<div class="note-trap">Captions or an alternative input mode map to <strong>inclusiveness</strong>, not transparency.</div>
+
+### Go deeper
+
+- [Embrace responsible AI principles and practices (training)](https://learn.microsoft.com/en-us/training/modules/embrace-responsible-ai-principles-practices/)
 
 ---
 
-## 1.5 How Generative AI Models Work
+## 1.5 Describe considerations for transparency in an AI solution
 
 ### Key Concept
 
-**A language model turns text into tokens and embeddings, then predicts the next most likely token, over and over.**
+**People should know when they're dealing with AI, what it was built to do and where it can go wrong.**
 
-Text is split into **tokens** (words, sub-words or punctuation), and each token gets a numeric ID. Tokens become **embeddings**: vectors with thousands of dimensions in which words with similar meanings point in similar directions, so "dog" sits near "puppy" and far from "skateboard" (measured with cosine similarity).
+**Transparency is the label on the medicine.**
 
-A **transformer** processes these vectors. **Attention** lets each token take its context into account, which is why "bank" means something different next to "river" than next to "account", and **positional encoding** tells the model the order of the tokens. The decoder then predicts the most probable next token, appends it and repeats until it predicts the end. **Think of it as extremely well-read predictive text**: it writes fluently because it has seen a lot, not because it looks answers up.
+### Real use
+
+A bank tells loan applicants that AI helps screen applications and lists the main factors it uses. Its support bot cites the policy page behind each answer.
+
+### How it works
+
+- Transparency measures are things people can see or read: an AI disclosure, stated limitations, sources for answers, documented intended uses.
+- Microsoft publishes **transparency notes** for its AI services so builders can pass the same information on.
+- Without it, users trust answers they should have checked.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| "You're chatting with AI" + limitations | Any user-facing bot | Says nothing about a specific answer |
+| Citations / source links | Grounded Q&A | Only as good as the sources |
+| Documentation of uses and limits | Builders, auditors | Few end users read it |
+
+### How to do it
+
+1. Tell users up front that AI is involved and what it can get wrong.
+2. Show sources for factual answers.
+3. Publish intended uses, limitations and how to reach a human.
+
+### Exam Trap ⚠️
+
+<div class="note-trap"><strong>Transparency = telling people</strong> (disclosure, documentation); <strong>accountability = people answering for it</strong> (owners, review board).</div>
+
+### Go deeper
+
+- [Transparency note for Azure OpenAI in Foundry Models](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/transparency-note)
+
+---
+
+## 1.6 Describe considerations for accountability in an AI solution
+
+### Key Concept
+
+**Humans and the deploying organisation stay answerable for an AI system; responsibility never moves to the model.**
+
+**Accountability is the pharmacist who signs for the medicine.**
+
+### Real use
+
+An insurer's AI claims triage has a named owner, a review board that approves changes, an audit log of automated decisions and a documented way to switch it off.
+
+### How it works
+
+- Accountability measures are things the organisation does: owners, oversight, an escalation process, human sign-off for consequential decisions.
+- A model provider's filters help safety, but the organisation that deploys the solution must govern and monitor its own use case.
+- Without it, after an incident everyone says "the model did it" and nobody owns the fix.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Named owner + escalation path | Every AI system | Needs real authority |
+| Review board / governance | Several or high-risk systems | Slows releases |
+| Human sign-off + audit logs | High-impact decisions | Staff cost, storage |
+
+### How to do it
+
+1. Name an owner and escalation path for each system.
+2. Decide which decisions need human sign-off, and log them.
+3. Agree how to pause, roll back or retire the system.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">"The model provider is accountable for its outputs" is wrong. Accountability cannot be outsourced.</div>
+
+### Go deeper
+
+- [Responsible AI for Microsoft Foundry](https://learn.microsoft.com/en-us/azure/foundry/responsible-use-of-ai-overview)
+
+---
+
+## 1.7 Describe how generative AI models work
+
+### Key Concept
+
+**A language model turns text into tokens and embeddings, then predicts the next most likely token, adds it and repeats until it predicts the end.**
+
+**Think of it as extremely well-read predictive text.**
+
+### Real use
+
+A help-desk team learns the model predicts rather than looks things up, so it puts the relevant knowledge-base articles in each prompt, and accuracy rises sharply.
+
+### How it works
+
+- **Token**: a small unit of text (word, part of a word, punctuation). Usage and cost are counted in tokens.
+- **Embedding**: a vector where similar meanings point in similar directions; "dog" and "puppy" are close, "skateboard" is elsewhere (cosine similarity).
+- **Attention** weighs how strongly each token relates to the others in its context; **positional encoding** gives word order.
+- **LLMs** are large and general; **SLMs** (for example the Phi family) are compact enough for phones and edge devices.
 
 ![Flow diagram for "Key Concept": append and repeat, Prompt text, Tokens, Embeddings, Transformer with attention, Next-token prediction, Completion](/content/skillup/ai901/images/ai901-d1-ai-concepts-m1.svg)
 <!-- diagram source: scripts/diagrams/mermaid/ai901/ai901-d1-ai-concepts-m1.mmd -->
 
-Two related terms: **large language models (LLMs)** are big and general, and **small language models (SLMs)**, such as the Phi family, are compact enough for constrained devices. Usage, limits and cost are all measured in tokens.
+### Choose when
 
-### In Practice
-
-**What breaks without this**: teams treat the model like a database, expect it to "look up" facts, and are surprised when it produces fluent, confident text that is wrong.
-
-**Decision trigger**: if an answer must be factual and current, ask where the facts come from. If they are not in the prompt (grounding) or a tool, the model is predicting, not retrieving.
-
-**When you'd choose differently**: for tasks with one correct structured answer (a language code, a redacted string), a purpose-built tool such as Azure Language is more consistent than next-token prediction.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| LLM | Open-ended or complex tasks | Cost, latency |
+| SLM | Edge, offline or simple high-volume tasks | Narrower knowledge |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Positional encoding and attention are easy to swap. <strong>Positional encoding = order</strong>; <strong>attention = context</strong> (how much each token relates to the others). Also, a token is not an API key, and it is not always a whole word.
-</div>
+<div class="note-trap"><strong>Attention = context</strong>; <strong>positional encoding = order</strong>. A token is not an API key and not always a whole word.</div>
+
+### Go deeper
+
+- [Introduction to generative AI and agents (training)](https://learn.microsoft.com/en-us/training/modules/fundamentals-generative-ai/)
 
 ---
 
-## 1.6 Choosing a Model by Capability
+## 1.8 Identify an appropriate AI model, based on capabilities
 
 ### Key Concept
 
 **Match the model to the input and output you need first, then compare quality, cost and speed.**
 
-The Foundry model catalog has two broad groups: **models sold directly by Azure** (including Azure OpenAI models, hosted and supported by Microsoft) and **models from partners and the community**. Within them, choose by capability: chat models for text generation, **multimodal** models for mixed input such as an image plus text (vision-enabled GPT models, Phi-4-multimodal-instruct), **embeddings** models (for example text-embedding-3-small) for semantic search, image-generation models for pictures, and SLMs for small devices.
+**Choosing a model is like hiring**: read the CV, then give the shortlist a real task.
 
-For a well-defined task, such as detecting language or redacting PII, a **Foundry Tool** like Azure Language is often a better fit than a general model, because it returns structured, deterministic output. To compare candidate models, use the catalog's **leaderboards and benchmarks** (quality, safety, throughput), then try the shortlist with your own prompts. **Choosing a model is like hiring for a role**: read the CV first, then give the shortlist a real task.
+### Real use
 
-| Need | Model type |
-|---|---|
-| Write, summarise, chat | Chat (LLM or SLM) |
-| Understand an image or audio with text | Multimodal |
-| Vectors for semantic search | Embeddings |
-| Create images | Image generation (GPT-image family) |
-| Run on a phone or edge device | Small language model |
-| Consistent structured text results | A Foundry Tool such as Azure Language |
+A retailer's search uses an embeddings model (text-embedding-3-small) to match "warm waterproof jacket" to products, and a chat model only to write the summary shown to the shopper.
 
-### In Practice
+### How it works
 
-**What breaks without this**: teams default to the largest model for everything and pay more for slower answers, or use a chat model to produce vectors or language codes it was never meant to produce.
+- The Foundry catalog has **models sold directly by Azure** (including Azure OpenAI) and **partner and community models**.
+- Multimodal models take image or audio plus text; embeddings models make vectors for search; GPT-image models create images; SLMs fit small devices.
+- For well-defined tasks like language detection or PII detection, **Azure Language in Foundry Tools** gives consistent, structured output.
 
-**Decision trigger**: write down the input type, the output type and whether the output must be identical every time. That usually picks the model category on its own.
+### Choose when
 
-**When you'd choose differently**: if the task is open-ended or the wording must adapt to context, a general chat model beats a purpose-built tool.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Chat model (LLM/SLM) | Write, summarise, chat | Output varies |
+| Multimodal model | Image or audio input with text | Higher cost per call |
+| Embeddings model | Semantic search, similarity | Produces vectors, not text |
+| Azure Language | Fixed-format results (language, PII) | Fixed feature set |
+
+### How to do it
+
+1. Write down input type, output type, and whether output must be identical every time.
+2. Filter the catalog, then compare candidates on the **leaderboards** (quality, safety, cost, throughput).
+3. Try the shortlist with your own prompts using the playground's **compare** feature.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Pick the model with the most parameters" and "pick the cheapest per token" are both wrong answers. The exam rewards matching capability to the task and testing with your own data.
-</div>
+<div class="note-trap">"Pick the model with the most parameters" or "the cheapest per token" are both wrong; match capability, then test with your own data.</div>
+
+### Go deeper
+
+- [Microsoft Foundry Models overview](https://learn.microsoft.com/en-us/azure/foundry/concepts/foundry-models-overview)
+- [Model benchmarks and leaderboards](https://learn.microsoft.com/en-us/azure/foundry/concepts/model-benchmarks)
 
 ---
 
-## 1.7 Deployment Options and Configuration Parameters
+## 1.9 Identify appropriate model deployment options and configuration parameters
 
 ### Key Concept
 
 **The deployment type decides where data is processed and how you pay; parameters decide how the model generates.**
 
-Deployment types differ along two lines. Where data is processed: **Global** (any Azure region), **Data Zone** (within a zone such as the EU or US) or **Standard/Regional** (one Azure geography). How you pay: **Standard** types bill per token on a best-effort basis, **Provisioned** types reserve throughput units for predictable latency, and **Batch** types run large asynchronous jobs at a 50% discount with a 24-hour target. **Developer** deployments are only for evaluating fine-tuned models. Microsoft recommends starting with **Global Standard** for most workloads.
+**Deployment is the shipping contract; parameters are the cooking instructions.**
 
-Parameters shape each response. **Temperature** controls randomness (lower is more focused), **top_p** limits sampling to the most likely tokens (change temperature or top_p, not both), **max tokens** caps response length, **frequency penalty** reduces verbatim repetition, **presence penalty** nudges the model towards new topics, and **stop sequences** end generation early. **Deployment type is the shipping contract; parameters are the cooking instructions.**
+### Real use
 
-| Requirement | Deployment type |
-|---|---|
-| Default, newest models, lowest price, pay per token | Global Standard |
-| Data processed only in the EU or US, pay per token | Data Zone Standard |
-| Predictable latency at steady high volume | Provisioned (Global, Data Zone or Regional) |
-| Huge offline job, cost over speed | Global Batch or Data Zone Batch |
-| Test a fine-tuned model briefly | Developer |
+An EU retailer runs live chat on Data Zone Standard to keep processing in the EU, and its nightly product-description rewrite on Data Zone Batch for half the price.
 
-### In Practice
+### How it works
 
-**What breaks without this**: an EU company ships on Global Standard and breaks its data-processing commitment, or a summariser stops mid-sentence because max tokens is too low (finish reason "length").
+- **Where**: Global (any region), Data Zone (EU or US), Standard/Regional (one geography). **How you pay**: Standard per token; Provisioned reserves throughput for lower latency variance; Batch is asynchronous, 50% off, 24-hour target. Developer is only for testing fine-tuned models.
+- **Temperature** lower = focused and deterministic; change temperature *or* **top_p**, not both. **Max tokens** too low cuts replies off. **frequency_penalty** cuts repetition; **presence_penalty** pushes new topics. HTTP 429 = rate limit: raise TPM within quota or cut max tokens and concurrency.
 
-**Decision trigger**: ask about data location first, then traffic shape (spiky, steady or offline), then latency needs. For parameters, ask whether you want variety or consistency.
+### Choose when
 
-**When you'd choose differently**: reasoning models (for example the GPT-5 series) do not accept temperature, top_p or the penalties, and use max completion tokens instead, so the usual tuning knobs do not apply.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Global Standard | Default, pay per token | Data may be processed in any region |
+| Data Zone Standard | Processing must stay in EU/US | Fewer models or regions |
+| Provisioned | Steady high volume, predictable latency | Pay for reserved capacity |
+| Global / Data Zone Batch | Huge offline jobs | Up to 24 hours |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Standard" is not "Global Standard". Standard processes data in one geography; Global Standard can use any region. Also, frequency penalty and presence penalty sound alike: <strong>frequency = stop repeating the same words</strong>, <strong>presence = move on to new topics</strong>.
-</div>
+<div class="note-trap">"Standard" is not "Global Standard". Reasoning models (GPT-5 series) don't accept temperature, top_p or the penalties.</div>
+
+### Go deeper
+
+- [Deployment types in Microsoft Foundry Models](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/deployment-types)
+- [Work with chat completion models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/chatgpt)
 
 ---
 
-## 1.8 Common AI Workloads
+## 1.10 Identify scenarios for common AI workloads, including generative and agentic AI, text analysis, speech, computer vision, and information extraction
 
 ### Key Concept
 
-**Name the workload from its input and output: create content, take actions, analyse text, handle speech, see images, or extract fields.**
+**Name the workload from its required output: create content, take actions, analyse text, handle speech, see images or extract fields.**
 
-**Generative AI** creates new content from a prompt. **Agentic AI** goes further: an agent combines a model, instructions and tools so it can reason about a request and act, such as looking up an order and starting a return. **Text analysis** finds insights in text (entities, key phrases, sentiment, summaries). **Speech** converts between audio and text. **Computer vision** interprets images and video. **Information extraction** turns unstructured content (forms, images, audio, video) into structured fields.
+**Workloads are verbs, not file types.**
 
-The same input can belong to different workloads depending on the output. A scanned claim form is information extraction if you need the policy number in a database, but computer vision if you only need to know whether a signature box is filled in. **Workloads are verbs, not file types**: ask what the solution has to do with the input.
+### Real use
 
-| Scenario | Workload |
-|---|---|
-| Draft an email from bullet points | Generative AI |
-| Check an order and start a return | Agentic AI |
-| Find the main topics in reviews | Text analysis |
-| Transcribe calls / read text aloud | Speech |
-| Count cars in camera frames | Computer vision |
-| Put invoice fields into a database | Information extraction |
+A retailer drafts emails with generative AI, lets an agent check orders and start returns, and pulls invoice fields into its finance system with information extraction.
+
+### How it works
+
+- **Generative AI** creates content; **agentic AI** adds instructions and tools so it can reason and act.
+- **Text analysis** finds insights in text; **speech** converts audio and text; **computer vision** interprets images and video.
+- **Information extraction** pulls specific fields into structured output. A scanned form is extraction if you need its values, vision if you only need to know it's signed.
 
 ![AI workload chooser: each input and required output maps to generative AI, agentic AI, text analysis, speech, computer vision or information extraction.](/content/skillup/ai901/images/ai901-d1-workload-chooser.svg)
 
-### In Practice
+### Choose when
 
-**What breaks without this**: a team builds a chatbot when users needed fields in a database, or runs sentiment analysis on scanned forms when it needed extraction.
-
-**Decision trigger**: finish the sentence "the output must be…". New content means generative; an action means agentic; named fields means extraction.
-
-**When you'd choose differently**: real solutions combine workloads. A voice agent uses speech, generative AI and tools together; the exam asks which workload is central to the requirement.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Generative app | Output is new content | Can't take actions |
+| Agent | Output is a completed task | More to test and govern |
+| Information extraction | Output is named fields | Schema design needed |
+| Computer vision | Output is a label, location or description | Not for field values |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"The forms contain text, so it's text analysis" is the classic trap. Text analysis gives insights <em>about</em> text; information extraction maps values to <em>named fields</em>.
-</div>
+<div class="note-trap">"The forms contain text, so it's text analysis" is the classic trap: named fields mean information extraction.</div>
+
+### Go deeper
+
+- [What is Microsoft Foundry?](https://learn.microsoft.com/en-us/azure/foundry/what-is-foundry)
 
 ---
 
-## 1.9 Text Analysis Techniques
+## 1.11 Describe common text analysis techniques, including keyword extraction, entity detection, sentiment analysis, and summarization
 
 ### Key Concept
 
-**Entities have types, key phrases do not, sentiment has a polarity, and summaries are either extracted or written.**
+**Entities have types, key phrases don't, sentiment has a polarity, and summaries are either extracted or written.**
 
-**Named entity recognition (NER)** finds entities and labels each with a category, such as Person, Location, Organization or DateTime. **Key phrase extraction** returns the main concepts ("wonderful staff", "slow check-in") with no category attached. **Sentiment analysis** labels text positive, neutral or negative with confidence scores, and **opinion mining** (aspect-based sentiment) ties sentiment to specific aspects ("breakfast" positive, "parking" negative). **Summarization** is **extractive** (selects original sentences) or **abstractive** (writes new ones).
+**Key phrases are the highlighter; entities are labelled sticky notes.**
 
-Related capabilities are **language detection** (language plus a confidence score) and **PII detection** (finds personal and health information and can return redacted text). In Foundry you can do these with a general-purpose model and a prompt, or with **Azure Language in Foundry Tools**, which gives structured, consistent results. **Key phrases are the highlighter; entities are the labelled sticky notes.**
+### Real use
 
-| Need | Technique |
-|---|---|
-| Typed people, places, organisations, dates | NER |
-| Main talking points, untyped | Key phrase extraction |
-| Overall positive or negative | Sentiment analysis |
-| Which aspect was liked or disliked | Opinion mining |
-| Summary of verbatim sentences | Extractive summarization |
-| Summary in new words | Abstractive summarization |
-| Mask personal data | PII detection |
+A hotel group runs opinion mining on reviews and learns guests love the staff but dislike parking at three sites; managers read a weekly summary instead of 2,000 reviews.
 
-### In Practice
+### How it works
 
-**What breaks without this**: a team uses NER to find "what guests talk about" and gets only names and places, or uses document-level sentiment and loses which aspect was the problem.
+- **NER** labels entities with categories (Person, Location, DateTime); **key phrase extraction** returns untyped topics ("slow check-in").
+- **Sentiment** is positive, neutral or negative with scores; **opinion mining** ties it to aspects ("parking" negative).
+- **Extractive** summarization picks original sentences; **abstractive** writes new ones. **Language detection** and **PII detection** sit alongside.
+- Azure Language marks key phrases, sentiment and summarization as legacy (retiring 2029); NER, PII and language detection stay core.
 
-**Decision trigger**: ask whether you need categories (NER), concepts (key phrases), feelings (sentiment), feelings per aspect (opinion mining) or a shorter text (summarization).
+### Choose when
 
-**When you'd choose differently**: Azure Language now marks key phrase extraction, sentiment analysis and summarization as legacy features (retiring in 2029) and directs new work to Foundry models, while NER, PII detection and language detection remain core. The techniques are the same; the tool you use for each is shifting.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Azure Language (e.g. language detection SDK call) | Code needs consistent, structured values | Fixed features |
+| Foundry model + prompt | Wording or task is open-ended | Output varies |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Key phrase extraction versus NER is the favourite trap. If the expected output has <strong>no type label</strong> ("slow check-in"), it is key phrases. If each item is <strong>labelled</strong> (Seattle = Location), it is NER.
-</div>
+<div class="note-trap">No type label ("slow check-in") = key phrases; labelled items (Seattle = Location) = NER.</div>
+
+### Go deeper
+
+- [What is Azure Language in Foundry Tools?](https://learn.microsoft.com/en-us/azure/ai-services/language-service/overview)
+- [Sentiment analysis and opinion mining](https://learn.microsoft.com/en-us/azure/ai-services/language-service/sentiment-opinion-mining/overview)
 
 ---
 
-## 1.10 Speech Recognition and Synthesis
+## 1.12 Identify features and capabilities of speech recognition and speech synthesis
 
 ### Key Concept
 
 **Speech recognition turns audio into text; speech synthesis turns text into audio, and SSML controls how it sounds.**
 
-**Speech to text** uses an acoustic model (audio to phonemes) and a language model (phonemes to words). Azure Speech in Foundry Tools offers **real-time** transcription with intermediate results, **fast transcription** for single files with predictable latency, and **batch transcription** for large volumes of recorded audio. **Diarization** separates speakers so a transcript can say who said what.
+**Recognition is the stenographer; synthesis is the narrator.**
 
-**Text to speech** uses neural voices that sound natural, and **custom voice** creates a branded voice (limited access). **SSML** (Speech Synthesis Markup Language) is XML that controls pauses, rate, pitch, volume and pronunciation. **Speech translation** converts speech in one language to speech or text in another. **Recognition is the stenographer; synthesis is the narrator, and SSML is the narrator's script directions.**
+### Real use
 
-### In Practice
+A contact centre batch-transcribes calls overnight with speaker diarization, and reads order updates to callers in a neural voice tuned with SSML.
 
-**What breaks without this**: a team tries to tune narration with a model temperature, or uses real-time recognition to work through an archive of ten thousand recordings.
+### How it works
 
-**Decision trigger**: ask which direction the audio flows, whether it is live or recorded, and whether you need to know who spoke.
+- Speech to text uses an acoustic model (audio to phonemes) and a language model (phonemes to words): real-time, fast (single file) or **batch** (archives via SAS URIs, asynchronous).
+- **Diarization** separates speakers; **speech translation** changes language.
+- Text to speech uses neural voices; **SSML** (XML) controls pauses, rate, pitch and pronunciation.
+- Need specific fields (name, number, action) from recordings? That's a Content Understanding audio analyzer, not just a transcript.
 
-**When you'd choose differently**: for a full conversational voice agent, the Voice Live API combines recognition, a generative model and synthesis in one managed, low-latency service (see Domain 2).
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Real-time speech to text | Live captions, commands | Not for archives |
+| Batch transcription | Thousands of recordings | Asynchronous, best-effort |
+| SSML | Pronunciation or pacing must be exact | More markup |
+| Voice Live API | Live voice conversation with AI (2.7) | Built for sessions |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Speech translation (audio in, Azure Speech) is not text translation, and diarization (who spoke) is not speech translation (which language). SSML is XML markup, not a model parameter.
-</div>
+<div class="note-trap">Diarization (who spoke) is not translation (which language). SSML is XML markup, not a model parameter.</div>
+
+### Go deeper
+
+- [What is Azure Speech?](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/overview)
+- [SSML overview](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup)
 
 ---
 
-## 1.11 Computer Vision and Image Generation
+## 1.13 Identify features and capabilities of computer vision and image-generation models
 
 ### Key Concept
 
 **Vision models interpret existing images; image-generation models create new ones.**
 
-Core vision tasks: **image classification** labels the whole image, **object detection** labels objects and returns their bounding boxes, **captioning** describes the scene in a sentence, and **OCR** reads printed or handwritten text. Today, many of these tasks are done by **multimodal models** (vision-enabled GPT models) that take an image and a text instruction together.
+**Vision is the critic; generation is the painter.**
 
-**Image-generation models**, such as the GPT-image family, create or edit images from text prompts, and **Sora** models generate video. Older services are being retired: dall-e-3 was retired in March 2026, Azure Vision Image Analysis 4.0 is deprecated (retiring September 2028), and Face emotion and gender recognition were retired for responsible AI reasons. **Vision is the critic describing the painting; generation is the painter.**
+### Real use
 
-| Need | Capability |
-|---|---|
-| Is there a defect in this photo? | Image classification |
-| Where is each defect? | Object detection (bounding boxes) |
-| One-sentence scene description | Captioning |
-| Text printed on a label | OCR |
-| A new image from a description | Image generation |
+A factory flags defective circuit boards and draws a box round each defect; its marketing team mocks up packaging with a GPT-image model.
 
-### In Practice
+### How it works
 
-**What breaks without this**: a factory gets "this board has a defect" when it needed the defect's location, or a team tries to create marketing images with an analysis model.
+- **Classification** labels the whole image; **object detection** adds bounding boxes ("where"); **captioning** describes the scene; **OCR** reads text.
+- Many of these are now done by multimodal models; repeatable fields across many images suit a Content Understanding image analyzer.
+- GPT-image models create images and Sora creates video. dall-e-3 was retired (March 2026) and Image Analysis 4.0 is deprecated.
+- Face emotion and gender recognition are retired; identity features (verification, identification) need approved Limited Access.
 
-**Decision trigger**: ask whether the output is a label, a location, a sentence, text read from the image, or a brand-new image.
+### Choose when
 
-**When you'd choose differently**: if the image is mostly text (a photographed receipt), document extraction is usually a better fit than image analysis.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Object detection | You need *where* | More labelling than classification |
+| Captioning + OCR | Describe a scene *and* read its label | Two capabilities |
+| Image generation | You need a new image | Review outputs for safety |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Classification versus object detection: <strong>"where" means detection</strong>. And captioning describes a scene while OCR reads text, so a question that needs both a description and the label text needs both capabilities.
-</div>
+<div class="note-trap"><strong>"Where" means detection</strong>, not classification. A receipt photo is a document job, not image analysis.</div>
+
+### Go deeper
+
+- [How to use vision-enabled chat models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/gpt-with-vision)
+- [Image generation models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/dall-e)
 
 ---
 
-## 1.12 Information Extraction Across Text, Images, Audio and Video
+## 1.14 Identify techniques to extract information from text, images, audio, and videos
 
 ### Key Concept
 
-**Information extraction turns unstructured content into named, structured fields by applying a schema by meaning.**
+**Information extraction turns unstructured content into named fields by applying a schema by meaning.**
 
-**Azure Content Understanding in Foundry Tools** ingests documents, images, audio and video, analyses them with OCR, speech recognition and generative models, and returns structured output (markdown and JSON). A **field schema** defines what you want, and it is applied semantically: "Invoice No.", "Invoice #" or an unlabelled number can all become `InvoiceNumber`. That is the difference from basic OCR, which reads text without understanding it.
+**OCR is a photocopier; Content Understanding is a clerk who fills in your spreadsheet.**
 
-Each modality yields different raw material. Documents give text, tables and layout; images give descriptions and fields; audio gives a WebVTT transcript, speakers and a summary; video gives a transcript of spoken words, key frames and segment descriptions. **OCR is a photocopier; Content Understanding is a clerk who reads the form and fills in your spreadsheet.**
+### Real use
 
-### In Practice
+A clinic turns voicemails into a callback list: caller name, number and requested action land in its booking system, so staff no longer replay recordings.
 
-**What breaks without this**: a clinic stores raw voicemail transcripts and staff still hunt for the callback number, or a parser built on fixed labels breaks on the first supplier who writes "Inv #".
+### How it works
 
-**Decision trigger**: if the requirement names the fields it needs ("caller name, callback number, requested action"), it is extraction, whatever the input type.
+- **Azure Content Understanding in Foundry Tools** analyses documents, images, audio and video with OCR, speech recognition and generative models, returning markdown and JSON.
+- The schema is applied by meaning: "Invoice No.", "Invoice #" and an unlabelled number can all map to `InvoiceNumber`.
+- Documents give text, tables and layout; images a description; audio a transcript and summary; video a transcript of spoken words, key frames and per-segment descriptions or fields.
 
-**When you'd choose differently**: if you only need the raw text (OCR) or a transcript, plain speech to text or a read/layout analyzer is enough, and no field schema is needed.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| OCR or speech to text only | You need raw text | No fields |
+| Prebuilt analyzer | A standard form (invoice, receipt) | Fixed fields |
+| Custom analyzer with schema | You name your own fields | Design and test the schema |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Speech to text and store the transcript" looks like a complete answer for audio extraction, but a transcript is still unstructured. When the question lists specific fields, the answer is an analyzer with a schema.
-</div>
+<div class="note-trap">"Transcribe and store the transcript" isn't extraction: when fields are listed, the answer is an analyzer with a schema.</div>
+
+### Go deeper
+
+- [What is Azure Content Understanding?](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/overview)
 
 ---
 
 ## Deep Dive: Making AI Concepts Click
 
-### 1. The connective narrative
+Every model in this domain predicts rather than knows. That is why the principles exist: reliability because predictions can be wrong, fairness because they inherit bias, transparency because users need to know they're reading a prediction.
 
-Everything in this domain hangs off one idea: an AI model is a probabilistic predictor. Generative models predict the next token from embeddings shaped by attention; vision and speech models predict labels, words or boxes from pixels and sound waves. Because every one of them predicts rather than knows, the responsible AI principles are not optional extras. Reliability exists because predictions can be wrong, fairness because predictions inherit bias from data, and transparency because users need to know they are reading a prediction.
-
-The model and deployment choices are how you manage those predictions in practice. You choose a model whose input and output types fit the job, a deployment type that fits your data-location and traffic rules, and parameters that trade variety for consistency. When the task has a single correct structured answer, you pick a purpose-built Foundry Tool, because deterministic output beats a creative guess.
-
-The workloads are the shapes those predictions take. Learn them as input-to-output pairs: text to new text (generative), request to action (agentic), text to insights (text analysis), audio to text and back (speech), image to labels or descriptions (vision), and messy content to named fields (information extraction). Once you can name the pair, Domain 2 is simply "which Foundry tool or model does that pair?"
-
-### 2. Worked scenario
-
-> **Scenario.** A regional insurer wants three things: (1) a voice line where customers report claims, (2) the claim number, incident date and amount captured from each call into its claims system, and (3) a weekly summary of what customers complain about most. The insurer operates in the EU and must keep processing in the EU.
+> **Worked scenario.** An EU insurer wants a claims voice line, claim number, date and amount captured from each call, and a weekly complaints summary.
 >
-> **Reasoning.** Start with workloads. Item 1 is speech (recognition and synthesis) plus generative AI, and if the line can look up policies it becomes agentic. Item 2 names fields, so it is information extraction, here from audio with a Content Understanding analyzer whose schema has ClaimNumber, IncidentDate and Amount. Item 3 is text analysis on the transcripts: key phrase extraction to list topics, plus opinion mining to see which aspects are negative.
+> **Workloads.** The voice line is speech plus generative AI (agentic if it looks up policies). Captured fields mean information extraction with a Content Understanding audio analyzer. The summary is text analysis: key phrases plus opinion mining.
 >
-> **Model and deployment.** The extraction and summaries need a chat model, and Content Understanding also needs an embeddings model. Because of the EU rule, Global Standard is out; Data Zone Standard keeps processing in the EU zone with pay-per-token billing. The weekly report has no latency need, so a Data Zone Batch deployment could cut its cost.
+> **Deployment.** The EU rule rules out Global Standard, so Data Zone Standard is used, and the weekly report runs on Data Zone Batch.
 >
-> **Responsible AI.** Callers must be told they are speaking to AI (transparency). Low-confidence extracted fields go to a claims handler before payment (reliability and safety, accountability). Card numbers and health details are redacted from stored transcripts (privacy and security). The voice line also offers a text or web alternative for people who cannot use voice (inclusiveness), and the team checks extraction accuracy across accents (fairness).
+> **Principles.** Callers are told it's AI (transparency) and low-confidence fields go to a handler (reliability, accountability). Card details are redacted (privacy), a web form serves people who can't use voice (inclusiveness), and accuracy is checked across accents (fairness).
 
-### 3. Memory aid
+**Memory aids.** **FRIPTA**: Fairness · Reliability and safety · Inclusiveness · Privacy and security · Transparency · Accountability. Ask: *equal, safe, usable by all, protected, understood, owned?*
 
-**"FRIPTA"** for the six principles (the study guide lists privacy before inclusiveness; the order does not matter on the exam): **F**airness · **R**eliability and safety · **I**nclusiveness · **P**rivacy and security · **T**ransparency · **A**ccountability. Pair it with the question each asks: *equal? safe? usable by all? protected? understood? owned?*
-
-For workloads, **"Create, Act, Analyse, Hear, See, Extract"**: generative, agentic, text analysis, speech, vision, information extraction.
-
-### 4. Exam strategy for this domain
-
-- Most traps are look-alike pairs: transparency/accountability, key phrases/NER, classification/detection, frequency/presence penalty, Standard/Global Standard, positional encoding/attention. Before choosing, say out loud what separates the pair.
-- The exam rewards answers that test, monitor and keep humans responsible. It punishes answers that claim a single setting (temperature 0, a bigger model, a vendor filter) solves a responsible AI problem.
-- For "which workload?" questions, ignore the file type and read the required output.
-- Five minutes before the exam: **name the input, name the output, then name the principle at risk.**
+For workloads: **Create, Act, Analyse, Hear, See, Extract**.
 
 ---
 
 ## Cheat Sheet 📋
 
-| Concept | Key Rule |
-|---|---|
-| Responsible AI | Six principles: fairness, reliability and safety, privacy and security, inclusiveness, transparency, accountability |
-| Transparency vs accountability | Telling people vs people answering for it |
-| Token | Word, sub-word or punctuation; usage is measured in tokens |
-| Embedding | Meaning as a vector; similar meaning, similar direction |
-| Attention | Uses context; positional encoding gives order |
-| SLM | Small model for constrained devices (for example Phi) |
-| Global Standard | Recommended default; any region; pay per token |
-| Data Zone | Processing within the EU or US zone |
-| Provisioned | Reserved throughput; predictable latency |
-| Batch | Asynchronous; 50% discount; 24-hour target |
-| Temperature / top_p | Randomness; change one, not both |
-| Frequency vs presence penalty | Less repetition vs more new topics |
-| NER vs key phrases | Typed entities vs untyped concepts |
-| Opinion mining | Sentiment per aspect |
-| SSML | XML that controls synthesized speech |
-| Diarization | Who spoke when |
-| Object detection | Labels plus bounding boxes |
-| Content Understanding | Schema-driven extraction from documents, images, audio and video |
+| Task | Concept | Key rule |
+|---|---|---|
+| 1.1 | Fairness | Test outcomes across groups; proxies defeat column deletion |
+| 1.2 | Reliability and safety | Edge-case testing, guardrails, human fallback, monitoring |
+| 1.3 | Privacy and security | Redact, restrict access, delete when done |
+| 1.4 | Inclusiveness | Several input/output modes; diverse testers |
+| 1.5 | Transparency | Disclose AI, limits and sources |
+| 1.6 | Accountability | Owners and oversight; can't be outsourced |
+| 1.7 | How models work | Next-token prediction; attention = context; positional encoding = order |
+| 1.8 | Model choice | Input + output first; leaderboards, then your own prompts |
+| 1.9 | Deployment | Global Standard default; Data Zone for EU/US; Provisioned steady; Batch offline |
+| 1.9 | Parameters | Temperature *or* top_p; frequency = repetition; 429 = raise TPM |
+| 1.10 | Workloads | Name the output: create, act, analyse, hear, see, extract |
+| 1.11 | Text analysis | NER typed, key phrases untyped, opinion mining per aspect |
+| 1.12 | Speech | Batch for archives; diarization = who; SSML = how it sounds |
+| 1.13 | Vision | "Where" = detection; GPT-image creates; Face emotion retired |
+| 1.14 | Extraction | Schema by meaning across documents, images, audio, video |
