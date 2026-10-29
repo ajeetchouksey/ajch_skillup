@@ -22,10 +22,10 @@
 <text x="72.0" y="190.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">User</text>
 <rect x="150.0" y="156.0" width="140" height="60.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="220.0" y="190.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Copilot Chat</text>
-<rect x="436.0" y="97.0" width="220" height="66.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="436.0" y="97.0" width="220" height="66.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="546.0" y="124.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Microsoft Graph</text>
 <text x="546.0" y="146.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Emails · Docs · Teams · Calendar</text>
-<rect x="436.0" y="209.0" width="220" height="66.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="436.0" y="209.0" width="220" height="66.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="546.0" y="236.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Bing</text>
 <text x="546.0" y="258.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Public internet</text>
 </svg>

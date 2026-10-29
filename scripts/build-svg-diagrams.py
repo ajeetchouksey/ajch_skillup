@@ -25,9 +25,9 @@ Visual grammar (keep it when adding diagrams):
   shape   rounded rect = step/outcome   diamond = decision
   line    solid = yes / happy path      dashed = no / alternative
   colour  indigo fill  = the recommended path or focal concept (one per diagram)
-          blue         = input / data
-          emerald      = good outcome / mitigation
-          amber        = warning / lever to watch
+          sky          = input / data
+          green        = good outcome / mitigation
+          saffron      = warning / false fix / lever to watch
           rose         = risk / anti-pattern
           slate        = everything else
 """
@@ -39,10 +39,12 @@ from fontTools import subset
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "content", "skillup")
 W = 680
 
-# BRAND.md section 5 accent + platform status colours
+# Accent + node colours mirror the SkillUp colour code's "diagram" block in
+# ajch_platform/scripts/skillup-site/colour-code.json (data sky, good green,
+# warn saffron, risk rose, focus indigo). Change them there first, then here.
 INDIGO, LILAC = "#5B4BD6", "#A99BFF"
-BLUE4 = "#60a5fa"
-EMERALD4, AMBER4, ROSE4 = "#34d399", "#fbbf24", "#fb7185"
+SKY = "#5ec8f2"
+GREEN, SAFFRON, ROSE = "#34d399", "#f5b94a", "#fb7185"
 SLATE7, SLATE4 = "#334155", "#94a3b8"
 TEXT = "#e2e8f0"              # Mermaid primaryTextColor
 LINE = "#64748b"              # Mermaid lineColor
@@ -51,10 +53,10 @@ LABEL_BG = "#162236"          # Mermaid edgeLabelBackground
 KINDS = {
     "neutral": ("#1a2a42", SLATE7, TEXT, SLATE4),
     "start":   ("#111f35", SLATE7, TEXT, SLATE4),
-    "data":    ("#162236", BLUE4, TEXT, SLATE4),
-    "good":    ("#1a2a12", EMERALD4, TEXT, SLATE4),
-    "warn":    ("#2a1a22", AMBER4, TEXT, SLATE4),
-    "risk":    ("#2a1a1a", ROSE4, TEXT, SLATE4),
+    "data":    ("#162236", SKY, TEXT, SLATE4),
+    "good":    ("#1a2a12", GREEN, TEXT, SLATE4),
+    "warn":    ("#2a1a22", SAFFRON, TEXT, SLATE4),
+    "risk":    ("#2a1a1a", ROSE, TEXT, SLATE4),
     "focus":   (INDIGO, LILAC, "#ffffff", "#F0EDFF"),
 }
 # Focal accent per diagram: (fill, on-dark stroke/accent, secondary text on fill).
@@ -262,7 +264,7 @@ def ccap_context(f):
         if x > x0: D.front.append(f'<line x1="{x}" y1="{y0}" x2="{x}" y2="{y0 + bh}" stroke="{SLATE7}" stroke-width="1"/>')
         if isinstance(k, int):
             badges.append((x + w / 2, k))
-            D.front.append(f'<rect x="{x + 1.5}" y="{y0 + 1.5}" width="{w - 3}" height="{bh - 3}" fill="none" stroke="{AMBER4}" stroke-width="1.25"/>')
+            D.front.append(f'<rect x="{x + 1.5}" y="{y0 + 1.5}" width="{w - 3}" height="{bh - 3}" fill="none" stroke="{SAFFRON}" stroke-width="1.25"/>')
         lines = f.wrap("label", name, 12, w - 14)
         ty = y0 + bh / 2 - (len(lines) - 1) * 7.5 + 4 + (8 if isinstance(k, int) else 0)
         for ln in lines:

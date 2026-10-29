@@ -17,7 +17,7 @@
 <rect x="30.0" y="104.0" width="340" height="60.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="200.0" y="128.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">System prompt</text>
 <text x="200.0" y="150.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#F0EDFF" text-anchor="middle">Role, scope, tone, output format: set by the app</text>
-<rect x="30.0" y="172.0" width="340" height="66.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="30.0" y="172.0" width="340" height="66.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="200.0" y="191.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Grounding</text>
 <text x="200.0" y="213.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Source text + "answer only from it, otherwise say you</text>
 <text x="200.0" y="229.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">don't know"</text>
@@ -27,7 +27,7 @@
 <rect x="30.0" y="314.0" width="340" height="60.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="200.0" y="338.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Earlier turns</text>
 <text x="200.0" y="360.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Resent: each request stands alone</text>
-<rect x="30.0" y="382.0" width="340" height="60.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="30.0" y="382.0" width="340" height="60.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="200.0" y="406.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">User prompt</text>
 <text x="200.0" y="428.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Today's task</text>
 <rect x="450.0" y="245.0" width="160" height="56.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
@@ -42,7 +42,7 @@
 <text x="530.0" y="175.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Never fixes fabrication</text>
 <rect x="24" y="477" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">THE RULES</text>
-<rect x="121.9705" y="477" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="121.9705" y="477" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="142.0" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">YOUR CONTENT</text>
 <rect x="241.92900000000003" y="477" width="12" height="12" rx="3" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="261.9" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">OUTCOME</text>

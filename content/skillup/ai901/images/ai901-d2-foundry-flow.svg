@@ -53,14 +53,14 @@
 <text x="500.0" y="506.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Agent tools</text>
 <text x="500.0" y="528.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">File search (your documents), code interpreter</text>
 <text x="500.0" y="544.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">(calculations), web search (public, current)</text>
-<rect x="350.0" y="585.0" width="300" height="86.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="350.0" y="585.0" width="300" height="86.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="500.0" y="606.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Foundry SDK</text>
 <text x="500.0" y="628.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">AIProjectClient → get_openai_client() →</text>
 <text x="500.0" y="644.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">responses.create(deployment name or agent</text>
 <text x="500.0" y="660.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">reference)</text>
 <rect x="24" y="679" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="690.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">WORKSPACE</text>
-<rect x="127.9735" y="679" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="127.9735" y="679" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="148.0" y="690.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">SDK CALL</text>
 <rect x="219.2625" y="679" width="12" height="12" rx="3" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="239.3" y="690.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">STEP OR COMPONENT</text>

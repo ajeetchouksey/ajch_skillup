@@ -18,7 +18,7 @@
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">Speech: Ears and a Voice</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">Recognition turns audio into text; synthesis turns text into audio, shaped by SSML.</text>
 <text x="24.0" y="108.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">SPEECH RECOGNITION (SPEECH TO TEXT)</text>
-<rect x="24.0" y="121.0" width="146" height="86.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="121.0" width="146" height="86.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="97.0" y="150.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Audio</text>
 <text x="97.0" y="172.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Live, a file, or an</text>
 <text x="97.0" y="188.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">archive</text>
@@ -34,7 +34,7 @@
 <text x="583.0" y="180.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">spoke; translation =</text>
 <text x="583.0" y="196.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">which language</text>
 <text x="24.0" y="240.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">SPEECH SYNTHESIS (TEXT TO SPEECH)</text>
-<rect x="24.0" y="253.0" width="146" height="78.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="253.0" width="146" height="78.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="97.0" y="286.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Text</text>
 <text x="97.0" y="308.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">What to say</text>
 <rect x="186.0" y="253.0" width="146" height="78.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
@@ -48,15 +48,15 @@
 <rect x="510.0" y="253.0" width="146" height="78.0" rx="10" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="583.0" y="286.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Audio</text>
 <text x="583.0" y="308.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Spoken output</text>
-<rect x="24.0" y="374.0" width="632" height="60.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="24.0" y="374.0" width="632" height="60.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="340.0" y="398.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Need fields, not a transcript?</text>
 <text x="340.0" y="420.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Caller name, number, requested action: use a Content Understanding audio analyzer (1.14)</text>
-<rect x="24" y="465" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="465" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="476.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">INPUT</text>
 <rect x="97.257" y="465" width="12" height="12" rx="3" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="117.3" y="476.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">OUTPUT</text>
 <rect x="179.553" y="465" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="199.6" y="476.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">CONTROLS HOW IT SOUNDS</text>
-<rect x="359.2885" y="465" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="359.2885" y="465" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="379.3" y="476.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">DIFFERENT JOB</text>
 </svg>

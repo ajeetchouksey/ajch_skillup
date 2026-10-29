@@ -22,7 +22,7 @@
 <text x="420.0" y="456.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="500" fill="#94a3b8" text-anchor="middle">no</text>
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">Deploy, Test, Then Call</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">A deployment is the phone line apps dial by name; the playground is the test call.</text>
-<rect x="24.0" y="108.0" width="146" height="96.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="108.0" width="146" height="96.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="97.0" y="142.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Model catalog</text>
 <text x="97.0" y="164.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Pick a model in your</text>
 <text x="97.0" y="180.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">project</text>
@@ -43,7 +43,7 @@
 <text x="421.0" y="264.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Save as agent</text>
 <text x="421.0" y="286.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Optional (2.4)</text>
 <text x="24.0" y="330.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">WHEN THE APP GETS HTTP 429</text>
-<rect x="25.0" y="374.0" width="150" height="72.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="25.0" y="374.0" width="150" height="72.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="100.0" y="396.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">HTTP 429</text>
 <text x="100.0" y="418.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Rate limit: a capacity</text>
 <text x="100.0" y="434.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">problem</text>
@@ -58,7 +58,7 @@
 <text x="340.0" y="544.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Changing temperature, or switching to a Developer deployment (only for evaluating fine-tuned models)</text>
 <rect x="24" y="569" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="580.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">CREATES THE ENDPOINT</text>
-<rect x="190.3725" y="569" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="190.3725" y="569" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="210.4" y="580.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">CAPACITY</text>
 <rect x="282.685" y="569" width="12" height="12" rx="3" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="302.7" y="580.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">FIX</text>

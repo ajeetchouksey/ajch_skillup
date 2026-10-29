@@ -46,18 +46,19 @@ const THEME = {
   fontFamily: 'Barlow, sans-serif',
   fontSize: '15px',
   primaryColor: '#1a2a42', primaryTextColor: '#e2e8f0', primaryBorderColor: '#334155',
-  secondaryColor: '#162236', secondaryTextColor: '#e2e8f0', secondaryBorderColor: '#60a5fa',
+  secondaryColor: '#162236', secondaryTextColor: '#e2e8f0', secondaryBorderColor: '#5ec8f2',
   tertiaryColor: '#111f35', tertiaryTextColor: '#e2e8f0', tertiaryBorderColor: '#334155',
   lineColor: '#64748b', textColor: '#e2e8f0', mainBkg: '#1a2a42', nodeBorder: '#334155',
   edgeLabelBackground: '#162236', clusterBkg: '#111f35', clusterBorder: '#334155', titleColor: '#ffffff',
-  noteBkgColor: '#2a1a22', noteTextColor: '#e2e8f0', noteBorderColor: '#fbbf24',
+  noteBkgColor: '#2a1a22', noteTextColor: '#e2e8f0', noteBorderColor: '#f5b94a',
   actorBkg: '#1a2a42', actorBorder: '#A99BFF', actorTextColor: '#e2e8f0', actorLineColor: '#475569',
   signalColor: '#94a3b8', signalTextColor: '#e2e8f0', labelBoxBkgColor: '#162236', labelBoxBorderColor: '#334155',
   labelTextColor: '#e2e8f0', loopTextColor: '#e2e8f0', activationBkgColor: '#5B4BD6', activationBorderColor: '#A99BFF',
   sequenceNumberColor: '#ffffff',
   // state / class / pie / journey
   labelColor: '#e2e8f0', altBackground: '#162236', compositeBackground: '#111f35', compositeTitleBackground: '#1a2a42',
-  pie1: '#5B4BD6', pie2: '#2DD4BF', pie3: '#F472B6', pie4: '#FB923C', pie5: '#A3E635', pie6: '#E879F9', pie7: '#FACC15',
+  // pie slices follow the SkillUp colour code's domain order (colour-code.json), indigo first
+  pie1: '#5B4BD6', pie2: '#5EC8F2', pie3: '#3DD9B3', pie4: '#F5B94A', pie5: '#FF8A7A', pie6: '#E58AE8', pie7: '#A99BFF',
   pieTitleTextColor: '#ffffff', pieSectionTextColor: '#ffffff', pieLegendTextColor: '#e2e8f0', pieStrokeColor: '#0e1a2d',
   cScale0: '#5B4BD6', cScale1: '#1a2a42', cScale2: '#162236', cScale3: '#111f35',
 };

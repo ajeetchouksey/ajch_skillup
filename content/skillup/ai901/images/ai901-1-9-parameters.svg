@@ -22,7 +22,7 @@
 <text x="130.0" y="146.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Temperature or top_p</text>
 <text x="130.0" y="168.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Lower temperature = focused,</text>
 <text x="130.0" y="184.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">deterministic. Change one, not both.</text>
-<rect x="435.0" y="116.0" width="230" height="88.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="435.0" y="116.0" width="230" height="88.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="550.0" y="154.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Max tokens</text>
 <text x="550.0" y="176.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Too low cuts replies off</text>
 <rect x="15.0" y="356.0" width="230" height="88.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
@@ -34,12 +34,12 @@
 <rect x="24.0" y="464.0" width="632" height="60.0" rx="10" fill="#2a1a1a" stroke="#fb7185" stroke-width="1.25"/>
 <text x="340.0" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Reasoning models (GPT-5 series)</text>
 <text x="340.0" y="510.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Don't accept temperature, top_p or the penalties</text>
-<rect x="24.0" y="536.0" width="632" height="60.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="24.0" y="536.0" width="632" height="60.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="340.0" y="560.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">HTTP 429 = rate limit, not a parameter</text>
 <text x="340.0" y="582.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Raise TPM within quota, or cut max tokens and concurrency</text>
 <rect x="24" y="607" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="618.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">THE MODEL</text>
-<rect x="123.1665" y="607" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="123.1665" y="607" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="143.2" y="618.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">WATCH</text>
 <rect x="200.897" y="607" width="12" height="12" rx="3" fill="#2a1a1a" stroke="#fb7185" stroke-width="1.25"/>
 <text x="220.9" y="618.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">DOESN'T APPLY</text>
