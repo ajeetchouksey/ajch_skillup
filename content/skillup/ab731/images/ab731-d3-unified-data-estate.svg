@@ -20,13 +20,13 @@
 <rect x="200.0" y="230.0" width="280" height="72.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="340.0" y="262.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Microsoft Fabric</text>
 <text x="340.0" y="279.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="500" fill="#F0EDFF" text-anchor="middle">Unified data layer</text>
-<rect x="41.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="41.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="109.0" y="120.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">CRM data</text>
-<rect x="195.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="195.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="263.0" y="120.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">ERP data</text>
-<rect x="349.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="349.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="417.0" y="120.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">HR data</text>
-<rect x="503.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="503.0" y="92.0" width="136" height="48.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="571.0" y="120.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Other data</text>
 <rect x="55.0" y="358.0" width="270" height="72.0" rx="10" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="190.0" y="388.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Analytics &amp; reporting</text>
@@ -35,7 +35,7 @@
 <text x="490.0" y="380.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">AI &amp; advanced analytics</text>
 <text x="490.0" y="402.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Machine learning, forecasting, advanced</text>
 <text x="490.0" y="418.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">insights</text>
-<rect x="24" y="447" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="447" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="458.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">SOURCE</text>
 <rect x="105.69800000000001" y="447" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="125.7" y="458.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">UNIFIED LAYER</text>

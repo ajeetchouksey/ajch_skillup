@@ -19,7 +19,7 @@
 <path d="M460.0,200.0 L642.0,200.0 Q650.0,200.0 650.0,208.0 L650.0,524.0 Q650.0,532.0 642.0,532.0 L440.0,532.0" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arrow)"/>
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">Orchestrator + Subagents</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">A lead agent fans work out to subagents, each with its own context and scoped tools.</text>
-<rect x="210.0" y="88.0" width="220" height="48.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="210.0" y="88.0" width="220" height="48.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="320.0" y="116.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">User Query</text>
 <rect x="180.0" y="172.0" width="280" height="56.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="320.0" y="204.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Orchestrator / Lead Agent</text>
@@ -36,7 +36,7 @@
 <text x="320.0" y="448.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Result Synthesis</text>
 <rect x="200.0" y="508.0" width="240" height="48.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="320.0" y="536.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Final Output to User</text>
-<rect x="24" y="579" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="579" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="590.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">INPUT</text>
 <rect x="97.257" y="579" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="117.3" y="590.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">LEAD AGENT</text>

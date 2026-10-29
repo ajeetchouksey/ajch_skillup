@@ -29,16 +29,16 @@
 <rect x="300.0" y="180.0" width="136" height="150.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="368.0" y="249.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">AI Agent</text>
 <text x="368.0" y="271.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#F0EDFF" text-anchor="middle">AI Foundry</text>
-<rect x="24.0" y="100.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="100.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="102.0" y="126.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Email arrives</text>
 <text x="102.0" y="148.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Exchange</text>
-<rect x="24.0" y="182.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="182.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="102.0" y="208.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Form submitted</text>
 <text x="102.0" y="230.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Power Apps</text>
-<rect x="24.0" y="264.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="264.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="102.0" y="290.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Queue message</text>
 <text x="102.0" y="312.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Service Bus</text>
-<rect x="24.0" y="346.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="346.0" width="156" height="64.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="102.0" y="372.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Document uploaded</text>
 <text x="102.0" y="394.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Blob Storage</text>
 <rect x="504.0" y="145.0" width="152" height="60.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
@@ -50,7 +50,7 @@
 <rect x="504.0" y="305.0" width="152" height="60.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="580.0" y="331.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Create ticket</text>
 <text x="580.0" y="348.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="500" fill="#94a3b8" text-anchor="middle">action</text>
-<rect x="24" y="441" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="441" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="452.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">EVENT SOURCE</text>
 <rect x="142.728" y="441" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="162.7" y="452.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">AGENT</text>

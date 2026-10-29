@@ -19,7 +19,7 @@
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">Three Ways to Answer a Spoken Prompt</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">An audio-capable model listens and thinks in one step; the other paths add a session or more parts.</text>
 <text x="24.0" y="106.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">AUDIO-CAPABLE MODEL: ONE STEP</text>
-<rect x="24.0" y="117.0" width="196" height="86.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="117.0" width="196" height="86.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="122.0" y="146.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Spoken question</text>
 <text x="122.0" y="168.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">input_audio part: base64,</text>
 <text x="122.0" y="184.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">format wav</text>
@@ -32,7 +32,7 @@
 <text x="558.0" y="168.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">modalities text and audio;</text>
 <text x="558.0" y="184.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">voice and format</text>
 <text x="24.0" y="234.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">VOICE LIVE API: LIVE CONVERSATION</text>
-<rect x="24.0" y="249.0" width="196" height="70.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="249.0" width="196" height="70.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="122.0" y="288.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Live speech</text>
 <rect x="242.0" y="249.0" width="196" height="70.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="340.0" y="270.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Voice Live API</text>
@@ -42,7 +42,7 @@
 <text x="558.0" y="278.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Natural conversation</text>
 <text x="558.0" y="300.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Session-based</text>
 <text x="24.0" y="350.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">AZURE SPEECH + TEXT MODEL (2.8)</text>
-<rect x="24.0" y="367.0" width="146" height="70.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24.0" y="367.0" width="146" height="70.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="97.0" y="406.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Audio</text>
 <rect x="186.0" y="367.0" width="146" height="70.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="259.0" y="396.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Speech to text</text>
@@ -53,7 +53,7 @@
 <rect x="510.0" y="367.0" width="146" height="70.0" rx="10" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="583.0" y="396.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Text to speech</text>
 <text x="583.0" y="418.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">SSML control</text>
-<rect x="24" y="475" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="475" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="486.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">SPOKEN INPUT</text>
 <rect x="141.1525" y="475" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="161.2" y="486.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">ONE-STEP MODEL</text>

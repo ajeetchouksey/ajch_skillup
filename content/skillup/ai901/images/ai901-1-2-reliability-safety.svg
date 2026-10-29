@@ -29,20 +29,20 @@
 <rect x="24.0" y="98.0" width="632" height="60.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="340.0" y="122.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Before launch: evaluate</text>
 <text x="340.0" y="144.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#F0EDFF" text-anchor="middle">Expected, edge-case and adversarial prompts, against a clear definition of "wrong"</text>
-<rect x="35.0" y="200.0" width="230" height="52.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="35.0" y="200.0" width="230" height="52.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="150.0" y="230.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">User prompt</text>
 <rect x="35.0" y="282.0" width="230" height="80.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="150.0" y="308.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Guardrails</text>
 <text x="150.0" y="330.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Content filters check prompts and</text>
 <text x="150.0" y="346.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">outputs for harmful content</text>
-<rect x="35.0" y="398.0" width="230" height="64.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="35.0" y="398.0" width="230" height="64.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="150.0" y="416.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Model reply</text>
 <text x="150.0" y="438.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Probabilistic: can be confidently</text>
 <text x="150.0" y="454.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">wrong</text>
 <path d="M420,380.0 L510.0,430 L420,480.0 L330.0,430 Z" fill="#1a2a42" stroke="#A99BFF" stroke-width="1.5" stroke-linejoin="round"/>
 <text x="420.0" y="426.5" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600" fill="#e2e8f0" text-anchor="middle">Confidence above</text>
 <text x="420.0" y="443.5" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600" fill="#e2e8f0" text-anchor="middle">threshold?</text>
-<rect x="533.0" y="394.0" width="130" height="72.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="533.0" y="394.0" width="130" height="72.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="598.0" y="416.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Route to a person</text>
 <text x="598.0" y="438.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Risky or low</text>
 <text x="598.0" y="454.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">confidence</text>
@@ -53,9 +53,9 @@
 <text x="150.0" y="572.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Re-evaluate after changes</text>
 <rect x="24" y="597" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="608.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">EVALUATION</text>
-<rect x="129.9515" y="597" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="129.9515" y="597" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="150.0" y="608.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">INPUT</text>
-<rect x="203.20850000000002" y="597" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="203.20850000000002" y="597" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="223.2" y="608.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">WATCH</text>
 <rect x="280.939" y="597" width="12" height="12" rx="3" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="300.9" y="608.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">OUTCOME</text>

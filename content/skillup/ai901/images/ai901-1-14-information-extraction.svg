@@ -19,13 +19,13 @@
 <path d="M403.0,475.0 L403.0,484.0 Q403.0,492.0 411.0,492.0 L577.0,492.0 Q585.0,492.0 585.0,484.0 L585.0,475.0" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arrow)"/>
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">Information Extraction: Content In, Named Fields Out</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">One analyzer handles every content type and applies your schema by meaning, not by label.</text>
-<rect x="25.0" y="115.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="25.0" y="115.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="95.0" y="144.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Documents</text>
-<rect x="25.0" y="179.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="25.0" y="179.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="95.0" y="208.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Images</text>
-<rect x="25.0" y="243.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="25.0" y="243.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="95.0" y="272.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Audio</text>
-<rect x="25.0" y="307.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="25.0" y="307.0" width="140" height="50.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="95.0" y="336.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Video</text>
 <rect x="245.0" y="161.0" width="200" height="150.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="345.0" y="205.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Content Understanding</text>
@@ -46,7 +46,7 @@
 <text x="403.0" y="454.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Unlabelled number</text>
 <rect x="510.0" y="425.0" width="150" height="50.0" rx="10" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="585.0" y="454.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">InvoiceNumber</text>
-<rect x="24" y="523" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="523" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="534.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">INPUT</text>
 <rect x="97.257" y="523" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="117.3" y="534.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">ANALYZER + SCHEMA</text>

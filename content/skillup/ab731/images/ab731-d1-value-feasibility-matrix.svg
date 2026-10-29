@@ -18,9 +18,9 @@
 <text x="24.0" y="190.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">BUSINESS VALUE</text>
 <text x="24.0" y="300.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">LOW</text>
 <text x="24.0" y="316.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">BUSINESS VALUE</text>
-<rect x="140.0" y="121.0" width="248" height="110.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="140.0" y="121.0" width="248" height="110.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="264.0" y="162.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Strategic Bets</text>
-<text x="264.0" y="179.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="500" fill="#fbbf24" text-anchor="middle">Plan for later</text>
+<text x="264.0" y="179.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="500" fill="#f5b94a" text-anchor="middle">Plan for later</text>
 <text x="264.0" y="200.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">High reward but needs investment</text>
 <rect x="404.0" y="121.0" width="248" height="110.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="528.0" y="162.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Quick Wins</text>
@@ -36,7 +36,7 @@
 <text x="528.0" y="326.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Low value, but easy to deliver</text>
 <rect x="24" y="389" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="44.0" y="400.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">DO FIRST</text>
-<rect x="112.97749999999999" y="389" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="112.97749999999999" y="389" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="133.0" y="400.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">INVEST CAREFULLY</text>
 <rect x="254.23399999999998" y="389" width="12" height="12" rx="3" fill="#2a1a1a" stroke="#fb7185" stroke-width="1.25"/>
 <text x="274.2" y="400.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">AVOID</text>

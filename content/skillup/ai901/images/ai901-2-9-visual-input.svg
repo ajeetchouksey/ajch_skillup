@@ -15,10 +15,10 @@
 <text x="24.0" y="40.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="600" fill="#e2e8f0" text-anchor="start">An Image and a Question in One Message</text>
 <text x="24.0" y="62.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" text-anchor="start">The image is the photo, the text part is the sticky note; a vision-capable model answers.</text>
 <text x="40.0" y="126.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.1em" fill="#94a3b8" text-anchor="start">ONE USER MESSAGE</text>
-<rect x="43.0" y="147.0" width="330" height="66.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="43.0" y="147.0" width="330" height="66.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="208.0" y="174.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">input_text</text>
 <text x="208.0" y="196.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">The question: "What is in this image? 3 bullet points."</text>
-<rect x="43.0" y="237.0" width="330" height="66.0" rx="10" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="43.0" y="237.0" width="330" height="66.0" rx="10" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="208.0" y="264.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">input_image</text>
 <text x="208.0" y="286.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">image_url: a public URL or a base64 data URL</text>
 <rect x="435.0" y="187.0" width="210" height="60.0" rx="10" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
@@ -33,16 +33,16 @@
 <rect x="240.0" y="390.0" width="200" height="72.0" rx="10" fill="#1a2a42" stroke="#334155" stroke-width="1.25"/>
 <text x="340.0" y="420.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">Base64 data URL</text>
 <text x="340.0" y="442.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Private or uploaded images</text>
-<rect x="456.0" y="390.0" width="200" height="72.0" rx="10" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="456.0" y="390.0" width="200" height="72.0" rx="10" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="556.0" y="412.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e2e8f0" text-anchor="middle">detail: "high"</text>
 <text x="556.0" y="434.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">Chat Completions image_url:</text>
 <text x="556.0" y="450.0" font-family="Barlow, ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="middle">fine print, more tokens</text>
-<rect x="24" y="477" width="12" height="12" rx="3" fill="#162236" stroke="#60a5fa" stroke-width="1.25"/>
+<rect x="24" y="477" width="12" height="12" rx="3" fill="#162236" stroke="#5ec8f2" stroke-width="1.25"/>
 <text x="44.0" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">MESSAGE PARTS</text>
 <rect x="148.961" y="477" width="12" height="12" rx="3" fill="#5B4BD6" stroke="#A99BFF" stroke-width="1.25"/>
 <text x="169.0" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">MODEL</text>
 <rect x="224.62150000000003" y="477" width="12" height="12" rx="3" fill="#1a2a12" stroke="#34d399" stroke-width="1.25"/>
 <text x="244.6" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">ANSWER</text>
-<rect x="308.9185" y="477" width="12" height="12" rx="3" fill="#2a1a22" stroke="#fbbf24" stroke-width="1.25"/>
+<rect x="308.9185" y="477" width="12" height="12" rx="3" fill="#2a1a22" stroke="#f5b94a" stroke-width="1.25"/>
 <text x="328.9" y="488.0" font-family="'Barlow Condensed', ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" letter-spacing="0.12em" fill="#94a3b8" text-anchor="start">COSTS MORE</text>
 </svg>
