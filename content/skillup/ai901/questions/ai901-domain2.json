@@ -1119,5 +1119,290 @@
       "analysis"
     ],
     "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-060",
+    "scenario": "A company's travel agent in the Foundry portal answers from uploaded travel-policy PDFs using file search. Staff now ask about rail strikes happening this week at their destination, and the agent says it doesn't know.",
+    "question": "What should the developer add?",
+    "options": [
+      "More PDFs to the file search tool",
+      "A code interpreter tool",
+      "A higher temperature, so the agent answers more freely",
+      "A web search tool for current public information"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: web search gets current public information, such as this week's rail strikes. File search stays in place for the private policy PDFs. A is wrong because file search answers from your own uploaded files; the company has no file about this week's strikes. B is wrong because code interpreter runs Python for calculations and charts, not for finding news. C is wrong because a higher temperature only makes output more varied; it doesn't give the agent new information and makes invented answers more likely.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-061",
+    "scenario": "A finance team wants an agent that reads uploaded expense CSVs, totals spending per category, draws a chart, and quotes the company's expense policy PDF with a citation when a claim breaks the rules.",
+    "question": "Which tools should the agent have?",
+    "options": [
+      "Code interpreter for the totals and chart, and file search for the policy PDF",
+      "Web search for the policy, and code interpreter for the totals and chart",
+      "File search only, because both the CSVs and the PDF are uploaded files",
+      "Code interpreter only, because it can open both the CSVs and the PDF"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: calculations and charts need code interpreter, and grounded, cited answers from your own documents need file search. Each tool does one part of the job. B is wrong because the policy is a private document, not current public information, so web search won't find it. C is wrong because file search retrieves passages to quote; it can't total columns or draw a chart. D is wrong because code interpreter runs code in a sandbox; it doesn't index the policy for grounded, cited answers.",
+    "tags": [
+      "architecture",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-062",
+    "scenario": "A warehouse app sends a shelf photo to a vision-capable model and asks how many slots are empty. Sometimes the reply is a sentence such as \"There seem to be about three gaps\", and the restock code fails.",
+    "question": "What should the developer do?",
+    "options": [
+      "Train a Custom Vision model to count empty slots instead",
+      "Switch the app to Image Analysis 4.0, which returns structured tags",
+      "Ask for a fixed JSON format, validate it in code and send unexpected replies to a person",
+      "Put the path of the photo file in the text instruction"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a lightweight vision app should ask for a fixed format such as {\"empty_slots\": int}, validate the JSON in code and send anything unexpected to a person. A is wrong because Custom Vision is retiring and custom training isn't needed for this. B is wrong because Image Analysis 4.0 is deprecated, and new apps should use multimodal models or Content Understanding. D is wrong because the model can't open a file path; the photo must be sent as base64 image content.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-063",
+    "scenario": "A developer's request to a vision-capable deployment contains only {\"type\": \"input_text\", \"text\": \"Count the empty slots in C:/photos/shelf.jpg\"}. The model replies that it can't see an image.",
+    "question": "What is the fix?",
+    "options": [
+      "Upload shelf.jpg to a file search tool so the model can retrieve it",
+      "Read and base64-encode the photo and send it in an input_image part as a data URL",
+      "Send the photo as an input_audio part, which accepts binary data",
+      "Deploy a model trained specifically on shelf images"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the app reads the image, base64-encodes it and sends it in an input_image content part (data:image/jpeg;base64,...) alongside the text instruction in the same request. The model never sees files on the developer's disk. A is wrong because file search indexes documents for grounded answers in an agent; it doesn't pass a photo to the model as image input. C is wrong because input_audio is for audio, not images. D is wrong because no custom training is needed; the deployment is already vision-capable, it just never received the image.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-064",
+    "scenario": "A developer is about to build an app that counts empty shelf slots from photos using a vision-capable model deployment.",
+    "question": "What is a sensible first step before writing code?",
+    "options": [
+      "Test the prompt in the playground with a sample shelf image",
+      "Collect and label 1,000 shelf images to train a custom model",
+      "Request approved access to Face identity features",
+      "Publish the model as an agent with a web search tool"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: testing the instruction with a sample image in the playground shows quickly whether the model answers in the format the app needs, before any code is written. B is wrong because a lightweight vision app uses a vision-capable deployment with no custom training. C is wrong because counting shelf slots has nothing to do with identifying people. D is wrong because no agent or web search is needed; one request with a photo and an instruction is enough.",
+    "tags": [
+      "best-practice",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-065",
+    "scenario": "Technicians photograph equipment on site and ask a different question each time, such as \"Is this valve corroded?\" or \"What model is this pump?\".",
+    "question": "Which approach fits best?",
+    "options": [
+      "A Content Understanding image analyzer with a fixed field schema",
+      "A Content Understanding document analyzer such as prebuilt-receipt",
+      "A Custom Vision model trained on each type of equipment",
+      "A vision-capable model deployment with the photo and the question in one prompt"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a multimodal model with a prompt suits flexible questions about images, which is what the technicians need; the app should still validate free-form output. A is wrong because an image analyzer returns the same fields from many images, and these questions change every time. B is wrong because document analyzers are for text-heavy images like receipts, not equipment scenes. C is wrong because Custom Vision is retiring and per-equipment training is unnecessary.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-066",
+    "scenario": "A retailer has published a product-help agent that uses file search over its manuals. A developer is building the website chat widget and wants answers that use those manuals.",
+    "question": "What should the widget call?",
+    "options": [
+      "The model deployment directly, with the question as the prompt",
+      "The Speech service, then the model deployment",
+      "The published agent, through the Responses API with an agent reference",
+      "The file search index directly, without a model"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: when the app needs an agent's tools and knowledge, it calls the agent through the Responses API with an agent reference. A is wrong because calling the model directly skips the agent's file search, so answers would not come from the manuals. B is wrong because nothing here involves speech. D is wrong because the widget needs a written answer, not raw search results, and the agent is what combines the two.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-067",
+    "scenario": "A chat widget creates a new conversation for every message a shopper sends to a Foundry agent. Shoppers complain that the agent forgets what they said one message earlier.",
+    "question": "What should the developer change?",
+    "options": [
+      "Create one thread per shopper and start a run for each message",
+      "Create one conversation per shopper and pass its ID in every call",
+      "Paste the agent instructions into every user message",
+      "Switch authentication from Entra ID to an API key"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: for multi-turn chat you create a conversation and pass its ID in each call, so one conversation per shopper keeps follow-ups in context. A is wrong because threads and runs are retired Assistants vocabulary, not the current Foundry Agent Service. C is wrong because the agent already has its instructions; the missing piece is the earlier messages. D is wrong because this code path needs Entra ID, and authentication doesn't control conversation history.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-068",
+    "scenario": "A developer's client calls openai_client.responses.create(model=\"gpt-chat-deployment\", input=msgs). Replies arrive, but they never cite the manuals that the published agent's file search uses.",
+    "question": "What is the problem?",
+    "options": [
+      "File search must also be added to each request in the client",
+      "The client must use threads.runs.create to reach an agent",
+      "DefaultAzureCredential blocks access to the agent's tools",
+      "The call goes to the model, not the agent; name the agent with extra_body={\"agent\": {..., \"type\": \"agent_reference\"}}"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: passing only a model deployment calls the model directly, so the agent's tools and knowledge are never used. Naming the agent in extra_body with type agent_reference sends the request to the agent. A is wrong because the tools belong to the agent; the client only needs to reference it. B is wrong because threads.runs.create is the retired Assistants API. C is wrong because Entra ID through DefaultAzureCredential is what this code path requires; it doesn't block tools.",
+    "tags": [
+      "troubleshooting",
+      "analysis"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-069",
+    "scenario": "A team is adding spoken answers to an app. It needs custom speech recognition and SSML to control how product names are pronounced.",
+    "question": "Which option fits?",
+    "options": [
+      "Azure Speech with a text model",
+      "An audio-capable model alone, sending input_audio",
+      "An image-generation model",
+      "A text-only model with the audio file path in the prompt"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Azure Speech plus a text model is the choice when you need custom recognition or SSML, at the cost of more parts to wire. B is wrong because an audio-capable model answers speech in one step but offers fewer speech-tuning options. C is wrong because image generation has nothing to do with speech. D is wrong because a text model can't hear a file path; audio must go in an input_audio part to an audio-capable model, or through Speech.",
+    "tags": [
+      "comparison",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-070",
+    "scenario": "A marketing team likes one generated banner image but wants only its background changed. Everything else must stay the same.",
+    "question": "What should they use?",
+    "options": [
+      "A new images.generate call with the same prompt",
+      "A Sora video job",
+      "Image edit with a mask over the background",
+      "A dall-e-3 deployment"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: image edit with a mask changes only the masked part of an image, so the background changes and the rest stays. A is wrong because generating again creates a new image, so everything may change. B is wrong because Sora creates short videos, not edits to a still image. D is wrong because dall-e-3 was retired on 4 March 2026; use the GPT-image family.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-071",
+    "scenario": "An online shop wants a paragraph describing each product photo so customers can search by description. It needs no custom fields.",
+    "question": "Which analyzer fits?",
+    "options": [
+      "prebuilt-receipt",
+      "A custom analyzer on prebuilt-image with extract fields",
+      "prebuilt-invoice",
+      "prebuilt-imageSearch"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: prebuilt-imageSearch returns a paragraph description of an image, which is all the shop needs. A and C are wrong because receipt and invoice analyzers are document analyzers for text-heavy images, not product scenes. B is wrong because no custom fields are needed, and extract isn't allowed for image fields anyway.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-072",
+    "scenario": "A custom analyzer on prebuilt-image must return ParkingStatus (Full, Busy or Empty) and a short free-text Notes field from car-park photos.",
+    "question": "Which field methods should the schema use?",
+    "options": [
+      "classify for ParkingStatus with the three values, and generate for Notes",
+      "extract for both fields",
+      "classify for both fields",
+      "generate for ParkingStatus, and extract for Notes"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: classify picks one value from a fixed list, which suits ParkingStatus, and generate produces free text, which suits Notes. A is the only option that never uses extract on an image. B is wrong because extract is document-only. C is wrong because free-text notes can't come from a fixed list. D is wrong because extract isn't supported for image fields, and generate would not limit ParkingStatus to the three allowed values.",
+    "tags": [
+      "configuration",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-073",
+    "scenario": "An insurer receives two kinds of phone photos: damaged cars, and repair invoices. It needs DamageSeverity (Minor, Major or Total) from car photos and the invoice total from invoice photos.",
+    "question": "Which design fits best?",
+    "options": [
+      "One custom analyzer on prebuilt-image with DamageSeverity classified and InvoiceTotal extracted",
+      "Car photos to a custom prebuilt-image analyzer classifying DamageSeverity; invoice photos to prebuilt-invoice",
+      "prebuilt-imageSearch for both, then read the values from the descriptions",
+      "A multimodal model prompt for both, with no schema"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: scenes such as damaged cars suit a custom analyzer on prebuilt-image with a classify field, while text-heavy images such as invoices belong with a document analyzer. A is wrong because image analyzers aren't tuned for text-heavy images and extract isn't allowed on image fields. C is wrong because prebuilt-imageSearch returns a paragraph, not the named fields the insurer needs. D is wrong because a model prompt gives no schema or confidence, which an insurer needs for consistent, checkable values.",
+    "tags": [
+      "architecture",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ai901-d2-074",
+    "scenario": "An analyst wants to see what the prebuilt invoice analyzer returns for five sample invoices before anyone writes an app.",
+    "question": "What is the quickest way?",
+    "options": [
+      "Write a REST client that polls Operation-Location",
+      "Install the azure-ai-contentunderstanding Python SDK",
+      "Use the Content Understanding page in the Foundry portal",
+      "Build a Foundry agent with file search over the invoices"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the Foundry portal's Content Understanding page lets you try analyzers with no code. A is wrong because REST works in any language but you write the polling yourself, which is more work than needed for a quick look. B is wrong because the SDK is for building a Python app, which the analyst isn't doing yet. D is wrong because file search answers questions from documents; it doesn't return the analyzer's invoice fields and confidence.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "easy"
   }
 ]

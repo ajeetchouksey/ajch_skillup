@@ -22,6 +22,8 @@ Domain 2 builds the Domain 1 workloads in Microsoft Foundry and expects you to r
 
 **The system prompt is the job description; the user prompt is today's task.**
 
+![Prompt stack: system prompt rules, grounding text, a few-shot example, earlier turns and the user prompt form one request that yields a grounded reply.](/content/skillup/ai901/images/ai901-2-1-prompt-stack.svg)
+
 ### Real use
 
 An HR assistant's system prompt says "Answer only from the policy text provided; if it isn't there, say you don't know." Invented policy answers stop.
@@ -64,6 +66,8 @@ An HR assistant's system prompt says "Answer only from the policy text provided;
 **Deploying allocates capacity and creates an endpoint that apps call by deployment name; the playground is where you test it first.**
 
 **The deployment is the phone line; the playground is the test call.**
+
+![Deploy and test: deploy from the catalog with name, type, version and TPM, test in the playground, call by deployment name, and handle HTTP 429 by raising TPM or cutting load.](/content/skillup/ai901/images/ai901-2-2-deploy-and-test.svg)
 
 ### Real use
 
@@ -109,6 +113,8 @@ A support team compares two models side by side in the playground on 20 real tic
 **`AIProjectClient` connects to the project; `get_openai_client()` gives a client that calls the model by deployment name.**
 
 **The project client is the receptionist; the OpenAI client is who you're put through to.**
+
+![Chat client: DefaultAzureCredential, AIProjectClient on the project endpoint, get_openai_client, responses.create with the deployment name, then read output_text.](/content/skillup/ai901/images/ai901-2-3-chat-client.svg)
 
 ### Real use
 
@@ -160,6 +166,8 @@ print(r.output_text)
 
 **Instructions are the job description, tools the toolbox, knowledge the library.**
 
+![Single agent: a model, instructions and tools form an agent; file search for your documents, code interpreter for calculations, web search for current public information.](/content/skillup/ai901/images/ai901-2-4-single-agent.svg)
+
 ### Real use
 
 An outdoor retailer's agent uses file search over 40 PDF manuals and answers "how do I re-proof this jacket?" with a citation to the right page.
@@ -204,6 +212,8 @@ An outdoor retailer's agent uses file search over 40 PDF manuals and answers "ho
 **Apps call an agent through the Responses API with an agent reference, authenticated with Microsoft Entra ID.**
 
 **The agent reference is the name badge on the request.**
+
+![Agent client sequence: authenticate with Entra ID, get the agent, call responses.create with an agent reference, and reuse one conversation ID for follow-ups.](/content/skillup/ai901/images/ai901-2-5-agent-client.svg)
 
 ### Real use
 
@@ -250,6 +260,8 @@ print(r.output_text)
 **Use Azure Language when the app needs consistent, structured values, and a general model when wording can vary.**
 
 **Azure Language is a form that always comes back filled in the same way.**
+
+![Text analysis app: TextAnalyticsClient calls detect_language and recognize_pii_entities on a one-item list, reading item 0 to route tickets and store redacted text.](/content/skillup/ai901/images/ai901-2-6-text-analysis-app.svg)
 
 ### Real use
 
@@ -298,6 +310,8 @@ print(client.recognize_pii_entities([text])[0].redacted_text)
 
 **It listens and thinks in one step.**
 
+![Spoken prompts: an audio-capable model answers input_audio in one step, the Voice Live API runs live sessions, and Azure Speech plus a text model wires more parts.](/content/skillup/ai901/images/ai901-2-7-spoken-prompts.svg)
+
 ### Real use
 
 Technicians ask a field-service app questions by voice with their hands busy; an audio-capable model answers in speech.
@@ -345,6 +359,8 @@ completion = client.chat.completions.create(
 **Azure Speech gives any app specialist ears (recognition) and a voice (synthesis).**
 
 **Recognition is the stenographer; synthesis is the narrator.**
+
+![Speech SDK: one SpeechConfig; recognize_once_async for short commands, continuous recognition for long speech, batch for archives, and speak_text_async for synthesis.](/content/skillup/ai901/images/ai901-2-8-speech-sdk.svg)
 
 ### Real use
 
@@ -395,6 +411,8 @@ speechsdk.SpeechSynthesizer(speech_config=cfg).speak_text_async("Your order has 
 
 **It's a photo handed over with a sticky note: the note is the question.**
 
+![Visual input: one user message with an input_text question and an input_image part goes to a vision-capable model, using a public URL or a base64 data URL.](/content/skillup/ai901/images/ai901-2-9-visual-input.svg)
+
 ### Real use
 
 An insurer's app lets customers photograph car damage; the model describes the damaged parts and pre-fills a claim for an assessor to confirm.
@@ -439,6 +457,8 @@ print(r.output_text)
 **Image models return base64 data you decode and save; video models run as jobs you poll.**
 
 **Image generation is a vending machine; video is a print shop where you collect the order later.**
+
+![Visual output: images.generate returns base64 you decode and save, while Sora video is a job you create, poll and then download.](/content/skillup/ai901/images/ai901-2-10-visual-output.svg)
 
 ### Real use
 
@@ -485,6 +505,8 @@ open("tent.png", "wb").write(base64.b64decode(result.data[0].b64_json))
 **A lightweight vision app is a vision-capable deployment plus a photo and a text instruction in one request; no custom training.**
 
 **Treat the model as a sharp-eyed assistant that needs a clear question and answer format.**
+
+![Vision app: a base64 photo and a JSON instruction go to a vision-capable deployment; valid replies build the restock list and unexpected ones go to a person.](/content/skillup/ai901/images/ai901-2-11-vision-app.svg)
 
 ### Real use
 
@@ -543,6 +565,8 @@ print(r.output_text)
 
 **Extract, classify and generate are copy, tick a box and write a sentence.**
 
+![Document analyzer: a prebuilt or custom analyzer applies a schema whose fields are extracted, classified or generated, with low-confidence fields sent to review.](/content/skillup/ai901/images/ai901-2-12-document-analyzer.svg)
+
 ### Real use
 
 An accounts-payable team runs `prebuilt-invoice` on supplier PDFs and only reviews fields with low confidence.
@@ -592,6 +616,8 @@ An accounts-payable team runs `prebuilt-invoice` on supplier PDFs and only revie
 
 **A photo is a witness to a scene: ask what it saw, not what it says in writing.**
 
+![Image analyzer choice: text-heavy photos go to prebuilt-receipt, descriptions to prebuilt-imageSearch, and custom fields to prebuilt-image with classify or generate, never extract.](/content/skillup/ai901/images/ai901-2-13-image-analyzer.svg)
+
 ### Real use
 
 A retailer analyses shelf photos from 300 stores; `ShelfStatus` is classified Full, Low or Empty and a dashboard shows which stores need restocking.
@@ -638,6 +664,8 @@ A retailer analyses shelf photos from 300 stores; `ShelfStatus` is classified Fu
 
 **A recording is a witness that tells its story over time.**
 
+![Audio and video analyzers: a recording becomes a WebVTT transcript with speakers, key frames and per-segment summaries and fields.](/content/skillup/ai901/images/ai901-2-14-audio-video-analyzer.svg)
+
 ### Real use
 
 A bank runs `prebuilt-callCenter` on support calls for sentiment and topics, and segments training videos so each chapter gets its own summary.
@@ -675,6 +703,8 @@ A bank runs `prebuilt-callCenter` on support calls for sentiment and topics, and
 **Analysis is asynchronous: start it, wait or poll, then read the fields and their confidence.**
 
 **It's a coat check: hand it in, get a ticket, come back later.**
+
+![Asynchronous extraction: send content, get 202 Accepted, poll Operation-Location until Succeeded, then route fields by confidence to the system or a person.](/content/skillup/ai901/images/ai901-2-15-async-extraction.svg)
 
 ### Real use
 

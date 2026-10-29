@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "estimatedMinutes": 15,
   "domains": [1, 2],
+  "taskIds": ["1.2", "1.3", "1.6", "1.9", "1.14", "2.14", "2.15"],
   "scenario": {
     "background": "Every morning, reception staff at Northwind Clinics spend two hours listening to overnight voicemails and retyping names, callback numbers and appointment requests, and last month a mistyped number meant a patient with urgent test results was never called back. Northwind runs eight clinics in Germany and the Netherlands and has a Microsoft Foundry resource with one project for patient services. The clinic group's contract with its patients' insurers requires that patient data is processed only within the EU. The team wants a lightweight Python app that takes each voicemail recording, produces structured fields and places them in a review queue for the scheduling system.",
     "characters": [

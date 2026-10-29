@@ -1010,5 +1010,100 @@
       "application"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-054",
+    "scenario": "A company's policy chatbot answers employee questions. Employees say they can't tell whether an answer is reliable, and several acted on a policy that had already changed.",
+    "question": "Which change most directly improves transparency?",
+    "options": [
+      "Show a link to the source policy page with each answer",
+      "Name an owner who reviews chatbot complaints every month",
+      "Encrypt the chat logs and limit who can read them",
+      "Retrain the chatbot on a more diverse set of employee questions"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: transparency measures are things people can see or read, and showing the source behind each factual answer lets employees check it instead of over-trusting it. B is wrong because a named owner who answers for the system is accountability, not something users can see about an answer. C is wrong because encryption and access control protect privacy and security but tell users nothing about reliability. D is wrong because more diverse training data is a fairness measure and doesn't let users check where an answer came from.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-055",
+    "scenario": "A council uses AI to prioritise housing-repair requests. A review board approves every change and a named owner answers complaints. Residents still don't know AI is involved or what it can't assess.",
+    "question": "What should the council add?",
+    "options": [
+      "A second review board to approve changes to the AI system",
+      "An appeals process run by the system owner",
+      "A notice that AI prioritises requests, with its limitations and how to reach a person",
+      "Removal of age and nationality from the data the model uses"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the gap is transparency. Telling people up front that AI is involved, publishing what it can get wrong and how to reach a human is exactly what transparency asks for. A is wrong because a review board is accountability, which the council already has. B is wrong because an appeals process is also accountability: people answering for decisions, not telling residents how the system works. D is wrong because removing sensitive attributes is a fairness measure; residents would still not know AI is involved.",
+    "tags": [
+      "exam-trap",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-056",
+    "scenario": "A help-desk assistant built on a language model keeps giving last year's return policy. The policy changed last month and the team assumed the model looks up the latest version.",
+    "question": "What should the team do?",
+    "options": [
+      "Ask the model in the system prompt to check its memory more carefully",
+      "Put the current policy article in each prompt so the model answers from it",
+      "Increase the maximum number of tokens so the model can search for the policy",
+      "Switch to a small language model, which stores less outdated information"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a language model predicts the next most likely token from what it learned and what is in its prompt; it doesn't look facts up. Putting the relevant knowledge-base article in each prompt gives it the current policy to predict from, and accuracy rises. A is wrong because asking the model to try harder doesn't give it the new policy. C is wrong because a longer reply limit gives more room to write, not access to new information. D is wrong because an SLM is a smaller, narrower model; it still has no knowledge of last month's change.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-057",
+    "scenario": "A team pastes an entire 200-page product manual into every chat prompt, even for one-line questions. The monthly bill for the model has risen sharply.",
+    "question": "What should the team change?",
+    "options": [
+      "Use a new API key, because each key has a fixed token budget",
+      "Ask the model to reply in whole words instead of tokens",
+      "Lower the temperature so the model uses fewer tokens",
+      "Send only the relevant sections of the manual, because usage and cost are counted in tokens"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a token is a small unit of text, and usage and cost are counted in tokens, so sending 200 pages with every question pays for those tokens every time. Including only the relevant passages cuts cost and keeps the model focused. A is wrong because a token is not an API key; changing keys doesn't change how much text is processed. B is wrong because the model always processes text as tokens; the reply format doesn't change that. C is wrong because temperature changes how varied the output is, not how many prompt tokens are sent.",
+    "tags": [
+      "troubleshooting",
+      "application"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ai901-d1-058",
+    "scenario": "A logistics company scans thousands of delivery notes. It only wants the raw text archived so staff can search it later; no named fields are needed.",
+    "question": "Which technique fits?",
+    "options": [
+      "A custom Content Understanding analyzer with a field schema",
+      "OCR to turn the scanned images into text",
+      "Speech to text on each delivery note",
+      "An image-generation model to recreate each note"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: when you only need raw text from scanned pages, OCR is enough. A is wrong because a custom analyzer with a schema is for named fields, which the company says it doesn't need; it adds design and testing work for nothing. C is wrong because speech to text works on audio, not scanned paper. D is wrong because image generation creates new images; it doesn't read text from existing ones.",
+    "tags": [
+      "scenario-based",
+      "application"
+    ],
+    "difficulty": "easy"
   }
 ]

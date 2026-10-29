@@ -20,6 +20,8 @@ Domain 1 is the vocabulary of the exam: the six responsible AI principles (1.1â€
 
 **Fairness asks whether the referee is biased**, not whether everyone wins.
 
+![Fairness: deleting a sensitive column leaves proxies such as postcode behind, so compare outcomes per group and rebalance the data if there is a gap.](/content/skillup/ai901/images/ai901-1-1-fairness.svg)
+
 ### Real use
 
 A lender compares loan approval and error rates by age band and region before launch. It finds one region rejected more often at equal income and retrains on rebalanced data before customers see it.
@@ -64,6 +66,8 @@ If people can't *use* the system at all, that's inclusiveness (1.4), not fairnes
 
 **Reliability is the seatbelt**: you fit it because a crash is possible.
 
+![Reliability and safety: evaluate before launch, filter prompts and outputs with guardrails, answer only above a confidence threshold and route the rest to a person.](/content/skillup/ai901/images/ai901-1-2-reliability-safety.svg)
+
 ### Real use
 
 A pharmacy chatbot answers medicine questions from approved leaflets. Low-confidence or risky dosage questions are routed to a pharmacist, and guardrails block harmful content.
@@ -105,6 +109,8 @@ A pharmacy chatbot answers medicine questions from approved leaflets. Low-confid
 ### Key Concept
 
 **Protect personal and business data at every step: what goes into the model, what it stores and what it can reveal.**
+
+![Privacy and security: redact PII before the model, logs or people see it, filter outputs, and restrict access, minimise data and delete it around every step.](/content/skillup/ai901/images/ai901-1-3-privacy-security.svg)
 
 ### Real use
 
@@ -148,6 +154,8 @@ A support centre runs PII detection on call transcripts, so card numbers and add
 **An inclusive AI system can be used by everyone, including people with disabilities, accents or limited connectivity.**
 
 **Inclusiveness asks whether everyone was allowed onto the pitch.**
+
+![Inclusiveness: a voice-only kiosk shuts out people who can't hear or speak clearly, accented speakers and noisy places, while several input and output modes include them.](/content/skillup/ai901/images/ai901-1-4-inclusiveness.svg)
 
 ### Real use
 
@@ -193,6 +201,8 @@ If everyone can use it but one group gets worse *decisions*, that's fairness (1.
 
 **Transparency is the label on the medicine.**
 
+![Transparency: an AI disclosure, stated limitations, sources and documented uses produce an informed user; without them users over-trust answers.](/content/skillup/ai901/images/ai901-1-5-transparency.svg)
+
 ### Real use
 
 A bank tells loan applicants that AI helps screen applications and lists the main factors it uses. Its support bot cites the policy page behind each answer.
@@ -234,6 +244,8 @@ A bank tells loan applicants that AI helps screen applications and lists the mai
 **Humans and the deploying organisation stay answerable for an AI system; responsibility never moves to the model.**
 
 **Accountability is the pharmacist who signs for the medicine.**
+
+![Accountability: after an incident the deploying organisation, not the model or its provider, answers for it through a named owner, review board, human sign-off and an off switch.](/content/skillup/ai901/images/ai901-1-6-accountability.svg)
 
 ### Real use
 
@@ -277,6 +289,9 @@ An insurer's AI claims triage has a named owner, a review board that approves ch
 
 **Think of it as extremely well-read predictive text.**
 
+![Flow diagram for "Key Concept": append and repeat, Prompt text, Tokens, Embeddings, Transformer with attention, Next-token prediction, Completion](/content/skillup/ai901/images/ai901-d1-ai-concepts-m1.svg)
+<!-- diagram source: scripts/diagrams/mermaid/ai901/ai901-d1-ai-concepts-m1.mmd -->
+
 ### Real use
 
 A help-desk team learns the model predicts rather than looks things up, so it puts the relevant knowledge-base articles in each prompt, and accuracy rises sharply.
@@ -287,9 +302,6 @@ A help-desk team learns the model predicts rather than looks things up, so it pu
 - **Embedding**: a vector where similar meanings point in similar directions; "dog" and "puppy" are close, "skateboard" is elsewhere (cosine similarity).
 - **Attention** weighs how strongly each token relates to the others in its context; **positional encoding** gives word order.
 - **LLMs** are large and general; **SLMs** (for example the Phi family) are compact enough for phones and edge devices.
-
-![Flow diagram for "Key Concept": append and repeat, Prompt text, Tokens, Embeddings, Transformer with attention, Next-token prediction, Completion](/content/skillup/ai901/images/ai901-d1-ai-concepts-m1.svg)
-<!-- diagram source: scripts/diagrams/mermaid/ai901/ai901-d1-ai-concepts-m1.mmd -->
 
 ### Choose when
 
@@ -315,6 +327,8 @@ A help-desk team learns the model predicts rather than looks things up, so it pu
 **Match the model to the input and output you need first, then compare quality, cost and speed.**
 
 **Choosing a model is like hiring**: read the CV, then give the shortlist a real task.
+
+![Model choice: match the input and output to a chat, multimodal, embeddings, GPT-image, Azure Language or SLM option, then compare on leaderboards and test with your own prompts.](/content/skillup/ai901/images/ai901-1-8-model-choice.svg)
 
 ### Real use
 
@@ -360,6 +374,8 @@ A retailer's search uses an embeddings model (text-embedding-3-small) to match "
 
 **Deployment is the shipping contract; parameters are the cooking instructions.**
 
+![Deployment choice: where data is processed (Global, Data Zone, Regional) plus how you pay (Standard, Provisioned, Batch) names the deployment type, such as Data Zone Standard.](/content/skillup/ai901/images/ai901-1-9-deployment-choice.svg)
+
 ### Real use
 
 An EU retailer runs live chat on Data Zone Standard to keep processing in the EU, and its nightly product-description rewrite on Data Zone Batch for half the price.
@@ -368,6 +384,8 @@ An EU retailer runs live chat on Data Zone Standard to keep processing in the EU
 
 - **Where**: Global (any region), Data Zone (EU or US), Standard/Regional (one geography). **How you pay**: Standard per token; Provisioned reserves throughput for lower latency variance; Batch is asynchronous, 50% off, 24-hour target. Developer is only for testing fine-tuned models.
 - **Temperature** lower = focused and deterministic; change temperature *or* **top_p**, not both. **Max tokens** too low cuts replies off. **frequency_penalty** cuts repetition; **presence_penalty** pushes new topics. HTTP 429 = rate limit: raise TPM within quota or cut max tokens and concurrency.
+
+![Parameters: temperature or top_p, max tokens, frequency_penalty and presence_penalty each shape the reply; reasoning models don't accept most of them, and HTTP 429 is a rate limit.](/content/skillup/ai901/images/ai901-1-9-parameters.svg)
 
 ### Choose when
 
@@ -397,6 +415,8 @@ An EU retailer runs live chat on Data Zone Standard to keep processing in the EU
 
 **Workloads are verbs, not file types.**
 
+![AI workload chooser: each input and required output maps to generative AI, agentic AI, text analysis, speech, computer vision or information extraction.](/content/skillup/ai901/images/ai901-d1-workload-chooser.svg)
+
 ### Real use
 
 A retailer drafts emails with generative AI, lets an agent check orders and start returns, and pulls invoice fields into its finance system with information extraction.
@@ -406,8 +426,6 @@ A retailer drafts emails with generative AI, lets an agent check orders and star
 - **Generative AI** creates content; **agentic AI** adds instructions and tools so it can reason and act.
 - **Text analysis** finds insights in text; **speech** converts audio and text; **computer vision** interprets images and video.
 - **Information extraction** pulls specific fields into structured output. A scanned form is extraction if you need its values, vision if you only need to know it's signed.
-
-![AI workload chooser: each input and required output maps to generative AI, agentic AI, text analysis, speech, computer vision or information extraction.](/content/skillup/ai901/images/ai901-d1-workload-chooser.svg)
 
 ### Choose when
 
@@ -435,6 +453,8 @@ A retailer drafts emails with generative AI, lets an agent check orders and star
 **Entities have types, key phrases don't, sentiment has a polarity, and summaries are either extracted or written.**
 
 **Key phrases are the highlighter; entities are labelled sticky notes.**
+
+![Text analysis on one review: NER gives typed entities, key phrases are untyped, sentiment and opinion mining give polarity per aspect, and summaries are extractive or abstractive.](/content/skillup/ai901/images/ai901-1-11-text-analysis.svg)
 
 ### Real use
 
@@ -472,6 +492,8 @@ A hotel group runs opinion mining on reviews and learns guests love the staff bu
 **Speech recognition turns audio into text; speech synthesis turns text into audio, and SSML controls how it sounds.**
 
 **Recognition is the stenographer; synthesis is the narrator.**
+
+![Speech: recognition turns audio into text through acoustic and language models; synthesis turns text marked up with SSML into audio with a neural voice.](/content/skillup/ai901/images/ai901-1-12-speech.svg)
 
 ### Real use
 
@@ -512,6 +534,8 @@ A contact centre batch-transcribes calls overnight with speaker diarization, and
 
 **Vision is the critic; generation is the painter.**
 
+![Vision versus generation: vision classifies, detects (where), captions and reads existing images; a GPT-image model creates new images and Sora creates video.](/content/skillup/ai901/images/ai901-1-13-vision-generation.svg)
+
 ### Real use
 
 A factory flags defective circuit boards and draws a box round each defect; its marketing team mocks up packaging with a GPT-image model.
@@ -549,6 +573,8 @@ A factory flags defective circuit boards and draws a box round each defect; its 
 **Information extraction turns unstructured content into named fields by applying a schema by meaning.**
 
 **OCR is a photocopier; Content Understanding is a clerk who fills in your spreadsheet.**
+
+![Information extraction: documents, images, audio and video go through a Content Understanding analyzer with a schema applied by meaning and come out as named fields.](/content/skillup/ai901/images/ai901-1-14-information-extraction.svg)
 
 ### Real use
 
