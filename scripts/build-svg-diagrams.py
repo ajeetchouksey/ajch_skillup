@@ -57,6 +57,10 @@ KINDS = {
     "risk":    ("#2a1a1a", ROSE4, TEXT, SLATE4),
     "focus":   (INDIGO, LILAC, "#ffffff", "#F0EDFF"),
 }
+# Focal accent per diagram: (fill, on-dark stroke/accent, secondary text on fill).
+# Default indigo (AaryaAI brand). "teal" is SkillUp's "Focus Teal" co-brand (AI-901);
+# pick it with Diagram(..., accent="teal") or a partial in the exam's module.
+ACCENTS = {"indigo": (INDIGO, LILAC, "#F0EDFF"), "teal": ("#0E7C86", "#4CC1CA", "#E0F7F8")}
 # key: (file, family, weight)
 FACES = {"title": ("BarlowCondensed-SemiBold.ttf", "Barlow Condensed", 600),
          "label": ("Barlow-Medium.ttf", "Barlow", 500),
@@ -100,8 +104,10 @@ class Fonts:
 
 
 class Diagram:
-    def __init__(self, fonts, h, title, subtitle, desc):
+    def __init__(self, fonts, h, title, subtitle, desc, accent="indigo"):
         self.f, self.h, self.title, self.desc = fonts, h, title, desc
+        self.acc = ACCENTS[accent]
+        self.kinds = dict(KINDS, focus=(self.acc[0], self.acc[1], "#ffffff", self.acc[2]))
         self.used = {k: set() for k in FACES}
         self.back, self.front = [], []
         self.text(24, 40, title, "title", 21)
@@ -118,7 +124,7 @@ class Diagram:
             f'fill="{fill}" text-anchor="{anchor}">{escape(s)}</text>')
 
     def box(self, cx, cy, w, title, body=None, kind="neutral", sub=None, h=None):
-        fill, stroke, ink, ink2 = KINDS[kind]
+        fill, stroke, ink, ink2 = self.kinds[kind]
         tl = self.f.wrap("title", title, 16, w - 24)
         sl = self.f.wrap("label", sub, 13, w - 24) if sub else []
         bl = self.f.wrap("body", body, 13, w - 24) if body else []
@@ -136,7 +142,7 @@ class Diagram:
 
     def diamond(self, cx, cy, w, h, label):
         self.front.append(f'<path d="M{cx},{cy - h/2} L{cx + w/2},{cy} L{cx},{cy + h/2} L{cx - w/2},{cy} Z" '
-                          f'fill="#1a2a42" stroke="{LILAC}" stroke-width="1.5" stroke-linejoin="round"/>')
+                          f'fill="#1a2a42" stroke="{self.acc[1]}" stroke-width="1.5" stroke-linejoin="round"/>')
         lines = self.f.wrap("title", label, 15, w * 0.56)
         ty = cy - (len(lines) - 1) * 8.5 + 5
         for ln in lines: self.text(cx, ty, ln, "title", 15, TEXT, "middle"); ty += 17
@@ -152,7 +158,7 @@ class Diagram:
             a = toward(x1, y1, x0, y0); b = toward(x1, y1, x2, y2)
             d += f" L{a[0]:.1f},{a[1]:.1f} Q{x1:.1f},{y1:.1f} {b[0]:.1f},{b[1]:.1f}"
         d += f" L{pts[-1][0]:.1f},{pts[-1][1]:.1f}"
-        col = LILAC if hot else LINE
+        col = self.acc[1] if hot else LINE
         dash = ' stroke-dasharray="5 4"' if dashed else ""
         self.back.append(f'<path d="{d}" fill="none" stroke="{col}" stroke-width="{2 if hot else 1.5}" '
                          f'stroke-linecap="round"{dash} marker-end="url(#{"arrow-hot" if hot else "arrow"})"/>')
@@ -163,7 +169,7 @@ class Diagram:
             self.text(x, y, label, "label", 13, SLATE4, anchor, layer=self.back)
 
     def badge(self, cx, cy, n):
-        self.front.append(f'<circle cx="{cx}" cy="{cy}" r="9" fill="{INDIGO}" stroke="{LILAC}" stroke-width="1"/>')
+        self.front.append(f'<circle cx="{cx}" cy="{cy}" r="9" fill="{self.acc[0]}" stroke="{self.acc[1]}" stroke-width="1"/>')
         self.text(cx, cy + 4, str(n), "title", 11, "#ffffff", "middle")
 
     def legend(self, y, items):
@@ -174,7 +180,7 @@ class Diagram:
                 self.front.append(f'<line x1="{x}" y1="{y - 4}" x2="{x + 22}" y2="{y - 4}" stroke="{LINE}" stroke-width="1.5"{dash}/>')
                 x += 30
             else:
-                fill, stroke, *_ = KINDS[kind]
+                fill, stroke, *_ = self.kinds[kind]
                 self.front.append(f'<rect x="{x}" y="{y - 11}" width="12" height="12" rx="3" fill="{fill}" stroke="{stroke}" stroke-width="1.25"/>')
                 x += 20
             t = txt.upper(); self.text(x, y, t, "title", 11.5, SLATE4, track=0.12)
@@ -190,14 +196,14 @@ class Diagram:
                 f'<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#263347"/>'
                 f'<stop offset="1" stop-color="#1b2638"/></linearGradient>\n'
                 # .card-accent-top default strip (indigo to lilac)
-                f'<linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{INDIGO}"/>'
-                f'<stop offset="1" stop-color="{LILAC}"/></linearGradient>\n'
+                f'<linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{self.acc[0]}"/>'
+                f'<stop offset="1" stop-color="{self.acc[1]}"/></linearGradient>\n'
                 f'<pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
                 f'<rect width="7" height="7" fill="#1a2a42"/><line x1="0" y1="0" x2="0" y2="7" stroke="{SLATE7}" stroke-width="2.5"/></pattern>\n'
                 f'<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
                 f'<path d="M0,1 L9,5 L0,9 z" fill="{LINE}"/></marker>\n'
                 f'<marker id="arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-                f'<path d="M0,1 L9,5 L0,9 z" fill="{LILAC}"/></marker></defs>\n'
+                f'<path d="M0,1 L9,5 L0,9 z" fill="{self.acc[1]}"/></marker></defs>\n'
                 f'<rect width="{W}" height="{H}" fill="url(#glass)"/>\n'
                 f'<rect width="{W}" height="2" fill="url(#brand)"/>\n'
                 + "\n".join(self.back) + "\n" + "\n".join(self.front) + "\n</svg>\n")

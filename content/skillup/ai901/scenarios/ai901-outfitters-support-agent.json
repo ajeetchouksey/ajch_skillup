@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "estimatedMinutes": 15,
   "domains": [1, 2],
+  "taskIds": ["1.2", "1.4", "1.5", "2.1", "2.4", "2.5", "2.9"],
   "scenario": {
     "background": "Contoso Outfitters' prototype support chatbot confidently told a customer that a tent was rated for winter storms, which it is not, and the customer's complaint went viral, so the next version must answer only from the company's own product manuals. Contoso sells camping and climbing gear online and has a Microsoft Foundry resource with a new project for customer support. The team has 60 PDF manuals and warranty guides, a vision-capable chat model deployed as 'support-chat', and six weeks before the summer season. Customers also want to upload photos of damaged gear and ask whether it is covered by the warranty.",
     "characters": [

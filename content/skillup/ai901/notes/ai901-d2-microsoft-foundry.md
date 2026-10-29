@@ -1,398 +1,732 @@
 # D2: Implement AI solutions by using Microsoft Foundry
 
-> **Exam weight**: 55–60% · **Skills measured as of**: April 15, 2026
+> **Exam weight**: 55–60% · **Skills measured as of**: April 15, 2026 · One section per official task, 2.1 to 2.15
 
 ## Overview
 
-Domain 2 is the hands-on half of AI-901 and the heavier one. It asks you to build the workloads from Domain 1 in Microsoft Foundry: write system and user prompts, deploy and test a model in the portal, call it from a small Python client with the Foundry SDK, build and call a single agent, and build lightweight apps for text analysis, speech, vision, image generation and information extraction with Azure Content Understanding. The study guide expects you to read short Python snippets and know which SDK, client and method each task uses.
+Domain 2 builds the Domain 1 workloads in Microsoft Foundry and expects you to read short Python snippets. **One Foundry resource holds the shared platform (models, quotas, security); each Foundry project inside it is a workspace for one app.** `AIProjectClient` uses the project endpoint `https://<resource>.services.ai.azure.com/api/projects/<project>`.
 
-> 💡 **Human Angle**: Almost every app in this domain follows the same four beats: get an endpoint, authenticate, send a request in the right shape, read the right property of the response. Learn the beats once and each new service is just new names.
-
-<div class="note-scribble"><strong>Code note.</strong> The snippets here follow Microsoft Learn's AI-901 training modules and the current Foundry docs (checked October 2026). The SDKs are moving fast: the Foundry SDK is <code>azure-ai-projects</code> 2.x, and Microsoft's samples differ slightly in how they reference an agent. The exam tests the pattern (which client, which call, which property), not exact version numbers.</div>
-
----
-
-## 2.1 Foundry Resource, Project and Portal Workflow
-
-### Key Concept
-
-**One Foundry resource holds the shared platform; each Foundry project inside it is a workspace for one solution.**
-
-The **Foundry resource** is the Azure resource that provides models, the agent service, quotas, governance, monitoring and security boundaries. A **Foundry project** is a workspace inside it where you build agents, run evaluations and keep files, datasets, indexes and connections. The documented pattern is one resource per team with many projects inside it.
-
-The portal workflow is the same for every solution: create a project, pick a model from the **model catalog** and deploy it, experiment in the **playground**, then call the deployment from a client app. In Foundry terms, the model deployment is the server and your app is the client. **The resource is the office building; each project is a team's floor, with its own desks and filing cabinets.**
+> 💡 **Human Angle**: Every app follows four beats: get an endpoint, authenticate, send a request in the right shape, read the right property. Learn them once and each service is just new names.
 
 ![Microsoft Foundry flow: a Foundry resource contains projects; in a project you deploy a model from the catalog, test it in the playground, optionally save it as an agent with tools, then call the deployment or agent from a client app through the project endpoint.](/content/skillup/ai901/images/ai901-d2-foundry-flow.svg)
 
-Two endpoints appear in code. The **project endpoint**, `https://<resource>.services.ai.azure.com/api/projects/<project>`, is what `AIProjectClient` uses. The **OpenAI-compatible endpoint**, `https://<resource>.openai.azure.com/openai/v1`, is what the plain `OpenAI` client uses. Calls authenticate with an API key or a Microsoft Entra ID token.
-
-### In Practice
-
-**What breaks without this**: teams create a new resource for every app and end up with scattered quotas and security settings, or put three apps in one project and mix their agents and files together.
-
-**Decision trigger**: shared governance and quota means the same resource; separate agents, files and evaluations means separate projects.
-
-**When you'd choose differently**: a team with strict billing or regional isolation between apps may need separate resources. Hub-based projects are the older model and only appear in the classic portal.
-
-### Exam Trap ⚠️
-
-<div class="note-trap">
-The hierarchy is <strong>resource contains projects</strong>, never the other way round. And the endpoint is a URL while the key is a secret that authenticates calls to it; they are not the same thing.
-</div>
+<div class="note-scribble"><strong>Code note.</strong> Snippets follow the AI-901 modules and current Foundry docs (October 2026; <code>azure-ai-projects</code> 2.x). The exam tests the pattern, not exact versions.</div>
 
 ---
 
-## 2.2 System and User Prompts
+## 2.1 Create effective system and user prompts for generative AI models
 
 ### Key Concept
 
 **The system prompt sets the rules for the whole conversation; the user prompt is the request.**
 
-A **system prompt** (system instructions) defines role, tone, scope, output format and guardrails, for example: "You are a support assistant for Contoso. Only answer about Contoso products. If the answer isn't in the provided text, say you don't know." The application controls it. A **user prompt** is what the end user asks.
+**The system prompt is the job description; the user prompt is today's task.**
 
-Effective prompts are clear and specific, give context, show examples and ask for a structure. **Few-shot** examples guide the format for that request only; they do not retrain the model. **Grounding** puts source text into the prompt and tells the model to answer only from it, with an "out" ("say you don't know") and citations, which reduces fabrication. Models see only what is in each request, so chat apps resend the conversation history or use a service-side conversation. **The system prompt is the job description; the user prompt is today's task.**
+![Prompt stack: system prompt rules, grounding text, a few-shot example, earlier turns and the user prompt form one request that yields a grounded reply.](/content/skillup/ai901/images/ai901-2-1-prompt-stack.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: an app parses answers that arrive as bullets one day and JSON the next, or an HR bot invents policy because nothing in the prompt told it to stick to the handbook.
+An HR assistant's system prompt says "Answer only from the policy text provided; if it isn't there, say you don't know." Invented policy answers stop.
 
-**Decision trigger**: if a rule must apply to every reply, it belongs in the system prompt. If the answer must be factual about your data, ground the prompt.
+### How it works
 
-**When you'd choose differently**: reasoning models (such as the GPT-5 series) need fewer prompt tricks; Microsoft notes that techniques like chain-of-thought prompting are not recommended for them.
+- Rules for every reply (role, scope, tone, output format) go in the **system prompt**, which the app controls.
+- **Grounding** puts source text in the prompt, says "answer only from it" and allows "I don't know"; this reduces fabrication.
+- **Few-shot** examples guide format and style for that request only; they don't retrain the model.
+- Each request stands alone, so chat apps resend earlier turns or use a conversation.
 
-### Exam Trap ⚠️
+### Choose when
 
-<div class="note-trap">
-"Add 'always be accurate' and raise the temperature" is never the answer to fabrication. Accuracy comes from grounding the prompt with the facts; a higher temperature makes invention more likely.
-</div>
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| State output structure + an example | Code parses the reply | Tokens on every call |
+| Grounding with source text | Answers must match your data | Longer prompts |
+| Fewer prompt tricks | Reasoning models (GPT-5 series) | Chain-of-thought not recommended |
 
----
+### How to do it
 
-## 2.3 Deploy a Model and Use the Playground
-
-### Key Concept
-
-**Deploying a model creates a named endpoint with fixed settings and a rate limit; the playground is where you test it before writing code.**
-
-When you deploy, you choose the **deployment name**, the **deployment type** (for example Global Standard), the **model version** and a **tokens-per-minute (TPM)** rate limit. Deployment allocates capacity, fixes the configuration and creates the endpoint that apps call by deployment name. It does not train the model or give you its weights.
-
-The **model playground** lets you write system instructions, adjust parameters (temperature, max output tokens), add tools, compare up to three models side by side, export code and **save the setup as an agent**. If requests start failing with HTTP 429, the deployment has hit its rate limit: raise TPM within your quota, or reduce max tokens and concurrent requests. **The deployment is the phone line; the playground is the test call before you print the number on the website.**
-
-### In Practice
-
-**What breaks without this**: a team writes code against a model it never tested, then discovers the format, tone or speed is wrong after integration.
-
-**Decision trigger**: before any code, ask whether the prompt and settings already produce the answers you want in the playground.
-
-**When you'd choose differently**: for large offline jobs, testing a few samples interactively and then running a Batch deployment is cheaper than calling a standard deployment millions of times.
+1. Write role, scope and output format in the system prompt.
+2. Paste the source text and say "answer only from it; otherwise say you don't know".
+3. Add one example of the exact output format, then test in the playground.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-429 errors are a capacity problem, not a model problem. Temperature changes nothing here, and a Developer deployment is for evaluating fine-tuned models, not a way round rate limits.
-</div>
+<div class="note-trap">"Add 'always be accurate' and raise the temperature" never fixes fabrication; grounding does.</div>
+
+### Go deeper
+
+- [Prompt engineering techniques](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/prompt-engineering)
 
 ---
 
-## 2.4 A Chat Client with the Foundry SDK
+## 2.2 Deploy a model and interact with it in the Foundry portal
 
 ### Key Concept
 
-**`AIProjectClient` connects to the project; `get_openai_client()` gives an OpenAI-compatible client that calls the model.**
+**Deploying allocates capacity and creates an endpoint that apps call by deployment name; the playground is where you test it first.**
 
-The Foundry SDK for Python is `azure-ai-projects`. You create an `AIProjectClient` with the project endpoint and a credential, usually `DefaultAzureCredential` from `azure-identity` (sign in with `az login` first). From it you get an OpenAI-compatible client and call the **Responses API**, passing the **deployment name** as `model`, and read `output_text`.
+**The deployment is the phone line; the playground is the test call.**
+
+![Deploy and test: deploy from the catalog with name, type, version and TPM, test in the playground, call by deployment name, and handle HTTP 429 by raising TPM or cutting load.](/content/skillup/ai901/images/ai901-2-2-deploy-and-test.svg)
+
+### Real use
+
+A support team compares two models side by side in the playground on 20 real tickets, picks the cheaper one that scored as well, and exports the code for developers.
+
+### How it works
+
+- Workflow: create a project, deploy a model from the catalog, test in the playground, then call it from the app.
+- At deployment you set the name, type (e.g. Global Standard), version and tokens-per-minute (TPM) limit. It doesn't train the model.
+- The playground sets instructions and parameters, compares models side by side, exports code and can **save as agent**.
+- Use one Foundry resource with a separate project per app.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Raise TPM within quota | HTTP 429 errors | Uses more quota |
+| Cut max tokens / concurrency | 429 and no quota left | Shorter or slower replies |
+| Playground compare | Choosing between models | Small sample only |
+
+### How to do it
+
+1. In your project, open the **model catalog**, pick a model and select **Deploy**.
+2. Set deployment name, type and TPM.
+3. Open it in the **playground**, add instructions, test real and tricky prompts.
+4. Use **View code** to copy the endpoint and sample.
+
+### Exam Trap ⚠️
+
+<div class="note-trap">429 is a capacity problem: temperature changes nothing, and a Developer deployment is only for evaluating fine-tuned models.</div>
+
+### Go deeper
+
+- [Deploy Foundry Models in the portal](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/deploy-foundry-models)
+- [Microsoft Foundry playgrounds](https://learn.microsoft.com/en-us/azure/foundry/concepts/concept-playgrounds)
+
+---
+
+## 2.3 Create a lightweight chat client application by using the Foundry SDK
+
+### Key Concept
+
+**`AIProjectClient` connects to the project; `get_openai_client()` gives a client that calls the model by deployment name.**
+
+**The project client is the receptionist; the OpenAI client is who you're put through to.**
+
+![Chat client: DefaultAzureCredential, AIProjectClient on the project endpoint, get_openai_client, responses.create with the deployment name, then read output_text.](/content/skillup/ai901/images/ai901-2-3-chat-client.svg)
+
+### Real use
+
+An internal IT helper is a 15-line script on a VM that authenticates with the VM's managed identity, so no API key is stored anywhere.
+
+### How it works
+
+- Package `azure-ai-projects`; credential `DefaultAzureCredential` from `azure-identity` (run `az login` as an identity with project access).
+- Call the Responses API with `model=` set to the **deployment name** and read `output_text`.
+- Each request stands alone: resend history or use a conversation.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `AIProjectClient` + Entra ID | Production; same client for agents | Needs sign-in or managed identity |
+| Plain `OpenAI` client + API key | Quick local test | Key must be protected |
+| Chat Completions | Existing samples (`choices[0].message.content`) | Not the base for agents |
+
+### How to do it
 
 ```python
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 
-project = AIProjectClient(
-    endpoint="https://<resource>.services.ai.azure.com/api/projects/<project>",
-    credential=DefaultAzureCredential())
+project = AIProjectClient(endpoint="https://<resource>.services.ai.azure.com/api/projects/<project>",
+                          credential=DefaultAzureCredential())
 openai = project.get_openai_client()
-
-response = openai.responses.create(
-    model="support-chat",            # the deployment name
-    input=[{"role": "system", "content": "You're a helpful assistant."},
-           {"role": "user", "content": "What can you help me with?"}])
-print(response.output_text)
+r = openai.responses.create(model="support-chat",   # deployment name
+                            input="What can you help me with?")
+print(r.output_text)
 ```
 
-Microsoft's module also shows the plain `OpenAI` client with the OpenAI-compatible endpoint and an API key, and parameters such as `max_output_tokens` and `temperature`. Either way the request shape is the same. **The project client is the receptionist; the OpenAI client is the person you are put through to.**
-
-### In Practice
-
-**What breaks without this**: code passes the base model name ("gpt-4.1-mini") when the deployment is called "support-chat" and fails with deployment-not-found, or `DefaultAzureCredential` fails because nobody signed in.
-
-**Decision trigger**: authentication error means check identity and sign-in; not-found error means check the deployment name.
-
-**When you'd choose differently**: Chat Completions (`chat.completions.create` with `messages`, reading `choices[0].message.content`) also works and appears in many samples; the Responses API is the one Foundry's newer SDK and agents are built on.
-
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-<code>model=</code> takes the <strong>deployment name</strong>, not the model family. And <code>DefaultAzureCredential</code> is the Entra ID route; it does not take an API key.
-</div>
+<div class="note-trap"><code>model=</code> takes the <strong>deployment name</strong>, not the model family. <code>DefaultAzureCredential</code> doesn't take an API key.</div>
+
+### Go deeper
+
+- [Quickstart: Get started with the Microsoft Foundry SDK](https://learn.microsoft.com/en-us/azure/foundry/quickstarts/get-started-code)
 
 ---
 
-## 2.5 Create and Test a Single Agent in the Portal
+## 2.4 Create and test a single-agent solution in the Foundry portal
 
 ### Key Concept
 
-**An agent is a model plus instructions plus tools; tools are actions and knowledge is context.**
+**An agent is a model plus instructions plus tools; tools take actions and knowledge grounds answers in data.**
 
-In the Foundry portal you create an agent (Build > Agents, or "Save as agent" from the playground), choose a model deployment, write the **instructions**, and add **tools**. Built-in tools include **file search** (upload files; they are indexed into a vector store so the agent can ground answers and cite them), **code interpreter** (runs Python in a sandbox for calculations, data analysis and charts), and **web search** (current public information). Custom tools can be functions, OpenAPI specs or MCP servers.
+**Instructions are the job description, tools the toolbox, knowledge the library.**
 
-Test the agent in the **agents playground** with realistic and tricky questions and check its responses and tool calls. When it behaves, **publish** it: publishing turns it into a managed Azure resource with a stable endpoint that apps and channels such as Microsoft Teams can use. **Instructions are the job description, tools are the toolbox, and knowledge is the reference library on the shelf.**
+![Single agent: a model, instructions and tools form an agent; file search for your documents, code interpreter for calculations, web search for current public information.](/content/skillup/ai901/images/ai901-2-4-single-agent.svg)
 
-| Need | Tool |
-|---|---|
-| Answer from the company's own documents, with citations | File search |
-| Calculate from a CSV, draw a chart | Code interpreter |
-| Current public information | Web search |
-| Call Azure Language (PII, language detection) | Azure Language MCP server |
+### Real use
 
-### In Practice
+An outdoor retailer's agent uses file search over 40 PDF manuals and answers "how do I re-proof this jacket?" with a citation to the right page.
 
-**What breaks without this**: an agent asked about product manuals answers from general knowledge because nobody added file search, or a finance agent "calculates" growth rates by predicting digits because it has no code interpreter.
+### How it works
 
-**Decision trigger**: does the agent need to *do* something (tool) or *know* something specific (knowledge)?
+- **File search** indexes uploaded files for grounded, cited answers; **code interpreter** runs Python for calculations and charts; **web search** gets current public information.
+- The **Azure Language MCP server** tool connects with your Foundry resource name; no separate Language resource is needed.
+- **Publishing** turns the agent into a managed Azure resource with a stable endpoint.
 
-**When you'd choose differently**: if no tools or knowledge are needed, a plain model deployment with a good system prompt is simpler than an agent.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| File search | Answers from your own documents | Keep files current |
+| Code interpreter | Calculations, data, charts | Sandbox only |
+| Web search | Current public information | Less control of sources |
+| No agent | No tools needed | Plain deployment is simpler |
+
+### How to do it
+
+1. Go to **Build > Agents > Create agent** (or **Save as agent** from the playground).
+2. Choose the model deployment and write instructions.
+3. Add tools (upload files for file search).
+4. Test in the **agents playground** with expected and tricky questions, then publish.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-File search and web search are easy to swap. <strong>Private uploaded documents = file search</strong>; <strong>public, current information = web search</strong>. Neither runs calculations; that is code interpreter.
-</div>
+<div class="note-trap"><strong>Private documents = file search</strong>; <strong>public, current = web search</strong>. Calculations need code interpreter.</div>
+
+### Go deeper
+
+- [Quickstart: Create a prompt agent](https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/prompt-agent)
+- [File search tool](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/file-search)
 
 ---
 
-## 2.6 A Client Application for an Agent
+## 2.5 Create a lightweight client application for an agent
 
 ### Key Concept
 
-**Apps call a Foundry agent through the Responses API with an agent reference, authenticated with Microsoft Entra ID.**
+**Apps call an agent through the Responses API with an agent reference, authenticated with Microsoft Entra ID.**
 
-The client uses `AIProjectClient` with `DefaultAzureCredential`, gets the OpenAI-compatible client and calls `responses.create`, identifying the agent rather than a model. Microsoft's training shows this form:
+**The agent reference is the name badge on the request.**
+
+![Agent client sequence: authenticate with Entra ID, get the agent, call responses.create with an agent reference, and reuse one conversation ID for follow-ups.](/content/skillup/ai901/images/ai901-2-5-agent-client.svg)
+
+### Real use
+
+A website chat widget calls the published product-help agent from a small back end, with one conversation per shopper so follow-ups keep context.
+
+### How it works
+
+- Use `AIProjectClient` + `DefaultAzureCredential`; this code path needs Entra ID, not an API key.
+- Name the agent with `extra_body={"agent": {..., "type": "agent_reference"}}`.
+- For multi-turn chat, create a **conversation** and pass its ID in each call. Threads and runs are retired Assistants vocabulary.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Call the agent | You need its tools and knowledge | More setup |
+| Call the model (2.3) | No tools needed | You manage prompts yourself |
+
+### How to do it
 
 ```python
 agent = project_client.agents.get(agent_name="learning-agent")
 openai_client = project_client.get_openai_client()
-response = openai_client.responses.create(
+r = openai_client.responses.create(
     input=[{"role": "user", "content": "Tell me what you can help with."}],
     extra_body={"agent": {"name": agent.name, "type": "agent_reference"}})
-print(response.output_text)
+print(r.output_text)
 ```
 
-For multi-turn chat, create a **conversation** and pass its ID with each request so the service keeps the history. The current Agent Service uses **conversations, items, responses and agent versions**; the older Assistants API concepts (threads, messages, runs) are retired. Microsoft's exercise notes that key-based authentication is not supported for this agent code, so sign in with an Entra ID identity. **The agent reference is the name badge on the request: it tells Foundry which agent should answer.**
-
-### In Practice
-
-**What breaks without this**: a developer copies an old Assistants tutorial with threads and runs, or swaps `DefaultAzureCredential` for an API key and every call fails.
-
-**Decision trigger**: if the code talks to an agent, look for `responses.create` plus an agent reference, and an Entra ID credential.
-
-**When you'd choose differently**: Microsoft's samples vary in the exact agent-reference syntax (for example `get_openai_client(agent_name=...)` in newer quickstarts). The pattern is the same: Responses API, agent named, conversation for history.
-
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Threads, runs and assistants are the old vocabulary. If an answer option uses <code>threads.runs.create</code>, it is describing the retired Assistants API, not the current Foundry Agent Service.
-</div>
+<div class="note-trap">An option using <code>threads.runs.create</code> describes the retired Assistants API, not Foundry Agent Service.</div>
+
+### Go deeper
+
+- [What is Foundry Agent Service?](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
 
 ---
 
-## 2.7 Text Analysis Apps
+## 2.6 Build a lightweight application that includes text analysis
 
 ### Key Concept
 
-**Use a general model for flexible text tasks and Azure Language when the app needs consistent, structured values.**
+**Use Azure Language when the app needs consistent, structured values, and a general model when wording can vary.**
 
-Foundry gives you two routes. A general-purpose model, prompted well, can extract key phrases, link entities, assess sentiment and summarise, but its output varies between calls. **Azure Language in Foundry Tools** returns structured, deterministic results, such as a language code with a confidence score or redacted text, which is what automated workflows need.
+**Azure Language is a form that always comes back filled in the same way.**
 
-The Language SDK is `azure-ai-textanalytics`. Create a `TextAnalyticsClient` with the endpoint and an `AzureKeyCredential`, and pass a **list** of documents to each method: `detect_language([text])[0]` returns `primary_language` (name, ISO code, confidence score), and `recognize_pii_entities([text])[0]` returns `redacted_text` and the entities found. Agents can use Language through the **Azure Language MCP server** tool, connected with the Foundry resource name and no separate Language resource. **A chat model is a talented writer; Azure Language is a form that always comes back filled in the same way.**
+![Text analysis app: TextAnalyticsClient calls detect_language and recognize_pii_entities on a one-item list, reading item 0 to route tickets and store redacted text.](/content/skillup/ai901/images/ai901-2-6-text-analysis-app.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: a workflow expects "es" and receives "It is Spanish", or a ticketing system stores unredacted phone numbers because the developer read `entities` instead of `redacted_text`.
+A ticketing system detects each ticket's language to route it, and stores only PII-redacted text so agents never see card numbers.
 
-**Decision trigger**: if downstream code parses the result, prefer Azure Language; if a person reads it, a model's flexible prose is often fine.
+### How it works
 
-**When you'd choose differently**: for features Azure Language now marks as legacy (key phrases, sentiment, summarization), Microsoft directs new projects to Foundry models.
+- SDK `azure-ai-textanalytics`; `TextAnalyticsClient` with endpoint and `AzureKeyCredential`.
+- Methods take a **list** of documents: `detect_language([text])[0]` returns `primary_language` (name, ISO code, score).
+- `recognize_pii_entities([text])[0]` returns `redacted_text` and the entities.
+- Agents can use Language through the Azure Language MCP server tool.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Azure Language SDK | Code parses the result | Fixed features |
+| Foundry model + prompt | People read the result | Output varies |
+
+### How to do it
+
+```python
+from azure.ai.textanalytics import TextAnalyticsClient
+from azure.core.credentials import AzureKeyCredential
+
+client = TextAnalyticsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+print(client.detect_language([text])[0].primary_language.iso6391_name)
+print(client.recognize_pii_entities([text])[0].redacted_text)
+```
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-<code>TextAnalyticsClient</code> methods take a <strong>list</strong> of documents and return a list of results, so a single string goes in as <code>[text]</code> and you read <code>[0]</code>.
-</div>
+<div class="note-trap">Pass <code>[text]</code> and read <code>[0]</code>. Masked output is <code>redacted_text</code>, not <code>entities</code>.</div>
+
+### Go deeper
+
+- [PII detection in Azure Language](https://learn.microsoft.com/en-us/azure/ai-services/language-service/personally-identifiable-information/overview)
 
 ---
 
-## 2.8 Spoken Prompts and Azure Speech Apps
+## 2.7 Respond to spoken prompts by using a deployed multimodal model
 
 ### Key Concept
 
-**Send audio straight to an audio-capable model, or use Azure Speech in Foundry Tools to recognise and synthesise speech.**
+**An audio-capable model takes speech in and answers directly, without a separate transcription step.**
 
-To respond to a spoken prompt with one model, deploy a multimodal model that accepts audio (for example the gpt-audio models, the gpt-realtime family or Phi-4-multimodal-instruct). In Chat Completions the audio goes in an `input_audio` content part with base64 data and a format such as `wav`; to get spoken output too, request the text and audio modalities with a voice and format. For live voice agents, the **Voice Live API** is a fully managed, low-latency speech-to-speech service with noise suppression, interruption handling and end-of-turn detection.
+**It listens and thinks in one step.**
 
-For classic speech apps, the SDK is `azure-cognitiveservices-speech`. Create a `SpeechConfig` with the Foundry resource key and endpoint. **Recognition**: `SpeechRecognizer` with `recognize_once_async()` for one utterance (about 30 seconds), or `start_continuous_recognition()` with `recognized` event handlers for longer speech. **Synthesis**: set `speech_synthesis_voice_name`, create a `SpeechSynthesizer` and call `speak_text_async(text).get()`. Use **batch transcription** (files via SAS URIs, asynchronous, best-effort) for archives. **The multimodal model listens and thinks in one step; Azure Speech is the specialist ears and voice you wire to anything.**
+![Spoken prompts: an audio-capable model answers input_audio in one step, the Voice Live API runs live sessions, and Azure Speech plus a text model wires more parts.](/content/skillup/ai901/images/ai901-2-7-spoken-prompts.svg)
+
+### Real use
+
+Technicians ask a field-service app questions by voice with their hands busy; an audio-capable model answers in speech.
+
+### How it works
+
+- Deploy a multimodal model that accepts audio (gpt-audio, gpt-realtime family, Phi-4-multimodal-instruct).
+- Audio goes in an `input_audio` content part as base64 data with a format such as `wav`.
+- For spoken replies, set `modalities` to text and audio plus an `audio` setting with voice and format.
+- The **Voice Live API** is a managed, low-latency speech-to-speech service for live conversations.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Audio-capable model | One spoken question | Fewer speech-tuning options |
+| Voice Live API | Live, natural conversation | Session-based |
+| Azure Speech + text model (2.8) | Custom recognition or SSML | More parts to wire |
+
+### How to do it
+
+```python
+completion = client.chat.completions.create(
+    model="gpt-audio-deployment",
+    modalities=["text", "audio"], audio={"voice": "alloy", "format": "wav"},
+    messages=[{"role": "user", "content": [
+        {"type": "input_audio", "input_audio": {"data": audio_b64, "format": "wav"}}]}])
+```
+
+### Exam Trap ⚠️
+
+<div class="note-trap">Audio goes in an <code>input_audio</code> part as base64, not an <code>image_url</code> or a file path in the prompt.</div>
+
+### Go deeper
+
+- [Voice Live API overview](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/voice-live)
+- [Quickstart: Azure OpenAI audio generation](https://learn.microsoft.com/en-us/azure/foundry/openai/audio-completions-quickstart)
+
+---
+
+## 2.8 Build a lightweight application by using Azure Speech in Foundry Tools
+
+### Key Concept
+
+**Azure Speech gives any app specialist ears (recognition) and a voice (synthesis).**
+
+**Recognition is the stenographer; synthesis is the narrator.**
+
+![Speech SDK: one SpeechConfig; recognize_once_async for short commands, continuous recognition for long speech, batch for archives, and speak_text_async for synthesis.](/content/skillup/ai901/images/ai901-2-8-speech-sdk.svg)
+
+### Real use
+
+A delivery IVR reads "Your order has shipped" in a neural voice and transcribes callers' replies continuously so nothing is cut off after one sentence.
+
+### How it works
+
+- SDK `azure-cognitiveservices-speech`; `SpeechConfig` with the Foundry resource key and endpoint.
+- `recognize_once_async()` handles one utterance (about 30 seconds); `start_continuous_recognition()` with `recognized` handlers handles long speech.
+- Synthesis: set `speech_synthesis_voice_name`, create a `SpeechSynthesizer`, call `speak_text_async(text).get()`.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `recognize_once_async()` | Short commands | Stops after one utterance |
+| Continuous recognition | Dictation, long speech | Event handling code |
+| Batch transcription | Archives (SAS URIs, async) | Best-effort timing |
+| Voice Live (2.7) | Speech must drive reasoning and tools | Session-based |
+
+### How to do it
 
 ```python
 import azure.cognitiveservices.speech as speechsdk
-speech_config = speechsdk.SpeechConfig(subscription=key, endpoint=endpoint)
-speech_config.speech_synthesis_voice_name = "en-US-Ava:DragonHDLatestNeural"
-synth = speechsdk.SpeechSynthesizer(speech_config=speech_config,
-    audio_config=speechsdk.audio.AudioOutputConfig(use_default_speaker=True))
-result = synth.speak_text_async("Your order has shipped.").get()
+cfg = speechsdk.SpeechConfig(subscription=key, endpoint=endpoint)
+print(speechsdk.SpeechRecognizer(speech_config=cfg).recognize_once_async().get().text)
+
+cfg.speech_synthesis_voice_name = "en-US-Ava:DragonHDLatestNeural"
+speechsdk.SpeechSynthesizer(speech_config=cfg).speak_text_async("Your order has shipped.").get()
 ```
-
-### In Practice
-
-**What breaks without this**: a dictation app built on `recognize_once_async()` keeps only the first sentence, or a team streams an archive of recordings through real-time recognition.
-
-**Decision trigger**: live conversation means Voice Live or an audio-capable model; transcripts and narration mean Azure Speech; recorded archives mean batch.
-
-**When you'd choose differently**: if the user's question must also drive tools and reasoning, a voice-enabled agent (Voice Live with a Foundry agent) is better than wiring recognition and synthesis by hand.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Audio goes in an <code>input_audio</code> part as base64 data, not as an <code>image_url</code> or a file path in the prompt. And <code>speak_text_async</code> is synthesis, while <code>recognize_once_async</code> is recognition.
-</div>
+<div class="note-trap"><code>speak_text_async</code> is synthesis; <code>recognize_once_async</code> is recognition. Archives need batch transcription.</div>
+
+### Go deeper
+
+- [Speech to text quickstart](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text)
+- [Batch transcription](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/batch-transcription)
 
 ---
 
-## 2.9 Visual Input to a Multimodal Model
+## 2.9 Interpret visual input in prompts by using a deployed multimodal model
 
 ### Key Concept
 
 **Put an image and a text instruction in the same user message, and a vision-capable model answers about the image.**
 
-Vision-enabled models (for example the GPT-4.1 and GPT-5 series) accept images as URLs or as base64-encoded data. In the **Responses API** the user content holds an `input_text` part and an `input_image` part; in **Chat Completions** it is an `image_url` part, optionally with a `detail` setting.
+**It's a photo handed over with a sticky note: the note is the question.**
+
+![Visual input: one user message with an input_text question and an input_image part goes to a vision-capable model, using a public URL or a base64 data URL.](/content/skillup/ai901/images/ai901-2-9-visual-input.svg)
+
+### Real use
+
+An insurer's app lets customers photograph car damage; the model describes the damaged parts and pre-fills a claim for an assessor to confirm.
+
+### How it works
+
+- Responses API: an `input_text` part plus an `input_image` part. Chat Completions: an `image_url` part with optional `detail`.
+- Image URLs must be reachable by the service, so private images go as base64 data URLs.
+- `detail: "high"` processes at higher resolution to read small text; `"low"` is cheaper.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Public URL | Image is internet-reachable | None for private files |
+| Base64 data URL | Private or uploaded images | Bigger request |
+| `detail: "high"` | Fine print matters | More tokens |
+
+### How to do it
 
 ```python
-response = client.responses.create(model=deployment, input=[{"role": "user", "content": [
+r = client.responses.create(model=deployment, input=[{"role": "user", "content": [
     {"type": "input_text", "text": "What is in this image? Give 3 bullet points."},
     {"type": "input_image", "image_url": image_url}]}])
-print(response.output_text)
+print(r.output_text)
 ```
 
-Image URLs must be reachable by the service, so private images are sent as base64 data URLs. In Chat Completions, `detail: "low"` uses a 512x512 version (cheaper, less detail) and `"high"` lets the model read small text. **Sending an image is like handing someone a photo with a sticky note on it: the note is the question.**
-
-### In Practice
-
-**What breaks without this**: an app sends links to an internal file share the model cannot reach, or misreads a spec sheet because detail was set to low.
-
-**Decision trigger**: is the image public? If not, base64 it. Does the task need fine print? Then use high detail.
-
-**When you'd choose differently**: for repeatable structured fields from many images, a Content Understanding analyzer gives consistent JSON with confidence scores instead of free text.
-
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Responses API image parts are <code>input_image</code>; the <code>image_url</code> object with <code>url</code> and <code>detail</code> is the Chat Completions format. Both are correct for their own API.
-</div>
+<div class="note-trap">Responses API uses <code>input_image</code>; <code>image_url</code> with <code>detail</code> is the Chat Completions format.</div>
+
+### Go deeper
+
+- [How to use vision-enabled chat models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/gpt-with-vision)
 
 ---
 
-## 2.10 Creating Visual Outputs and Vision Apps
+## 2.10 Create new visual outputs by using generative models
 
 ### Key Concept
 
-**Image models return base64 image data you decode and save; video models run as asynchronous jobs.**
+**Image models return base64 data you decode and save; video models run as jobs you poll.**
 
-For images, Microsoft recommends the **GPT-image** family. With `images.generate(model=..., prompt=..., size="1024x1024")`, GPT-image models always return base64 data in `data[0].b64_json`, which you decode and write to a file; the Responses API can also generate images through the `image_generation` tool. The older dall-e-3 model was retired on 4 March 2026. For video, **Sora** models create a job that you poll until it completes and then download, which can take minutes.
+**Image generation is a vending machine; video is a print shop where you collect the order later.**
 
-A lightweight vision app is usually just a vision-capable deployment plus a prompt, with no custom training. Be aware of retirements: Azure Vision Image Analysis 4.0 is deprecated (retiring 25 September 2028), Custom Vision is also retiring, and the Face service's emotion and gender capabilities were retired, with identity features (verification and identification) behind Limited Access. **Image generation is a vending machine that drops the picture straight out; video generation is a print shop where you collect the order later.**
+![Visual output: images.generate returns base64 you decode and save, while Sora video is a job you create, poll and then download.](/content/skillup/ai901/images/ai901-2-10-visual-output.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: an app looks for an image URL that GPT-image models never return, or waits synchronously for a video that takes minutes.
+A marketing team generates five banner concepts from one brief, then uses image edit with a mask to change only the background of the winner.
 
-**Decision trigger**: still image means decode base64 from the response; video means create, poll, download.
+### How it works
 
-**When you'd choose differently**: when you need to edit part of an existing image, use the image edit operation with a mask rather than generating from scratch.
+- Use the **GPT-image** family; dall-e-3 was retired on 4 March 2026.
+- `images.generate(...)` returns base64 in `data[0].b64_json`; decode it and write the bytes to a file.
+- **Sora** video: create a job, poll its status, then download the video.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `images.generate` | New still image | Review for safety and brand |
+| Image edit with mask | Change part of an image | Need a mask |
+| Sora | Short video | Minutes per job |
+
+### How to do it
+
+```python
+import base64
+result = client.images.generate(model="gpt-image-deployment",
+                                prompt="Flat illustration of a tent at dawn", size="1024x1024")
+open("tent.png", "wb").write(base64.b64decode(result.data[0].b64_json))
+```
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Old tutorials mention dall-e-3, Image Analysis custom models and Face emotion detection. All three are retired; the right answers point to GPT-image models, multimodal models or Content Understanding.
-</div>
+<div class="note-trap">GPT-image models don't return an image URL, and dall-e-3 is retired.</div>
+
+### Go deeper
+
+- [Image generation models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/dall-e)
+- [Sora video generation overview](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/video-generation)
 
 ---
 
-## 2.11 Content Understanding: Analyzers for Documents and Forms
+## 2.11 Build a lightweight application that includes vision capabilities
 
 ### Key Concept
 
-**An analyzer takes content in, applies AI and a schema, and returns structured fields; prebuilt analyzers cover common documents.**
+**A lightweight vision app is a vision-capable deployment plus a photo and a text instruction in one request; no custom training.**
 
-**Azure Content Understanding in Foundry Tools** is part of the Foundry resource. **Prebuilt analyzers** include `prebuilt-read` and `prebuilt-layout` (text, tables, structure), domain analyzers such as `prebuilt-invoice`, `prebuilt-receipt`, `prebuilt-idDocument` and `prebuilt-contract`, and search-oriented analyzers (`prebuilt-documentSearch`, `prebuilt-imageSearch`, `prebuilt-audioSearch`, `prebuilt-videoSearch`). A **custom analyzer** starts from a base (`prebuilt-document`, `prebuilt-image`, `prebuilt-audio` or `prebuilt-video`) and adds a **field schema**.
+**Treat the model as a sharp-eyed assistant that needs a clear question and answer format.**
 
-Each field has a type and a **method**: **extract** returns a value that appears in the content (documents only), **classify** picks from fixed categories, and **generate** writes a value such as a summary. **Confidence scores** (0 to 1) and **grounding** (where the value came from) are opt-in via `estimateFieldSourceAndConfidence`. Content Understanding uses *your* Foundry model deployments: most analyzers need a chat completion model and an embeddings model set as defaults, while `prebuilt-read` and `prebuilt-layout` need none. **An analyzer is a clerk with a form: the schema is the form, and extract, classify and generate are copy, tick-a-box and write-a-sentence.**
+![Vision app: a base64 photo and a JSON instruction go to a vision-capable deployment; valid replies build the restock list and unexpected ones go to a person.](/content/skillup/ai901/images/ai901-2-11-vision-app.svg)
 
-| Field | Method |
-|---|---|
-| Vendor name printed on the invoice | extract |
-| Document category from a fixed list | classify |
-| One-sentence summary | generate |
+### Real use
 
-### In Practice
+A warehouse app photographs each shelf at closing time; the model returns `{"empty_slots": 3}` and a restock list is generated automatically.
 
-**What breaks without this**: the first `prebuilt-invoice` call fails because no model deployments are mapped, or a finance system loads every value with no idea which ones are uncertain.
+### How it works
 
-**Decision trigger**: does the value appear on the page (extract), come from a fixed list (classify), or need writing (generate)?
+- Read the image, base64-encode it, send it with an instruction, and ask for a fixed format such as JSON.
+- Image Analysis 4.0 is deprecated (retiring 25 September 2028) and Custom Vision is retiring; use multimodal models or Content Understanding.
+- Face emotion and gender recognition are retired; identity features need approved access.
 
-**When you'd choose differently**: for highly standard forms, or on-premises needs, Azure Document Intelligence prebuilt models and containers remain an option; Microsoft says existing Document Intelligence users do not need to migrate.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Multimodal model + prompt | Flexible questions about images | Validate free-form output |
+| Content Understanding image analyzer | Same fields from many images | Schema design |
+| Document analyzer (2.12) | Text-heavy images like receipts | Not for scenes |
+
+### How to do it
+
+```python
+import base64
+from azure.identity import DefaultAzureCredential
+from azure.ai.projects import AIProjectClient
+
+project = AIProjectClient(endpoint=project_endpoint, credential=DefaultAzureCredential())
+client = project.get_openai_client()
+b64 = base64.b64encode(open("shelf.jpg", "rb").read()).decode()
+r = client.responses.create(model="vision-chat", input=[{"role": "user", "content": [
+    {"type": "input_text", "text": 'Count empty slots. Reply as JSON: {"empty_slots": int}'},
+    {"type": "input_image", "image_url": f"data:image/jpeg;base64,{b64}"}]}])
+print(r.output_text)
+```
+
+1. Test the prompt in the playground with a sample image.
+2. Validate the JSON in code.
+3. Send unexpected results to a person.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Confidence and grounding are <strong>not on by default</strong>, and <strong>extract only works for documents</strong>. Both facts make good distractors.
-</div>
+<div class="note-trap">New vision apps built on Image Analysis custom models, Custom Vision or Face emotion detection point at retired or retiring services.</div>
+
+### Go deeper
+
+- [How to use vision-enabled chat models](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/gpt-with-vision)
+- [What is Azure Vision in Foundry Tools? (retirement notes)](https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/overview)
 
 ---
 
-## 2.12 Content Understanding: Images, Audio and Video
+## 2.12 Extract information from documents and forms by using Azure Content Understanding in Foundry Tools
 
 ### Key Concept
 
-**Images, audio and video use generate and classify fields, and their outputs are descriptions, WebVTT transcripts, key frames and segments.**
+**An analyzer takes a document in, applies AI and a schema, and returns structured fields; prebuilt analyzers cover common forms.**
 
-**Images**: `prebuilt-imageSearch` returns a paragraph description, and a custom analyzer on `prebuilt-image` can return fields such as a stock level (classify) or an attendee count (generate). Image analyzers are not optimised for text-heavy images, so photographed receipts belong with a document analyzer such as `prebuilt-receipt`.
+**Extract, classify and generate are copy, tick a box and write a sentence.**
 
-**Audio**: `prebuilt-audioSearch` gives a transcript and summary, and `prebuilt-callCenter` adds sentiment, topics, people and companies for call recordings. Transcripts are **WebVTT**, with diarization and speaker roles. **Video**: transcripts of spoken words (music and sound effects are ignored), **key frames**, and segment descriptions; turning on segmentation with content categories gives separate output per section. **Treat each modality like a different witness: the document hands you paperwork, the photo shows a scene, the recording tells a story over time.**
+![Document analyzer: a prebuilt or custom analyzer applies a schema whose fields are extracted, classified or generated, with low-confidence fields sent to review.](/content/skillup/ai901/images/ai901-2-12-document-analyzer.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: an image analyzer fails because a field uses extract, or a team expects one description per chapter from a video analysed as a single segment.
+An accounts-payable team runs `prebuilt-invoice` on supplier PDFs and only reviews fields with low confidence.
 
-**Decision trigger**: is the content mostly text? Use a document analyzer. Does it unfold over time? Use audio or video analyzers, and enable segmentation if you need per-section output.
+### How it works
 
-**When you'd choose differently**: if you only need a live voice conversation, Voice Live fits better; Content Understanding analyses recordings after the fact.
+- Prebuilt: `prebuilt-read`/`prebuilt-layout` (text, tables), `prebuilt-invoice`, `prebuilt-receipt`, `prebuilt-idDocument`, `prebuilt-contract`. Custom analyzers start from `prebuilt-document`.
+- Field methods: **extract** (value on the page, documents only), **classify** (fixed list), **generate** (written value).
+- Confidence and grounding are off by default: enable `estimateFieldSourceAndConfidence`.
+- Most analyzers need a chat completion model and an embeddings model deployed and set as defaults; read and layout need none.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `prebuilt-read` / `prebuilt-layout` | You need text and tables only | No named fields |
+| Domain prebuilt (invoice, receipt) | Standard forms | Fixed fields |
+| Custom analyzer | Your own fields | Design and test the schema |
+
+### How to do it
+
+```json
+{ "baseAnalyzerId": "prebuilt-document",
+  "config": { "estimateFieldSourceAndConfidence": true },
+  "fieldSchema": { "fields": {
+    "VendorName":       { "type": "string", "method": "extract" },
+    "DocumentCategory": { "type": "string", "method": "classify", "enum": ["Goods", "Services"] },
+    "Summary":          { "type": "string", "method": "generate" } } } }
+```
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Music cues become chapter markers" and "the transcript comes back as SSML" are both made-up distractors. Only spoken words are transcribed, and transcripts are WebVTT.
-</div>
+<div class="note-trap">Confidence isn't on by default, and extract works only for documents.</div>
+
+### Go deeper
+
+- [Analyzer configuration reference](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/concepts/analyzer-reference)
+- [Prebuilt analyzers](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/concepts/prebuilt-analyzers)
 
 ---
 
-## 2.13 Building an Information Extraction App
+## 2.13 Extract information from images by using Content Understanding
+
+### Key Concept
+
+**Image analyzers turn photos into descriptions and fields using generate and classify, never extract.**
+
+**A photo is a witness to a scene: ask what it saw, not what it says in writing.**
+
+![Image analyzer choice: text-heavy photos go to prebuilt-receipt, descriptions to prebuilt-imageSearch, and custom fields to prebuilt-image with classify or generate, never extract.](/content/skillup/ai901/images/ai901-2-13-image-analyzer.svg)
+
+### Real use
+
+A retailer analyses shelf photos from 300 stores; `ShelfStatus` is classified Full, Low or Empty and a dashboard shows which stores need restocking.
+
+### How it works
+
+- `prebuilt-imageSearch` returns a paragraph description.
+- A custom analyzer on `prebuilt-image` adds your fields with classify or generate.
+- Image analyzers aren't tuned for text-heavy images: a receipt photo belongs with `prebuilt-receipt`.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `prebuilt-imageSearch` | You need a description | No custom fields |
+| Custom on `prebuilt-image` | Your own fields from scenes | Schema design |
+| Document analyzer | Receipts, invoices, IDs | Not for scenes |
+| Multimodal model (2.9) | One-off question | No schema or confidence |
+
+### How to do it
+
+```json
+{ "baseAnalyzerId": "prebuilt-image",
+  "fieldSchema": { "fields": {
+    "ShelfStatus": { "type": "string", "method": "classify", "enum": ["Full", "Low", "Empty"] },
+    "Notes":       { "type": "string", "method": "generate" } } } }
+```
+
+### Exam Trap ⚠️
+
+<div class="note-trap"><strong>Extract is document-only</strong>; image fields use generate or classify.</div>
+
+### Go deeper
+
+- [Content Understanding image overview](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/image/overview)
+
+---
+
+## 2.14 Extract information from audio and video by using Content Understanding
+
+### Key Concept
+
+**Audio and video analyzers return WebVTT transcripts, summaries, key frames and segments, plus your generate or classify fields.**
+
+**A recording is a witness that tells its story over time.**
+
+![Audio and video analyzers: a recording becomes a WebVTT transcript with speakers, key frames and per-segment summaries and fields.](/content/skillup/ai901/images/ai901-2-14-audio-video-analyzer.svg)
+
+### Real use
+
+A bank runs `prebuilt-callCenter` on support calls for sentiment and topics, and segments training videos so each chapter gets its own summary.
+
+### How it works
+
+- `prebuilt-audioSearch`: transcript and summary. `prebuilt-callCenter`: adds sentiment, topics, people and companies.
+- Transcripts are **WebVTT** with diarization; video transcribes spoken words only (music and effects ignored) plus key frames.
+- Enable segmentation with content categories so each section gets its own output; set `locales` for languages.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| `prebuilt-audioSearch` | Transcript + summary | No call analytics |
+| `prebuilt-callCenter` | Call recordings | Call-centre focus |
+| Video with segmentation | Per-section output | Longer processing |
+| Voice Live (2.7) | Live conversation | Not analysis of recordings |
+
+### Exam Trap ⚠️
+
+<div class="note-trap">Transcripts are WebVTT, not SSML, and music cues don't become chapter markers.</div>
+
+### Go deeper
+
+- [Content Understanding audio overview](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/audio/overview)
+- [Content Understanding video overview](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/video/overview)
+
+---
+
+## 2.15 Build a lightweight application with information extraction capabilities by using Content Understanding
 
 ### Key Concept
 
 **Analysis is asynchronous: start it, wait or poll, then read the fields and their confidence.**
 
-With the Python SDK (`azure-ai-contentunderstanding`), create a `ContentUnderstandingClient` with the Foundry endpoint and a credential, call `begin_analyze(analyzer_id=..., inputs=[{"url": ...}])`, and call `.result()` on the poller. The fields are on each item in `result.contents`, each with a type, a value (for example `valueString`, `valueDate`) and a confidence when enabled.
+**It's a coat check: hand it in, get a ticket, come back later.**
+
+![Asynchronous extraction: send content, get 202 Accepted, poll Operation-Location until Succeeded, then route fields by confidence to the system or a person.](/content/skillup/ai901/images/ai901-2-15-async-extraction.svg)
+
+### Real use
+
+A clinic sends voicemails to a custom audio analyzer overnight; high-confidence callback requests go to the booking system and the rest to a receptionist.
+
+### How it works
+
+- SDK `azure-ai-contentunderstanding`: `begin_analyze(...)` returns a poller; `.result()` waits; fields are on `result.contents`.
+- REST analyze returns **202 Accepted** with an **Operation-Location** header; poll it until `Succeeded`.
+- Enable `estimateFieldSourceAndConfidence`, and send fields below a confidence threshold to human review.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Foundry portal CU page | Trying analyzers, no code | Not an app |
+| Python SDK | Python app | Package install |
+| REST | Any language | You write the polling |
+
+### How to do it
 
 ```python
-from azure.ai.contentunderstanding import ContentUnderstandingClient
-from azure.core.credentials import AzureKeyCredential
 client = ContentUnderstandingClient(endpoint=endpoint, credential=AzureKeyCredential(key))
 poller = client.begin_analyze(analyzer_id="prebuilt-invoice", inputs=[{"url": invoice_url}])
 result = poller.result()
@@ -400,60 +734,33 @@ for content in result.contents:
     print(content.fields)
 ```
 
-Over REST, `POST {endpoint}/contentunderstanding/analyzers/{analyzerId}:analyze?api-version=2025-11-01` with the `Ocp-Apim-Subscription-Key` header returns **202 Accepted** and an **Operation-Location** header; poll that URL until the status is `Succeeded`. A sensible app routes low-confidence fields to a person before they reach a system of record. **It is a coat check: you hand the content in, get a ticket, and come back for the result.**
-
-### In Practice
-
-**What breaks without this**: a client treats 202 as failure and re-posts, creating duplicate jobs and token costs, or loads blurry-invoice values straight into finance with no review.
-
-**Decision trigger**: if a call returns a poller or a 202, there is a result to collect later.
-
-**When you'd choose differently**: for a quick one-off, the Content Understanding page in the Foundry portal lets you run analyzers on sample files and view the code without writing an app.
+1. Enable confidence in the analyzer.
+2. Route low-confidence fields to a person.
+3. Over REST, poll Operation-Location; never re-POST.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-A 202 with no fields is success, not failure. The answer is always "poll Operation-Location", never "repeat the POST".
-</div>
+<div class="note-trap">A 202 with no fields is success: poll Operation-Location, don't repeat the POST.</div>
+
+### Go deeper
+
+- [Quickstart: Content Understanding REST API](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/quickstart/use-rest-api)
 
 ---
 
 ## Deep Dive: Making Microsoft Foundry Click
 
-### 1. The connective narrative
+Pick a capability per requirement: a model deployment, an agent when tools are needed, or a Foundry Tool (Language, Speech, Content Understanding) when a purpose-built service is more reliable. Timing is the other split: chat, Language and Speech return at once; video, batch transcription and Content Understanding are asynchronous.
 
-Foundry is one platform with one shape. A **Foundry resource** holds models, tools and governance; **projects** hold your work. Inside a project you choose a capability: a **model deployment** for generation and multimodal understanding, an **agent** when the model needs tools and knowledge, or a **Foundry Tool** (Azure Language, Azure Speech, Content Understanding) when a purpose-built service does the job more reliably. The portal is where you try each one, and the SDKs are how your app calls them.
-
-Every client follows the same four beats. **Endpoint**: the project endpoint for `AIProjectClient`, the OpenAI-compatible endpoint for `OpenAI`, or the resource endpoint for Speech, Language and Content Understanding. **Authenticate**: Entra ID through `DefaultAzureCredential`, or a key where the service supports it. **Request shape**: messages with text, `input_image` or `input_audio` parts; a list of documents for Language; a `SpeechConfig` for Speech; an analyzer ID and inputs for Content Understanding. **Read the response**: `output_text`, `redacted_text`, a speech result reason, `b64_json`, or `contents[].fields`.
-
-What changes between services is timing. Chat, Language and Speech calls return at once. Image generation returns base64 straight away. Video generation, batch transcription and Content Understanding are asynchronous: you start a job and collect the result later. Once you know which group a service falls into, most "what should the code do next?" questions answer themselves.
-
-### 2. Worked scenario
-
-> **Scenario.** Fabrikam Outdoor wants a support agent for its website. It must answer questions from 40 PDF product manuals, read photos customers upload of damaged gear, and log each warranty claim's order number, purchase date and fault description into a database. Customers sometimes phone in instead.
+> **Worked scenario.** Fabrikam wants a support agent over 40 PDF manuals that reads photos of damaged gear and logs order number, purchase date and fault description for warranty claims. Some customers phone in.
 >
-> **Step 1, project and model.** Create a Foundry project in the team's existing resource and deploy a vision-capable chat model (Global Standard is fine; there is no data-residency rule) with the deployment name `support-chat`. Test the system prompt in the playground: "Answer only from the manuals; if the answer isn't there, say so and offer a human."
+> **Model and agent (2.2, 2.4).** Deploy a vision-capable model as `support-chat`, test the grounded system prompt in the playground, save as an agent with **file search**, and publish.
 >
-> **Step 2, agent.** Save it as an agent and add **file search** with the 40 manuals, so answers are grounded and cited. No code interpreter is needed because there are no calculations. Test tricky questions in the agents playground, then publish.
+> **Client (2.5, 2.9).** The site calls the agent with `DefaultAzureCredential` and a conversation per visitor, sending photos as base64 `input_image` parts.
 >
-> **Step 3, client.** The website calls the agent with `AIProjectClient` and `DefaultAzureCredential` (a managed identity in production), `responses.create` with the agent reference, and a **conversation** so follow-up questions keep context. Photos go in as `input_image` parts, base64-encoded because they are uploaded rather than public.
->
-> **Step 4, extraction.** Warranty claims are documents and calls, and the requirement names fields, so it is Content Understanding. A custom document analyzer *extracts* OrderNumber and PurchaseDate and *generates* FaultDescription; phoned-in claims use an audio analyzer with *generate* fields, because extract is document-only. Confidence is switched on, and anything under the team's threshold goes to a person.
->
-> **Outcome.** Four services, one project, and every choice traced to a requirement: grounded answers (file search), image understanding (multimodal input), structured claims (Content Understanding), and human review for low confidence (reliability and accountability).
+> **Extraction (2.12, 2.14, 2.15).** A document analyzer *extracts* OrderNumber and PurchaseDate and *generates* FaultDescription. Phoned-in claims use an audio analyzer with generate fields, and low-confidence values go to a person.
 
-### 3. Memory aid
-
-**"E-A-R-R"** for every client in this domain: **E**ndpoint · **A**uthenticate · **R**equest shape · **R**ead the response. If you can fill in those four for a service, you can answer its code questions.
-
-For Content Understanding field methods, **"Copy, Choose, Compose"**: **extract** copies a value from the document, **classify** chooses from a list, **generate** composes new text.
-
-### 4. Exam strategy for this domain
-
-- Retired vocabulary is the main distractor source: Azure AI Studio, hub projects, the Assistants API's threads and runs, dall-e-3, Face emotion detection, Image Analysis custom models. Prefer answers using current names.
-- Look-alike API details: deployment name vs model name, `input_image` vs `image_url`, `recognize_once_async` vs continuous recognition, extract vs generate, file search vs web search.
-- The exam rewards testing in the playground before coding, grounding over "be accurate" instructions, structured tools when output feeds automation, and human review for low-confidence results.
-- Five minutes before the exam: **for any code question, find the endpoint, the credential, the request shape and the property being read; the wrong options usually get one of those four wrong.**
+**Memory aids.** **E-A-R-R**: Endpoint · Authenticate · Request shape · Read the response. For Content Understanding: **Copy, Choose, Compose** = extract, classify, generate.
 
 ---
 
@@ -461,18 +768,18 @@ For Content Understanding field methods, **"Copy, Choose, Compose"**: **extract*
 
 | Task | Service / SDK | Key call or setting |
 |---|---|---|
-| Connect to a project | `azure-ai-projects` | `AIProjectClient(endpoint, DefaultAzureCredential())` |
-| Chat with a model | OpenAI-compatible client | `responses.create(model=<deployment name>, input=...)` then `output_text` |
-| Call an agent | Responses API | agent reference in the request; conversation for multi-turn |
-| Agent tools | Foundry Agent Service | file search (own docs), code interpreter (calculations), web search (public, current) |
-| Language detection / PII | `azure-ai-textanalytics` | `detect_language([text])`, `recognize_pii_entities([text])` then `redacted_text` |
-| Speech to text | `azure-cognitiveservices-speech` | `recognize_once_async()` (short) or `start_continuous_recognition()` (long) |
-| Text to speech | Speech SDK | `speech_synthesis_voice_name`, `speak_text_async(text).get()`, SSML for fine control |
-| Spoken prompt to a model | Audio-capable model | `input_audio` part with base64 data and format |
-| Live voice agent | Voice Live API | Managed speech-to-speech, low latency |
-| Image in a prompt | Vision-capable model | `input_image` (Responses) or `image_url` (Chat Completions) |
-| Generate an image | GPT-image model | decode `data[0].b64_json` |
-| Generate a video | Sora | create job, poll, download |
-| Extract fields | `azure-ai-contentunderstanding` | `begin_analyze(...).result()` then `contents[].fields` |
-| CU over REST | REST | 202 + Operation-Location, poll until `Succeeded` |
-| CU field methods | Analyzer schema | extract (documents only), classify, generate |
+| 2.1 | Prompts | Rules in system prompt; grounding with "I don't know" |
+| 2.2 | Foundry portal | Deployment name, type, TPM; 429 = raise TPM |
+| 2.3 | `azure-ai-projects` | `responses.create(model=<deployment name>)` → `output_text` |
+| 2.4 | Agent Service | File search, code interpreter, web search; publish = stable endpoint |
+| 2.5 | Responses API | Agent reference + conversation + Entra ID |
+| 2.6 | `azure-ai-textanalytics` | `detect_language([text])[0]`; `redacted_text` |
+| 2.7 | Audio model / Voice Live | `input_audio` base64; modalities text + audio |
+| 2.8 | `azure-cognitiveservices-speech` | once vs continuous; `speak_text_async`; batch for archives |
+| 2.9 | Vision model | `input_image` / `image_url`; base64 for private; `detail: high` |
+| 2.10 | GPT-image / Sora | decode `b64_json`; video = job, poll, download |
+| 2.11 | Vision app | Photo + instruction in one request; Image Analysis deprecated |
+| 2.12 | CU documents | Prebuilt or custom; extract/classify/generate; enable confidence |
+| 2.13 | CU images | `prebuilt-image`; generate/classify only |
+| 2.14 | CU audio/video | audioSearch, callCenter; WebVTT; segmentation |
+| 2.15 | CU app | `begin_analyze().result()`; 202 + poll Operation-Location |
