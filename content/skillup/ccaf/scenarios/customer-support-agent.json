@@ -11,6 +11,13 @@
     4,
     5
   ],
+  "taskIds": [
+    "1.4",
+    "2.1",
+    "2.2",
+    "5.1",
+    "5.2"
+  ],
   "scenario": {
     "background": "The business case depends on resolving at least 80% of contacts on first contact, but a single refund issued to an unverified caller would be a reportable fraud incident. Halcyon Home Goods is replacing its scripted chatbot with a Claude Agent SDK agent that handles returns, billing disputes and account issues. The agent reaches backend systems through a custom MCP server named `support` that exposes `get_customer`, `lookup_order`, `process_refund` and `escalate_to_human`. In the pilot, the agent occasionally confused order and account lookups, escalated simple returns, and handed human agents cases with no context.",
     "characters": [

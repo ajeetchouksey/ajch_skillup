@@ -1,8 +1,0 @@
-graph TD
-    subgraph "First Request (Cache Write)"
-        R1[50K token system prompt] -->|"1.25x cost"| CACHE[(Cache)]
-    end
-
-    subgraph "Subsequent Requests (Cache Read)"
-        CACHE -->|"0.1x cost (lower on some current models)"| R2[System prompt from cache]
-    end

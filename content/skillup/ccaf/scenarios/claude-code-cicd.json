@@ -11,6 +11,12 @@
     3,
     5
   ],
+  "taskIds": [
+    "3.3",
+    "3.6",
+    "4.5",
+    "4.6"
+  ],
   "scenario": {
     "background": "Last quarter a home-grown review bot posted dozens of vague, unparseable comments per pull request, and developers learned to ignore it. Leadership wants a replacement that runs unattended in CI and posts findings the pipeline can parse reliably, without ever changing the repository. Larkspur Payments runs a GitHub monorepo with application code in src/ and Terraform in infra/. On every PR the pipeline must check for security vulnerabilities, check that new code has tests, and check that Terraform resources follow the team's naming convention, then post the results as PR comments. A nightly job should also produce a repository-wide technical-debt report.",
     "characters": [

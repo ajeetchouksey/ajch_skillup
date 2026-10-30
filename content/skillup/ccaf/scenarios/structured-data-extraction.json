@@ -10,6 +10,11 @@
     3,
     5
   ],
+  "taskIds": [
+    "4.3",
+    "4.4",
+    "4.5"
+  ],
   "scenario": {
     "background": "The warehouse load fails whenever a single record breaks the schema, and the extraction budget was set assuming batch pricing, so reliability and cost matter far more than latency. Corvid Retail collects about 100,000 customer-feedback documents a day. Each one must get a sentiment label, an array of product mentions, a priority from 1 to 5, and an array of action items. Many documents mention no products or contain no action items. The job runs overnight, and results must be loaded into the warehouse before the 7 a.m. dashboards refresh.",
     "characters": [

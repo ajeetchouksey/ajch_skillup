@@ -1126,8 +1126,8 @@
     },
     {
       "schemaVersion": "1.0",
-      "contentVersion": "1.1.0",
-      "contentUpdatedAt": "2026-10-27",
+      "contentVersion": "1.2.0",
+      "contentUpdatedAt": "2026-10-30",
       "provider": "Anthropic",
       "palette": {
         "color": "#a78bfa",
@@ -1154,6 +1154,12 @@
           "date": "2026-10-27",
           "type": "minor",
           "summary": "Syllabus check against the official CCAR-F Exam Guide v1.0 (effective July 2026): domains, weights and task statements unchanged. Difficulty tags added to all 250 existing questions; 17 new questions for thin task statements (1.3, 2.4, 3.6, 4.6, 5.2, 5.3, 5.4), mapped in task-statements.json. 49 questions corrected against current Claude docs (rule frontmatter is paths, not path/applyTo; CLAUDE.md files concatenate rather than override; MCP servers live in .mcp.json/~/.claude.json; allowed-tools pre-approves rather than restricts; hook exit code 2 blocks; Task tool renamed Agent; forced tool_choice rejected on Opus 5.5/Sonnet 5.5/Fable 5.1; adaptive thinking replaces budget_tokens; batch expiry vs 29-day results; caching minimums and read prices; removed the unsupported '18-tool cliff' statistic). All five notes corrected and extended with house-standard sections and a Deep Dive. 6 legacy scenarios converted to guided walkthroughs. task-statements.json domain ids realigned to this registry's numbering (the official guide orders Tool Design 2, Claude Code 3, Prompt Engineering 4), so objectives group under the right domain; official task ids unchanged. Correct-answer positions rebalanced (B had been correct in 82%)."
+        },
+        {
+          "version": "1.2.0",
+          "date": "2026-10-30",
+          "type": "minor",
+          "summary": "Converted to the SkillUp lessons format. The 30 official exam-guide objectives (unchanged, with their knowledge and skills) are now 30 lessons, one ## section each, keyed by the guide's own numbering inside each app domain (Claude Code 3.x, prompting 4.x, tools and MCP 2.x). Each lesson has a claim, diagram, Real use, How it works, Choose when, How to do it, Exam Trap and verified Anthropic, Claude Code or MCP documentation links; Deep Dives and Cheat Sheets per domain. Checked against current docs: the Task tool is named Agent since Claude Code 2.1.63 (Task still works); commands are merged into skills; context: fork runs a skill in an isolated subagent; --json-schema returns structured_output; Agent SDK resume with fork_session / forkSession; PostToolUse updatedToolOutput; structured outputs via strict tool use or output_config.format. 30 new lesson diagrams (scripts/diagrams/ccaf.py) replace the 37 Mermaid renders and their sources. 11 questions listed under two or three objectives now map to one lesson each (d5-007, an expired-batch question, moves to 4.5). Short titles added; the 6 case studies are tagged with the lessons they cover. No question text changed."
         }
       ],
       "id": "ccaf",
