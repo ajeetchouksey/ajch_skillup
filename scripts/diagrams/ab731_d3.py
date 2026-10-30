@@ -90,42 +90,6 @@ def register(api):
             D.edge([(a["r"], y), (b["l"], y)])
         return bs
 
-    def strategy(f):
-        D = Diagram(f, 236, "Aligning AI to Business Strategy",
-                    "Start from business need and work toward technology, never the reverse.",
-                    "Four steps left to right. Start with business strategy and its top three priorities. Map each to "
-                    "an AI opportunity: which task, which tool. Set KPIs with measurable outcomes. Secure an executive "
-                    "sponsor for funding and endorsement.")
-        chain(D, 142, [("Business strategy", "Top 3 priorities", "focus"),
-                       ("Map to AI opportunity", "Which task? Which tool?", "neutral"),
-                       ("Set KPIs", "Measurable outcomes", "neutral"),
-                       ("Executive sponsor", "Funding + endorsement", "neutral")], 92)
-        D.legend(220, [("focus", "start here"), ("solid", "flow")])
-        return D
-
-    def data_estate(f):
-        D = Diagram(f, 476, "The Unified Data Estate",
-                    "Break down silos: connect every source into one layer before AI builds on it.",
-                    "CRM data, ERP data, HR data and other data all flow into Microsoft Fabric, the unified data layer. "
-                    "Fabric then feeds two outcomes: analytics and reporting (dashboards, reports, insights) and AI and "
-                    "advanced analytics (machine learning, forecasting, advanced insights).")
-        srcs = ["CRM data", "ERP data", "HR data", "Other data"]
-        w, gap = 136, 18
-        x0 = (680 - (4 * w + 3 * gap)) / 2
-        fab = D.box(340, 266, 280, "Microsoft Fabric", sub="Unified data layer", kind="focus", h=72)
-        targets = [240, 300, 380, 440]
-        for i, (s, tx) in enumerate(zip(srcs, targets)):
-            cx = x0 + w / 2 + i * (w + gap)
-            b = D.box(cx, 116, w, s, kind="data", h=48)
-            D.edge([(cx, b["b"]), (cx, 186), (tx, 186), (tx, fab["t"])])
-        outs = [(190, 250, "Analytics & reporting", "Dashboards, reports, insights"),
-                (490, 430, "AI & advanced analytics", "Machine learning, forecasting, advanced insights")]
-        for cx, sx, t, b in outs:
-            o = D.box(cx, 394, 270, t, b, kind="good", h=72)
-            D.edge([(sx, fab["b"]), (sx, 336), (cx, 336), (cx, o["t"])])
-        D.legend(458, [("data", "source"), ("focus", "unified layer"), ("good", "outcome")])
-        return D
-
     def adoption_curve(f):
         D = Diagram(f, 236, "Adoption Curve for AI",
                     "Each stage has its own lever, from leadership comms to hands-on support.",
@@ -169,8 +133,6 @@ def register(api):
         "ab731-d3-responsible-ai-principles": ("ab731", principles),
         "ab731-d3-ai-council": ("ab731", council),
         "ab731-d3-implementation-checklist": ("ab731", checklist),
-        "ab731-d3-strategy-alignment": ("ab731", strategy),
-        "ab731-d3-unified-data-estate": ("ab731", data_estate),
         "ab731-d3-adoption-curve": ("ab731", adoption_curve),
         "ab731-d3-scale-framework": ("ab731", scale),
     }

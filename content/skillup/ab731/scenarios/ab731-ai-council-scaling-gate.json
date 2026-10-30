@@ -7,6 +7,11 @@
   "difficulty": "hard",
   "estimatedMinutes": 18,
   "domains": [2, 3],
+  "taskIds": [
+    "3.3",
+    "3.5",
+    "3.8"
+  ],
   "scenario": {
     "background": "Whether Calderwood & Finch's first AI Council survives its first real test depends less on the claims-triage tool it's reviewing than on who has a seat at the table and what still needs that table's sign-off once the Centre of Excellence is up and running. Calderwood & Finch is a 3,000-employee insurance and financial advisory firm licensed to operate in the UK, US, and Canada, each with its own regulator watching how the company uses AI in customer-facing decisions. A six-week pilot of an AI-assisted claims-triage assistant in the Underwriting division went well, and leadership wants to move fast — but the company has never had to decide, in writing, who governs an AI use case, what a Centre of Excellence is allowed to approve on its own, or what has to happen before a pilot is trusted with production claims data company-wide.",
     "characters": [

@@ -7,6 +7,13 @@
   "difficulty": "hard",
   "estimatedMinutes": 18,
   "domains": [1, 3],
+  "taskIds": [
+    "1.1",
+    "1.6",
+    "1.10",
+    "1.15",
+    "3.2"
+  ],
   "scenario": {
     "background": "Northwind Retail Group, a mid-size retailer with 2,400 employees, just completed a six-week Microsoft 365 Copilot pilot with 50 users across customer support and legal. The pilot was well received, and the AI steering committee is now meeting to decide how to allocate next quarter's AI budget. Three initiatives are on the table: an automated support-email triage system, an internal HR/legal document Q&A assistant, and a customer-facing chat feature that would look up account details to answer billing questions. The committee has funding for only one net-new build this quarter and needs to make defensible, evidence-based calls on approach, priority, and governance.",
     "characters": [

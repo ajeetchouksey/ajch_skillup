@@ -293,28 +293,6 @@ def ccap_context(f):
     return D
 
 
-def ab731_bias(f):
-    D = Diagram(f, 572, "How Bias Enters a Model",
-                "Bias flows down the chain; mitigation intervenes at the data and the model.",
-                "Training data contains bias. The model learns and internalizes that bias, produces skewed or "
-                "discriminatory outputs, and creates business, legal and ethical risk. Mitigation with diverse data, "
-                "human feedback (RLHF) and continuous evaluation acts on the training data and the model, and is "
-                "triggered by the risk it reduces.")
-    cx, w = 158, 256
-    spec = [(130, "Training data", "Data used to train the model", "data", "contains bias"),
-            (240, "Model learns bias", "Picks up and internalizes patterns and biases from the data", "neutral", None),
-            (350, "Biased outputs", "Skewed or discriminatory results", "neutral", None),
-            (460, "Business, legal & ethical risk", "Unfair outcomes, compliance issues, reputational damage", "risk", None)]
-    bs = [D.box(cx, y, w, t, b, kind=k, sub=s, h=84) for y, t, b, k, s in spec]
-    for a, b in zip(bs, bs[1:]): D.edge([(cx, a["b"]), (cx, b["t"])])
-    m = D.box(536, 185, 240, "Mitigation", "Diverse data, human feedback (RLHF) and continuous evaluation", kind="good", h=150)
-    D.edge([(m["l"], 130), (bs[0]["r"], 130)], label="diverse data", at=(354, 121))
-    D.edge([(m["l"], 240), (bs[1]["r"], 240)], label="RLHF, evaluation", at=(354, 231))
-    D.edge([(bs[3]["r"], 460), (536, 460), (536, m["b"])], dashed=True, label="risk drives mitigation", at=(536, 400))
-    D.legend(548, [("data", "input"), ("risk", "risk"), ("good", "mitigation"), ("dashed", "feedback")])
-    return D
-
-
 def ab731_champions(f):
     D = Diagram(f, 676, "The AI Champions Network",
                 "Champions connect top-down enablement with bottom-up adoption.",
@@ -344,7 +322,6 @@ def ab731_champions(f):
 
 DIAGRAMS = {
     "ab100-decision-framework": ("ab100", ab100_decision),
-    "ab731-d1-bias-chain": ("ab731", ab731_bias),
     "ab731-d3-champions-network": ("ab731", ab731_champions),
     "ccap-d2-context-window-budget": ("ccap", ccap_context),
 }

@@ -1,75 +1,168 @@
 {
   "schemaVersion": "1.0",
   "examCode": "AB-731",
+  "source": "Study guide for Exam AB-731: AI Transformation Leader (skills measured as of July 22, 2026)",
+  "sourceUrl": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731",
+  "skillsMeasuredAsOf": "2026-07-22",
   "domains": [
     {
       "id": 1,
+      "title": "Identify the business value of generative AI solutions",
+      "weight": 38,
+      "officialWeight": "35–40%",
       "tasks": [
         {
           "id": "1.1",
-          "title": "Identify and evaluate generative AI use cases",
+          "title": "Describe the differences between generative AI and other types of AI",
+          "shortTitle": "Generative AI vs other AI",
+          "group": "Identify the foundational concepts of generative AI",
           "questionIds": [
             "ab731-d1-001",
-            "ab731-d1-007",
-            "ab731-d1-012",
-            "ab731-d1-022"
+            "ab731-d1-026"
           ]
         },
         {
           "id": "1.2",
-          "title": "Assess risks, limitations, and responsible AI factors",
-          "questionIds": [
-            "ab731-d1-003",
-            "ab731-d1-004",
-            "ab731-d1-008",
-            "ab731-d1-009",
-            "ab731-d1-011",
-            "ab731-d2-005",
-            "ab731-d3-001",
-            "ab731-d3-008",
-            "ab731-d3-010"
-          ]
-        },
-        {
-          "id": "1.3",
-          "title": "Calculate ROI, costs, and business value",
-          "questionIds": [
-            "ab731-d1-002",
-            "ab731-d1-006",
-            "ab731-d1-010",
-            "ab731-d1-014",
-            "ab731-d1-015",
-            "ab731-d2-008",
-            "ab731-d2-014",
-            "ab731-d2-015",
-            "ab731-d3-007"
-          ]
-        },
-        {
-          "id": "1.4",
-          "title": "Apply grounding, RAG, and contextualisation techniques",
-          "questionIds": [
-            "ab731-d1-005",
-            "ab731-d1-020",
-            "ab731-d2-011"
-          ]
-        },
-        {
-          "id": "1.5",
-          "title": "Evaluate AI agents and agentic automation",
+          "title": "Select a generative AI solution to meet a business need",
+          "shortTitle": "Choosing a solution",
+          "group": "Identify the foundational concepts of generative AI",
           "questionIds": [
             "ab731-d1-013",
             "ab731-d1-019",
             "ab731-d1-023",
-            "ab731-d1-024",
-            "ab731-d1-025"
+            "ab731-d1-024"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Describe the differences between AI models, including fine-tuned and pretrained models",
+          "shortTitle": "Pretrained vs fine-tuned",
+          "group": "Identify the foundational concepts of generative AI",
+          "questionIds": [
+            "ab731-d1-012",
+            "ab731-d1-016",
+            "ab731-d1-020"
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Explain the cost drivers in generative AI usage, including tokens and return-on-investment (ROI) considerations",
+          "shortTitle": "Tokens, cost and ROI",
+          "group": "Identify the foundational concepts of generative AI",
+          "questionIds": [
+            "ab731-d1-006",
+            "ab731-d1-010"
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Identify the challenges of using generative AI solutions, including fabrications, reliability, and bias",
+          "shortTitle": "Fabrication, reliability, bias",
+          "group": "Identify the foundational concepts of generative AI",
+          "questionIds": [
+            "ab731-d1-003",
+            "ab731-d1-004",
+            "ab731-d1-008",
+            "ab731-d1-009"
           ]
         },
         {
           "id": "1.6",
-          "title": "Select AI models and address security considerations",
+          "title": "Identify when generative AI solutions can provide business value, including scalability and automation",
+          "shortTitle": "Where AI adds value",
+          "group": "Identify the foundational concepts of generative AI",
           "questionIds": [
-            "ab731-d1-016",
+            "ab731-d1-014",
+            "ab731-d3-014"
+          ]
+        },
+        {
+          "id": "1.7",
+          "title": "Describe the impact of prompt engineering",
+          "shortTitle": "Impact of prompting",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-002",
+            "ab731-d1-027"
+          ]
+        },
+        {
+          "id": "1.8",
+          "title": "Understand techniques of prompt engineering",
+          "shortTitle": "Prompting techniques",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-028",
+            "ab731-d1-029"
+          ]
+        },
+        {
+          "id": "1.9",
+          "title": "Identify business requirements for grounding solutions",
+          "shortTitle": "When to ground",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-005",
+            "ab731-d1-030"
+          ]
+        },
+        {
+          "id": "1.10",
+          "title": "Understand how retrieval-augmented generation (RAG) is used for AI solutions",
+          "shortTitle": "How RAG works",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-031",
+            "ab731-d1-032"
+          ]
+        },
+        {
+          "id": "1.11",
+          "title": "Understand the impact of data on AI solutions, including data type, data quality, and representative datasets",
+          "shortTitle": "Data and AI",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-033",
+            "ab731-d1-034"
+          ]
+        },
+        {
+          "id": "1.12",
+          "title": "Describe the importance of secure AI",
+          "shortTitle": "Why secure AI",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-035",
+            "ab731-d1-036"
+          ]
+        },
+        {
+          "id": "1.13",
+          "title": "Identify scenarios when machine learning adds value",
+          "shortTitle": "When ML adds value",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-007",
+            "ab731-d1-037"
+          ]
+        },
+        {
+          "id": "1.14",
+          "title": "Describe the lifecycle of a machine learning solution",
+          "shortTitle": "ML lifecycle",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-022",
+            "ab731-d1-038"
+          ]
+        },
+        {
+          "id": "1.15",
+          "title": "Identify security considerations for AI systems, including application security, data security, and authentication requirements",
+          "shortTitle": "AI security controls",
+          "group": "Identify benefits and capabilities of generative AI solutions",
+          "questionIds": [
+            "ab731-d1-011",
             "ab731-d1-017",
             "ab731-d1-018",
             "ab731-d1-021"
@@ -79,23 +172,65 @@
     },
     {
       "id": 2,
+      "title": "Identify benefits, capabilities, and opportunities for Microsoft's AI apps and services",
+      "weight": 38,
+      "officialWeight": "35–40%",
       "tasks": [
         {
           "id": "2.1",
-          "title": "Use Microsoft 365 Copilot features and experiences",
+          "title": "Map business processes and use cases to Copilot",
+          "shortTitle": "Processes to Copilot",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
           "questionIds": [
             "ab731-d2-001",
-            "ab731-d2-002",
-            "ab731-d2-003",
-            "ab731-d2-004",
-            "ab731-d2-010",
-            "ab731-d2-012",
-            "ab731-d2-013"
+            "ab731-d2-014"
           ]
         },
         {
           "id": "2.2",
-          "title": "Manage permissions, data access, and Microsoft Graph",
+          "title": "Understand differences in capabilities between versions of Copilot",
+          "shortTitle": "Copilot versions",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-021",
+            "ab731-d2-022"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Understand capabilities of Microsoft 365 Copilot Chat web and mobile experiences",
+          "shortTitle": "Copilot Chat",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-023",
+            "ab731-d2-024"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Understand capabilities of the Copilot experience in various Microsoft 365 apps",
+          "shortTitle": "Copilot in the apps",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-002",
+            "ab731-d2-013"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Understand capabilities of Microsoft Copilot Studio",
+          "shortTitle": "Copilot Studio",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-009",
+            "ab731-d2-017"
+          ]
+        },
+        {
+          "id": "2.6",
+          "title": "Understand capabilities of Microsoft Graph",
+          "shortTitle": "Microsoft Graph",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
           "questionIds": [
             "ab731-d2-005",
             "ab731-d2-010",
@@ -103,94 +238,198 @@
           ]
         },
         {
-          "id": "2.3",
-          "title": "Extend and build solutions with Copilot Studio and Azure AI",
+          "id": "2.7",
+          "title": "Identify benefits and capabilities of an integrated Microsoft AI solution, including risk mitigation and safety benefits",
+          "shortTitle": "Integrated solution benefits",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-025",
+            "ab731-d2-026"
+          ]
+        },
+        {
+          "id": "2.8",
+          "title": "Map business processes and use cases to Microsoft's AI apps and services",
+          "shortTitle": "Processes to Microsoft AI",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-019",
+            "ab731-d2-027"
+          ]
+        },
+        {
+          "id": "2.9",
+          "title": "Identify when to use Researcher or Analyst in Copilot",
+          "shortTitle": "Researcher or Analyst",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
+          "questionIds": [
+            "ab731-d2-003",
+            "ab731-d2-004",
+            "ab731-d1-025"
+          ]
+        },
+        {
+          "id": "2.10",
+          "title": "Identify when to build, buy, or extend, including the Microsoft 365 Copilot extensibility framework",
+          "shortTitle": "Build, buy or extend",
+          "group": "Identify benefits and capabilities of Microsoft 365 Copilot and Microsoft Copilot",
           "questionIds": [
             "ab731-d2-006",
+            "ab731-d2-012"
+          ]
+        },
+        {
+          "id": "2.11",
+          "title": "Map business processes and use cases to Foundry Tools",
+          "shortTitle": "Processes to Foundry Tools",
+          "group": "Identify benefits and capabilities of Foundry Tools",
+          "questionIds": [
             "ab731-d2-007",
-            "ab731-d2-009"
+            "ab731-d2-028"
           ]
         },
         {
-          "id": "2.4",
-          "title": "Optimise AI model costs, licensing, and selection",
+          "id": "2.12",
+          "title": "Identify capabilities of Foundry Tools, including Azure Vision in Foundry Tools, Azure AI Search, and Microsoft Foundry",
+          "shortTitle": "Foundry Tools capabilities",
+          "group": "Identify benefits and capabilities of Foundry Tools",
           "questionIds": [
-            "ab731-d3-006",
+            "ab731-d2-011",
+            "ab731-d2-029"
+          ]
+        },
+        {
+          "id": "2.13",
+          "title": "Match an AI model to a business need",
+          "shortTitle": "Matching a model",
+          "group": "Identify benefits and capabilities of Foundry Tools",
+          "questionIds": [
+            "ab731-d2-008",
             "ab731-d2-018",
-            "ab731-d2-019",
-            "ab731-d2-020"
+            "ab731-d2-020",
+            "ab731-d1-015"
           ]
         },
         {
-          "id": "2.5",
-          "title": "Map and automate business processes with AI",
+          "id": "2.14",
+          "title": "Identify the benefits of Microsoft Foundry and Foundry Tools, including scalability and security",
+          "shortTitle": "Foundry benefits",
+          "group": "Identify benefits and capabilities of Foundry Tools",
           "questionIds": [
-            "ab731-d2-009",
-            "ab731-d2-014",
-            "ab731-d2-017"
+            "ab731-d2-030",
+            "ab731-d2-031"
           ]
         }
       ]
     },
     {
       "id": 3,
+      "title": "Identify an implementation and adoption strategy for Microsoft's AI apps and services",
+      "weight": 24,
+      "officialWeight": "20–25%",
       "tasks": [
         {
           "id": "3.1",
-          "title": "Apply Responsible AI principles and governance",
+          "title": "Explain the importance of responsible AI",
+          "shortTitle": "Why responsible AI",
+          "group": "Align an AI strategy with Microsoft responsible AI policies",
           "questionIds": [
-            "ab731-d3-002",
-            "ab731-d3-003",
             "ab731-d3-011",
-            "ab731-d3-012",
-            "ab731-d3-013"
+            "ab731-d3-023"
           ]
         },
         {
           "id": "3.2",
-          "title": "Design AI governance structures and councils",
+          "title": "Establish governance principles for AI use",
+          "shortTitle": "Governance principles",
+          "group": "Align an AI strategy with Microsoft responsible AI policies",
+          "questionIds": [
+            "ab731-d3-008",
+            "ab731-d3-013"
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Establish an AI council to guide strategy, oversight, and cross-functional alignment",
+          "shortTitle": "AI council",
+          "group": "Align an AI strategy with Microsoft responsible AI policies",
           "questionIds": [
             "ab731-d3-004",
-            "ab731-d3-016",
             "ab731-d3-019",
             "ab731-d3-020"
           ]
         },
         {
-          "id": "3.3",
-          "title": "Lead AI adoption, champions programme, and change management",
-          "questionIds": [
-            "ab731-d3-005",
-            "ab731-d3-009",
-            "ab731-d3-015"
-          ]
-        },
-        {
           "id": "3.4",
-          "title": "Manage AI licensing and deployment economics",
+          "title": "Ensure that AI solutions meet responsible AI standards, including fairness, reliability, safety, privacy, security, inclusiveness, transparency, and accountability",
+          "shortTitle": "Meeting the standards",
+          "group": "Align an AI strategy with Microsoft responsible AI policies",
           "questionIds": [
-            "ab731-d3-006",
-            "ab731-d3-007",
-            "ab731-d2-015",
-            "ab731-d3-017"
+            "ab731-d3-001",
+            "ab731-d3-002",
+            "ab731-d3-003",
+            "ab731-d3-012"
           ]
         },
         {
           "id": "3.5",
-          "title": "Address privacy, data protection, and compliance",
+          "title": "Establish an adoption team",
+          "shortTitle": "Adoption team",
+          "group": "Plan for AI adoption across the organization",
           "questionIds": [
-            "ab731-d1-011",
+            "ab731-d3-016",
+            "ab731-d3-021",
+            "ab731-d3-022"
+          ]
+        },
+        {
+          "id": "3.6",
+          "title": "Identify common barriers to adoption",
+          "shortTitle": "Adoption barriers",
+          "group": "Plan for AI adoption across the organization",
+          "questionIds": [
+            "ab731-d3-005",
+            "ab731-d3-015"
+          ]
+        },
+        {
+          "id": "3.7",
+          "title": "Establish an AI champions program",
+          "shortTitle": "Champions program",
+          "group": "Plan for AI adoption across the organization",
+          "questionIds": [
+            "ab731-d3-009",
+            "ab731-d3-024"
+          ]
+        },
+        {
+          "id": "3.8",
+          "title": "Understand potential impacts to data, security, privacy, and cost",
+          "shortTitle": "Data, security, privacy, cost",
+          "group": "Plan for AI adoption across the organization",
+          "questionIds": [
             "ab731-d3-010",
             "ab731-d3-018"
           ]
         },
         {
-          "id": "3.6",
-          "title": "Scale AI initiatives with governance frameworks",
+          "id": "3.9",
+          "title": "Understand Copilot license types, including pay-as-you go, monthly, and included with Microsoft 365 subscription",
+          "shortTitle": "Copilot licences",
+          "group": "Plan for AI adoption across the organization",
           "questionIds": [
-            "ab731-d3-014",
-            "ab731-d3-021",
-            "ab731-d3-022"
+            "ab731-d3-006",
+            "ab731-d3-017"
+          ]
+        },
+        {
+          "id": "3.10",
+          "title": "Understand Foundry Tools subscription models, including pay-as-you-go and commitment tiers",
+          "shortTitle": "Foundry Tools pricing",
+          "group": "Plan for AI adoption across the organization",
+          "questionIds": [
+            "ab731-d3-007",
+            "ab731-d2-015"
           ]
         }
       ]

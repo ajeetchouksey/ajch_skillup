@@ -52,27 +52,6 @@ def register(api):
         D.legend(452, [("solid", "request"), ("dashed", "response"), ("data", "your data")])
         return D
 
-    def agent_workflow(f):
-        D = Diagram(f, 470, "How an Agent Works",
-                    "Give it a goal; it plans the steps and executes them without a prompt at each step.",
-                    "An agent is given a goal: process all new contracts. It plans by breaking the goal into steps. "
-                    "Step 1: retrieve the contract from SharePoint. Step 2: extract key terms. Step 3: flag "
-                    "non-standard clauses. Step 4: update the tracking spreadsheet. Output: a summary report sent "
-                    "to legal.")
-        goal = D.box(190, 124, 260, "Goal", "Process all new contracts", kind="data", h=68)
-        plan = D.box(490, 124, 260, "Plan", "Agent breaks the goal into steps", kind="focus", h=68)
-        D.edge([(goal["r"], 124), (plan["l"], 124)])
-        xs = [95, 257, 419, 581]; sy = 272
-        bodies = ["Retrieve contract from SharePoint", "Extract key terms",
-                  "Flag non-standard clauses", "Update tracking spreadsheet"]
-        st = [D.box(x, sy, 142, f"Step {i + 1}", b, h=84) for i, (x, b) in enumerate(zip(xs, bodies))]
-        D.edge([(490, plan["b"]), (490, 196), (95, 196), (95, st[0]["t"])])
-        for a, b in zip(st, st[1:]): D.edge([(a["r"], sy), (b["l"], sy)])
-        out = D.box(340, 390, 300, "Output: summary report", "Sent to legal", kind="good", h=64)
-        D.edge([(581, st[3]["b"]), (581, 390), (out["r"], 390)])
-        D.legend(452, [("data", "goal"), ("focus", "agent plans"), ("good", "outcome")])
-        return D
-
     def value_matrix(f):
         D = Diagram(f, 420, "AI Use Case Prioritisation Matrix",
                     "Score each use case on business value and implementation feasibility.",
@@ -97,6 +76,5 @@ def register(api):
     return {
         "ab731-d1-ai-type-selection": ("ab731", ai_types),
         "ab731-d1-rag-sequence": ("ab731", rag_sequence),
-        "ab731-d1-agent-workflow": ("ab731", agent_workflow),
         "ab731-d1-value-feasibility-matrix": ("ab731", value_matrix),
     }
