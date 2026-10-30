@@ -1,0 +1,227 @@
+[
+  {
+    "domain": 6,
+    "id": "ccao-d6-001",
+    "scenario": "An HR team proposes having Claude score job applicants and automatically reject anyone below a threshold.",
+    "question": "What is the main problem?",
+    "options": [
+      "It's an automated decision about people with no qualified human reviewing it",
+      "The scoring prompt isn't long enough",
+      "Claude is too slow for this task",
+      "HR teams aren't allowed to use Claude at all"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: decisions that affect people's jobs need a qualified human in the loop, and the people affected should be told AI was involved. B is wrong because a better prompt doesn't remove the need for human judgement. C is wrong because speed isn't the issue. D is wrong because many HR uses, such as drafting job adverts, are fine.",
+    "tags": [
+      "use-cases",
+      "human-in-the-loop"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-002",
+    "scenario": "A company is listing proposed uses of Claude to decide which need extra controls.",
+    "question": "Which use is most clearly appropriate without special controls?",
+    "options": [
+      "Giving final medical diagnoses to patients",
+      "Deciding which customers get a loan",
+      "Producing legal advice sent to clients with no lawyer review",
+      "Drafting internal meeting agendas that the organiser reviews"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: low-impact drafting with a person reviewing is a good use. A is wrong because diagnosis needs a qualified clinician. B is wrong because lending decisions affect people's finances and need qualified human review. C is wrong because legal advice needs expert review before clients rely on it.",
+    "tags": [
+      "use-cases",
+      "zones"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-003",
+    "scenario": "A bank uses Claude to summarise loan applications for loan officers, who make the decisions.",
+    "question": "Which practice aligns with Anthropic's Usage Policy requirements for high-risk uses?",
+    "options": [
+      "Claude makes the decision and officers sign it off without reading",
+      "A qualified officer reviews and can change the recommendation, and applicants are told AI assisted",
+      "No disclosure is needed because officers are involved",
+      "Use the summaries only if Claude is confident"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: for high-risk uses such as lending, the Usage Policy expects a qualified human in the loop and disclosure to the people affected. A is wrong because rubber-stamping isn't meaningful review. C is wrong because disclosure is still expected. D is wrong because Claude's confidence isn't a control.",
+    "tags": [
+      "use-cases",
+      "disclosure"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-004",
+    "scenario": "A project manager wants Claude to find trends in a spreadsheet that includes customer names and account numbers. Policy restricts sharing regulated personal data.",
+    "question": "What should she do?",
+    "options": [
+      "Upload it as is, since the analysis is internal",
+      "Upload it and tell Claude not to remember it",
+      "Abandon the analysis",
+      "Remove or anonymise the names and account numbers before uploading, as policy requires"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: removing or anonymising identifiers lets the analysis go ahead without sharing restricted data. A is wrong because internal use isn't an exemption from policy. B is wrong because the data has already been shared once uploaded. C is wrong because anonymisation makes the task possible.",
+    "tags": [
+      "data-sensitivity",
+      "anonymisation"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-005",
+    "scenario": "A colleague asks whether their chats are used to train Anthropic's models.",
+    "question": "Which answer is accurate?",
+    "options": [
+      "All chats on every plan are always used for training",
+      "On consumer plans it depends on a privacy setting the user controls; on Team and Enterprise plans, data isn't used for training under commercial terms",
+      "No chat is ever stored anywhere",
+      "Only chats with attachments are used for training"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: consumer users control model-training use in their privacy settings, and commercial plans such as Team and Enterprise don't use customer data for training. A is wrong because it ignores the setting and commercial terms. C is wrong because chats are stored in history unless incognito or deleted. D is wrong because attachments aren't the deciding factor.",
+    "tags": [
+      "privacy",
+      "plans"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-006",
+    "scenario": "An analyst needs Claude to compare complaint themes across regions. The export includes customer names, emails, regions, products and complaint text.",
+    "question": "Which approach best applies data minimisation?",
+    "options": [
+      "Upload the full export so Claude has every detail",
+      "Upload the full export but in an incognito chat",
+      "Upload only the region, product and complaint text columns, with any names in the text removed",
+      "Upload names and emails only, since they identify each complaint"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: minimisation means sharing only the data the task needs, and the comparison needs region, product and text, not identities. A is wrong because it shares identifiers the task doesn't need. B is wrong because incognito doesn't override data policy or minimisation. D is wrong because identifiers are what should be removed.",
+    "tags": [
+      "data-minimisation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-007",
+    "scenario": "A marketer's personal Claude account has a feature her company workspace hasn't enabled, so she considers analysing customer feedback there.",
+    "question": "What should she do?",
+    "options": [
+      "Use the approved company workspace, and ask the policy owner about enabling the feature",
+      "Use her personal account, since the result is the same",
+      "Use the personal account but delete the chat afterwards",
+      "Ask a colleague to run it on their personal account"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: company data belongs in the approved workspace, and gaps should go to the policy owner. B is wrong because it works around company controls. C is wrong because deleting afterwards doesn't undo sharing data outside the approved workspace. D is wrong because it's the same policy breach through someone else.",
+    "tags": [
+      "policy",
+      "approved-tools"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-008",
+    "scenario": "A team wants to use Claude for a new kind of task that the company's AI policy doesn't mention.",
+    "question": "What is the appropriate step?",
+    "options": [
+      "Ask the policy owner or governance team before going ahead",
+      "Go ahead, because anything not forbidden is allowed",
+      "Ask Claude whether it's allowed under company policy",
+      "Do it once and decide afterwards"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: when a policy is silent, the policy owner decides. B is wrong because silence isn't permission. C is wrong because Claude doesn't know or set company policy. D is wrong because the risk is taken before anyone decides.",
+    "tags": [
+      "policy",
+      "escalation"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-009",
+    "scenario": "On an Enterprise plan, an employee finds a connector unavailable and code execution turned off.",
+    "question": "What is the most likely reason, and the right response?",
+    "options": [
+      "It's a bug; use a browser extension to bypass it",
+      "The features don't exist; stop using Claude",
+      "Admins control these settings centrally; request a change through the proper channel rather than working around it",
+      "Copy the data into a personal account where the features work"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: on Team and Enterprise plans, owners and admins set which features and connectors are available, and requests go through governance. A is wrong because bypassing controls breaches policy. B is wrong because the features exist but are restricted. D is wrong because it moves company data outside approved tools.",
+    "tags": [
+      "admin-settings",
+      "governance"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-010",
+    "scenario": "A report Claude helped draft contains an error that reaches a client. The author says, \"Claude wrote that section.\"",
+    "question": "Who is accountable?",
+    "options": [
+      "Claude",
+      "The author and the organisation that sent the report",
+      "Anthropic",
+      "Nobody, because AI was involved"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: accountability stays with the people and organisation who use the output and send it. A is wrong because a tool can't be accountable. C is wrong because the provider didn't review or send the report. D is wrong because AI involvement doesn't remove responsibility.",
+    "tags": [
+      "accountability"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-011",
+    "scenario": "A teacher uses Claude to help draft feedback that students will rely on.",
+    "question": "Which practice best reflects ethical use?",
+    "options": [
+      "Hide the use of AI so students trust the feedback",
+      "Let Claude assign grades without review",
+      "Use AI only for students she hasn't met",
+      "Tell students AI helped draft feedback that she reviewed, and make sure the final judgements are hers"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: transparency about AI's role, plus human ownership of judgements, reflects responsible use. A is wrong because hiding AI's role where it matters is a transparency failure. B is wrong because grades are her judgement. C is wrong because it treats students unequally.",
+    "tags": [
+      "transparency"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 6,
+    "id": "ccao-d6-012",
+    "scenario": "Claude helps write customer-facing descriptions of loan products. A reviewer notices the language for one neighbourhood's customers is consistently more cautious.",
+    "question": "What is the most responsible action?",
+    "options": [
+      "Ignore it, since the descriptions are accurate",
+      "Treat it as a fairness issue: review and correct the wording, and check other outputs about people for similar patterns",
+      "Remove that neighbourhood from the marketing",
+      "Ask Claude to add a disclaimer"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: outputs that treat groups differently need review and correction, and the pattern should be checked more widely. A is wrong because accurate facts can still be framed unfairly. C is wrong because excluding the group deepens the unfairness. D is wrong because a disclaimer doesn't fix biased wording.",
+    "tags": [
+      "fairness",
+      "bias"
+    ],
+    "difficulty": "hard"
+  }
+]

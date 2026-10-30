@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccao-scenario-002",
+  "title": "Northgate Logistics Redesigns Its Weekly Report",
+  "description": "An operations team uses Claude to cut the time it spends on a weekly performance report. They have to choose the right output format and model, manage long chats, decide whether to augment or redesign the workflow, and make it efficient without losing quality.",
+  "examId": "ccao",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [
+    2,
+    3,
+    4,
+    7
+  ],
+  "taskIds": [
+    "2.6",
+    "3.3",
+    "3.4",
+    "4.4",
+    "7.3"
+  ],
+  "scenario": {
+    "background": "Northgate Logistics runs four regional depots. Every Monday, the operations team spends most of a day on the weekly performance report: copying figures from three spreadsheets, writing a commentary for each depot and pasting it all into a slide deck for the leadership meeting. Each depot manager then receives an emailed summary. The team has Claude on an Enterprise plan and a mandate to halve the time the report takes, as long as leadership trusts the numbers as much as before.",
+    "characters": [
+      {
+        "name": "Priya Nair",
+        "role": "Head of Operations",
+        "concern": "She owns the report and needs leadership to trust the figures as much as they do today."
+      },
+      {
+        "name": "Jonas Weber",
+        "role": "Operations Analyst",
+        "concern": "He spends most Mondays building the report and wants to spend that time on analysis instead."
+      },
+      {
+        "name": "Amara Osei",
+        "role": "Depot Manager, North",
+        "concern": "She wants a short summary of her depot's numbers and actions, not the whole leadership deck."
+      },
+      {
+        "name": "Daniel Price",
+        "role": "Finance Business Partner",
+        "concern": "He reconciles the cost figures and has caught copying errors in past reports."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccao-scenario-002-q1",
+      "stem": "Jonas wants Claude to pull each depot's on-time rate, cost per parcel and incident count from the three spreadsheets into one place that he'll paste into the leadership deck's data table. Which output format should he ask for?",
+      "options": [
+        "A narrative paragraph for each depot",
+        "An interactive dashboard artifact with charts",
+        "A bullet list of all the figures in one line each",
+        "A structured table with one row per depot and one column per measure"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: data headed for a table should come out as structured rows and columns, ready to paste. A is wrong because figures in prose have to be re-keyed. B is wrong because a dashboard is more than the task needs and doesn't paste into the deck's table. C is wrong because a flat list loses the depot-by-measure structure."
+    },
+    {
+      "id": "ccao-scenario-002-q2",
+      "stem": "The weekly report needs two kinds of Claude work: routine extraction and formatting of the same figures every week, and a short commentary on why one depot's costs rose, drawing on conflicting signals in the data. How should Jonas choose models?",
+      "options": [
+        "Use the most capable model with maximum effort for everything",
+        "Use a faster, lower-cost model for the routine extraction, and a more capable model for the cost analysis, checking quality on a few weeks of data",
+        "Use the fastest model for everything, since speed was the mandate",
+        "Let each analyst choose any model each week"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: match the model to each task: light and fast for routine, high-volume work; more capable for complex reasoning; then confirm quality holds. A is wrong because it spends time and usage where routine work doesn't need it. C is wrong because the mandate requires keeping trust in the analysis. D is wrong because inconsistent choices give inconsistent results."
+    },
+    {
+      "id": "ccao-scenario-002-q3",
+      "stem": "By mid-afternoon, Jonas's single chat holds four weeks of data, several drafts and many corrections, and Claude starts mixing up two depots' figures. What should he do?",
+      "options": [
+        "Keep working in the same chat and correct each mix-up",
+        "Switch to the fastest model to speed up the long chat",
+        "Paste all four weeks of data again so Claude sees them twice",
+        "Ask Claude for a summary of the agreed format and open points, start a new chat for this week's report with that summary, and save the agreed format in the Project's instructions"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: long chats drift and use more of the usage limit. Summarising, restarting and saving what's reused to the Project fixes the cause. A is wrong because the chat keeps growing and drifting. B is wrong because a different model doesn't fix an overlong context. C is wrong because it makes the context longer still."
+    },
+    {
+      "id": "ccao-scenario-002-q4",
+      "stem": "Priya considers two options: add Claude to the current process to draft the commentary only, or redesign the process so Claude produces the table, the commentary and each depot manager's summary from one validated data extract. When is the redesign the better choice?",
+      "options": [
+        "When the repeated copying exists only because of manual limits, and the redesign keeps Daniel's reconciliation check before anything is shared",
+        "Always, because redesign removes all human steps",
+        "Never, because existing reports shouldn't change",
+        "Only if Claude can also approve the report for leadership"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: redesign is worth it when steps exist only because of manual limits, and the controls that keep trust, such as the finance check, stay. B is wrong because removing human checks isn't the goal. C is wrong because the duplicated copying is exactly what redesign removes. D is wrong because sign-off stays with accountable people."
+    },
+    {
+      "id": "ccao-scenario-002-q5",
+      "stem": "After the redesign, the report takes two hours instead of a day. Amara's summary is now produced on a lighter model, and Daniel finds a cost error in two of the last four summaries. How should Priya judge the change?",
+      "options": [
+        "It's a full success, because the time target was met",
+        "Remove Daniel's check, since it slows the process",
+        "The time saving is real, but the summaries aren't yet an optimisation: fix the cause (check the model choice and the extract) until quality matches before",
+        "Stop the redesign and go back to the old process entirely"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: efficiency only counts when quality still meets the need, so the quality gap should be diagnosed and fixed while keeping the gains. A is wrong because errors in cost figures undermine trust. B is wrong because the check is catching real errors. D is wrong because most of the change is working and the problem can be fixed."
+    }
+  ],
+  "keyLearnings": [
+    "Pick the output format for where the result goes: structured tables for data, inline answers for quick questions, artifacts for things to keep and share.",
+    "Match the model to each task: fast and light for routine work, more capable for complex reasoning, and test quality before scaling.",
+    "When a long chat drifts, summarise, restart and save what you reuse in the Project.",
+    "Redesign a workflow when its steps exist only because of manual limits, and keep the controls that maintain trust.",
+    "An optimisation that lowers quality isn't finished: diagnose the cause and keep the gains."
+  ]
+}

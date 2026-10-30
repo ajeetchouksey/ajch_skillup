@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccao-scenario-001",
+  "title": "Harbour & Pine Sets Up Its Campaign Project",
+  "description": "A homeware retailer's marketing team moves from ad-hoc chats to a shared Claude Project for campaign copy. They have to brief Claude well, choose what goes into knowledge and what should be a connector, decide what needs review before it goes out, and handle a customer-data request safely.",
+  "examId": "ccao",
+  "difficulty": "medium",
+  "estimatedMinutes": 15,
+  "domains": [
+    1,
+    2,
+    5,
+    6
+  ],
+  "taskIds": [
+    "1.1",
+    "2.4",
+    "5.1",
+    "5.2",
+    "6.2"
+  ],
+  "scenario": {
+    "background": "Harbour & Pine sells homeware online and in twelve shops. Its six-person marketing team has used Claude for six months, but everyone works differently: some paste the brand guide into every chat, others don't, and copy quality varies from one campaign to the next. The team is on a Claude Team plan. Next quarter brings a spring campaign across email, social and in-store signs, and the marketing lead wants one shared setup so every draft starts from the same brand voice, product facts and rules, without slowing the team down or creating new risks with customer data.",
+    "characters": [
+      {
+        "name": "Maya Okafor",
+        "role": "Marketing Lead",
+        "concern": "She wants consistent, on-brand copy from everyone on the team, and less time spent re-explaining the brand to Claude."
+      },
+      {
+        "name": "Leo Brandt",
+        "role": "Content Writer",
+        "concern": "He writes most of the drafts and is frustrated that Claude's first attempts are generic."
+      },
+      {
+        "name": "Sana Iqbal",
+        "role": "CRM Analyst",
+        "concern": "She owns the customer database and wants to use Claude to find patterns in purchase data for the campaign."
+      },
+      {
+        "name": "Tom Reyes",
+        "role": "Legal and Compliance Advisor",
+        "concern": "He signs off anything with promotional terms, prices or claims, and worries about customer data leaving approved tools."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccao-scenario-001-q1",
+      "stem": "Leo asks Claude, \"Write a spring email for our garden range.\" The draft is generic and twice as long as the email template allows. Which revised prompt would most improve the result?",
+      "options": [
+        "Ask for the same email again with \"make it better\" added",
+        "Ask Claude to write five emails and pick the longest",
+        "Give the goal (drive visits to the garden range), the audience (existing customers who bought outdoor items last year), the 150-word limit, the three products and offer to feature, and the brand-voice rules",
+        "Ask Claude to research what spring means to customers"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: generic, overlong output signals missing context. Goal, audience, length, key facts and voice turn a vague request into a brief Claude can meet. A is wrong because \"better\" doesn't say what to change. B is wrong because more drafts from the same vague prompt don't fix the brief, and the longest one breaks the limit. D is wrong because research isn't the gap; the brief is."
+    },
+    {
+      "id": "ccao-scenario-001-q2",
+      "stem": "Maya sets up a shared Project for the campaign. What should go in the Project's instructions, and what in its knowledge?",
+      "options": [
+        "Instructions: the brand voice, audience and format rules for every chat. Knowledge: the brand guide, product fact sheets and approved example copy",
+        "Instructions: the full 40-page brand guide pasted in. Knowledge: nothing",
+        "Instructions: each writer's personal preferences. Knowledge: last year's customer list",
+        "Instructions: left empty, so Claude is free to be creative. Knowledge: every file the team has ever made"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: Project instructions set standing behaviour for every chat, and knowledge holds the reference documents every chat can draw on. B is wrong because reference material belongs in knowledge, and long instructions are harder to follow. C is wrong because personal preferences belong in account instructions and a customer list raises data issues. D is wrong because no rules means inconsistent copy, and dumping every file adds outdated and conflicting material."
+    },
+    {
+      "id": "ccao-scenario-001-q3",
+      "stem": "The product team updates stock levels and prices in a Google Drive sheet several times a week. Leo has been downloading it and uploading it to the Project each Monday. What is the better approach?",
+      "options": [
+        "Connect Google Drive so Claude can read the current sheet from Leo's connected account, and keep stable reference files such as the brand guide as uploaded knowledge",
+        "Upload the sheet every day instead of every Monday",
+        "Paste the prices into the Project instructions",
+        "Ask Claude to estimate current prices from last month's sheet"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: connectors suit information that changes often, while uploads suit stable reference material. The connector only sees what Leo's account can access. B is wrong because daily uploads are still stale snapshots and repeated work. C is wrong because instructions are for rules, not changing data. D is wrong because estimates would produce wrong prices in customer copy."
+    },
+    {
+      "id": "ccao-scenario-001-q4",
+      "stem": "Claude drafts three pieces: an internal team update, social posts with no prices, and in-store signs that say \"30% off all garden furniture until 30 April\". Which needs Tom's review before use?",
+      "options": [
+        "The internal team update, because it goes to everyone in marketing",
+        "None of them, because the Project instructions were followed",
+        "The in-store signs, because they state a promotional offer and terms that carry legal and customer impact",
+        "All three need the same full legal review"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: review should match the stakes, and a public price promotion carries legal and customer risk. A is wrong because an internal update is low risk. B is wrong because following instructions doesn't remove the need to check claims and terms. D is wrong because full legal review of low-risk content wastes the expert's time."
+    },
+    {
+      "id": "ccao-scenario-001-q5",
+      "stem": "Sana wants Claude to find which customer segments bought outdoor items last spring. The export includes names, emails, postcodes, purchase history and loyalty IDs. Tom reminds her that policy restricts sharing personal data. What should she do?",
+      "options": [
+        "Upload the full export, since the analysis stays inside the marketing team",
+        "Remove names, emails and loyalty IDs, keep only what the analysis needs (such as region, product category and purchase month), and use the company's Team workspace",
+        "Upload the full export and tell Claude not to remember it",
+        "Upload it to her personal account, which has memory turned off"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: removing identifiers and sharing only the columns the task needs lets the analysis go ahead within policy, in the approved workspace. A is wrong because internal use isn't an exemption from policy. C is wrong because the data has already been shared once uploaded. D is wrong because a personal account is outside approved tools, whatever its settings."
+    }
+  ],
+  "keyLearnings": [
+    "Generic or overlong drafts usually mean a thin brief: give goal, audience, format, key facts and voice.",
+    "In a Project, instructions set behaviour for every chat and knowledge holds the reference documents.",
+    "Use connectors for information that changes often and uploads for stable reference material.",
+    "Match review to stakes: public offers, prices and legal terms need expert sign-off; low-risk internal content doesn't.",
+    "Before uploading personal data, remove identifiers and share only what the task needs, in the approved workspace."
+  ]
+}

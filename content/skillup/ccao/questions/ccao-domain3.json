@@ -1,0 +1,230 @@
+[
+  {
+    "domain": 3,
+    "id": "ccao-d3-001",
+    "scenario": "A consultant uploads the same client brand guide and contract into a new chat every week before asking for help with that client.",
+    "question": "Which feature would best remove this repeated work?",
+    "options": [
+      "Research mode, so Claude searches for the files each time",
+      "A Project for the client, with the brand guide and contract as knowledge and the standing rules as instructions",
+      "An incognito chat, so the files aren't stored",
+      "A longer single chat that is never closed"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Projects keep instructions and knowledge files together so every chat in them starts with the same context. A is wrong because Research searches the web and connected sources for questions, not to replace a stable reference set. C is wrong because incognito chats aren't available in Projects and keep nothing. D is wrong because one endless chat grows long and drifts.",
+    "tags": [
+      "projects",
+      "features"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-002",
+    "scenario": "A strategy lead needs a cited overview of how five competitors have changed their pricing in the past year, drawn from many sources.",
+    "question": "Which Claude feature best fits this task?",
+    "options": [
+      "A plain chat with no web access, answering from training knowledge",
+      "An artifact, since the output will be long",
+      "Account instructions telling Claude to be thorough",
+      "Research, with web search turned on, then check the cited sources"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Research runs several searches, follows up on findings and returns a cited report, which suits multi-source, current questions. It needs web search on. A is wrong because training knowledge may be out of date and gives no citations. B is wrong because an artifact is an output format, not a way to gather sources. C is wrong because instructions don't give Claude access to current sources.",
+    "tags": [
+      "research",
+      "features"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-003",
+    "scenario": "An office manager has four Claude tasks this week and wants to use the lightest feature that fits each one.",
+    "question": "Which task is the best fit for a plain chat, rather than an artifact or a Project?",
+    "options": [
+      "Building a reusable onboarding checklist the team will update monthly",
+      "Rewording one email to sound more polite",
+      "Running a three-month client engagement with shared reference documents",
+      "Creating an interactive budget calculator to share with colleagues"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a one-off, short task suits a plain chat. A is wrong because a reusable, updated document suits an artifact. C is wrong because ongoing work with shared documents suits a Project. D is wrong because an interactive tool to share is an artifact.",
+    "tags": [
+      "artifacts",
+      "chat"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-004",
+    "scenario": "A support team drafts several hundred short, routine replies to common questions every day.",
+    "question": "Which model family is usually the best fit?",
+    "options": [
+      "Opus for every reply, to maximise quality",
+      "Whichever model has the newest version number",
+      "Alternate between models at random to compare them",
+      "Haiku, the fastest and lowest-cost family, suited to high-volume straightforward tasks"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Haiku is built for speed and volume on straightforward tasks. A is wrong because the most capable model wastes speed and usage on simple work. B is wrong because version numbers don't tell you which family fits. C is wrong because random switching isn't a selection strategy.",
+    "tags": [
+      "models",
+      "haiku"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-005",
+    "scenario": "A strategy director needs to work through a complex pricing decision with many interacting assumptions and trade-offs, once per quarter.",
+    "question": "Which model family is the best fit?",
+    "options": [
+      "Opus, the most capable family, suited to complex multi-step reasoning",
+      "Haiku, because it's fastest",
+      "Haiku with a shorter prompt",
+      "Any model, since all families reason equally well"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Opus is designed for the hardest reasoning, and an infrequent high-value task justifies the extra time and usage. B is wrong because speed isn't the priority here. C is wrong because a shorter prompt doesn't add reasoning capability. D is wrong because the families differ in capability.",
+    "tags": [
+      "models",
+      "opus"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-006",
+    "scenario": "A new team member asks where Sonnet sits among Claude's model families.",
+    "question": "Which statement about Sonnet is correct?",
+    "options": [
+      "It is the smallest model, used only for classification",
+      "It is the most capable model, reserved for the hardest problems",
+      "It balances capability and speed, making it a strong everyday choice for most business writing and analysis",
+      "It is a feature for searching the web"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: Sonnet sits between Haiku and Opus as the balanced everyday choice. A is wrong because that describes Haiku, and Haiku isn't limited to classification. B is wrong because that describes Opus. D is wrong because Sonnet is a model family, not a feature.",
+    "tags": [
+      "models",
+      "sonnet"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-007",
+    "scenario": "A marketing team will generate descriptions for 2,000 products. They're unsure which model to use.",
+    "question": "What is the best approach?",
+    "options": [
+      "Use the most capable model for all 2,000, just to be safe",
+      "Pick the model at random, since the descriptions are short",
+      "Test a sample of products on a faster, lower-cost model and move up only if the quality isn't good enough",
+      "Generate all 2,000 on every model and compare them all"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: start with the lightest model that might work, test on a sample, and step up only where quality falls short. Volume multiplies every choice. A is wrong because it may spend far more time and usage than needed. B is wrong because it isn't a decision method. D is wrong because full runs on every model waste effort a sample would avoid.",
+    "tags": [
+      "cost-speed-quality",
+      "testing"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-008",
+    "scenario": "A user turns on extended thinking and the highest effort setting for every task, including quick email replies.",
+    "question": "What is the main drawback?",
+    "options": [
+      "Routine tasks become slower and use more of the usage limit without a meaningful quality gain",
+      "Thinking makes Claude refuse simple tasks",
+      "Higher effort disables Projects",
+      "There is no drawback; higher settings are always better"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: higher effort and thinking help on complex problems but add time and usage, so they're wasted on routine work. B is wrong because thinking doesn't cause refusals. C is wrong because effort settings don't affect Projects. D is wrong because the trade-off is real.",
+    "tags": [
+      "effort",
+      "thinking"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-009",
+    "scenario": "An analyst runs a weekly report on a fast model. Recently the reports have needed complex judgements about conflicting data, and reviewers are finding shallow conclusions.",
+    "question": "What is the most appropriate change?",
+    "options": [
+      "Keep the fast model and add \"think harder\" to the end of the prompt",
+      "Switch every team task to the most capable model",
+      "Stop using Claude for reports altogether",
+      "Step up to a more capable model, or raise effort, for this report and check whether conclusions improve"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: when task requirements change, model selection should follow: step up for the task that now needs deeper reasoning, then check the result. A is wrong because wording doesn't add the capability the task needs. B is wrong because one task's needs don't apply to every task. C is wrong because the problem is fit, not the tool.",
+    "tags": [
+      "cost-speed-quality"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-010",
+    "scenario": "After a three-hour planning chat, Claude starts mixing up decisions made early in the conversation.",
+    "question": "What is the best next step?",
+    "options": [
+      "Keep going in the same chat and correct each mistake",
+      "Ask Claude for a summary of decisions and open items, then start a new chat with that summary",
+      "Delete the chat and start from nothing",
+      "Switch to the fastest model to speed up the chat"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: long chats drift and use more of the usage limit. Summarising and restarting keeps what matters and clears the rest. A is wrong because the chat will keep growing and drifting. C is wrong because it throws away the decisions. D is wrong because a different model doesn't fix an overlong context.",
+    "tags": [
+      "context",
+      "restart"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-011",
+    "scenario": "A team discussed the agreed launch date in one chat in their Project. In a new chat in the same Project, Claude doesn't know it.",
+    "question": "Why, and what is the fix?",
+    "options": [
+      "Projects only remember the first chat; delete the others",
+      "It's a bug; report it and wait for a fix",
+      "Turn on incognito mode so the chats share context",
+      "Chats in a Project don't share each other's conversations; add the launch date to the Project's knowledge or instructions"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: shared context in a Project comes from its knowledge and instructions, not from other chats. Anything needed repeatedly should be saved there. A is wrong because Projects don't work that way. B is wrong because this is expected behaviour. C is wrong because incognito chats are saved to neither history nor memory, and aren't available in Projects.",
+    "tags": [
+      "context",
+      "projects",
+      "persist"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-012",
+    "scenario": "A manager wants to ask Claude a one-off sensitive question about a personal matter and doesn't want it saved to chat history or memory.",
+    "question": "Which option fits?",
+    "options": [
+      "A Project with the question saved in its knowledge",
+      "An incognito chat, which isn't saved to history or memory",
+      "A normal chat, then ask Claude to forget it",
+      "Account instructions telling Claude never to remember anything"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: incognito chats aren't saved to chat history or memory. A is wrong because it stores the question for reuse. C is wrong because asking Claude to forget doesn't remove a saved chat. D is wrong because instructions don't control what is saved.",
+    "tags": [
+      "memory",
+      "incognito"
+    ],
+    "difficulty": "medium"
+  }
+]
