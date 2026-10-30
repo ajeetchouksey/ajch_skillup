@@ -11,6 +11,15 @@
     2,
     3
   ],
+  "taskIds": [
+    "1.3",
+    "1.4",
+    "1.5",
+    "1.6",
+    "1.9",
+    "3.2",
+    "3.4"
+  ],
   "officialDescription": "Your organization has migrated 30 microservices into a single GitHub monorepo shared by 5 teams. You need to enforce per-service ownership, prevent unauthorized changes to production-critical paths, detect secrets before they land in main, and gate all merges on passing security checks — without slowing down individual teams.",
   "scenario": {
     "background": "One repository now holds the code for every payment, fraud and compliance service the company runs, so a single misconfigured rule can let an unreviewed change, a leaked credential or a vulnerable dependency reach production for all of them at once. Larchmont Pay, a fintech on GitHub Enterprise Cloud, consolidated 30 microservices into one monorepo used by five teams; payment-service, fraud-service and compliance-service live under /services/ alongside 27 others, and each service team runs its own path-filtered CI workflow. The payment team set up a classic branch protection rule on main before the consolidation, and the platform team now wants to manage protection with rulesets. The compliance team must approve every change under /services/compliance/, and the platform team owns everything under .github/workflows/. Secret scanning has already raised alerts for three credentials committed in the past, and the CISO wants pushes containing secrets blocked from now on. Every pull request to main must pass a dependency vulnerability check that individual teams can't remove, and release tags matching v* must stay intact for audit.",

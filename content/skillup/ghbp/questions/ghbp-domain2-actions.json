@@ -446,5 +446,37 @@
     "explanation": "C is correct: the allowed-actions policy can require actions to be pinned to a full-length commit SHA, and workflows that use an unpinned action then fail. Set at organization level, it covers every repository at once. A is wrong because Dependabot keeps action versions up to date (and can update SHA pins) but doesn't block tag references, and it still needs a file in each repo. B is wrong because code owner review relies on humans noticing unpinned references and needs a CODEOWNERS entry in each repo. D is wrong because blocking all `.yml` changes would stop all legitimate workflow edits too.",
     "difficulty": "medium",
     "tags": ["configuration", "application", "best-practice"]
+  },
+  {
+    "domain": 2,
+    "id": "ghbp-d2-029",
+    "difficulty": "medium",
+    "scenario": "A machine-learning team's packaging jobs need GPUs that standard GitHub-hosted runners don't provide. The jobs run in two private repositories.",
+    "question": "Which runner set-up is the most secure way to provide GPUs for these jobs?",
+    "options": [
+      "Register two persistent GPU machines as self-hosted runners available to every repository in the organization",
+      "Use ephemeral just-in-time GPU runners in a runner group restricted to the two private repositories",
+      "Make both repositories public so that GitHub-hosted runners can be used for the packaging jobs",
+      "Run the packaging on a developer workstation and upload the resulting artifact by hand"
+    ],
+    "correct": 1,
+    "explanation": "Ephemeral, just-in-time runners run one job and are destroyed, so nothing persists between jobs, and a runner group restricted to the two private repositories limits who can schedule work on them. Persistent runners shared with every repository keep state and widen exposure. Making repositories public doesn't add GPUs and exposes the code. A manual workstation build loses the audit trail and reproducibility of CI.",
+    "tags": ["best-practice", "application", "high-weight"]
+  },
+  {
+    "domain": 2,
+    "id": "ghbp-d2-030",
+    "difficulty": "medium",
+    "scenario": "The production environment requires one reviewer from @team-leads. A new deploy job calls the production API with a token from a repository secret, and it ran last night without any approval.",
+    "question": "Why did the job skip the production approval?",
+    "options": [
+      "Required reviewers only apply to jobs triggered by workflow_dispatch, not to push events",
+      "The repository secret overrode the environment's protection rules for that run",
+      "The job doesn't declare environment: production, so the environment's rules never applied",
+      "Approval is skipped automatically when the pushing user is a repository administrator"
+    ],
+    "correct": 2,
+    "explanation": "Deployment protection rules guard only jobs that name the environment with environment:. A job that deploys to production without declaring it bypasses the reviewers entirely, which is why credentials should be environment secrets that such a job can't read. Required reviewers apply regardless of trigger. Secrets don't override protection rules. Admin bypass exists but must be exercised; it isn't an automatic skip, and it isn't the cause here.",
+    "tags": ["troubleshooting", "analysis", "exam-trap"]
   }
 ]

@@ -1,9 +1,0 @@
-graph LR
-    PR["Any merged PR"] -->|"Automatic trigger"| PROD["🔴 Production deploy"]
-
-    PR2["Any merged PR"] -->|"Trigger"| STAGING["✅ Staging deploy"]
-    STAGING -->|"Required review"| GATE["👁️ Production Approval"]
-    GATE -->|"Approved"| PROD2["🟢 Production deploy"]
-
-    style PROD fill:#7f1d1d,color:#fca5a5
-    style PROD2 fill:#14532d,color:#86efac
