@@ -1,7 +1,0 @@
-graph LR
-    A[📨 User Message] --> B{🤖 Claude Thinks}
-    B -->|"Needs info/action"| C[🔧 Tool Call]
-    C --> D[📊 Tool Result]
-    D --> B
-    B -->|"Task complete"| E[✅ Final Response]
-    B -->|"stop_reason: end_turn"| E

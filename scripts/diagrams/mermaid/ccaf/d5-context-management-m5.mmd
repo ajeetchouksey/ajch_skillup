@@ -1,5 +1,0 @@
-graph LR
-    subgraph "Batches API"
-        IN["JSONL Input (up to 100K requests)"] --> API[Anthropic Batch API]
-        API -->|"Processing (up to 24h)"| OUT["Results (50% cost)"]
-    end

@@ -1,4 +1,0 @@
-graph LR
-    M["Main Agent<br/>(high-level coordination)"] -->|"Spawn"| E["Explore Subagent<br/>(verbose discovery)"]
-    E -->|"Summary only"| M
-    M --> I["Implementation<br/>(context still clean)"]

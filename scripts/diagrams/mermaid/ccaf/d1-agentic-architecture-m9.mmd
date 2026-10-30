@@ -1,7 +1,0 @@
-graph LR
-    subgraph "Trace (one request)"
-        A[Span: coordinator] --> B[Span: route_decision]
-        A --> C[Span: subagent_billing]
-        C --> D[Span: tool_lookup_invoice]
-        C --> E[Span: tool_issue_refund]
-    end

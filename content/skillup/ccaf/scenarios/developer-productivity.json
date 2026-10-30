@@ -11,6 +11,10 @@
     4,
     5
   ],
+  "taskIds": [
+    "4.6",
+    "5.4"
+  ],
   "scenario": {
     "background": "The assistant is already making 500+ Claude API calls a day across 50 developers, and finance will cap the project unless input costs fall substantially this quarter. Northpeak Software's assistant helps engineers explore a 15-year-old Java and TypeScript codebase, explain legacy modules, generate tests and boilerplate, and review pull requests for security issues. Every request carries the same static block of team standards and architecture context, followed by the developer's question and any code they paste in. Some of the code under review comes from third-party vendors.",
     "characters": [

@@ -1,8 +1,0 @@
-graph TD
-    subgraph "Most Reliable → Least Reliable"
-        T1["🥇 API-level: tool_use with a JSON schema (strict: true)<br/>or JSON outputs (output_config.format)<br/>Schema compliance via constrained decoding"]
-        T3["🥈 Few-shot examples<br/>Usually works"]
-        T4["🥉 Prompt instruction ('output as JSON')<br/>May add fences, prose — UNRELIABLE"]
-    end
-
-    T1 --> T3 --> T4

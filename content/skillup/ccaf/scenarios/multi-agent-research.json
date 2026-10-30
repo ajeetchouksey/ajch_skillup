@@ -11,6 +11,12 @@
     4,
     5
   ],
+  "taskIds": [
+    "1.3",
+    "5.1",
+    "5.3",
+    "5.4"
+  ],
   "scenario": {
     "background": "Research sessions run for up to an hour, and when one fails at minute 45, the whole run and its spend are lost; reports have also shipped with statistics that no longer matched their sources. Meridian Policy Institute's system uses a coordinator agent that delegates to a `web_searcher`, a `data_analyzer`, a `synthesizer` and a `report_writer`, with each phase depending on the previous one. Some individual search results exceed 20,000 tokens. Analysts need every figure in a final report to trace back to a cited source.",
     "characters": [

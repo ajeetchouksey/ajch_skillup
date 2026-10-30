@@ -11,6 +11,7 @@
         {
           "id": "1.1",
           "title": "Design and implement agentic loops for autonomous task execution",
+          "shortTitle": "Agentic loop",
           "knowledge": [
             "The agentic loop lifecycle: sending requests to Claude, inspecting stop_reason ('tool_use' vs 'end_turn'), executing requested tools, and returning results for the next iteration",
             "How tool results are appended to conversation history so the model can reason about the next action",
@@ -22,7 +23,6 @@
             "Avoiding anti-patterns such as parsing natural language signals to determine loop termination, setting arbitrary iteration caps as the primary stopping mechanism, or checking for assistant text content as a completion indicator"
           ],
           "questionIds": [
-            "d1-001",
             "d1-003",
             "d1-009",
             "d1-011",
@@ -41,6 +41,7 @@
         {
           "id": "1.2",
           "title": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+          "shortTitle": "Coordinator and subagents",
           "knowledge": [
             "Hub-and-spoke architecture where a coordinator agent manages all inter-subagent communication, error handling, and information routing",
             "How subagents operate with isolated context — they do not inherit the coordinator's conversation history automatically",
@@ -54,19 +55,15 @@
             "Routing all subagent communication through the coordinator for observability, consistent error handling, and controlled information flow"
           ],
           "questionIds": [
-            "d1-002",
             "d1-007",
             "d1-008",
             "d1-016",
             "d1-010",
             "d1-019",
             "d1-021",
-            "d1-023",
             "d1-024",
-            "d1-025",
             "d1-026",
             "d1-028",
-            "d1-036",
             "d1-037",
             "d1-038",
             "d1-040",
@@ -86,6 +83,7 @@
         {
           "id": "1.3",
           "title": "Configure subagent invocation, context passing, and spawning",
+          "shortTitle": "Spawning subagents",
           "knowledge": [
             "The Task tool as the mechanism for spawning subagents, and the requirement that allowedTools must include 'Task' for a coordinator to invoke subagents",
             "That subagent context must be explicitly provided in the prompt — subagents do not automatically inherit parent context or share memory between invocations",
@@ -112,6 +110,7 @@
         {
           "id": "1.4",
           "title": "Implement multi-step workflows with enforcement and handoff patterns",
+          "shortTitle": "Enforcement and handoff",
           "knowledge": [
             "The difference between programmatic enforcement (hooks, prerequisite gates) and prompt-based guidance for workflow ordering",
             "When deterministic compliance is required (e.g., identity verification before financial operations), prompt instructions alone have a non-zero failure rate",
@@ -135,6 +134,7 @@
         {
           "id": "1.5",
           "title": "Apply Agent SDK hooks for tool call interception and data normalisation",
+          "shortTitle": "Agent SDK hooks",
           "knowledge": [
             "Hook patterns (e.g., PostToolUse) that intercept tool results for transformation before the model processes them",
             "Hook patterns that intercept outgoing tool calls to enforce compliance rules (e.g., blocking refunds above a threshold)",
@@ -156,6 +156,7 @@
         {
           "id": "1.6",
           "title": "Design task decomposition strategies for complex workflows",
+          "shortTitle": "Task decomposition",
           "knowledge": [
             "When to use fixed sequential pipelines (prompt chaining) versus dynamic adaptive decomposition based on intermediate findings",
             "Prompt chaining patterns that break reviews into sequential steps (e.g., analyse each file individually, then run a cross-file integration pass)",
@@ -167,7 +168,6 @@
             "Decomposing open-ended tasks by first mapping structure, identifying high-impact areas, then creating a prioritised plan that adapts as dependencies are discovered"
           ],
           "questionIds": [
-            "d1-018",
             "d1-033",
             "d1-051",
             "d1-065"
@@ -176,6 +176,7 @@
         {
           "id": "1.7",
           "title": "Manage session state, resumption, and forking",
+          "shortTitle": "Resume and fork",
           "knowledge": [
             "Named session resumption using --resume <session-name> to continue a specific prior conversation",
             "fork_session for creating independent branches from a shared analysis baseline to explore divergent approaches",
@@ -207,6 +208,7 @@
         {
           "id": "3.1",
           "title": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organisation",
+          "shortTitle": "CLAUDE.md hierarchy",
           "knowledge": [
             "The CLAUDE.md configuration hierarchy: user-level (~/.claude/CLAUDE.md), project-level (./CLAUDE.md), and directory-level (subdirectory CLAUDE.md files)",
             "That user-level settings apply only to that user — instructions in ~/.claude/CLAUDE.md are not shared with teammates via version control",
@@ -245,6 +247,7 @@
         {
           "id": "3.2",
           "title": "Create and configure custom slash commands and skills",
+          "shortTitle": "Commands and skills",
           "knowledge": [
             "Project-scoped commands in .claude/commands/ (shared via version control) vs user-scoped commands in ~/.claude/commands/ (personal)",
             "Skills in .claude/skills/ with SKILL.md files that support frontmatter configuration including context: fork, allowed-tools, and argument-hint",
@@ -274,6 +277,7 @@
         {
           "id": "3.3",
           "title": "Apply path-specific rules for conditional convention loading",
+          "shortTitle": "Path-specific rules",
           "knowledge": [
             ".claude/rules/ files with YAML frontmatter paths fields containing glob patterns for conditional rule activation",
             "How path-scoped rules load only when editing matching files, reducing irrelevant context and token usage",
@@ -297,6 +301,7 @@
         {
           "id": "3.4",
           "title": "Determine when to use plan mode vs direct execution",
+          "shortTitle": "Plan mode vs direct",
           "knowledge": [
             "Plan mode is designed for complex tasks involving large-scale changes, multiple valid approaches, architectural decisions, and multi-file modifications",
             "Direct execution is appropriate for simple, well-scoped changes (e.g., adding a single validation check to one function)",
@@ -319,6 +324,7 @@
         {
           "id": "3.5",
           "title": "Apply iterative refinement techniques for progressive improvement",
+          "shortTitle": "Iterative refinement",
           "knowledge": [
             "Concrete input/output examples as the most effective way to communicate expected transformations when prose descriptions are interpreted inconsistently",
             "Test-driven iteration: writing test suites first, then iterating by sharing test failures to guide progressive improvement",
@@ -342,6 +348,7 @@
         {
           "id": "3.6",
           "title": "Integrate Claude Code into CI/CD pipelines",
+          "shortTitle": "Claude Code in CI/CD",
           "knowledge": [
             "The -p (or --print) flag for running Claude Code in non-interactive mode in automated pipelines",
             "--output-format json and --json-schema CLI flags for enforcing structured output in CI contexts",
@@ -373,6 +380,7 @@
         {
           "id": "4.1",
           "title": "Design prompts with explicit criteria to improve precision and reduce false positives",
+          "shortTitle": "Explicit criteria",
           "knowledge": [
             "The importance of explicit criteria over vague instructions (e.g., 'flag comments only when claimed behaviour contradicts actual code behaviour' vs 'check that comments are accurate')",
             "How general instructions like 'be conservative' or 'only report high-confidence findings' fail to improve precision compared to specific categorical criteria",
@@ -402,6 +410,7 @@
         {
           "id": "4.2",
           "title": "Apply few-shot prompting to improve output consistency and quality",
+          "shortTitle": "Few-shot prompting",
           "knowledge": [
             "Few-shot examples as the most effective technique for achieving consistently formatted, actionable output when detailed instructions alone produce inconsistent results",
             "The role of few-shot examples in demonstrating ambiguous-case handling",
@@ -416,7 +425,6 @@
             "Adding few-shot examples showing correct extraction from documents with varied formats to address empty/null extraction of required fields"
           ],
           "questionIds": [
-            "d3-003",
             "d3-005",
             "d3-007",
             "d3-011",
@@ -432,6 +440,7 @@
         {
           "id": "4.3",
           "title": "Enforce structured output using tool use and JSON schemas",
+          "shortTitle": "Structured output",
           "knowledge": [
             "Tool use (tool_use) with JSON schemas as the most reliable approach for guaranteed schema-compliant structured output, eliminating JSON syntax errors",
             "The distinction between tool_choice: 'auto', 'any', and forced tool selection",
@@ -448,7 +457,6 @@
           "questionIds": [
             "d3-003",
             "d3-004",
-            "d4-002",
             "d4-009",
             "d3-019",
             "d3-020",
@@ -471,6 +479,7 @@
         {
           "id": "4.4",
           "title": "Implement validation, retry, and feedback loops for extraction quality",
+          "shortTitle": "Validation and retry",
           "knowledge": [
             "Retry-with-error-feedback: appending specific validation errors to the prompt on retry to guide the model toward correction",
             "The limits of retry: retries are ineffective when the required information is simply absent from the source document",
@@ -486,7 +495,6 @@
           "questionIds": [
             "d3-009",
             "d5-006",
-            "d5-007",
             "d3-025",
             "d3-026",
             "d3-028",
@@ -496,6 +504,7 @@
         {
           "id": "4.5",
           "title": "Design efficient batch processing strategies",
+          "shortTitle": "Batch processing",
           "knowledge": [
             "The Message Batches API: 50% cost savings, up to 24-hour processing window, no guaranteed latency SLA",
             "Batch processing is appropriate for non-blocking, latency-tolerant workloads (overnight reports, weekly audits, nightly test generation) and inappropriate for blocking workflows (pre-merge checks)",
@@ -512,12 +521,14 @@
             "d5-016",
             "d3-029",
             "d3-031",
-            "d3-042"
+            "d3-042",
+            "d5-007"
           ]
         },
         {
           "id": "4.6",
           "title": "Design multi-instance and multi-pass review architectures",
+          "shortTitle": "Multi-pass review",
           "knowledge": [
             "Self-review limitations: a model retains reasoning context from generation, making it less likely to question its own decisions in the same session",
             "Independent review instances (without prior reasoning context) are more effective at catching subtle issues than self-review instructions or extended thinking",
@@ -546,6 +557,7 @@
         {
           "id": "2.1",
           "title": "Design effective tool interfaces with clear descriptions and boundaries",
+          "shortTitle": "Tool descriptions",
           "knowledge": [
             "Tool descriptions as the primary mechanism LLMs use for tool selection; minimal descriptions lead to unreliable selection among similar tools",
             "The importance of including input formats, example queries, edge cases, and boundary explanations in tool descriptions",
@@ -586,6 +598,7 @@
         {
           "id": "2.2",
           "title": "Implement structured error responses for MCP tools",
+          "shortTitle": "MCP error responses",
           "knowledge": [
             "The MCP isError flag pattern for communicating tool failures back to the agent",
             "The distinction between transient errors (timeouts), validation errors (invalid input), business errors (policy violations), and permission errors",
@@ -599,8 +612,6 @@
             "Distinguishing between access failures (needing retry decisions) and valid empty results (representing successful queries with no matches)"
           ],
           "questionIds": [
-            "d1-002",
-            "d1-017",
             "d4-004",
             "d4-013",
             "d4-020"
@@ -609,6 +620,7 @@
         {
           "id": "2.3",
           "title": "Distribute tools appropriately across agents and configure tool choice",
+          "shortTitle": "Tool distribution",
           "knowledge": [
             "The principle that giving an agent access to too many tools (e.g., 18+) degrades tool selection reliability by increasing decision complexity",
             "Why agents with tools outside their specialisation tend to misuse them",
@@ -636,6 +648,7 @@
         {
           "id": "2.4",
           "title": "Integrate MCP servers into Claude Code and agent workflows",
+          "shortTitle": "MCP servers",
           "knowledge": [
             "MCP server scoping: project-level (.mcp.json) for shared team tooling vs user-level (~/.claude.json) for personal/experimental servers",
             "Environment variable expansion in .mcp.json (e.g., ${GITHUB_TOKEN}) for credential management without committing secrets",
@@ -660,6 +673,7 @@
         {
           "id": "2.5",
           "title": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
+          "shortTitle": "Built-in tools",
           "knowledge": [
             "Grep for content search (searching file contents for patterns like function names, error messages, or import statements)",
             "Glob for file path pattern matching (finding files by name or extension patterns)",
@@ -693,6 +707,7 @@
         {
           "id": "5.1",
           "title": "Manage conversation context to preserve critical information across long interactions",
+          "shortTitle": "Preserving context",
           "knowledge": [
             "Progressive summarisation risks: condensing numerical values, percentages, dates, and customer-stated expectations into vague summaries",
             "The 'lost in the middle' effect: models reliably process information at the beginning and end of long inputs but may omit findings from middle sections",
@@ -730,6 +745,7 @@
         {
           "id": "5.2",
           "title": "Design effective escalation and ambiguity resolution patterns",
+          "shortTitle": "Escalation",
           "knowledge": [
             "Appropriate escalation triggers: customer requests for a human, policy exceptions/gaps, and inability to make meaningful progress",
             "The distinction between escalating immediately when a customer explicitly demands it versus offering to resolve when the issue is straightforward",
@@ -753,6 +769,7 @@
         {
           "id": "5.3",
           "title": "Implement error propagation strategies across multi-agent systems",
+          "shortTitle": "Error propagation",
           "knowledge": [
             "Structured error context (failure type, attempted query, partial results, alternative approaches) as enabling intelligent coordinator recovery decisions",
             "The distinction between access failures (timeouts needing retry decisions) and valid empty results (successful queries with no matches)",
@@ -776,6 +793,7 @@
         {
           "id": "5.4",
           "title": "Manage context effectively in large codebase exploration",
+          "shortTitle": "Large codebase context",
           "knowledge": [
             "Context degradation in extended sessions: models start giving inconsistent answers and referencing 'typical patterns' rather than specific classes discovered earlier",
             "The role of scratchpad files for persisting key findings across context boundaries",
@@ -790,7 +808,6 @@
             "Using /compact to reduce context usage during extended exploration sessions when context fills with verbose discovery output"
           ],
           "questionIds": [
-            "d5-003",
             "d5-004",
             "d5-045",
             "d5-046",
@@ -801,6 +818,7 @@
         {
           "id": "5.5",
           "title": "Design human review workflows and confidence calibration",
+          "shortTitle": "Human review",
           "knowledge": [
             "The risk that aggregate accuracy metrics (e.g., 97% overall) may mask poor performance on specific document types or fields",
             "Stratified random sampling for measuring error rates in high-confidence extractions and detecting novel error patterns",
@@ -814,7 +832,6 @@
             "Routing extractions with low model confidence or ambiguous/contradictory source documents to human review, prioritising limited reviewer capacity"
           ],
           "questionIds": [
-            "d5-007",
             "d5-008",
             "d5-021",
             "d5-022",
@@ -828,6 +845,7 @@
         {
           "id": "5.6",
           "title": "Preserve information provenance and handle uncertainty in multi-source synthesis",
+          "shortTitle": "Provenance",
           "knowledge": [
             "How source attribution is lost during summarisation steps when findings are compressed without preserving claim-source mappings",
             "The importance of structured claim-source mappings that the synthesis agent must preserve and merge when combining findings",
