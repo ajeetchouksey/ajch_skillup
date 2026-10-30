@@ -1,0 +1,231 @@
+[
+  {
+    "domain": 5,
+    "id": "ccao-d5-001",
+    "scenario": "A customer-support lead wants every agent's Claude chats to follow the same returns policy and reply style.",
+    "question": "What is the best setup?",
+    "options": [
+      "Ask each agent to paste the policy at the start of every chat",
+      "A shared Project with the returns policy as knowledge and the reply rules as Project instructions",
+      "Put the returns policy in each agent's account instructions",
+      "Use an incognito chat so the policy isn't stored"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a Project bundles instructions and knowledge so every chat in it starts from the same rules and documents, and it can be shared with the team. A is wrong because repeated pasting is error-prone and inconsistent. C is wrong because account instructions apply to all of a person's chats and aren't meant for reference documents. D is wrong because incognito chats aren't available in Projects and keep nothing.",
+    "tags": [
+      "projects",
+      "knowledge"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-002",
+    "scenario": "A team on a paid plan keeps adding documents to a Project, and its knowledge is approaching the context limit.",
+    "question": "What happens?",
+    "options": [
+      "The Project deletes the oldest files",
+      "The Project stops accepting chats",
+      "Retrieval (RAG) switches on automatically, letting the Project hold much more knowledge by searching it for the relevant parts",
+      "Claude reads only the first file"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: on paid plans, Projects switch to retrieval automatically as knowledge nears the context limit, expanding capacity (up to about ten times). A is wrong because files aren't deleted. B is wrong because chats continue normally. D is wrong because retrieval searches across the knowledge.",
+    "tags": [
+      "projects",
+      "rag"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-003",
+    "scenario": "On a Team plan, a manager wants colleagues to use her Project but not change its instructions or files.",
+    "question": "Which sharing option fits?",
+    "options": [
+      "Share the Project with \"Can view\" access",
+      "Share it with \"Can edit\" access",
+      "Copy the instructions into each colleague's account settings",
+      "Make the Project public on the internet"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: \"Can view\" lets colleagues use the Project without changing its setup. B is wrong because edit access lets them change instructions and knowledge. C is wrong because copies drift and aren't maintained in one place. D is wrong because company Projects shouldn't be exposed publicly.",
+    "tags": [
+      "projects",
+      "sharing"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-004",
+    "scenario": "An executive assistant exports the boss's calendar to a file and uploads it to a Project every morning.",
+    "question": "What is the better approach?",
+    "options": [
+      "Connect Google Calendar so Claude can read the live schedule from the connected account",
+      "Upload the calendar twice a day instead",
+      "Paste the calendar into the Project instructions",
+      "Ask Claude to guess the schedule from previous weeks"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: connectors suit information that changes often, such as calendars and email. B is wrong because more uploads are still stale snapshots. C is wrong because instructions are for rules, not daily data. D is wrong because guessing a schedule produces wrong answers.",
+    "tags": [
+      "connectors",
+      "live-data"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-005",
+    "scenario": "With Gmail connected, Claude drafts a reply to a client.",
+    "question": "What happens by default before the email is sent?",
+    "options": [
+      "Claude sends it immediately without asking",
+      "Claude sends it from a shared company account",
+      "Claude asks for the user's approval before sending",
+      "Claude forwards it to the user's manager for approval"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: by default, connector actions such as sending email ask for approval first. A is wrong because sending isn't automatic by default. B is wrong because a connector acts only for the connected account. D is wrong because Claude doesn't route approvals to managers.",
+    "tags": [
+      "connectors",
+      "approvals"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-006",
+    "scenario": "A team member connects Google Drive and asks Claude to summarise a document that only her manager can access.",
+    "question": "What should she expect?",
+    "options": [
+      "Claude can read any document in the company's Drive",
+      "Claude can access only what her connected account can access, so it can't read the manager's private document",
+      "Claude will request the file from the manager automatically",
+      "Claude will summarise it from the document's title"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: connectors only reach the connected account's data and permissions. A is wrong because connectors don't bypass sharing permissions. C is wrong because Claude doesn't request access on her behalf. D is wrong because summarising from a title would be guessing.",
+    "tags": [
+      "connectors",
+      "uploads",
+      "scope"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-007",
+    "scenario": "A consultant wants every Claude chat to use British spelling and lead with the recommendation, whatever the topic.",
+    "question": "Where should this preference go?",
+    "options": [
+      "The instructions of one client Project",
+      "A knowledge file in every Project",
+      "The first message of each chat",
+      "Account instructions, which apply to all of her chats"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: preferences that apply everywhere belong in account instructions. A is wrong because Project instructions apply only within that Project. B is wrong because knowledge files are reference material, not rules. C is wrong because repeating it in every chat is what standing instructions avoid.",
+    "tags": [
+      "instructions",
+      "scope"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-008",
+    "scenario": "A bid team is writing the instructions for its client-proposals Project.",
+    "question": "Which Project instruction is most effective?",
+    "options": [
+      "\"Be professional and good.\"",
+      "\"Write for procurement managers. Lead with cost and timeline. Use the attached template's headings. If a requirement is unclear, list it under 'Questions for the client' rather than assuming.\"",
+      "\"Never make any mistakes.\"",
+      "\"Write proposals.\""
+    ],
+    "correct": 1,
+    "explanation": "B is correct: effective instructions are specific and positive, name the audience and structure, and say what to do when information is missing. A is wrong because it's too vague to change behaviour. C is wrong because it isn't something Claude can act on. D is wrong because it adds nothing about how.",
+    "tags": [
+      "instructions",
+      "writing"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-009",
+    "scenario": "A user's account instructions say \"always answer in bullet points\", but a Project requires full paragraphs for client letters. Results are inconsistent.",
+    "question": "What is the best fix?",
+    "options": [
+      "Add the same rule to the Project three times so it wins",
+      "Delete the Project",
+      "Ask Claude to choose whichever format it prefers",
+      "Make the instructions consistent: make the account preference conditional or remove it, and keep the letter format in the Project instructions"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: conflicting standing instructions at different levels cause inconsistent output; each rule should sit at the level where it applies. A is wrong because repetition doesn't resolve a conflict. B is wrong because the Project is useful. C is wrong because it leaves the format unpredictable.",
+    "tags": [
+      "instructions",
+      "conflicts"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-010",
+    "scenario": "A pricing policy changes. The Project now holds both the old and the new pricing file.",
+    "question": "What should the Project owner do?",
+    "options": [
+      "Remove the old file, keep the single current version, and note the change in the instructions",
+      "Keep both so nothing is lost",
+      "Rename the new file \"FINAL\" and keep both",
+      "Tell users to ignore the old file"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: one current version avoids Claude using conflicting sources. B is wrong because Claude may draw from either version. C is wrong because a file name doesn't stop Claude reading the old file. D is wrong because users can't control which file Claude uses.",
+    "tags": [
+      "maintenance",
+      "versions"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-011",
+    "scenario": "A shared Project is used by 40 people. Nobody has checked its files since it was created a year ago.",
+    "question": "Which practice best keeps it reliable?",
+    "options": [
+      "Let anyone add files whenever they like",
+      "Delete the Project every year and start again",
+      "Assign an owner, set a review schedule, and test with a few standard questions after each update",
+      "Wait for users to complain"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an owner, a review schedule and testing keep a shared configuration current. A is wrong because unmanaged edits create duplicates and conflicts. B is wrong because it throws away good setup. D is wrong because a stale Project fails quietly, answering confidently from old information.",
+    "tags": [
+      "maintenance",
+      "ownership"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-012",
+    "scenario": "The owner of a team Project updates the leave policy file and the instructions.",
+    "question": "What else should she do?",
+    "options": [
+      "Nothing; users will notice the answers changed",
+      "Ask users to re-upload the old policy in their chats",
+      "Test the Project with common leave questions and tell users what changed",
+      "Turn off memory for the whole team"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: after changes, test that answers are right and inform users so they know what changed. A is wrong because silent changes confuse users. B is wrong because it brings back outdated information. D is wrong because memory isn't related to the policy update.",
+    "tags": [
+      "maintenance",
+      "communication"
+    ],
+    "difficulty": "medium"
+  }
+]

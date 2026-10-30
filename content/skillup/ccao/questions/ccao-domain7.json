@@ -1,0 +1,172 @@
+[
+  {
+    "domain": 7,
+    "id": "ccao-d7-001",
+    "scenario": "A sales Project keeps quoting last year's discount. Reps have tried rewording their questions.",
+    "question": "What is the most likely cause, and fix?",
+    "options": [
+      "The questions are too short; ask longer questions",
+      "The model is too small; switch to the most capable model",
+      "Claude is broken; stop using the Project",
+      "An outdated or duplicate pricing file in the Project's knowledge; replace it with the single current version"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: wrong facts usually trace back to a missing or stale source, and fixing the source fixes every chat. A is wrong because rewording doesn't change the source Claude uses. B is wrong because a bigger model answers just as confidently from the same wrong file. C is wrong because the cause is fixable.",
+    "tags": [
+      "diagnosis",
+      "knowledge"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-002",
+    "scenario": "Claude's replies to a request for a project update are generic and could apply to any project.",
+    "question": "What is the most likely cause?",
+    "options": [
+      "The prompt is missing context: the project's details, audience and goal",
+      "Claude's usage limit has been reached",
+      "The chat needs to be in incognito mode",
+      "The output needs to be an artifact"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: generic output is the classic symptom of missing context, so the fix is in the prompt. B is wrong because usage limits stop responses rather than making them generic. C is wrong because incognito affects saving, not quality. D is wrong because the format isn't the cause.",
+    "tags": [
+      "diagnosis",
+      "prompt"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-003",
+    "scenario": "An analyst's monthly report prompt has started producing worse results. She plans to rewrite the prompt, switch models and add new files all at once.",
+    "question": "Why is this a poor approach?",
+    "options": [
+      "Prompts should never be changed once written",
+      "Claude can't use new files and a new model together",
+      "Changing several things at once makes it impossible to tell which change fixed, or caused, the problem",
+      "Switching models deletes the Project"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: diagnose, then change one thing at a time and retest with the same input, so you know what worked. A is wrong because prompts should improve over time. B is wrong because files and models can be changed together; the issue is diagnosis. D is wrong because changing model doesn't affect the Project.",
+    "tags": [
+      "diagnosis",
+      "one-change"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-004",
+    "scenario": "Editors make the same correction to Claude's newsletter drafts every week: product names in the wrong case.",
+    "question": "What is the best response?",
+    "options": [
+      "Keep correcting each draft by hand",
+      "Stop using Claude for newsletters",
+      "Add the product-name list and the rule to the Project instructions so the fix applies every time",
+      "Ask a different editor to do the corrections"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: recurring feedback points to a setup change, which prevents the issue instead of fixing it each time. A is wrong because it repeats the same work indefinitely. B is wrong because the issue is easy to fix. D is wrong because it moves the work rather than removing it.",
+    "tags": [
+      "feedback",
+      "setup"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-005",
+    "scenario": "A team wants Claude's approved drafts to publish automatically to the company website, which requires connecting to the content management system.",
+    "question": "What is the appropriate step for an Associate?",
+    "options": [
+      "Escalate the integration to Claude Architects or Developers with clear requirements",
+      "Build the integration themselves through trial and error",
+      "Paste website admin passwords into the Project instructions",
+      "Give up on publishing drafts"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: technical integrations are beyond the Associate scope and should be escalated with clear requirements. B is wrong because untested integrations risk errors and security problems. C is wrong because credentials should never go into instructions. D is wrong because the goal is achievable through the right people.",
+    "tags": [
+      "escalation"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-006",
+    "scenario": "After trying Claude for a month to draft legal contract clauses, the team's lawyer rewrites almost every draft, and it now takes longer than writing from scratch.",
+    "question": "What is the best adjustment?",
+    "options": [
+      "Keep going, because AI always improves results eventually",
+      "Remove the lawyer's review to save time",
+      "Ask Claude to write longer clauses",
+      "Stop using Claude for that step, or narrow its role (for example, summarising contracts) where results show it helps"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: adjusting based on results includes removing Claude from steps where it doesn't help, or refocusing it where it does. A is wrong because the evidence shows no gain. B is wrong because legal review is essential. C is wrong because length doesn't address quality.",
+    "tags": [
+      "feedback",
+      "results"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-007",
+    "scenario": "A recruiter sends Claude ten separate short messages about each candidate's CV, one question at a time.",
+    "question": "What is a more efficient approach?",
+    "options": [
+      "Send each question in a new chat",
+      "Batch the related questions about each candidate into a single message",
+      "Ask each question twice to be sure",
+      "Use the most capable model for every message"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: batching related questions reduces the number of messages and repeated context. A is wrong because new chats lose context and still multiply messages. C is wrong because it doubles the work. D is wrong because it adds cost without addressing the message count.",
+    "tags": [
+      "efficiency",
+      "batching"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-008",
+    "scenario": "A team uploads the same 50-page handbook into new chats several times a day.",
+    "question": "Which change saves the most effort and usage?",
+    "options": [
+      "Upload a shorter version of the handbook each time",
+      "Paste the handbook as text instead of uploading it",
+      "Upload it to every chat twice so Claude reads it more carefully",
+      "Put the handbook in a Project's knowledge, where it's reused across chats"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Project knowledge is reused across chats, and project content is cached, so repeated use counts less against usage than uploading it fresh. A is wrong because it still repeats the upload and loses content. B is wrong because pasting is still repeated work. C is wrong because it doubles the cost.",
+    "tags": [
+      "efficiency",
+      "projects"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-009",
+    "scenario": "A team switches its weekly report to a faster model and halves the time it takes, but managers now find errors in every report.",
+    "question": "How should this be judged?",
+    "options": [
+      "It's a success, because the report is faster",
+      "It isn't a real optimisation: efficiency only counts if quality still meets the need",
+      "It's a success if fewer messages were sent",
+      "It doesn't matter, because managers can fix the errors"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: optimising a workflow means keeping quality while reducing time or usage. A is wrong because speed with errors isn't effective. C is wrong because message count isn't the goal. D is wrong because it moves work to managers rather than saving it.",
+    "tags": [
+      "efficiency",
+      "quality"
+    ],
+    "difficulty": "medium"
+  }
+]

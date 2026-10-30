@@ -1,0 +1,230 @@
+[
+  {
+    "domain": 1,
+    "id": "ccao-d1-001",
+    "scenario": "A marketing coordinator asks Claude: \"Write something about our new loyalty programme.\" The result is generic and too long for the email newsletter it was meant for.",
+    "question": "Which change to the prompt would most improve the next result?",
+    "options": [
+      "Add \"please\" and \"be creative\" so Claude puts in more effort",
+      "State the goal, the audience (existing customers), the format (a 120-word newsletter section) and the key details of the programme",
+      "Ask the same question again and pick the better of the two answers",
+      "Switch to the most capable model so it can infer what was meant"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: generic output usually means missing context. Goal, audience, format and the facts Claude needs turn a vague request into a specific brief. A is wrong because politeness and \"be creative\" don't supply the missing details. C is wrong because rerunning a vague prompt gives another guess, not a better brief. D is wrong because a more capable model still can't know the programme details or the newsletter's length limit.",
+    "tags": [
+      "prompt-structure",
+      "context"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-002",
+    "scenario": "An HR partner wants Claude to rewrite job adverts in the company's house style, which is warm, direct and avoids jargon. Describing the style in words has given mixed results.",
+    "question": "What is the most effective way to get consistent results?",
+    "options": [
+      "Write the instruction in capital letters so Claude treats it as important",
+      "Ask Claude to guess the house style from the company name",
+      "Remove all instructions so Claude uses its default style",
+      "Include two or three short examples of adverts already written in the house style, clearly marked as examples"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: examples show tone and structure more reliably than a description, and marking them clearly keeps them separate from the task. A is wrong because emphasis doesn't make a vague style description clearer. B is wrong because a company name gives Claude nothing reliable about house style. C is wrong because removing instructions makes the output less consistent, not more.",
+    "tags": [
+      "examples",
+      "prompt-structure"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-003",
+    "scenario": "An operations analyst asks Claude to draft a supplier comparison. Some suppliers' delivery times aren't known yet.",
+    "question": "Which instruction best prevents Claude from filling the gaps with invented figures?",
+    "options": [
+      "\"Where a figure isn't in the data I've provided, write 'not provided' instead of estimating.\"",
+      "\"Be accurate.\"",
+      "\"Use your best judgement for any missing numbers.\"",
+      "\"Make the comparison look complete for the leadership team.\""
+    ],
+    "correct": 0,
+    "explanation": "A is correct: telling Claude exactly what to do when information is missing gives it a safe alternative to guessing. B is wrong because it's too vague to change behaviour. C is wrong because it explicitly invites estimates. D is wrong because pressure to look complete encourages Claude to fill gaps.",
+    "tags": [
+      "prompt-structure",
+      "missing-information"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-004",
+    "scenario": "A project manager pastes a 40-page tender into Claude and asks, in one message, for a summary, a risk register, a bid/no-bid recommendation and a draft cover letter. The answer skims every part.",
+    "question": "What is the best way to restructure the request?",
+    "options": [
+      "Ask for the same four outputs again but say \"be thorough\"",
+      "Ask for the cover letter only, since it is the final deliverable",
+      "Break it into steps: summary first, then risks, then the recommendation using the summary and risks, then the cover letter",
+      "Split the tender into four files and upload them to four unrelated chats"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: decomposing a complex request into ordered steps lets each one get full attention and lets later steps build on earlier results. A is wrong because asking for thoroughness doesn't fix four tasks competing in one answer. B is wrong because the cover letter depends on the analysis it would skip. D is wrong because unrelated chats lose the shared context each step needs.",
+    "tags": [
+      "decomposition"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-005",
+    "scenario": "A communications lead uses Claude to turn interview notes into a case study. Step one extracts the key quotes and facts; step two writes the case study.",
+    "question": "Why is it useful to review the output of step one before running step two?",
+    "options": [
+      "Claude can't write a case study unless a human has approved each step",
+      "Reviewing between steps makes Claude use a faster model",
+      "Errors in the extracted facts can be fixed before the case study is written on top of them",
+      "It allows the case study to be written without any of the extracted facts"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a checkpoint between chained steps stops a mistake in an early step from flowing into everything after it. A is wrong because approval isn't a technical requirement; it's good practice. B is wrong because reviewing doesn't change the model. D is wrong because step two is meant to use the extracted facts.",
+    "tags": [
+      "decomposition",
+      "chaining"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-006",
+    "scenario": "An analyst needs Claude to assess three independent vendor proposals and then recommend one.",
+    "question": "Which structure is most effective?",
+    "options": [
+      "Assess each proposal separately against the same criteria, then compare the three assessments in a final step",
+      "Ask Claude to recommend a vendor first, then justify the choice afterwards",
+      "Assess all three proposals and recommend one in a single short prompt",
+      "Assess only the cheapest proposal, since cost decides most tenders"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: independent parts can be handled separately with the same criteria, and a final step combines them. That gives each proposal fair, equal attention. B is wrong because deciding first and justifying afterwards produces rationalisation, not analysis. C is wrong because one short prompt invites a shallow comparison. D is wrong because it ignores the criteria the decision needs.",
+    "tags": [
+      "decomposition",
+      "parallel-steps"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-007",
+    "scenario": "Claude's first draft of a policy summary is accurate but too technical for front-line staff.",
+    "question": "What is the most effective next prompt?",
+    "options": [
+      "\"That's wrong, try again.\"",
+      "\"Make it better.\"",
+      "Start a new chat and paste in the original prompt unchanged",
+      "\"Rewrite this for front-line staff with no policy background: plain words, under 200 words, and the three actions they need to take first.\""
+    ],
+    "correct": 3,
+    "explanation": "D is correct: good iteration says specifically what to change (audience, language, length, focus) and keeps what already works. A is wrong because the draft is accurate; calling it wrong gives no direction. B is wrong because \"better\" doesn't say in what way. C is wrong because the same prompt is likely to produce the same problem.",
+    "tags": [
+      "iteration",
+      "feedback"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-008",
+    "scenario": "After four rounds of refining, a sales manager finally gets the meeting-summary format she wants. She'll need the same summary every week.",
+    "question": "What should she do next?",
+    "options": [
+      "Repeat the same four rounds of feedback every week",
+      "Save the final, refined prompt as a reusable template, or put it in a Project's instructions",
+      "Ask Claude to remember the format in this chat and use only this chat from now on",
+      "Accept the first draft each week to save time"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the improvements from iteration should be captured in the prompt itself, so next time starts from the refined version. A is wrong because it repeats work already done. C is wrong because one endless chat grows long and drifts. D is wrong because the first draft didn't meet the need.",
+    "tags": [
+      "iteration",
+      "templates"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-009",
+    "scenario": "A trainer iterates on a quiz-generation prompt and gets one excellent result. She wants to know whether the prompt is reliably good.",
+    "question": "What is the best way to check?",
+    "options": [
+      "Assume it is reliable, because the one result was excellent",
+      "Ask Claude whether the prompt is reliable",
+      "Make the prompt longer so it covers more possible cases",
+      "Run the prompt on several different source texts and compare the results against the same quality criteria"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: testing on several varied inputs against fixed criteria shows whether the prompt works generally, not just once. A is wrong because one good result can be luck. B is wrong because Claude's opinion of its own prompt isn't evidence. C is wrong because length without testing doesn't show reliability.",
+    "tags": [
+      "iteration",
+      "evaluation"
+    ],
+    "difficulty": "hard"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-010",
+    "scenario": "A product team wants new names for a feature and asks Claude for \"the best name\". They get one safe suggestion.",
+    "question": "How should the prompt change for a brainstorming task?",
+    "options": [
+      "Ask for the single most accurate name, with sources",
+      "Ask for many varied options (for example 20 across different styles) before narrowing down, and say that unusual ideas are welcome",
+      "Ask Claude to fact-check its suggestion",
+      "Ask for a formal report on naming conventions"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: brainstorming benefits from quantity and variety first, then selection. A is wrong because accuracy and sources fit research, not idea generation. C is wrong because there are no facts to check in a naming idea. D is wrong because a report about naming doesn't generate names.",
+    "tags": [
+      "task-types",
+      "brainstorming"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-011",
+    "scenario": "A finance manager uploads quarterly figures and asks Claude to analyse why margins fell.",
+    "question": "Which prompt approach best suits an analysis task?",
+    "options": [
+      "Ask for an upbeat narrative that will reassure the board",
+      "Ask for as many creative explanations as possible, without checking the data",
+      "Ask Claude to work from the uploaded data only, show the figures behind each finding, and separate observations from possible explanations",
+      "Ask Claude to answer from general knowledge about the industry"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: analysis prompts should anchor Claude to the data, ask for the evidence behind each finding and keep facts apart from interpretation. A is wrong because it asks for a conclusion before the analysis. B is wrong because that's brainstorming, not analysis. D is wrong because general knowledge isn't this company's data.",
+    "tags": [
+      "task-types",
+      "analysis"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ccao-d1-012",
+    "scenario": "A policy officer has two tasks: find out what three regulators have published on a topic, then draft a briefing note from the findings.",
+    "question": "Which pairing of approaches fits these tasks?",
+    "options": [
+      "Research: ask for sources and citations for each claim. Drafting: give audience, tone, length and structure for the note",
+      "Research: ask for many creative ideas. Drafting: ask for sources for every sentence",
+      "Use the same one-line prompt for both, so the style stays consistent",
+      "Research: answer from memory to save time. Drafting: let Claude choose any audience"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: research prompts focus on sources and citations, while drafting prompts focus on audience, tone and structure. B is wrong because it swaps the strategies. C is wrong because different task types need different instructions. D is wrong because research from memory can be out of date and drafting needs a defined audience.",
+    "tags": [
+      "task-types",
+      "research",
+      "drafting"
+    ],
+    "difficulty": "medium"
+  }
+]
