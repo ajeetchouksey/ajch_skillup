@@ -7,6 +7,12 @@
   "difficulty": "hard",
   "estimatedMinutes": 18,
   "domains": [1, 2],
+  "taskIds": [
+    "2.5",
+    "2.6",
+    "2.10",
+    "2.13"
+  ],
   "scenario": {
     "background": "Three unrelated AI requests landing on the same quarter's roadmap force Solstice Retail Group to run the same buy/extend/build decision three separate times — and a two-year-old SharePoint sharing mistake threatens to turn the very first rollout into a data-exposure incident on day one, before anyone has even asked a security question about the other two. Solstice Retail Group is a 6,000-employee apparel and home-goods retailer operating in 14 countries, with Microsoft 365 E5 licences enterprise-wide and analytics workloads already split across Fabric and Azure. This quarter, three separate teams have brought AI proposals to IT for review at the same time: marketing wants faster on-brand product copy, HR wants a faster and less error-prone new-hire process, and data science wants to finally build the personalized recommendation engine it has been requesting for two years. IT's job is to route each request to the right layer of the Microsoft AI stack, and to make sure none of them go live on top of a permissions problem nobody has looked at in years.",
     "characters": [

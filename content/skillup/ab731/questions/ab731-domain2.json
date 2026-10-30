@@ -416,5 +416,223 @@
       "risk"
     ],
     "difficulty": "hard"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-021",
+    "scenario": "A company on Microsoft 365 Business Standard wants its account managers to ask Copilot, inside Outlook, to 'summarise last week's emails about Project Atlas' from their own mailboxes.",
+    "question": "Which Copilot version does this need?",
+    "options": [
+      "Microsoft Copilot, the consumer app at copilot.microsoft.com",
+      "Copilot Chat, included with Microsoft 365, using the web scope",
+      "Any version, because every Copilot reads the user's mailbox",
+      "Microsoft 365 Copilot, the paid per-user licence, which grounds answers in the user's own Microsoft Graph data, including email; Business Standard is an eligible base plan"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: only Microsoft 365 Copilot reasons broadly over a user's own email, meetings and files through Microsoft Graph, inside the apps, and Business plans are eligible for it. A is the consumer product and has no access to work mailboxes. B is included but web-grounded, without broad Graph grounding. C is the classic trap of treating the versions as the same.",
+    "tags": [
+      "copilot-versions",
+      "microsoft-graph",
+      "licensing"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-022",
+    "scenario": "An employee drafts a client proposal in the free consumer Microsoft Copilot app, signed in with a personal account, pasting in confidential pricing. IT points out that the company already provides Copilot Chat to every employee.",
+    "question": "What is the key difference IT is concerned about?",
+    "options": [
+      "Consumer Microsoft Copilot doesn't provide enterprise data protection for work content, while Copilot Chat signed in with a work account does, at no extra cost",
+      "Consumer Microsoft Copilot grounds answers in the company's SharePoint, so the pricing could leak to colleagues",
+      "There is no difference; both are the same product with different logos",
+      "Consumer Microsoft Copilot automatically saves prompts to the company's OneDrive"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: enterprise data protection is the main difference between the consumer app and Copilot Chat for work accounts, and Copilot Chat is included for eligible Microsoft 365 users. B and D describe organisational integration the consumer app doesn't have. C is the trap the exam tests: Microsoft Copilot, Copilot Chat and Microsoft 365 Copilot are different offerings.",
+    "tags": [
+      "copilot-versions",
+      "enterprise-data-protection"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-023",
+    "scenario": "Field technicians don't have Microsoft 365 Copilot licences. They want to use AI on their phones to rewrite customer emails and to summarise a PDF equipment manual they upload, without exposing work content.",
+    "question": "What can they use?",
+    "options": [
+      "Nothing, because any Copilot experience on mobile requires a Microsoft 365 Copilot licence",
+      "Microsoft 365 Copilot Chat in the Microsoft 365 Copilot mobile app, included at no extra cost with enterprise data protection, including file upload",
+      "Only the consumer Microsoft Copilot app with a personal account",
+      "Only Copilot in the Word desktop app"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Copilot Chat is included for eligible Microsoft 365 work users, is available on web and mobile, supports file upload and comes with enterprise data protection. A is wrong because the licence adds Graph grounding, not access to Copilot Chat itself. C lacks enterprise data protection. D needs the licence and isn't a mobile experience.",
+    "tags": [
+      "copilot-chat",
+      "mobile",
+      "enterprise-data-protection"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-024",
+    "scenario": "Finance staff without Microsoft 365 Copilot licences want to use a company agent in Copilot Chat that answers questions from internal finance policies stored in SharePoint. IT asks how this usage is paid for.",
+    "question": "What is correct?",
+    "options": [
+      "Agent usage in Copilot Chat is free and unlimited for every user",
+      "Each user needs a Microsoft 365 Copilot licence before they can use any agent",
+      "Agent usage by unlicensed Copilot Chat users is billed pay-as-you-go through an Azure subscription, linked by a billing policy in the Microsoft 365 admin center",
+      "The cost is charged to each employee's personal Microsoft account"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: unlicensed Copilot Chat users can use agents, and that usage is metered pay-as-you-go through an Azure subscription. A ignores the metering. B is wrong: pay-as-you-go exists precisely so unlicensed users can reach specific agents. D is not how organisational billing works.",
+    "tags": [
+      "copilot-chat",
+      "agents",
+      "pay-as-you-go"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-025",
+    "scenario": "A CISO is comparing a third-party AI writing assistant with Microsoft 365 Copilot. The company already uses sensitivity labels, retention policies, DLP and audit in Microsoft Purview, and Microsoft Entra ID for sign-in.",
+    "question": "Which is a genuine risk-mitigation benefit of the integrated Microsoft solution?",
+    "options": [
+      "Copilot never makes mistakes, so human review is no longer needed",
+      "Integrated tools don't need any AI governance",
+      "Copilot can access all tenant data regardless of permissions, so answers are complete",
+      "Existing Purview labels, retention, DLP and audit, and existing Entra ID permissions, apply to Copilot interactions, so these controls don't have to be rebuilt for a new tool"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the integrated stack's benefit is that AI inherits the identity, permission and compliance controls already in place. A and B overstate it: integration reduces risk but doesn't remove the need for review or governance. C is wrong and would be a risk: Copilot only surfaces what each user can already access.",
+    "tags": [
+      "integrated-solution",
+      "purview",
+      "risk-mitigation"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-026",
+    "scenario": "A team is building a customer-facing app on Microsoft Foundry. It is worried that users will try to make the app produce harmful content or trick it into ignoring its instructions.",
+    "question": "Which built-in safety benefit of Microsoft's platform helps most?",
+    "options": [
+      "Foundry's content filters and Prompt Shields, together with evaluations, applied to the app",
+      "Microsoft 365 permissions, which filter what anonymous customers can type",
+      "Copilot Pages, which keeps a record of each conversation",
+      "None; safety for custom apps must always come from a third-party product"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Microsoft Foundry provides content safety filters, Prompt Shields to detect jailbreak and injection attempts, and evaluations for custom apps. B is wrong: Microsoft 365 permissions govern access to tenant data, not what external users type. C is a collaboration feature, not a safety control. D ignores the safety tooling built into the platform.",
+    "tags": [
+      "foundry",
+      "content-safety",
+      "integrated-solution"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-027",
+    "scenario": "A company has three requests: (1) legal staff want help drafting and summarising documents in Word from their own files; (2) customer service wants a website chatbot for anonymous customers that answers from product FAQs and checks order status through an API, built without developers; (3) R&D wants to train a custom model on sensor data for a new product feature.",
+    "question": "Which mapping to Microsoft's AI apps and services is best?",
+    "options": [
+      "(1) Microsoft Foundry, (2) Microsoft 365 Copilot, (3) Copilot Studio",
+      "(1) Microsoft 365 Copilot, (2) Copilot Studio, (3) Microsoft Foundry",
+      "All three on Microsoft 365 Copilot",
+      "All three on Microsoft Foundry"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: employees working with their own Microsoft 365 content need Microsoft 365 Copilot; a low-code agent with knowledge, an API action and an external channel is Copilot Studio; training a custom model is Microsoft Foundry. A reverses the layers. C can't serve anonymous customers or train models. D over-engineers the first two needs.",
+    "tags": [
+      "use-case-mapping",
+      "copilot-studio",
+      "foundry"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-028",
+    "scenario": "An insurer wants to automate claims intake. Customers upload photos of the damage and a scanned claim form. The system must read the fields on the form, describe the damage shown in the photos, and find similar past claims.",
+    "question": "Which combination of Foundry Tools maps to these steps?",
+    "options": [
+      "Speech, Translator and Azure AI Search",
+      "A single custom language model fine-tuned to do all three steps",
+      "Document Intelligence for the form fields, Azure Vision for the photos, and Azure AI Search to find similar past claims",
+      "Copilot Pages and the Analyst agent"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: each step maps to a prebuilt tool: forms to Document Intelligence, images to Azure Vision, and finding similar records to Azure AI Search. A includes tools for audio and translation that the process doesn't need. B rebuilds solved problems at high cost. D are Microsoft 365 Copilot features, not Foundry Tools for a custom intake process.",
+    "tags": [
+      "foundry-tools",
+      "document-intelligence",
+      "azure-vision",
+      "azure-ai-search"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-029",
+    "scenario": "A business leader understands that Azure Vision analyses images and Azure AI Search retrieves content, and now asks what Microsoft Foundry itself provides.",
+    "question": "Which description is best?",
+    "options": [
+      "A Microsoft 365 app for chatting about your emails and meetings",
+      "An image-recognition service for photos and scans",
+      "A low-code agent builder for business users",
+      "A platform for building, evaluating, deploying and monitoring custom AI apps and agents, with a catalog of models from many providers"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Microsoft Foundry is the platform for custom AI apps and agents, into which tools such as Azure Vision and Azure AI Search plug. A describes Microsoft 365 Copilot. B describes Azure Vision. C describes Copilot Studio.",
+    "tags": [
+      "foundry",
+      "foundry-tools"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-030",
+    "scenario": "A start-up's AI app on Microsoft Foundry grows from 1,000 to 2 million users after a launch. The security team requires access tied to corporate identity and wants traffic kept off the public internet.",
+    "question": "Which benefits of Microsoft Foundry address these needs?",
+    "options": [
+      "Only open-source models can scale to this size",
+      "Azure scalability from prototype to production, plus Microsoft Entra ID access control and private networking",
+      "Per-user Microsoft 365 Copilot licences for every app user",
+      "Moving the app to on-premises servers, since cloud platforms can't meet these needs"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Foundry runs on Azure, so it scales with demand, and it supports Entra ID access control and private networking. A is wrong: scale doesn't depend on the model's licence. C licenses employees for Microsoft 365, not users of a custom app. D ignores the security features the platform provides.",
+    "tags": [
+      "foundry",
+      "scalability",
+      "security"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 2,
+    "id": "ab731-d2-031",
+    "scenario": "A CTO hesitates to build on Microsoft Foundry because they believe it will lock the company into a single model vendor.",
+    "question": "Is the concern correct?",
+    "options": [
+      "No: Foundry's model catalog includes models from many providers, such as OpenAI, Microsoft's Phi, and open models like Llama and Mistral, so the team can choose and change models",
+      "Yes: Foundry only offers OpenAI models",
+      "Yes: Foundry only offers Microsoft-built models",
+      "No, but only if every model is self-hosted outside Foundry"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: model choice across providers is one of Foundry's stated benefits. B and C misstate the catalog. D is wrong: open models can be deployed within Foundry; self-hosting is a separate option chosen for other reasons, such as air-gapped requirements.",
+    "tags": [
+      "foundry",
+      "model-choice"
+    ],
+    "difficulty": "easy"
   }
 ]

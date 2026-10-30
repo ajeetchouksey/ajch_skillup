@@ -514,5 +514,255 @@
       "use-case-selection"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-026",
+    "scenario": "An insurer wants AI to read each claim decision and write a personalised, plain-language letter to the customer explaining the outcome and what happens next.",
+    "question": "Which type of AI does the letter-writing need?",
+    "options": [
+      "Regression ML — predict the payout amount for each claim",
+      "Classification ML — label each claim as approved or denied",
+      "Generative AI — produce new text tailored to each customer's claim",
+      "Recommendation AI — suggest the most similar letter sent in the past"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the output is new, personalised text, which is what generative AI produces. A outputs a number and B outputs a label from a fixed set; both are traditional ML and neither writes a letter. D surfaces existing items rather than creating a new letter for this customer's situation.",
+    "tags": [
+      "gen-ai-vs-ml",
+      "use-case-selection"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-027",
+    "scenario": "A legal operations team says Microsoft 365 Copilot's contract summaries are 'too long and unfocused'. Everyone uses the same prompt: 'Summarise this contract.' Before approving a fine-tuning budget, the COO asks what difference better prompts could make.",
+    "question": "Which statement best describes the impact of prompt engineering here?",
+    "options": [
+      "A prompt that states the audience, length, format and the clauses to cover can make summaries focused immediately, at no extra cost and without changing the model",
+      "Prompt engineering only changes tone; length and focus can only be changed by fine-tuning",
+      "Better prompts would raise token costs so much that fine-tuning becomes the cheaper option",
+      "Prompting has no effect in Microsoft 365 Copilot because Microsoft fixes the model's behaviour"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the model fills in whatever the prompt leaves unspecified, so a one-line prompt gets a generic summary. Stating audience, length, format and focus narrows the output at no extra cost and with no model change, which is why prompting comes before fine-tuning. B is wrong: length, structure and focus are exactly what prompts control. C is wrong: a few extra lines of instruction add very few tokens compared with a training project. D is wrong: users' prompts directly shape Copilot's output.",
+    "tags": [
+      "prompt-engineering",
+      "business-impact"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-028",
+    "scenario": "An HR team asks Copilot to write job adverts. Each advert comes back in a different layout, but every advert must follow the company's fixed house format: a two-line summary, then 'What you'll do', 'What you'll bring' and 'What we offer'.",
+    "question": "Which prompt engineering technique most directly fixes this?",
+    "options": [
+      "Chain-of-thought — ask Copilot to reason step by step before writing",
+      "Few-shot — include two or three past adverts in the house format before the request",
+      "Zero-shot — ask for the advert more briefly",
+      "Role prompting — tell Copilot it is an experienced HR manager"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: few-shot prompting shows examples of the output wanted, which is the most direct way to make a model match a fixed format or style. A helps multi-step reasoning, not layout. C removes guidance rather than adding it. D sets a voice and expertise but doesn't show the exact structure, so layouts would still vary.",
+    "tags": [
+      "prompt-engineering",
+      "few-shot"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-029",
+    "scenario": "A company is building an internal policy assistant. Every answer, for every user, must come only from the attached policies, cite the policy section, and say clearly when the policies don't cover the question. Users shouldn't have to remember any of this.",
+    "question": "Where should these rules be set?",
+    "options": [
+      "In a training email asking each user to add the rules to every question",
+      "In few-shot examples that users paste into their own prompts",
+      "By fine-tuning the model on the policy documents",
+      "In a system prompt set by the solution's builder, which applies to every turn of every conversation"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a system prompt holds persistent rules and context that apply to every turn, set once by whoever builds the solution, so users don't have to repeat them. A and B depend on every user remembering to do it, so the rules won't hold consistently. C changes the model's weights but doesn't enforce answering only from sources or citing sections, and fine-tuned policy facts go stale.",
+    "tags": [
+      "prompt-engineering",
+      "system-prompt"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-030",
+    "scenario": "A bank is choosing between three AI pilots: (1) rewriting marketing slogans in different tones; (2) answering employees' questions about the bank's own lending policy, which compliance updates monthly, with a citation to the relevant policy section; (3) brainstorming names for a new branch.",
+    "question": "Which pilot has business requirements that call for a grounded solution?",
+    "options": [
+      "Pilot 1, because marketing copy must be on-brand",
+      "Pilot 3, because names must be original",
+      "Pilot 2, because answers must be current, specific to the bank, and verifiable against a cited source",
+      "None of them — a larger model makes grounding unnecessary"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: grounding is required when answers must be current, organisation-specific and checkable against a source, and pilot 2 needs all three. A and B are general creative tasks with no private or changing facts, so retrieval would only add cost. D is wrong: a larger model still has a knowledge cutoff and has never seen the bank's private, monthly-updated policy.",
+    "tags": [
+      "grounding",
+      "business-requirements"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-031",
+    "scenario": "An architect is explaining the design of a RAG-based support assistant to the business sponsor, who wants to understand what happens when a customer asks a question.",
+    "question": "Which sequence describes how RAG answers the question?",
+    "options": [
+      "The documents are indexed in advance; at query time the most relevant chunks are retrieved, added to the prompt, and the model generates an answer from them with citations",
+      "The model is retrained on all documents every night and then answers from memory",
+      "Every document is sent in full with every question so nothing is missed",
+      "The model answers from its own knowledge first and searches the documents only if the user complains"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: RAG indexes content, retrieves the relevant chunks for each question, augments the prompt with them and generates a grounded, cited answer, with no retraining. B describes repeated fine-tuning, which is costly and can't cite sources. C runs into context-window and cost limits. D is ungrounded by default, so fabrication risk remains.",
+    "tags": [
+      "rag",
+      "retrieval",
+      "grounding"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-032",
+    "scenario": "A retailer's RAG-based assistant answers questions from its returns policy. The policy changed this morning, but the assistant still quotes yesterday's rule.",
+    "question": "What is the correct fix?",
+    "options": [
+      "Fine-tune the model on the new returns policy",
+      "Switch to a larger, more capable model",
+      "Add 'always use the latest policy' to the system prompt",
+      "Update the source document and refresh the search index so retrieval returns the new section"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a RAG solution answers from what it retrieves, so the fix is to update the source and the index; no model change is needed, which is RAG's main advantage. A puts facts into weights, which is slow and goes stale again at the next change. B doesn't change what is retrieved. C can't make the model see a document the index doesn't return.",
+    "tags": [
+      "rag",
+      "index",
+      "grounding"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-033",
+    "scenario": "A sales assistant grounded on company data quotes different prices for the same product on different days. Investigation finds three copies of the price list on different SharePoint sites, with conflicting figures.",
+    "question": "What should be fixed first?",
+    "options": [
+      "Upgrade to a more capable model that can work out which price is right",
+      "Consolidate to one authoritative, owned and current price list, and archive or remove the duplicates",
+      "Add 'always quote the correct price' to the system prompt",
+      "Set temperature to 0 so that answers are consistent"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the model treats every retrieved copy as equally trustworthy, so conflicting data produces conflicting answers. The fix is upstream: one authoritative source with an owner. A and C can't tell which copy is right either. D makes output repeatable for a given input but still depends on which wrong copy is retrieved.",
+    "tags": [
+      "data-quality",
+      "single-source-of-truth"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-034",
+    "scenario": "A manufacturer wants AI to flag defects in parts from photographs taken on the production line. Its data team proposes using a text-only language model trained on the inspectors' short written notes.",
+    "question": "What is the main problem with this proposal?",
+    "options": [
+      "The notes are too short to fine-tune on",
+      "Text models are always more expensive than vision models",
+      "The defect signal is in the images, so the solution needs a model that handles image data, such as a vision model; the data type must match the model",
+      "The model must first be fine-tuned on the full set of inspection notes"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: data type decides which model can use the data, and the evidence of a defect is visual. A text-only model can't see the photographs. A and D focus on the notes, which aren't where the signal is. B is a cost claim that doesn't address the mismatch.",
+    "tags": [
+      "data-type",
+      "vision"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-035",
+    "scenario": "The board asks why a new AI customer assistant, which can read order history and issue refunds, needs its own security review when the company website it sits on has already passed one.",
+    "question": "What is the best explanation?",
+    "options": [
+      "Connecting a model to data and actions creates new attack surfaces, such as instructions hidden in customer messages, and one weakness can be repeated across every conversation, leaking data or issuing unapproved refunds at scale",
+      "AI systems are exempt from website security reviews, so separate paperwork is needed",
+      "The review is only needed because the assistant might use an open-source model",
+      "The review is mainly needed to estimate the assistant's token cost"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a model can't reliably tell instructions from the content it reads, so reach (data and actions) multiplies the impact of a single weakness, and it applies to every conversation. B, C and D miss the reason: secure AI matters because of the new attack surface and the scale of potential harm, whatever the model's licence or cost.",
+    "tags": [
+      "secure-ai",
+      "attack-surface"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-036",
+    "scenario": "A COO wants to launch an internal AI assistant quickly and 'sort out security after launch if any issues appear'. The assistant will read employee emails and update HR records.",
+    "question": "Why should secure AI be addressed before launch?",
+    "options": [
+      "It doesn't need to be: Microsoft handles all security for any AI built on its platforms",
+      "It only matters for public-facing applications, not internal ones",
+      "Delaying security affects only compliance paperwork, not adoption",
+      "An exposure in a tool with this reach could leak personal data at scale, and a single incident can destroy the trust adoption depends on and halt the AI programme"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: with access to email and the ability to change HR records, one weakness could expose personal data across the organisation, and a visible incident damages trust far faster than any feature builds it. A is wrong: platform controls help, but each solution's access and design are the organisation's responsibility. B is wrong: internal tools with broad reach carry real risk. C ignores the effect of a breach on trust and adoption.",
+    "tags": [
+      "secure-ai",
+      "trust",
+      "adoption"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-037",
+    "scenario": "A retailer's AI steering committee is reviewing four proposals.",
+    "question": "Which proposal is the best candidate for traditional machine learning rather than generative AI?",
+    "options": [
+      "Drafting personalised thank-you notes to loyalty customers",
+      "Predicting next month's demand for each of 2,000 products from three years of sales history",
+      "Summarising weekly store-manager meeting transcripts",
+      "Translating product manuals into eight languages"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a numeric forecast from structured history, repeated for thousands of products, is the classic case where a trained ML model is cheaper, faster and more consistent. A, C and D all produce new language, which is generative AI's strength.",
+    "tags": [
+      "machine-learning",
+      "use-case-selection"
+    ],
+    "difficulty": "easy"
+  },
+  {
+    "domain": 1,
+    "id": "ab731-d1-038",
+    "scenario": "Before building a customer-churn prediction model, the project sponsor wants the team to start collecting data immediately. The data scientist insists on one step first.",
+    "question": "Which stage of the machine learning lifecycle should come first, and why?",
+    "options": [
+      "Training — to discover which data turns out to be useful",
+      "Deployment — so the business sees results as early as possible",
+      "Problem definition — agree the business question and the success metric before collecting data, so the data and the validation measure the right thing",
+      "Monitoring — so drift is caught from day one"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the lifecycle starts with defining the problem and how success will be measured; without it the team can't know which data is relevant or what 'good enough' means at validation. A and B skip ahead of data preparation entirely. D happens after deployment.",
+    "tags": [
+      "ml-lifecycle",
+      "machine-learning"
+    ],
+    "difficulty": "easy"
   }
 ]

@@ -467,5 +467,45 @@
       "governance-structure"
     ],
     "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-023",
+    "scenario": "A bank executive says: 'Our loan-approval model is accurate on average, so responsible AI reviews are just box-ticking.'",
+    "question": "Which response best explains why responsible AI matters here?",
+    "options": [
+      "The executive is right: overall accuracy is the only measure that matters",
+      "Responsible AI applies only to public-sector organisations",
+      "Responsible AI applies only to generative AI, not to predictive models",
+      "The model makes the same decision thousands of times, so a hidden unfairness or an unexplained denial harms many people at once, damages trust and creates legal exposure; average accuracy can hide unequal outcomes for some groups"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: AI decisions reach people at scale, so a flaw is repeated in every decision, and an average can hide that one group is treated worse (Fairness) or that customers can't understand denials (Transparency). A ignores both. B and C are wrong: Microsoft's principles apply to any AI system, in any sector, generative or predictive.",
+    "tags": [
+      "responsible-ai",
+      "fairness",
+      "trust"
+    ],
+    "difficulty": "medium"
+  },
+  {
+    "domain": 3,
+    "id": "ab731-d3-024",
+    "scenario": "Three months into a Copilot rollout, the AI champions say they are overwhelmed: colleagues keep asking them whether specific use cases are allowed under company policy, and ask them to build custom agents.",
+    "question": "How should the champions programme be adjusted?",
+    "options": [
+      "Let champions approve use cases themselves to speed things up",
+      "Disband the programme, since champions can't answer every question",
+      "Keep champions focused on peer coaching ('how do I use this well in my job'), and route policy questions to governance (the acceptable use policy and the AI council) and build requests to the Centre of Excellence",
+      "Promote champions to managers so they have authority to decide"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: champions are peer coaches; they don't replace governance or technical expertise. Policy questions belong to the acceptable use policy and the council, and build requests to the CoE. A gives approval authority to people who aren't accountable for risk. B throws away the main team-level adoption lever. D misunderstands that champions work because they are trusted peers, not managers.",
+    "tags": [
+      "champions-programme",
+      "governance",
+      "centre-of-excellence"
+    ],
+    "difficulty": "medium"
   }
 ]
