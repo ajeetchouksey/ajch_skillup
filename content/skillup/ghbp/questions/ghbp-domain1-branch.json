@@ -446,5 +446,53 @@
     "explanation": "D is correct: pull requests use the CODEOWNERS file on their base branch, so @payments-team still has to approve; the edit only takes effect once it is merged into main, and that merge itself needs their approval. Owning the CODEOWNERS file itself (for example `/.github/CODEOWNERS @security-team`) is a common hardening step. A is wrong because the head branch's copy isn't used for the PR's own review requests. C is wrong because there is no such suspension. B is wrong because GitHub never merges the two files; it uses the base branch's version.",
     "difficulty": "hard",
     "tags": ["edge-case", "analysis", "exam-trap"]
+  },
+  {
+    "domain": 1,
+    "id": "ghbp-d1-029",
+    "difficulty": "medium",
+    "scenario": "A security team wants every production repository to run its dependency-review workflow on pull requests. Last quarter one team added continue-on-error: true to its own copy of the workflow, and its required check kept passing.",
+    "question": "Which approach keeps the gate in force even if a team edits its own workflows?",
+    "options": [
+      "Create an organization ruleset with 'Require workflows to pass before merging' pointing at a workflow in a central repository",
+      "Mark the dependency-review check as a required status check in every repository's branch protection rule",
+      "Add CODEOWNERS for .github/workflows/ so the security team must approve every workflow change",
+      "Copy the workflow into each repository from a workflow template and tell teams not to edit it"
+    ],
+    "correct": 0,
+    "explanation": "An organization ruleset's 'Require workflows to pass before merging' makes GitHub run one centrally owned workflow file, so a team can't weaken it from its own repository. A required status check only names a check; the workflow behind it lives in the team's repo and can be edited. CODEOWNERS on workflows helps but depends on reviewers catching the change and only gates merges where code owner review is required. A template is a copy that diverges after creation.",
+    "tags": ["best-practice", "application", "high-weight"]
+  },
+  {
+    "domain": 1,
+    "id": "ghbp-d1-030",
+    "difficulty": "hard",
+    "scenario": "An organization ruleset requires a central workflow on pull requests. A team adds paths: ['src/**'] to that central workflow so documentation-only PRs skip it.",
+    "question": "What happens on a documentation-only pull request?",
+    "options": [
+      "The paths filter applies, the workflow is skipped and the PR can merge without it",
+      "The workflow still runs, because ruleset-required workflows ignore paths and branches filters",
+      "The required workflow stays Pending forever, so the PR can never merge",
+      "GitHub rejects the workflow file because ruleset workflows may not declare any triggers"
+    ],
+    "correct": 1,
+    "explanation": "Workflows required by a ruleset run on pull_request, pull_request_target and merge_group with their default activity types, and any paths: or branches: filter is ignored, so the workflow runs on the docs-only PR. A filter skipping it is what people expect, which is why it's the trap. The 'Pending forever' behaviour belongs to an ordinary required status check whose workflow is skipped by a path filter. GitHub doesn't reject the file; it simply ignores the filter.",
+    "tags": ["configuration", "analysis", "exam-trap"]
+  },
+  {
+    "domain": 1,
+    "id": "ghbp-d1-031",
+    "difficulty": "medium",
+    "scenario": "A platform team's automation relies on branches starting with feature/, fix/, hotfix/ or release/. Someone just pushed a branch called Release-2.4, which their protection pattern release/* doesn't cover.",
+    "question": "Which control rejects badly named branches at the moment they are pushed?",
+    "options": [
+      "A classic branch protection rule whose name pattern lists every allowed prefix",
+      "A required status check that validates github.head_ref on every pull request",
+      "A ruleset metadata restriction that requires branch names to match the allowed pattern",
+      "A CODEOWNERS entry that assigns a reviewer to every new branch name"
+    ],
+    "correct": 2,
+    "explanation": "A ruleset metadata restriction on branch names rejects a non-matching branch when it is pushed. Classic protection patterns only choose which branches are protected; they never validate new names. A required check on head_ref is valid enforcement, but it blocks the merge later, not the push. CODEOWNERS maps file paths to reviewers and has nothing to do with branch names.",
+    "tags": ["configuration", "application", "frequently-tested"]
   }
 ]

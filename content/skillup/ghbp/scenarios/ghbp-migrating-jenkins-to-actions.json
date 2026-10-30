@@ -10,6 +10,13 @@
     2,
     3
   ],
+  "taskIds": [
+    "2.3",
+    "2.6",
+    "2.10",
+    "2.11",
+    "2.12"
+  ],
   "officialDescription": "Your company runs 40 microservices with Jenkins pipelines that are difficult to maintain, have no secrets rotation, and require a dedicated Jenkins admin. Leadership has approved migrating all pipelines to GitHub Actions over 3 sprints. You must maintain security posture, reduce secret sprawl, and achieve feature parity for build, test, and deploy workflows.",
   "scenario": {
     "background": "If the migration simply copies Jenkins habits into GitHub Actions, the company will end up with the same static AWS keys and long-lived build machines, just on a new platform. Northwind Logistics runs 40 Java microservices whose Jenkins pipelines are a mix of declarative Jenkinsfiles and older scripted pipelines; 12 of them call a shared library called build-library, and deploys go to staging and production Amazon EKS clusters. Every pipeline authenticates to AWS with static IAM user keys kept in the Jenkins credentials store, and none of those keys has been rotated in over a year. Builds run on persistent Jenkins agents, including two GPU machines the ML team uses for model packaging. The target state agreed with leadership: OIDC federation to AWS so no cloud keys are stored in GitHub; reusable workflows in a central repository in place of the shared library; GitHub environments with required reviewers in front of production; ephemeral self-hosted runners on Kubernetes for GPU jobs and GitHub-hosted runners for everything else; least-privilege GITHUB_TOKEN permissions; and Dependabot keeping Maven dependencies and pinned actions current.",

@@ -1,6 +1,6 @@
 # D1: Branch Management & Protection
 
-> **Exam weight**: 33% · **Questions**: ~28 in the bank
+> **Exam weight**: 33% · **Questions**: ~31 in the bank
 
 ## Overview
 
@@ -8,436 +8,475 @@ This domain covers how a team keeps its important branches trustworthy: which ch
 
 > 💡 **Human Angle**: Protect main like a production server. Every unreviewed commit to main is a change to production that nobody signed for.
 
-<div class="note-important"><strong>Branch protection is one of the most impactful controls GitHub offers.</strong> An unprotected main branch means any collaborator, or anyone holding a stolen credential, can push code straight to production. Audits routinely rate it as a Critical or High finding.</div>
-
 ---
 
-## 1.1 Branch Protection Rules: The Core Controls
+## 1.1 Configure branch protection rules that require review, checks and an up-to-date branch
 
 ### Key Concept
 
 **A protected branch only accepts changes that arrive the way you said they must: reviewed, tested and current.**
 
-A branch protection rule matches one or more branches by name pattern and attaches requirements to them. The main ones are: require a pull request, require N approvals, dismiss stale approvals, require review from code owners, require approval of the most recent reviewable push, require status checks, require conversation resolution, require signed commits, require linear history, require deployments, require a merge queue, and lock the branch. Force pushes and deletions are blocked on protected branches by default.
+A branch protection rule matches branches by name pattern and attaches requirements to them. Only one classic rule applies to a branch at a time, so the most specific match wins. Force pushes and deletions are blocked on protected branches by default.
 
-Only one classic branch protection rule can apply to a branch at a time, so the most specific match wins and the other rules are ignored. **Think of each requirement as a separate lock on the same door**: adding locks makes the door harder to open, but leaving one off tells you exactly where someone will get through.
+**Think of each requirement as a separate lock on the same door**: adding locks makes the door harder to open, and the lock you leave off is exactly where someone gets through.
 
-### The Story: "The Midnight Push"
+![A direct push to main is rejected, while a pull request passes required approvals, fresh approval after new commits, required checks and resolved conversations before it can merge.](/content/skillup/ghbp/images/ghbp-1-1-protection-gate.svg)
 
-A team ships a microservices platform with no branch protection on main. On a Friday night an engineer pushes a hotfix directly to main, skipping review. The fix introduces a race condition, and by Monday the production database has duplicate records. It takes three engineers two days to untangle.
+### Real use
 
-The bug wasn't the root cause. The root cause was that **nothing stopped the direct push**.
+A payments team protects `main` with a required pull request, two approvals, required `build` and `test` checks and conversation resolution. When an engineer tries a Friday-night hotfix straight to main, the push is rejected, and the fix ships an hour later through a reviewed PR instead of causing a weekend incident.
 
-![Flow diagram for "The Story: 'The Midnight Push'": Direct push — no rules, Open PR, CI must pass, Review required, Approved — merge, Developer, main branch, Production, Pull Request, Status Checks](/content/skillup/ghbp/images/ghbp-d1-branch-management-m1.svg)
-<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d1-branch-management-m1.mmd -->
+### How it works
 
-### The Controls Every Protected Branch Needs
+Without protection, any collaborator, or anyone holding a stolen credential, can push straight to production. The most common gap auditors find is stale approval: a PR approved on Monday picks up fifteen commits on Tuesday, and Monday's approval still counts for code nobody reviewed.
 
-| Control | What it does | Default when you create a rule | Should be |
-|---|---|---|---|
-| **Require a pull request before merging** | Blocks direct pushes; changes must arrive via PR | Off | **On** |
-| **Required approvals** | Minimum number of approving reviews from people with write access | Set when you enable PRs | **1–2** |
-| **Dismiss stale approvals** | Approvals are dismissed when new commits change the PR diff | Off | **On** |
-| **Require approval of the most recent reviewable push** | The latest push must be approved by someone other than the person who pushed it | Off | **On** for regulated repos |
-| **Require status checks** | Named checks must pass; "strict" also requires the branch to be up to date | Off | **On** |
-| **Require conversation resolution** | All review comment threads must be resolved | Off | **On** |
-| **Allow force pushes** | Lets selected people rewrite history | Off (force pushes blocked) | **Leave off** |
-| **Allow deletions** | Lets people with write access delete the branch | Off (deletion blocked) | **Leave off** |
-| **Do not allow bypassing the above settings** | Applies the rule to admins and "bypass branch protections" roles too | Off | **On** |
+- **Require a pull request**, with 1–2 approvals from people with write access.
+- **Dismiss stale approvals** when new commits change the diff.
+- **Require approval of the most recent reviewable push**: someone other than the last pusher must approve.
+- **Require status checks** (strict mode also requires the branch to be up to date) and **conversation resolution**.
 
-### In Practice
+### Choose when
 
-**What breaks without this**: Approvals go stale without anyone noticing. A PR approved on Monday picks up fifteen more commits on Tuesday, and without stale-approval dismissal Monday's approval still counts for code nobody reviewed. That is the most common gap auditors find in repos that think they are protected.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Full rule: PR, approvals, stale dismissal, checks | The branch deploys or releases to users | More steps per change |
+| Add most-recent-push approval | Regulated repos, or reviewers who also push fixes | Needs a second reviewer after every push |
+| Light rule: PR and checks, zero approvals | One-person sandboxes and prototypes | No second pair of eyes |
 
-**Decision trigger**: Ask: "If this branch received a bad commit, would we be able to show who reviewed the final version and which checks passed?" If the answer depends on people behaving well instead of on a setting, a control is missing.
+### How to do it
 
-**When you'd choose differently**: Throwaway prototype repositories, personal sandboxes and documentation-only repos with a single maintainer often run with a lighter rule (PR required, zero approvals, checks only). Heavy review rules on a one-person repo create self-approval workarounds and teach people to route around controls.
+1. Go to **Settings → Branches → Add branch protection rule** (or use a ruleset, see 1.3) and target `main`.
+2. Turn on **Require a pull request before merging** with 1–2 approvals and **Dismiss stale pull request approvals**.
+3. Turn on **Require status checks to pass** and select your CI checks.
+4. Turn on **Require conversation resolution** and leave force pushes and deletions blocked.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Dismiss stale approvals" and "Require approval of the most recent reviewable push" are different controls. Dismissing stale approvals forces a re-review after new commits, but the person who pushed those commits can still be one of the re-approvers. Only the most-recent-push setting requires someone <em>other than the last pusher</em> to approve. When a scenario says "a reviewer pushed a fix and then approved it", the answer is the most-recent-push setting, not stale dismissal.
-</div>
+<div class="note-trap">"Dismiss stale approvals" forces a re-review after new commits, but the person who pushed them can still re-approve. Only "Require approval of the most recent reviewable push" demands someone other than the last pusher.</div>
+
+### Go deeper
+
+- [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
 
 ---
 
-## 1.2 Bypass, Admins and Break-Glass Access
+## 1.2 Control who can bypass branch protection and design break-glass access
 
 ### Key Concept
 
-**By default, repository admins are not bound by branch protection; you have to opt them in.**
+**By default, repository admins are not bound by classic branch protection; you have to opt them in.**
 
-Classic branch protection does not apply to people with admin permission on the repository, or to custom roles with the "bypass branch protections" permission, unless you enable **Do not allow bypassing the above settings**. A compromised admin credential therefore skips every control on an otherwise well-protected branch. "Restrict who can push to matching branches" narrows who may push at all, but repository admins can always push when bypass is allowed.
+Classic rules don't apply to repository admins, or to custom roles with "bypass branch protections", unless you enable **Do not allow bypassing the above settings**. Rulesets work the other way round: nobody bypasses a ruleset unless they're on its **bypass list**, and each entry can be "Always allow" or "For pull requests only".
 
-Rulesets handle this differently. Nobody bypasses a ruleset unless they are on its **bypass list**, which can name roles, teams, GitHub Apps or Dependabot, and each entry can be "Always allow" or "For pull requests only". **Think of the bypass list as the building's master-key register**: master keys exist, but the register says exactly who holds one, and you can hand out keys that only open the door from the inside.
+**Think of the bypass list as the building's master-key register**: master keys exist, but the register says exactly who holds one.
 
-### In Practice
+![Classic protection lets every admin skip the rules unless no-bypass is enabled, while a ruleset binds everyone except a named bypass list whose entries can be limited to pull requests.](/content/skillup/ghbp/images/ghbp-1-2-bypass.svg)
 
-**What breaks without this**: An admin force-pushes over three days of merged work during a "quick cleanup", or a stolen admin token pushes a backdoor straight to main. Both happen without a single review, because admin bypass was left at its default.
+### Real use
 
-**Decision trigger**: Ask: "Who can change this branch without going through the gate, and would we notice?" If the honest answer is "any admin, silently", enable no-bypass (classic) or move the branch to a ruleset with a small, named bypass list.
+An incident team at a SaaS company holds the only bypass entry on the production ruleset, set to "For pull requests only". During an outage they merge a fix without waiting for two approvals, and the change still leaves a PR, a diff and an audit trail.
 
-**When you'd choose differently**: An emergency path is legitimate, but it should be a deliberate break-glass design: a ruleset bypass entry for a small incident team, ideally "For pull requests only" so even emergency changes leave a PR trail. Temporarily disabling protection is the wrong tool, because it opens the door for everyone and is easy to forget to close.
+### How it works
+
+When admin bypass is left at its default, a compromised admin token can push a backdoor straight to main, or an admin can force-push over three days of merged work during a "quick cleanup", without a single review.
+
+- Classic protection: one on/off switch for admins ("Do not allow bypassing").
+- Rulesets: an explicit list of roles, teams, GitHub Apps or Dependabot that may bypass.
+- "For pull requests only" means even a bypass has to go through a PR.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Classic rule with no-bypass on | A single repo where nobody should skip the rules | No sanctioned emergency path |
+| Ruleset bypass, "For pull requests only" | You need a break-glass path that still leaves a trail | Bypassers can skip approvals, so keep the list small |
+| Ruleset bypass, "Always allow" | A release app must push tags or commits directly | Direct pushes leave no PR |
+
+### How to do it
+
+1. Create a branch ruleset on `main` (**Settings → Rules → Rulesets**).
+2. Under **Bypass list**, add only the incident team or release app.
+3. Set each entry to **For pull requests only** unless it must push directly.
+4. On remaining classic rules, enable **Do not allow bypassing the above settings**.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Distractors suggest "temporarily disable branch protection" or "add the on-call engineer to the admin team" for incidents. Both widen access for everyone or forever. The exam rewards a scoped bypass on a ruleset. Remember: classic protection uses an on/off "do not allow bypassing" switch, while rulesets use an explicit bypass list. Don't mix their vocabulary.
-</div>
+<div class="note-trap">"Temporarily disable branch protection" or "add the on-call engineer to the admin team" widen access for everyone or forever. The exam rewards a scoped ruleset bypass entry, ideally "For pull requests only".</div>
+
+### Go deeper
+
+- [Creating rulesets for a repository](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository)
 
 ---
 
-## 1.3 Repository Rulesets vs Branch Protection Rules
+## 1.3 Choose between repository rulesets and classic branch protection rules
 
 ### Key Concept
 
 **Rulesets stack; classic branch protection rules don't, so with rulesets the strictest requirement always wins.**
 
-A ruleset is a named set of rules targeting branches, tags or (for push rulesets) every push to the repository. Unlike classic rules, **multiple rulesets can apply at once**. They have no priority order: GitHub aggregates them, and where the same rule is defined differently the most restrictive version applies. Rulesets also layer with any classic branch protection rule on the same branch. Each ruleset has an enforcement status (Active or Disabled, plus Evaluate for testing on plans that offer it), and anyone with read access can see which rulesets are active.
+Multiple rulesets can apply to one branch at once. They have no priority order: GitHub aggregates them, and where the same rule is defined differently the most restrictive version applies. Rulesets also layer with any classic rule on the same branch, and organization rulesets (Team and Enterprise plans) can target all repositories, name patterns or **custom properties**.
 
-Organization rulesets (GitHub Team and GitHub Enterprise plans) let one configuration target all repositories, selected repositories, repositories matching a name pattern, or repositories filtered by **custom properties**. **Think of rulesets like building codes from city, state and federal authorities**: each layer adds requirements, and a building must meet the strictest of them, not just the one issued last.
+**Think of rulesets like building codes from city, state and federal authorities**: a building must meet the strictest of them, not the one issued last.
 
-### Ruleset capabilities that classic protection lacks
+![An organization ruleset requiring two approvals and a repository ruleset requiring one approval plus code owner review combine into two approvals and code owner review.](/content/skillup/ghbp/images/ghbp-1-3-rulesets-stack.svg)
 
-| Capability | Classic branch protection | Rulesets |
+### Real use
+
+A fintech with 180 repositories sets one organization ruleset on the default branch of every repo whose custom property is `tier=production`. New production repos are protected the moment they get the property, and teams can still add stricter repository rules on top.
+
+### How it works
+
+Per-repository settings drift: every new repo starts unprotected until someone remembers it, and API scripts only fix the repos that existed when they last ran. Rulesets fix this and add capabilities classic rules lack:
+
+- Several rulesets per branch, aggregated, most restrictive wins.
+- Organization-wide targeting by name or custom property; Active, Disabled or Evaluate status.
+- Tag rulesets, push rulesets (path, extension, size) and metadata rules (branch names, commit messages).
+- An explicit bypass list instead of an admin switch.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| More than one rule on a branch | No, one rule applies | Yes, aggregated, most restrictive wins |
-| Organization-wide targeting | No, per repository | Yes: all, by name, by custom property |
-| Turn off without deleting | No | Yes, change the enforcement status |
-| Tag protection | No | Yes, tag rulesets (they replaced the old tag protection rules, sunset in 2024) |
-| Push rules (file path, extension, size) | No | Yes, push rulesets for private and internal repos and their forks |
-| Commit metadata and branch name patterns | No | Yes, metadata restrictions ("Restrict commit metadata", "Restrict branch names") |
-| Code scanning / secret scanning merge gates | Via required checks only | "Require code scanning results" rule; secret scanning rule in preview |
-| Centrally owned required workflow | No, required checks come from the repo's own workflows | "Require workflows to pass before merging" (organization or enterprise rulesets) |
-| Required reviewers by path | No | Yes, required reviewers by path (team-based, not for user-owned repos) |
-| Bypass model | Admin on/off switch | Bypass list, "Always allow" or "For pull requests only" |
-
-### In Practice
-
-**What breaks without this**: Branch protection drifts in a 200-repo organization. Every new repo starts unprotected until someone remembers to configure it, and per-repo API scripts only fix the repos that existed when the script last ran.
-
-**Decision trigger**: Ask: "Does this requirement apply to one repo or to a class of repos?" If it applies to a class ("every production service", "every repo with `tier=critical`"), write an organization ruleset targeted by custom property and let repository admins add stricter local rules on top.
-
-**When you'd choose differently**: For a single personal or small-team repository, a classic branch protection rule is perfectly adequate and is what many tools and tutorials still configure. There is no need to migrate working classic rules just for the sake of it, and because the two systems layer, you can add rulesets alongside them gradually.
+| Organization ruleset by custom property | A requirement applies to a class of repos | Needs Team or Enterprise and well-kept properties |
+| Repository ruleset | One repo needs extra rules or tag protection | Managed per repo |
+| Classic branch protection rule | A single small repo that already works | One rule per branch; no tags, no org scope |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-The trap is "the repository rule overrides the organization ruleset" or "the newer rule wins". Neither is true. All applicable rulesets plus any branch protection rule are combined, and the most restrictive version of each rule applies. If the org ruleset requires 2 approvals and the repo rule requires 1 approval plus code owner review, the PR needs 2 approvals <em>and</em> code owner review. Second trap: org rulesets target repos by name or <strong>custom property</strong>, not by topic.
-</div>
+<div class="note-trap">"The repository rule overrides the organization ruleset" and "the newer rule wins" are both false: everything that applies is combined and the most restrictive version wins. Organization rulesets target repos by name or custom property, not by topic.</div>
+
+### Go deeper
+
+- [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
+- [Creating rulesets for repositories in your organization](https://docs.github.com/en/organizations/managing-organization-settings/creating-rulesets-for-repositories-in-your-organization)
 
 ---
 
-## 1.4 CODEOWNERS: Automated Expert Review
+## 1.4 Route and require expert review with CODEOWNERS
 
 ### Key Concept
 
 **CODEOWNERS routes reviews automatically; "Require review from Code Owners" is what turns routing into a gate.**
 
-A `CODEOWNERS` file maps path patterns to users or teams. GitHub looks for it in `.github/`, then the repository root, then `docs/`, and uses the first one it finds. When a PR touches matching files, the owners are requested as reviewers automatically, except on draft PRs, where they're requested once the PR is marked ready. Owners must have write access (teams must be visible and have write access), the file must be under 3 MB, and invalid lines are skipped.
+A `CODEOWNERS` file maps path patterns to users or teams, and GitHub requests them as reviewers when a PR touches matching files. **The last matching pattern wins**, so broad defaults go first. The PR uses the CODEOWNERS file **on its base branch**, so editing CODEOWNERS in a PR doesn't change who must review that PR.
 
-Order matters: **the last matching pattern wins**, so put broad defaults first and specific paths later. The PR uses the CODEOWNERS file **on its base branch**, so editing CODEOWNERS in a PR doesn't change who must review that PR. **Think of CODEOWNERS like a hospital's on-call rota**: it pages the right specialist automatically, but the surgery only waits for them if policy says sign-off is mandatory.
+**Think of CODEOWNERS like a hospital's on-call rota**: it pages the right specialist automatically, but surgery only waits for them if policy says sign-off is mandatory.
+
+![A pull request touching migrations and payments files is matched against CODEOWNERS from top to bottom, the last matching line names the owner, and the merge waits for that owner only when code owner review is required.](/content/skillup/ghbp/images/ghbp-1-4-codeowners.svg)
+
+### Real use
+
+A payments company maps `/migrations/` to the DBA team and `/src/payments/` to the payments team. A frontend developer's PR that touches a migration automatically requests the DBAs, and with code owner review required it can't merge on a frontend approval alone.
+
+### How it works
+
+Without it, a migration merges with an approval from whoever was free first, or a catch-all `*` line at the bottom silently overrides every specific rule above it.
+
+- GitHub looks in `.github/`, then the root, then `docs/`, and uses the first file it finds (under 3 MB).
+- Owners need write access; draft PRs request owners only when marked ready.
+- Large owner teams can use automatic review assignment (round robin or load balance) so one or two people are requested, not fifteen.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| CODEOWNERS + "Require review from Code Owners" | A mistake in some path is expensive and only certain people can judge it | Owners can become a bottleneck |
+| CODEOWNERS without the requirement | You want routing but not a hard gate | Owners can be ignored |
+| Required approvals only | Small, high-trust teams where everyone reviews everything | No expertise routing |
+
+### How to do it
 
 ```
-# .github/CODEOWNERS
-
-# Default: every PR needs at least one lead review (listed first so later rules override it)
+# .github/CODEOWNERS: broad default first, specific paths later (last match wins)
 *                     @team-lead
-
-# Infrastructure: always needs DevOps review
 /terraform/           @team-devops
-/k8s/                 @team-devops
-
-# Security-critical code
-/src/auth/            @security-lead @team-lead
 /src/payments/        @security-lead
-
-# Database migrations: always need DBA sign-off
 /migrations/          @dba-team
-
-# Protect the rules themselves
 /.github/CODEOWNERS   @security-lead
-/.github/workflows/   @team-devops
 ```
-
-<div class="note-scribble">CODEOWNERS removes the "I forgot to add a reviewer" problem. The moment you open a PR touching /migrations/, the DBA team is automatically requested. Note the order: in the original version of this file, the catch-all <code>*</code> line sat at the bottom, and because the last match wins, it silently overrode every specific rule above it.</div>
-
-CODEOWNERS syntax follows `.gitignore` with three exceptions: no `!` negation, no `[ ]` character ranges, and no `\#` escaping of a leading hash.
-
-### In Practice
-
-**What breaks without this**: Database migrations get merged with an approval from a frontend developer because they were the first person free. Or a catch-all `*` line placed at the bottom of the file silently overrides every specific rule above it.
-
-**Decision trigger**: Ask: "Is there a path where a mistake is expensive and only certain people can judge it?" If yes, give that path an owner and turn on "Require review from Code Owners". For large owner teams, enable the team's automatic review assignment (round robin or load balance) so one or two people are requested instead of fifteen.
-
-**When you'd choose differently**: In small, high-trust teams where everyone reviews everything, a single catch-all owner adds friction without routing value. Required approvals alone are enough there. Also, CODEOWNERS doesn't follow files when they move, so very volatile directory structures need regular CODEOWNERS maintenance or broader patterns.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Three classic traps: (1) <strong>last match wins</strong>, not first match and not "most specific"; (2) owners are only <em>required</em> when "Require review from Code Owners" is enabled, otherwise they are just requested; (3) the <strong>base branch's</strong> CODEOWNERS applies, so a PR that adds its author as owner still needs the existing owners' approval.
-</div>
+<div class="note-trap">Last match wins, not first match and not "most specific". Owners are only required when "Require review from Code Owners" is on. And the base branch's CODEOWNERS applies, so a PR that adds its author as owner still needs the existing owners.</div>
+
+### Go deeper
+
+- [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 
 ---
 
-## 1.5 Status Checks, Deployments and Merge Automation
+## 1.5 Gate merges on status checks, deployments and the merge queue
 
 ### Key Concept
 
 **A check that isn't marked required is only advice; it never blocks a merge.**
 
-Required status checks name the checks that must succeed before a merge. With **strict** mode ("Require branches to be up to date before merging") the PR branch must also contain the latest base commit, so it was tested against what it will merge into. **Require deployments to succeed** goes further and gates the merge on a successful deployment to named environments such as `staging`. A **merge queue** gives busy branches the safety of strict mode without making every author rebase repeatedly.
+Required status checks name the checks that must succeed before a merge. **Strict** mode ("Require branches to be up to date") also makes the PR contain the latest base commit. **Require deployments to succeed** gates the merge on a deployment to named environments such as `staging`. A **merge queue** gives busy branches strict-mode safety without endless rebasing, and **auto-merge** merges a PR once every requirement is met, without bypassing any.
 
-Auto-merge is the author-side convenience: enable it on a PR and GitHub merges once every requirement is met, without bypassing any of them. **Think of required checks like a pre-flight checklist**: the plane can technically take off without it, which is exactly why the checklist has to be mandatory and not a suggestion pinned to the cockpit wall.
+**Think of required checks like a pre-flight checklist**: the plane can technically take off without it, which is why it has to be mandatory.
 
-```yaml
-# Checks you would mark as required on main
-- build          # Does it compile?
-- test           # Do all tests pass?
-- lint           # Code style / quality gate
-- security-scan  # Code scanning or dependency review
-```
+![Merge is allowed only when required checks pass on an up-to-date branch and the required staging deployment succeeded; optional checks are shown but never block, and auto-merge waits for the same gates.](/content/skillup/ghbp/images/ghbp-1-5-merge-gates.svg)
 
-<div class="note-important"><strong>A check only blocks merges if it actually runs on the PR and is listed as required.</strong> The workflow must trigger on <code>pull_request</code> (or <code>merge_group</code> when using a merge queue), and its check name must be selected under required status checks in the branch protection rule or ruleset.</div>
+### Real use
 
-### In Practice
+An e-commerce team marks `build`, `test` and `security-scan` as required, requires a successful `staging` deployment, and uses a merge queue on main. Authors enable auto-merge and move on; PRs land only after they've been tested together with everything queued ahead of them.
 
-**What breaks without this**: CI goes red on a PR and someone merges anyway, because "Merge" was still green. Or two PRs that each pass alone are merged in quick succession and break main together, because neither was tested against the other (no strict mode or merge queue).
+### How it works
 
-**Decision trigger**: Ask: "Which signals must be green before a human is even allowed to press Merge?" Those are your required checks. If main breaks from interactions between PRs more than about once a month, add strict mode or a merge queue.
+Without required checks, CI goes red and someone merges anyway because the button was still green. Without strict mode or a queue, two PRs that each pass alone break main together.
 
-**When you'd choose differently**: On very high-throughput monorepos, strict mode creates an endless "update branch" treadmill, so use a merge queue instead. On low-traffic repos, loose mode (no up-to-date requirement) is usually fine, and requiring deployments can be excessive when there is no staging environment worth gating on.
+- The workflow must trigger on `pull_request` (and `merge_group` with a merge queue), and its check name must be selected as required.
+- Renaming a job renames its check; the old required check then waits forever as "Expected".
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Required checks, loose mode | Low-traffic repos | PRs aren't tested against each other |
+| Strict mode | PRs often interact and traffic is modest | Authors keep updating branches |
+| Merge queue | Busy branches where strict mode becomes a treadmill | Needs `merge_group` triggers |
+| Require deployments | A real staging environment should prove the change first | Slower merges; needs an environment |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Require deployments to succeed before merging" is distinct from required status checks. If a question is about gating a merge on a successful <em>environment deployment</em> such as staging, the deployments setting is the native answer. Second trap: renaming a workflow job renames its check, and the old required check then waits forever as "Expected".
-</div>
+<div class="note-trap">"Require deployments to succeed before merging" is a separate setting from required status checks; it is the native answer for gating a merge on a staging deployment. And auto-merge never bypasses requirements.</div>
+
+### Go deeper
+
+- [About status checks](https://docs.github.com/en/pull-requests/reference/status-checks)
+- [Managing a merge queue](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue)
 
 ---
 
-## 1.6 Required Workflows: "Require workflows to pass before merging"
+## 1.6 Enforce centrally owned workflows with organization rulesets
 
 ### Key Concept
 
-**A required status check accepts any workflow that reports the right name; a required workflow makes GitHub run one centrally owned workflow file itself.**
+**A required status check trusts any workflow that reports the right name; a required workflow makes GitHub run one centrally owned file itself.**
 
-"Require workflows to pass before merging" is a branch ruleset rule configured in an **organization or enterprise ruleset**. It replaces the old Actions "required workflows" feature. You choose a source repository, a branch and a workflow file in its `.github/workflows`, and GitHub runs that file on pull requests in every targeted repository. A PR can't merge until the workflow passes. Required status checks (section 1.5) work differently, whether you set them in a classic rule or a ruleset. They name a check, and the workflow that produces the check lives in the target repository, so anyone who can edit its `.github/workflows/` can weaken or delete it. Classic branch protection has no equivalent of this rule.
+"Require workflows to pass before merging" is a rule in **organization or enterprise rulesets**. You choose a source repository, branch and workflow file, and GitHub runs it on pull requests in every targeted repository; a PR can't merge until it passes. With an ordinary required check, the workflow lives in the target repo, so anyone who can edit its `.github/workflows/` can weaken it.
 
-The source repository must be at least as visible as the repositories it runs in. A public workflow can run on any repository in the organization, an internal one on internal and private repositories, and a private one on private repositories only. An internal or private source repository must also have its Actions access set to "Accessible from repositories in the organization". **Think of it like a building inspector the city sends**: the contractor can fire an inspector they hired themselves, but not the city's.
+**Think of it like a building inspector the city sends**: a contractor can fire an inspector they hired, but not the city's.
 
-<div class="note-important"><strong>Ruleset workflows ignore event filters.</strong> They support only <code>pull_request</code>, <code>pull_request_target</code> and <code>merge_group</code>, and always run on those events' default activity types. Any <code>paths:</code> or <code>branches:</code> filter is ignored. An ordinary required check behaves differently. When its workflow is skipped by a path, branch or commit-message filter, the check stays <strong>Pending</strong> and blocks merging, whereas a job skipped by an <code>if:</code> condition reports Success. Add <code>merge_group</code> if you use a merge queue, or the check is never reported there. Because the rule also blocks direct pushes, target only branches where every change arrives through a PR.</div>
+![A team edits its own copy of a dependency-review workflow to always pass, so its required check goes green, while a ruleset-required workflow runs from the central repository and still blocks the vulnerable pull request.](/content/skillup/ghbp/images/ghbp-1-6-required-workflow.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: A security team makes dependency review a required status check in 30 repositories, with a copy of the workflow in each one. One team adds `continue-on-error: true` to its copy, and from then on the check passes regardless of what dependency review finds. In a monorepo with path-filtered CI, a docs-only PR waits indefinitely on a Pending required check.
+A security team requires one dependency-review workflow, stored in a central `security-workflows` repository, on every production repo through an organization ruleset. Service teams can change their own CI freely, but none of them can switch the security gate off.
 
-**Decision trigger**: Ask: "Must this gate keep working even if the target repository's own maintainers change their workflows?" If yes, create an organization ruleset with this rule pointing at a workflow in a central repository. Roll it out in **Evaluate** mode first. The workflow runs but isn't required to pass, and once it has passed you can switch the ruleset to Active without a new run. PRs that are already open when you create the rule don't run the workflow until they get a new commit, an updated branch, or are closed and reopened.
+### How it works
 
-**When you'd choose differently**: Use ordinary required status checks for CI that each team owns and that varies by repository, such as unit tests and per-service builds. In a monorepo, skip jobs with a job-level `if:` rather than a trigger path filter, so skipped work reports Success. Ruleset workflows also have limits. They can't use CodeQL actions other than `upload-sarif` (for code scanning, use the "Require code scanning results" rule), they don't run on events triggered by `GITHUB_TOKEN`, and they shouldn't use `cancel-in-progress` concurrency.
+When a gate lives as a copy in each repository, one team adds `continue-on-error: true` and the check passes regardless of findings.
+
+- The source repo must be at least as visible as the targets: a private workflow can run on private repos only.
+- Ruleset workflows run on `pull_request`, `pull_request_target` and `merge_group` and **ignore** `paths:` and `branches:` filters.
+- Roll out in **Evaluate** mode first; the rule also blocks direct pushes, so target only PR-only branches.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Ruleset "Require workflows to pass" | The gate must hold even if the repo's maintainers change their workflows | Org or enterprise ruleset; filters ignored |
+| Ordinary required status check | Team-owned CI that varies by repository | Teams can weaken their own workflow |
+| "Require code scanning results" rule | The gate is code scanning | Uses the code scanning rule, not a workflow |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-When a scenario says teams must not be able to remove or edit the gate, "make it a required status check" is the distractor, because the workflow behind a status check lives in the team's own repository. The answer is an organization ruleset's <strong>Require workflows to pass before merging</strong>. Second trap: adding <code>paths:</code> to a ruleset workflow doesn't skip it, because its filters are ignored. Adding <code>paths:</code> to the workflow behind an ordinary required check leaves the check Pending, and the PR can't merge. Third trap: a workflow in a private repository can't be required on internal or public repositories.
-</div>
+<div class="note-trap">If teams must not be able to remove or edit the gate, "make it a required status check" is the distractor. And adding <code>paths:</code> to a ruleset workflow doesn't skip it, because its event filters are ignored.</div>
+
+### Go deeper
+
+- [Available rules for rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
 
 ---
 
-## 1.7 Branching Strategies and Merge Methods
+## 1.7 Choose a branching strategy and merge method
 
 ### Key Concept
 
 **Short-lived branches make every other control cheap; long-lived branches make every merge an incident.**
 
-**GitHub flow** is one long-lived branch (main), with short-lived feature branches merged by PR and deployed from main. **Trunk-based development** is the same idea pushed further: branches live for hours, and incomplete work ships dark behind feature flags. **GitFlow** adds `develop`, `release/*` and `hotfix/*` branches, which suits scheduled, versioned releases but slows teams that deploy many times a day.
+**GitHub flow** is one long-lived branch (main) with short-lived feature branches merged by PR. **Trunk-based development** pushes that further: branches live for hours and unfinished work ships dark behind feature flags. **GitFlow** adds `develop`, `release/*` and `hotfix/*`, which suits scheduled, versioned releases. Merge method shapes history: merge commits keep everything, squash gives one commit per PR, rebase replays commits linearly.
 
-Merge method shapes history. A merge commit keeps every commit plus a merge bubble. Squash merging produces one commit per PR (good for Conventional Commits release tooling). Rebase merging replays commits linearly. "Require linear history" allows only squash or rebase. **Think of a long-lived branch like a letter written over three months**: by the time you post it, half the addresses have changed.
+**Think of a long-lived branch like a letter written over three months**: by the time you post it, half the addresses have changed.
 
-| Strategy | Branch lifetime | Release style | Best fit |
-|---|---|---|---|
-| Trunk-based | Hours to 1–2 days | Continuous, feature flags | High-frequency delivery, strong CI |
-| GitHub flow | Days | Deploy from main after merge | Most web services and SaaS teams |
-| GitFlow | Weeks (develop/release) | Scheduled, versioned | Packaged or installed software with support branches |
+![Trunk-based development with hour-long branches, GitHub flow with days-long branches and GitFlow with weeks-long release branches are compared by branch lifetime and release style, alongside the merge, squash and rebase merge methods.](/content/skillup/ghbp/images/ghbp-1-7-branching.svg)
 
-### In Practice
+### Real use
 
-**What breaks without this**: A three-month feature branch diverges so far from main that the final merge takes a week of conflict resolution, and integration bugs that would have surfaced in week one surface in month three.
+A SaaS team deploying several times a day uses trunk-based development with feature flags and squash merging, so every PR becomes one Conventional Commit on main and release notes generate themselves.
 
-**Decision trigger**: Ask: "How often do we deploy, and do we have to support old versions?" Deploying daily with one supported version points to trunk-based or GitHub flow. Shipping versioned releases with maintained older lines points to GitFlow-style release branches, which you lock once they're end-of-life.
+### How it works
 
-**When you'd choose differently**: Squash merging loses individual commits, which hurts when a PR deliberately contains several meaningful, bisectable commits. Rebase merging suits those teams. Required signed commits can also interact with merge methods: unsigned commits on a PR's head branch can block a squash merge even though GitHub signs the squash commit itself.
+A three-month feature branch diverges so far from main that the final merge takes a week of conflict resolution, and integration bugs that would have shown in week one show in month three.
+
+- "Require linear history" allows only squash or rebase merges.
+- Draft PRs are GitHub's way to share unfinished work: they can't be merged and don't request code owners until marked ready.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Trunk-based | You deploy many times a day with strong CI | Needs feature flags and discipline |
+| GitHub flow | Most web services and SaaS teams | Release from main only |
+| GitFlow-style release branches | You ship versioned releases and support old lines | Slower; more branches to protect |
+| Squash merging | You want one clean commit per PR | Loses the PR's individual commits |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Require linear history" blocks merge commits; it doesn't enforce review and doesn't lock tags. And Draft PRs, not "WIP:" title prefixes, are GitHub's native way to share unfinished work: drafts can't be merged and don't request code owners until they're marked ready.
-</div>
+<div class="note-trap">"Require linear history" blocks merge commits; it doesn't enforce review or lock tags. And "WIP:" title prefixes aren't a GitHub feature; Draft pull requests are.</div>
+
+### Go deeper
+
+- [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)
+- [About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github)
 
 ---
 
-## 1.8 Branch Naming Conventions
+## 1.8 Enforce branch naming conventions
 
 ### Key Concept
 
 **A naming convention is only real when something rejects names that break it.**
 
-Prefixes such as `feature/`, `fix/`, `hotfix/` and `release/` make intent visible and allow pattern-based rules (for example, a ruleset that protects `release/**`). Without enforcement, branches like `johns-stuff` and `temp2` accumulate within weeks.
+Prefixes such as `feature/`, `fix/`, `hotfix/` and `release/` make intent visible and let rules target patterns like `release/**`. There are two enforcement points: a ruleset **restrict branch names** metadata rule rejects the branch at push time, and a required PR check that validates `github.head_ref` blocks the merge instead.
 
-There are two enforcement points. Rulesets can **restrict branch names** with a metadata pattern, rejecting the branch at push time. A PR workflow that validates `github.head_ref` and is a required check blocks the merge instead. **Think of the convention as a dress code**: posting it on the door informs people, but only the doorman checking names actually enforces it.
+**Think of the convention as a dress code**: posting it on the door informs people, but only the doorman checking names enforces it.
 
-| Prefix | Purpose | Example |
+![A push of a branch named Release-2.4 is rejected by a ruleset branch-name rule at push time, while a required check catches the same name later, at merge time.](/content/skillup/ghbp/images/ghbp-1-8-naming.svg)
+
+### Real use
+
+A platform team's ruleset requires branch names to match `(feature|fix|hotfix|release|chore|docs)/*`. Because the protected-branch pattern `release/*` is now reliable, no release branch escapes protection by being called `Release-2.4`.
+
+### How it works
+
+When names aren't enforced, pattern-based protection silently misses branches: a rule on `release/*` doesn't protect `Release-2.4`, and nobody notices until a force push lands on it.
+
+- Ruleset metadata restriction: rejects bad names when the branch is pushed.
+- Required check on `pull_request`: pass the name through `env:`, because branch names from forks are attacker-controllable (see 2.5).
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| `feature/` | New functionality | `feature/user-authentication` |
-| `fix/` or `bugfix/` | Bug fixes | `fix/login-redirect-loop` |
-| `hotfix/` | Critical production fix | `hotfix/payment-null-reference` |
-| `release/` | Release preparation | `release/v2.4.0` |
-| `chore/` | Non-functional changes (deps, config) | `chore/upgrade-node-22` |
-| `docs/` | Documentation only | `docs/api-reference-update` |
+| Ruleset "restrict branch names" | Rules or automation depend on names | Needs rulesets |
+| Required naming check | You also want a friendly CI message | Catches names at merge, not at push |
+| No enforcement | Trunk-based teams whose branches live for hours | Names drift |
+
+### How to do it
 
 ```yaml
-# .github/workflows/branch-naming.yml
-name: Branch Naming Convention
-on:
-  pull_request:
-    branches: [main, develop]
-
-permissions:
-  contents: read
-
-jobs:
-  check-branch-name:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate branch name
-        env:
-          BRANCH: ${{ github.head_ref }}   # pass via env: branch names are attacker-controllable
-        run: |
-          PATTERN="^(feature|fix|hotfix|release|chore|docs)/.+"
-          if ! echo "$BRANCH" | grep -qE "$PATTERN"; then
-            echo "Branch '$BRANCH' does not match convention: $PATTERN"
-            exit 1
-          fi
+- name: Validate branch name
+  env:
+    BRANCH: ${{ github.head_ref }}   # pass via env: never interpolate into run
+  run: |
+    echo "$BRANCH" | grep -qE '^(feature|fix|hotfix|release|chore|docs)/.+' \
+      || { echo "Branch '$BRANCH' breaks the naming convention"; exit 1; }
 ```
-
-<div class="note-scribble">The branch name is passed through <code>env:</code> rather than interpolated straight into the script. A branch name is attacker-controlled input for PRs from forks; see the script-injection section in D2.</div>
-
-### In Practice
-
-**What breaks without this**: Pattern-based protection silently misses branches. If your rule protects `release/*` and someone creates `Release-2.4`, it isn't protected, and nobody notices until a force-push lands on it.
-
-**Decision trigger**: Ask: "Do any rules, automations or deploy filters depend on branch names?" If yes, naming is a control, not a style choice, and needs enforcing.
-
-**When you'd choose differently**: Trunk-based teams whose branches live for hours often skip naming rules, because nothing keys off them and the branches are deleted on merge.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-Classic branch protection patterns choose <em>which</em> branches are protected; they don't validate the names of new branches. "Configure a branch protection regex to restrict names" is a distractor. Name validation is a ruleset metadata restriction or a required CI check.
-</div>
+<div class="note-trap">Classic branch protection patterns choose <em>which</em> branches are protected; they don't validate new branch names. Name validation is a ruleset metadata restriction or a required check.</div>
+
+### Go deeper
+
+- [Available rules for rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
 
 ---
 
-## 1.9 Branch Lifecycle and Read-Only Branches
+## 1.9 Manage the branch lifecycle and protect release tags
 
 ### Key Concept
 
-**Delete branches when they merge, lock branches you must keep, and protect tags you release from.**
+**Delete branches when they merge, lock branches you must keep, and protect the tags you release from.**
 
-Every merged branch left behind is clutter that hides active work. "Automatically delete head branches" removes PR branches the moment they merge, and a scheduled job can report branches that have been inactive for weeks. For branches you must keep but never change, such as an end-of-life `v1.x`, **Lock branch** makes the branch read-only (optionally still allowing fork syncing).
+"Automatically delete head branches" removes PR branches as they merge. **Lock branch** makes a branch you must keep, such as an end-of-life `v1.x`, read-only. A **tag ruleset** on `refs/tags/v*` that restricts updates and deletions stops anyone outside its bypass list from moving `v1.0.0`; it replaced the old tag protection rules, sunset in 2024.
 
-Release tags deserve the same care: a **tag ruleset** on `refs/tags/v*` restricting updates and deletions stops anyone outside the bypass list from moving `v1.0.0` to a different commit. **Think of a locked branch as a museum exhibit**: everyone can look at it and photograph it, but nobody gets to rearrange it.
+**Think of a locked branch as a museum exhibit**: everyone can look at it, but nobody gets to rearrange it.
 
-![Flow diagram for "Key Concept": No cleanup, Auto-delete enabled, Feature merged, Stale branch stays, Repo clutter builds, Hard to find active work, Confusion about what's inproduction, Branch auto-deleted, Clean branch list, Only active work visible](/content/skillup/ghbp/images/ghbp-d1-branch-management-m2.svg)
-<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d1-branch-management-m2.mmd -->
+![Merged feature branches are deleted automatically, end-of-life release branches are locked read-only, release tags are protected by a tag ruleset, and a whole retired repository is archived instead.](/content/skillup/ghbp/images/ghbp-1-9-lifecycle.svg)
 
-| Layer | Mechanism | When |
+### Real use
+
+A library maintainer enables auto-delete, locks `v1.x` when its support ends, and adds a tag ruleset on `refs/tags/v*` with the release app as the only bypass actor. Downstream builds pinned to `v2.3.0` always get the code that was published.
+
+### How it works
+
+Merged branches left behind hide active work. A blunt "delete everything older than 90 days" job deletes a `release/2023-lts` branch customers still get patches from, or someone moves a release tag and builds silently pick up different code.
+
+- Auto-delete for merged branches; a scheduled report for stale ones, excluding `release/*`.
+- Lock branch for "keep but freeze"; archive for a whole retired repository.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| **Auto-delete merged** | Setting: "Automatically delete head branches" | Immediately after merge |
-| **Stale detection** | Scheduled workflow listing branches with no commits for 30+ days | Weekly |
-| **Abandoned cleanup** | Notify the owner; delete if there's no response in 14 days (excluding `release/*`, `hotfix/*`) | Monthly |
-| **Keep but freeze** | Lock branch on end-of-life lines | When support ends |
-
-```yaml
-# .github/workflows/stale-branches.yml
-name: Stale Branch Report
-on:
-  schedule:
-    - cron: '0 9 * * 1'  # Monday 09:00 UTC
-
-jobs:
-  detect-stale:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 0
-      - name: Find stale branches
-        run: |
-          CUTOFF=$(date -d '30 days ago' +%Y-%m-%d)
-          git branch -r --sort=committerdate \
-            --format='%(refname:short) %(committerdate:short)' \
-            | awk -v cutoff="$CUTOFF" '$2 < cutoff && $1 !~ /HEAD|main|develop|release\// {print $1}'
-```
-
-### In Practice
-
-**What breaks without this**: A blunt "delete everything older than 90 days" job deletes a `release/2023-lts` branch that customers still receive patches from. Or a developer moves a release tag, and downstream builds that pin `v1.0.0` silently pick up different code.
-
-**Decision trigger**: Ask: "Is this branch or tag something people or systems depend on staying put?" If yes, lock it (branch) or ruleset-protect it (tag). If no, it should be deleted automatically.
-
-**When you'd choose differently**: To retire a whole repository rather than one branch, archive the repository. Archiving makes everything read-only, including issues and PRs, which lock branch doesn't do.
+| Auto-delete head branches | Always, for merged PR branches | Restore needed if deleted by mistake |
+| Lock branch | A branch must stay but never change | Read-only for that branch only |
+| Tag ruleset | Released versions must never move | Release tooling needs a bypass entry |
+| Archive repository | The whole repository is retired | Issues and PRs become read-only too |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Tag protection rules" are the old feature; GitHub sunset them in 2024 and migrated them to tag rulesets. If an option mentions tag protection by ruleset (targeting <code>refs/tags/...</code> with restrict updates/deletions), prefer it. And "lock branch" means read-only for that branch; "archive" means read-only for the whole repository.
-</div>
+<div class="note-trap">"Tag protection rules" are the retired feature; prefer a tag ruleset targeting <code>refs/tags/...</code>. And "lock branch" is read-only for one branch, while "archive" is read-only for the whole repository.</div>
+
+### Go deeper
+
+- [Managing the automatic deletion of branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches)
+- [About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
 
 ---
 
-## 1.10 Signed Commits and the Risk Matrix
+## 1.10 Require signed commits and map branch risks to controls
 
 ### Key Concept
 
 **Signing proves who made a commit; it says nothing about whether anyone reviewed it.**
 
-"Require signed commits" accepts only commits that are signed and verified against a GPG, SSH or S/MIME key on the committer's GitHub account. Git otherwise trusts whatever name and email a developer configures, so without signing, anyone can author commits "as" a colleague. Vigilant mode only *labels* unsigned commits as Unverified; it enforces nothing.
+"Require signed commits" accepts only commits signed and verified with a GPG, SSH or S/MIME key on the committer's GitHub account. Git otherwise trusts whatever name and email a developer configures, so anyone can author commits "as" a colleague. Vigilant mode only *labels* unsigned commits as Unverified; it enforces nothing.
 
-Because signing and review answer different questions, compliance regimes usually want both. **Think of a signature on a cheque**: it proves who wrote it, but someone still has to check the amount.
+**Think of a signature on a cheque**: it proves who wrote it, but someone still has to check the amount.
+
+![Each branch risk maps to its control: direct pushes to a required pull request, unreviewed merges to approvals and code owners, rewritten history to blocked force pushes, moved tags to a tag ruleset, and forged authorship to required signed commits.](/content/skillup/ghbp/images/ghbp-1-10-risk-matrix.svg)
+
+### Real use
+
+A company under SOC 2 requires signed commits on `main` and release branches. When an auditor asks for proof that a change attributed to a senior engineer was really theirs, the Verified badge and the signing key answer it in seconds.
+
+### How it works
+
+Git metadata is self-asserted: without signing, you can't prove a commit's author. Compliance regimes usually want both signing (who) and review (what was checked).
+
+- Developers add a signing key and set `commit.gpgsign true`.
+- Bots sign by creating commits through the GitHub API, which GitHub signs.
+- Unsigned commits on a PR's head branch can block a squash merge even though GitHub signs the squash commit.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Require signed commits | You need non-repudiation (SOC 2, FedRAMP, supply-chain attestations) | Every contributor and bot must sign |
+| Signing on release branches only | Open-source projects with casual contributors | Main stays unsigned |
+| Vigilant mode only | You want visibility, not enforcement | Nothing is blocked |
+
+### How to do it
 
 ```bash
-# Developer setup (SSH signing)
 git config --global gpg.format ssh
 git config --global user.signingkey ~/.ssh/id_ed25519.pub
 git config --global commit.gpgsign true
-# GitHub: add the key as a *signing* key; then enable "Require signed commits" on the branch or ruleset
+# Add the key to GitHub as a *signing* key, then require signed commits on the branch or ruleset
 ```
-
-| Risk | Impact | Likelihood with no protection | Control |
-|---|---|---|---|
-| Direct push breaks production | Critical | High | Require PR + checks |
-| Compromised credential pushes malicious code | Critical | Medium | No-bypass, signed commits, push restrictions |
-| Accidental force-push rewrites history | High | Medium | Keep force pushes blocked |
-| Merge without review introduces vulnerability | High | High | Required approvals + code owners |
-| Protected branch deleted | High | Low | Keep deletions blocked |
-| Release tag moved | High | Low | Tag ruleset |
-
-### In Practice
-
-**What breaks without this**: An auditor asks you to prove that a commit attributed to a senior engineer was really theirs, and you can't. Git metadata is self-asserted.
-
-**Decision trigger**: Ask: "Do we need non-repudiation (SOC 2 change management, FedRAMP, supply-chain attestations)?" If yes, require signed commits and make sure bots sign too, for example by having automation create commits through the GitHub API, which GitHub signs.
-
-**When you'd choose differently**: For open-source projects with many casual contributors, required signing raises the contribution barrier. Many projects require signing only on release branches, or rely on squash merges (which GitHub signs) while being aware of the head-branch caveat above.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"A CI workflow that checks signatures" detects unsigned commits only after they're pushed; the native rule rejects them at the door. "Vigilant mode" is a display setting. "Add GPG keys to accounts" is a prerequisite, not enforcement.
-</div>
+<div class="note-trap">"A CI workflow that checks signatures" finds unsigned commits only after they're pushed; the native rule rejects them at the door. "Vigilant mode" is a display setting, and "add GPG keys to accounts" is a prerequisite, not enforcement.</div>
+
+### Go deeper
+
+- [About commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification)
 
 ---
 
@@ -508,5 +547,3 @@ CODEOWNERS and branching strategy are what make the controls sustainable. CODEOW
 | Freeze a branch | Lock branch | Read-only; optional fork syncing |
 | Auto-delete merged branches | Settings → General | Removes head branches on merge |
 | Signed commits | Branch rule / ruleset | Verified GPG, SSH or S/MIME signatures only |
-
-<div class="note-important"><strong>The minimum viable protection setup is: require a PR, 1 approval, and at least one required CI check, with no admin bypass.</strong> Everything else is hardening, but that minimum must exist on every team's main branch before anything else.</div>

@@ -446,5 +446,37 @@
     "explanation": "A is correct: once owners or admins enable private vulnerability reporting on a public repository, reporters can privately submit details (as a draft security advisory) and maintainers are notified immediately. A security policy (SECURITY.md) tells reporters what to expect and is good practice, but it is not a prerequisite. B is wrong because the feature doesn't depend on the file. C is wrong because a CVE is requested later, when publishing an advisory, if at all. D is wrong because reports go directly and privately to the repository maintainers.",
     "difficulty": "medium",
     "tags": ["concept", "comprehension", "exam-trap"]
+  },
+  {
+    "domain": 3,
+    "id": "ghbp-d3-029",
+    "difficulty": "easy",
+    "scenario": "A project's bug reports keep arriving without a version number or steps to reproduce, even though its Markdown issue template asks for both.",
+    "question": "Which change makes those two fields mandatory?",
+    "options": [
+      "Add the fields to the Markdown template in bold so that authors notice them",
+      "Convert the template to an issue form in .github/ISSUE_TEMPLATE/ with validations: required: true",
+      "Add a CONTRIBUTING.md file asking reporters to include the version and steps",
+      "Set blank_issues_enabled: false in config.yml so that every issue uses the template"
+    ],
+    "correct": 1,
+    "explanation": "Issue forms are YAML templates that render real fields, and validations: required: true stops submission until a field is filled. Markdown templates are only pre-filled text that authors can delete, however it's formatted. CONTRIBUTING.md is guidance, not enforcement. Disabling blank issues forces a template choice but doesn't make any field inside it required.",
+    "tags": ["configuration", "recall", "frequently-tested"]
+  },
+  {
+    "domain": 3,
+    "id": "ghbp-d3-030",
+    "difficulty": "medium",
+    "scenario": "A library's release tooling depends on Conventional Commit messages on main. The team wants pushes with non-conforming commit messages rejected before they land, without relying on a CI job.",
+    "question": "Which control does this?",
+    "options": [
+      "A ruleset metadata restriction that requires commit messages to match a Conventional Commits pattern",
+      "Enabling 'Require linear history' on main so only squash and rebase merges are allowed",
+      "Enabling 'Require signed commits' so every commit carries a verified signature",
+      "A commitlint workflow that runs on push to main and opens an issue for each bad message"
+    ],
+    "correct": 0,
+    "explanation": "Rulesets can restrict commit metadata, including requiring commit messages to match a pattern, and they reject non-matching pushes. Linear history controls merge methods, not message format. Signed commits prove authorship, not message structure. A commitlint job on push to main runs after the commit has already landed and only reports it; as a required PR check it would block merges, but the question asks to reject pushes without CI.",
+    "tags": ["configuration", "application", "edge-case"]
   }
 ]

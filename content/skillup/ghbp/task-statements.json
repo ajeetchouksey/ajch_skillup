@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "examCode": "GH-BP",
-  "source": "GitHub Engineering Best Practices — internal SkillUp content",
+  "source": "GitHub Engineering Best Practices: SkillUp's own course blueprint, one objective per lesson",
   "sourceUrl": "https://docs.github.com/en/repositories",
   "domains": [
     {
@@ -12,61 +12,183 @@
       "tasks": [
         {
           "id": "1.1",
-          "title": "Understand branch protection rules and repository rulesets",
+          "title": "Configure branch protection rules that require review, checks and an up-to-date branch",
+          "shortTitle": "Branch protection rules",
           "knowledge": [
-            "Branch protection rule settings (required reviews, status checks, restrictions)",
-            "Repository rulesets vs branch protection rules",
-            "CODEOWNERS file syntax and enforcement"
+            "Required pull requests and approvals",
+            "Stale approval dismissal vs most-recent-push approval",
+            "Required status checks and conversation resolution"
           ],
           "skills": [
-            "Configure branch protection for a production branch",
-            "Create a ruleset that enforces conventional commits",
-            "Set up CODEOWNERS for automated review assignment"
+            "Protect a production branch so changes arrive reviewed, tested and current"
           ],
           "questionIds": [
             "ghbp-d1-001",
             "ghbp-d1-002",
-            "ghbp-d1-003",
-            "ghbp-d1-004",
             "ghbp-d1-007",
-            "ghbp-d1-008",
             "ghbp-d1-009",
-            "ghbp-d1-011",
-            "ghbp-d1-013",
-            "ghbp-d1-014",
-            "ghbp-d1-015",
-            "ghbp-d1-018",
-            "ghbp-d1-019",
-            "ghbp-d1-020",
-            "ghbp-d1-021",
-            "ghbp-d1-023",
-            "ghbp-d1-024",
-            "ghbp-d1-026",
-            "ghbp-d1-027",
-            "ghbp-d1-028"
+            "ghbp-d1-021"
           ]
         },
         {
           "id": "1.2",
-          "title": "Apply Git branching strategies",
+          "title": "Control who can bypass branch protection and design break-glass access",
+          "shortTitle": "Bypass and break-glass",
           "knowledge": [
-            "Git Flow, trunk-based development, GitHub Flow patterns",
-            "Feature flags and short-lived branches",
-            "Merge strategies: merge commit, squash, rebase"
+            "Admin bypass and 'Do not allow bypassing the above settings'",
+            "Ruleset bypass lists: Always allow vs For pull requests only"
           ],
           "skills": [
-            "Choose the right branching strategy for a given team size and release cadence",
-            "Configure default merge strategy at repo level"
+            "Design an emergency path that still leaves a pull request trail"
+          ],
+          "questionIds": [
+            "ghbp-d1-003",
+            "ghbp-d1-018",
+            "ghbp-d1-027",
+            "ghbp-d3-002"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Choose between repository rulesets and classic branch protection rules",
+          "shortTitle": "Rulesets vs protection",
+          "knowledge": [
+            "Ruleset aggregation: most restrictive wins",
+            "Organization rulesets targeted by name or custom property",
+            "Capabilities only rulesets have"
+          ],
+          "skills": [
+            "Set an organization-wide floor that repositories can only raise"
+          ],
+          "questionIds": [
+            "ghbp-d1-011",
+            "ghbp-d1-026"
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Route and require expert review with CODEOWNERS",
+          "shortTitle": "CODEOWNERS",
+          "knowledge": [
+            "CODEOWNERS locations, syntax and last-match-wins",
+            "Base-branch CODEOWNERS and code owner review",
+            "Team review assignment"
+          ],
+          "skills": [
+            "Route reviews for risky paths to the right owners and require their approval"
+          ],
+          "questionIds": [
+            "ghbp-d1-004",
+            "ghbp-d1-008",
+            "ghbp-d1-019",
+            "ghbp-d1-025",
+            "ghbp-d1-028",
+            "ghbp-d3-006"
+          ]
+        },
+        {
+          "id": "1.5",
+          "title": "Gate merges on status checks, deployments and the merge queue",
+          "shortTitle": "Checks and merge gates",
+          "knowledge": [
+            "Required status checks and strict mode",
+            "Require deployments to succeed",
+            "Merge queue and auto-merge"
+          ],
+          "skills": [
+            "Choose merge gates that match a branch's traffic"
+          ],
+          "questionIds": [
+            "ghbp-d1-015",
+            "ghbp-d1-023"
+          ]
+        },
+        {
+          "id": "1.6",
+          "title": "Enforce centrally owned workflows with organization rulesets",
+          "shortTitle": "Required workflows",
+          "knowledge": [
+            "'Require workflows to pass before merging'",
+            "Source repository visibility rules",
+            "Ignored event filters and Evaluate mode"
+          ],
+          "skills": [
+            "Make a security workflow a gate that target repositories can't weaken"
+          ],
+          "questionIds": [
+            "ghbp-d1-029",
+            "ghbp-d1-030"
+          ]
+        },
+        {
+          "id": "1.7",
+          "title": "Choose a branching strategy and merge method",
+          "shortTitle": "Branching and merging",
+          "knowledge": [
+            "Trunk-based, GitHub flow and GitFlow",
+            "Merge commit, squash and rebase",
+            "Linear history and draft pull requests"
+          ],
+          "skills": [
+            "Pick a branching strategy for a team's release cadence"
+          ],
+          "questionIds": [
+            "ghbp-d1-012",
+            "ghbp-d1-014",
+            "ghbp-d1-016",
+            "ghbp-d1-017",
+            "ghbp-d1-022"
+          ]
+        },
+        {
+          "id": "1.8",
+          "title": "Enforce branch naming conventions",
+          "shortTitle": "Branch naming",
+          "knowledge": [
+            "Ruleset branch-name restrictions",
+            "Required naming checks and safe handling of head_ref"
+          ],
+          "skills": [
+            "Reject branch names that break the convention"
+          ],
+          "questionIds": [
+            "ghbp-d1-006",
+            "ghbp-d1-031"
+          ]
+        },
+        {
+          "id": "1.9",
+          "title": "Manage the branch lifecycle and protect release tags",
+          "shortTitle": "Branch lifecycle and tags",
+          "knowledge": [
+            "Automatic deletion of head branches",
+            "Lock branch vs archive",
+            "Tag rulesets"
+          ],
+          "skills": [
+            "Keep branches tidy and released versions immutable"
           ],
           "questionIds": [
             "ghbp-d1-005",
-            "ghbp-d1-006",
-            "ghbp-d1-010",
-            "ghbp-d1-012",
-            "ghbp-d1-016",
-            "ghbp-d1-017",
-            "ghbp-d1-022",
-            "ghbp-d1-025"
+            "ghbp-d1-013",
+            "ghbp-d1-024",
+            "ghbp-d3-020"
+          ]
+        },
+        {
+          "id": "1.10",
+          "title": "Require signed commits and map branch risks to controls",
+          "shortTitle": "Signed commits",
+          "knowledge": [
+            "Required signed commits and vigilant mode",
+            "Branch risk matrix"
+          ],
+          "skills": [
+            "Prove commit authorship for audits"
+          ],
+          "questionIds": [
+            "ghbp-d1-020",
+            "ghbp-d3-014"
           ]
         }
       ]
@@ -79,62 +201,212 @@
       "tasks": [
         {
           "id": "2.1",
-          "title": "Build and secure GitHub Actions workflows",
+          "title": "Apply least-privilege GITHUB_TOKEN permissions",
+          "shortTitle": "GITHUB_TOKEN permissions",
           "knowledge": [
-            "Workflow syntax (on, jobs, steps, env, secrets)",
-            "Permissions and GITHUB_TOKEN scope minimisation",
-            "Third-party action pinning to SHAs",
-            "Concurrency groups and cancel-in-progress"
+            "Default token permissions and the permissions key",
+            "Fork pull request token behaviour",
+            "Token limits"
           ],
           "skills": [
-            "Write a CI workflow that runs tests, lints, and builds",
-            "Harden a workflow against script injection",
-            "Pin third-party actions to immutable commit SHAs"
+            "Give each job only the scopes it needs"
           ],
           "questionIds": [
-            "ghbp-d2-002",
             "ghbp-d2-003",
-            "ghbp-d2-004",
-            "ghbp-d2-006",
-            "ghbp-d2-008",
-            "ghbp-d2-011",
-            "ghbp-d2-014",
-            "ghbp-d2-016",
-            "ghbp-d2-019",
-            "ghbp-d2-020",
-            "ghbp-d2-021",
-            "ghbp-d2-026",
-            "ghbp-d2-027",
-            "ghbp-d2-028"
+            "ghbp-d2-021"
           ]
         },
         {
           "id": "2.2",
-          "title": "Implement CD and release automation",
+          "title": "Store secrets and variables at the right scope",
+          "shortTitle": "Secrets and variables",
           "knowledge": [
-            "Environments, deployment protection rules, required reviewers",
-            "Reusable workflows and composite actions",
-            "Caching strategies for faster pipelines"
+            "Organization, repository and environment secrets",
+            "Secret precedence",
+            "Variables, masking and Dependabot secrets"
           ],
           "skills": [
-            "Create a multi-environment deployment pipeline",
-            "Extract repeated logic into a reusable workflow"
+            "Keep production credentials out of reach of non-deploy jobs"
+          ],
+          "questionIds": [
+            "ghbp-d2-016",
+            "ghbp-d2-019"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Deploy to the cloud with OpenID Connect instead of stored keys",
+          "shortTitle": "OIDC deployments",
+          "knowledge": [
+            "id-token: write and the OIDC JWT",
+            "Trust policy audience and subject conditions"
+          ],
+          "skills": [
+            "Deploy to a cloud provider without stored keys"
+          ],
+          "questionIds": [
+            "ghbp-d2-006",
+            "ghbp-d2-027",
+            "ghbp-d3-007"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Pin and govern third-party actions",
+          "shortTitle": "Pinning actions",
+          "knowledge": [
+            "Full-length SHA pinning",
+            "Allowed-actions policy and SHA-pinning enforcement",
+            "Workflow dependency lockfiles"
+          ],
+          "skills": [
+            "Stop a moved tag from changing the code your workflows run"
+          ],
+          "questionIds": [
+            "ghbp-d2-002",
+            "ghbp-d2-028"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Prevent script injection from untrusted input",
+          "shortTitle": "Script injection",
+          "knowledge": [
+            "Expression expansion before the shell runs",
+            "pull_request vs pull_request_target vs workflow_run"
+          ],
+          "skills": [
+            "Pass untrusted input to scripts safely"
+          ],
+          "questionIds": [
+            "ghbp-d2-011",
+            "ghbp-d2-026"
+          ]
+        },
+        {
+          "id": "2.6",
+          "title": "Choose and secure GitHub-hosted and self-hosted runners",
+          "shortTitle": "Runners",
+          "knowledge": [
+            "GitHub-hosted vs self-hosted runners",
+            "Ephemeral runners and runner groups"
+          ],
+          "skills": [
+            "Provide special hardware without exposing it to untrusted code"
+          ],
+          "questionIds": [
+            "ghbp-d2-014",
+            "ghbp-d2-029"
+          ]
+        },
+        {
+          "id": "2.7",
+          "title": "Configure Dependabot alerts, security updates and version updates",
+          "shortTitle": "Dependabot",
+          "knowledge": [
+            "Alerts vs security updates vs version updates",
+            "dependabot.yml, groups and the github-actions ecosystem",
+            "Auto-merge patterns"
+          ],
+          "skills": [
+            "Keep dependencies patched and current with manageable PR volume"
+          ],
+          "questionIds": [
+            "ghbp-d2-004",
+            "ghbp-d2-020"
+          ]
+        },
+        {
+          "id": "2.8",
+          "title": "Cache dependencies safely and effectively",
+          "shortTitle": "Caching",
+          "knowledge": [
+            "Cache keys and restore-keys",
+            "Cache scope across branches",
+            "Eviction and size limits"
+          ],
+          "skills": [
+            "Speed up builds without stale or poisoned caches"
           ],
           "questionIds": [
             "ghbp-d2-001",
+            "ghbp-d2-025"
+          ]
+        },
+        {
+          "id": "2.9",
+          "title": "Run code scanning with CodeQL and make it a merge gate",
+          "shortTitle": "Code scanning",
+          "knowledge": [
+            "CodeQL default and advanced setup",
+            "SARIF upload for third-party tools",
+            "Blocking merges on code scanning results"
+          ],
+          "skills": [
+            "Turn code scanning alerts into a merge gate"
+          ],
+          "questionIds": [
+            "ghbp-d2-008",
+            "ghbp-d3-022"
+          ]
+        },
+        {
+          "id": "2.10",
+          "title": "Reuse automation with reusable workflows and composite actions",
+          "shortTitle": "Reusable workflows",
+          "knowledge": [
+            "Reusable workflows (job level)",
+            "Composite actions (step level)",
+            "Workflow templates"
+          ],
+          "skills": [
+            "Share a pipeline stage or a set of steps across repositories"
+          ],
+          "questionIds": [
             "ghbp-d2-005",
+            "ghbp-d2-013"
+          ]
+        },
+        {
+          "id": "2.11",
+          "title": "Protect deployments with environments",
+          "shortTitle": "Environments",
+          "knowledge": [
+            "Required reviewers, wait timers and deployment branch rules",
+            "Environment secrets",
+            "Plan limits"
+          ],
+          "skills": [
+            "Gate production deploys behind approval"
+          ],
+          "questionIds": [
             "ghbp-d2-007",
+            "ghbp-d2-030"
+          ]
+        },
+        {
+          "id": "2.12",
+          "title": "Control workflow runs with concurrency, timeouts, matrices and outputs",
+          "shortTitle": "Workflow control",
+          "knowledge": [
+            "Concurrency and cancel-in-progress",
+            "Timeouts",
+            "Matrices, needs and outputs",
+            "Triggers, conditions and manual inputs"
+          ],
+          "skills": [
+            "Solve scheduling, lifetime and data-passing problems with built-in keys"
+          ],
+          "questionIds": [
             "ghbp-d2-009",
             "ghbp-d2-010",
             "ghbp-d2-012",
-            "ghbp-d2-013",
             "ghbp-d2-015",
             "ghbp-d2-017",
             "ghbp-d2-018",
             "ghbp-d2-022",
             "ghbp-d2-023",
-            "ghbp-d2-024",
-            "ghbp-d2-025"
+            "ghbp-d2-024"
           ]
         }
       ]
@@ -147,63 +419,171 @@
       "tasks": [
         {
           "id": "3.1",
-          "title": "Apply repository security features",
+          "title": "Set up the essential repository files",
+          "shortTitle": "Repository essentials",
           "knowledge": [
-            "Dependabot alerts, security updates, and version updates",
-            "Secret scanning and push protection",
-            "Code scanning with CodeQL",
-            "GitHub Advanced Security feature set"
+            "README, LICENSE, .gitignore, CONTRIBUTING, SECURITY, CODEOWNERS",
+            "Organization .github defaults"
           ],
           "skills": [
-            "Enable Dependabot version updates for a monorepo",
-            "Configure push protection to block credential leaks",
-            "Set up CodeQL analysis on every pull request"
+            "Give every repository its operating manual and first line of defence"
           ],
           "questionIds": [
             "ghbp-d3-001",
-            "ghbp-d3-003",
-            "ghbp-d3-007",
-            "ghbp-d3-008",
-            "ghbp-d3-011",
-            "ghbp-d3-012",
-            "ghbp-d3-013",
-            "ghbp-d3-014",
-            "ghbp-d3-016",
-            "ghbp-d3-017",
-            "ghbp-d3-018",
-            "ghbp-d3-022",
-            "ghbp-d3-023",
-            "ghbp-d3-024",
-            "ghbp-d3-025",
-            "ghbp-d3-026",
-            "ghbp-d3-027",
-            "ghbp-d3-028"
+            "ghbp-d3-009"
           ]
         },
         {
           "id": "3.2",
-          "title": "Govern repository structure and collaboration",
+          "title": "Stop leaked secrets with secret scanning and push protection",
+          "shortTitle": "Secret scanning",
           "knowledge": [
-            "Repository templates and standardisation",
-            "Issue and PR templates",
-            "GitHub Projects for team tracking",
-            "Audit log and compliance reporting"
+            "Secret scanning vs push protection",
+            "Bypass reasons and delegated bypass",
+            "Leaked-secret remediation order"
           ],
           "skills": [
-            "Create a repository template with required files",
-            "Write issue templates that capture structured information"
+            "Block secrets at push and remediate leaks in the right order"
           ],
           "questionIds": [
-            "ghbp-d3-002",
+            "ghbp-d1-010",
+            "ghbp-d3-011",
+            "ghbp-d3-013",
+            "ghbp-d3-026"
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Choose GitHub Secret Protection or Code Security and enforce them with security configurations",
+          "shortTitle": "Security products",
+          "knowledge": [
+            "GitHub Secret Protection vs GitHub Code Security",
+            "Security configurations and Enforce"
+          ],
+          "skills": [
+            "Buy the right product and enforce a security baseline across repositories"
+          ],
+          "questionIds": [
+            "ghbp-d3-023",
+            "ghbp-d3-027"
+          ]
+        },
+        {
+          "id": "3.4",
+          "title": "Block vulnerable and non-compliant dependencies with dependency review",
+          "shortTitle": "Dependency review",
+          "knowledge": [
+            "dependency-review-action severity and scope",
+            "License allow and deny lists"
+          ],
+          "skills": [
+            "Stop pull requests from adding vulnerable or disallowed dependencies"
+          ],
+          "questionIds": [
+            "ghbp-d3-012",
+            "ghbp-d3-019"
+          ]
+        },
+        {
+          "id": "3.5",
+          "title": "Structure contributions with pull request and issue templates",
+          "shortTitle": "Templates",
+          "knowledge": [
+            "PR templates",
+            "Issue forms and required fields",
+            "config.yml"
+          ],
+          "skills": [
+            "Capture the context reviewers and triagers need up front"
+          ],
+          "questionIds": [
             "ghbp-d3-004",
+            "ghbp-d3-029"
+          ]
+        },
+        {
+          "id": "3.6",
+          "title": "Handle vulnerability reports privately with a security policy",
+          "shortTitle": "Vulnerability reporting",
+          "knowledge": [
+            "Private vulnerability reporting",
+            "SECURITY.md",
+            "Repository security advisories"
+          ],
+          "skills": [
+            "Receive and fix vulnerability reports without public disclosure"
+          ],
+          "questionIds": [
+            "ghbp-d3-003",
+            "ghbp-d3-008",
+            "ghbp-d3-028"
+          ]
+        },
+        {
+          "id": "3.7",
+          "title": "Standardize commit messages with Conventional Commits",
+          "shortTitle": "Commit messages",
+          "knowledge": [
+            "Conventional Commits types and version bumps",
+            "Enforcement with commitlint or ruleset metadata rules"
+          ],
+          "skills": [
+            "Generate versions and changelogs from commit history"
+          ],
+          "questionIds": [
             "ghbp-d3-005",
-            "ghbp-d3-006",
-            "ghbp-d3-009",
+            "ghbp-d3-030"
+          ]
+        },
+        {
+          "id": "3.8",
+          "title": "Govern visibility, archiving, topics and custom properties",
+          "shortTitle": "Visibility and properties",
+          "knowledge": [
+            "Public, private and internal visibility",
+            "Archiving",
+            "Topics vs custom properties"
+          ],
+          "skills": [
+            "Make repositories findable and targetable by policy"
+          ],
+          "questionIds": [
             "ghbp-d3-010",
             "ghbp-d3-015",
-            "ghbp-d3-019",
-            "ghbp-d3-020",
             "ghbp-d3-021"
+          ]
+        },
+        {
+          "id": "3.9",
+          "title": "Choose the right machine identity for automation",
+          "shortTitle": "Machine identities",
+          "knowledge": [
+            "GitHub Apps, deploy keys, PATs and OIDC",
+            "GitHub Packages scopes"
+          ],
+          "skills": [
+            "Keep automation working when people leave"
+          ],
+          "questionIds": [
+            "ghbp-d3-016",
+            "ghbp-d3-024",
+            "ghbp-d3-025"
+          ]
+        },
+        {
+          "id": "3.10",
+          "title": "Audit changes and verify webhook deliveries",
+          "shortTitle": "Audit log and webhooks",
+          "knowledge": [
+            "Organization audit log and streaming",
+            "Webhook HMAC signatures"
+          ],
+          "skills": [
+            "Attribute changes and reject forged webhooks"
+          ],
+          "questionIds": [
+            "ghbp-d3-017",
+            "ghbp-d3-018"
           ]
         }
       ]

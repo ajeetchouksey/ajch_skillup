@@ -1,170 +1,176 @@
 # D3: Repository Security & Governance
 
-> **Exam weight**: 34% · **Questions**: ~28 in the bank
+> **Exam weight**: 34% · **Questions**: ~30 in the bank
 
 ## Overview
 
-A repository is more than a code store. It is an access-control boundary, an audit trail and a collaboration protocol. This domain covers the security features that watch it (secret scanning and push protection, Dependabot and dependency review, code scanning, and how GitHub packages them as Secret Protection and Code Security), how to enforce them at scale with security configurations, and the governance files and settings that make collaboration predictable: templates, security policy and private vulnerability reporting, commit conventions, visibility, archiving, machine identities and the audit log.
+A repository is more than a code store. It is an access-control boundary, an audit trail and a collaboration protocol. This domain covers the security features that watch it (secret scanning and push protection, dependency review, and how GitHub packages them as Secret Protection and Code Security), how to enforce them at scale with security configurations, and the governance files and settings that make collaboration predictable: templates, security policy and private vulnerability reporting, commit conventions, visibility, machine identities and the audit log.
 
 > 💡 **Human Angle**: Governance gaps compound like interest. No template, no owner, no policy: each looks minor on its own, and together they add up to a compliance failure.
 
-<div class="note-important"><strong>Repository governance gaps compound over time.</strong> No PR template leads to inconsistent reviews. No CODEOWNERS means the wrong people review critical changes. No security policy or private reporting means vulnerabilities get reported in public issues. Each gap seems minor; together they create a compliance failure.</div>
-
 ---
 
-## 3.1 Repository Structure Essentials
+## 3.1 Set up the essential repository files
 
 ### Key Concept
 
 **The files in a repository's root and `.github/` folder are its operating manual and its first line of defence.**
 
-A production repository needs a README (what it is and how to run it), a LICENSE (the legal terms), a `.gitignore` (what must never be committed), CONTRIBUTING.md (how to work here), SECURITY.md (how to report vulnerabilities), CODEOWNERS (who reviews what), and `dependabot.yml` if it uses version updates. GitHub surfaces several of these automatically. The community profile checks for them, and SECURITY.md populates the Security tab's policy.
+A production repository needs a README, a LICENSE, a `.gitignore`, CONTRIBUTING.md, SECURITY.md, CODEOWNERS, and `dependabot.yml` if it uses version updates. GitHub surfaces several of them automatically, and organization-wide defaults for community files can live in a public repository named `.github`. A missing `.gitignore` is a security issue: once a secret is committed it stays in history even if the next commit deletes it.
 
-A missing `.gitignore` is a security issue, not a style issue. Once a secret is committed it lives in history even if the next commit deletes it. **Think of `.gitignore` like a "do not pack" list for airport security**: it's far easier to leave the knife at home than to explain it at the gate.
+**Think of `.gitignore` like a "do not pack" list for airport security**: it's far easier to leave the knife at home than to explain it at the gate.
 
-| File | Location | Purpose |
+![A repository's root and .github folder hold the README, LICENSE, .gitignore, CONTRIBUTING, SECURITY, CODEOWNERS and dependabot.yml, grouped by what each one protects: people, legal terms, secrets, reviews and dependencies.](/content/skillup/ghbp/images/ghbp-3-1-repo-files.svg)
+
+### Real use
+
+A platform team ships a repository template with a stack-specific `.gitignore` (`.env`, `*.pem`, `*.key`), CODEOWNERS and `dependabot.yml`, and keeps SECURITY.md, CONTRIBUTING.md and issue templates in the organization's `.github` repository. Every new service starts with the essentials on day one.
+
+### How it works
+
+A developer runs `git add .` with a `.env` file present, and production credentials go into a commit every clone now carries forever.
+
+- Ask: could a new contributor set up, contribute and report a security problem using only what's in the repo?
+- `.gitignore` must exist per repository, because it's specific to the stack.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| `README.md` | Root (or `.github/`, `docs/`) | What it is, how to run it, how to contribute |
-| `LICENSE` | Root | Legal terms for use and modification |
-| `.gitignore` | Root | Keeps secrets, build artifacts and IDE files out of commits |
-| `CODEOWNERS` | `.github/`, root or `docs/` | Auto-requests reviewers by path |
-| `SECURITY.md` | Root, `.github/` or `docs/` | How to report vulnerabilities confidentially |
-| `CONTRIBUTING.md` | Root, `.github/` or `docs/` | Workflow, standards and setup for contributors |
-| `dependabot.yml` | `.github/` | Dependabot version updates configuration |
-
-```gitignore
-# Environment & secrets: NEVER commit these
-.env
-.env.*
-!.env.example      # The example is OK to commit
-*.pem
-*.key
-*_rsa
-*_dsa
-
-# Dependencies
-node_modules/
-vendor/
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Build outputs
-dist/
-build/
-*.log
-coverage/
-.nyc_output/
-
-# IDE & OS files
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/*
-!.vscode/extensions.json   # This one is useful to share
-*.suo
-*.user
-```
-
-Organization-wide defaults for community files (issue templates, SECURITY.md, CONTRIBUTING.md) can live in a public repository named `.github` in the organization. They apply to any repository that doesn't have its own.
-
-### In Practice
-
-**What breaks without this**: A developer runs `git add .` with a `.env` file present, and production credentials go into a commit that every clone now carries forever.
-
-**Decision trigger**: Ask: "Could a new contributor set this up, contribute and report a security problem using only what's in the repo?" If not, the missing file is the gap.
-
-**When you'd choose differently**: Small internal repositories inherit community files from the organization's `.github` repository instead of copying them, which keeps one version of the truth. `.gitignore` is different: it must exist per repository, because it's specific to the stack.
+| Files in each repository | Stack-specific files like `.gitignore` and CODEOWNERS | Copies to maintain |
+| Organization `.github` defaults | Community files (SECURITY, CONTRIBUTING, templates) shared by many repos | A repo's own file overrides them |
+| Repository template | New repos should start complete | Existing repos aren't updated |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Delete the file in the next commit" doesn't remove a committed secret; the earlier commit still holds it. The first response is to <strong>revoke and rotate</strong> the secret, and only then, if needed, rewrite history.
-</div>
+<div class="note-trap">Deleting the file in the next commit doesn't remove a committed secret; the earlier commit still holds it. The first response is to revoke and rotate the secret, and only then, if needed, rewrite history.</div>
+
+### Go deeper
+
+- [About repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories)
 
 ---
 
-## 3.2 Secret Scanning and Push Protection
+## 3.2 Stop leaked secrets with secret scanning and push protection
 
 ### Key Concept
 
 **Secret scanning finds leaked secrets after the fact; push protection stops supported secrets before they land.**
 
-**Secret scanning** scans repository history (and issues, PRs and discussions) for known secret formats from partner providers, plus custom patterns and AI-detected generic secrets, and raises alerts. For public repositories, many partner secrets are also reported to the issuing provider. **Push protection** checks content *at push time*, covering command-line pushes, web UI commits, file uploads and REST API requests, and rejects pushes that contain supported secrets.
+**Secret scanning** scans history, issues, PRs and discussions for known secret formats, custom patterns and AI-detected generic secrets, and raises alerts. **Push protection** checks content at push time (command line, web UI, uploads, REST API) and rejects pushes containing supported secrets. By default a contributor can bypass with a reason; **delegated bypass** turns that into a request designated reviewers must approve.
 
-By default, a contributor with write access can bypass a block by giving a reason. "It's used in tests" and "It's a false positive" create *closed* alerts, while "I'll fix it later" creates an *open* alert. Every bypass is logged in the audit log and emailed to owners, security managers and repository admins who watch the repository. **Delegated bypass** turns that self-service into a request that designated reviewers must approve. **Think of push protection as a metal detector at the door and secret scanning as the CCTV**: one stops things coming in, the other shows you what's already inside.
+**Think of push protection as a metal detector at the door and secret scanning as the CCTV**: one stops things coming in, the other shows what's already inside.
 
-| | Push protection for repositories | Push protection for users |
+![A push containing a secret is stopped by push protection before it reaches the repository, a secret already in history is found by secret scanning, and the remediation order is rotate first, check logs, then optionally rewrite history.](/content/skillup/ghbp/images/ghbp-3-2-push-protection.svg)
+
+### Real use
+
+A cloud team enables push protection with delegated bypass on its infrastructure repositories. When an engineer pastes an AWS key into a Terraform file, the push is rejected with the exact line, and the key never reaches GitHub.
+
+### How it works
+
+An AWS key pushed to a public repo is found by automated scrapers within minutes, long before the next day's review.
+
+- Bypass reasons "used in tests" and "false positive" create *closed* alerts; "I'll fix it later" creates an *open* alert. Every bypass is logged and emailed.
+- After a leak: revoke and rotate, check the provider's logs, then optionally rewrite with `git-filter-repo` and ask GitHub Support to clear cached views.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| Scope | Pushes to that repository / org / enterprise | Your personal account's pushes to public repos on GitHub.com |
-| Default | Off until enabled | On by default |
-| Requires | GitHub Secret Protection (private/internal repos) | Nothing |
-| Bypass creates alert? | Yes | No, unless repo-level push protection is also on |
-
-### Removing a leaked secret: the order matters
-
-1. **Revoke and rotate** the credential with its provider. Assume it is compromised the moment it was pushed.
-2. Check the provider's logs for misuse during the exposure window.
-3. If history must be cleaned, rewrite it with `git-filter-repo` (the recommended successor to `git filter-branch`), force-push, and have collaborators re-clone.
-4. Ask GitHub Support to remove cached views and references in pull requests, which a rewrite alone doesn't clear.
-5. Close the secret scanning alert as revoked, and add a `.gitignore` entry or push protection so it can't happen again.
-
-### In Practice
-
-**What breaks without this**: An AWS key is pushed to a public repo, and automated scrapers that watch public pushes find it within minutes, long before the next day's code review would have.
-
-**Decision trigger**: Ask: "If someone pasted a production credential into a commit right now, what would stop it?" If the answer is "a reviewer might notice", turn on push protection, and consider delegated bypass for repos holding high-value credentials.
-
-**When you'd choose differently**: Repositories that legitimately store test fixtures with fake credential-shaped strings generate false positives. Use the bypass reason "used in tests", or exclude test fixture paths, rather than turning push protection off for the whole repo.
+| Push protection, self-service bypass | Most repositories | Contributors decide their own bypasses |
+| Push protection with delegated bypass | High-value credentials | Bypasses wait for a reviewer |
+| Secret scanning alerts | Always, to catch what's already in history | Detects after the fact |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Secret scanning blocked the push" is wrong: <em>push protection</em> blocks, secret scanning alerts. "Bypass requires an admin's approval" is only true when delegated bypass is configured. "History rewrite fixes the leak" is wrong too: rotation fixes the leak, and the rewrite is only clean-up.
-</div>
+<div class="note-trap">"Secret scanning blocked the push" is wrong: push protection blocks, secret scanning alerts. Bypass needs approval only with delegated bypass. And a history rewrite is clean-up; rotation is the fix.</div>
+
+### Go deeper
+
+- [Push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection)
+- [Removing sensitive data from a repository](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
 
 ---
 
-## 3.3 GitHub Secret Protection, Code Security and Security Configurations
+## 3.3 Choose GitHub Secret Protection or Code Security and enforce them with security configurations
 
 ### Key Concept
 
 **GitHub Advanced Security is sold as two products, Secret Protection and Code Security, and enforced at scale with security configurations.**
 
-**GitHub Secret Protection** includes secret scanning, push protection, AI-detected secrets, custom patterns, delegated bypass for push protection and delegated alert dismissal. **GitHub Code Security** includes code scanning (CodeQL or third-party via SARIF), Copilot Autofix, dependency review, custom auto-triage rules for Dependabot and security campaigns. Both include security overview, and both require a GitHub Team or GitHub Enterprise plan for private repositories. Public repositories get many features free; code scanning and secret scanning, for example, are enabled for public repositories by default.
+**Secret Protection** covers secret scanning, push protection, AI-detected secrets, custom patterns and delegated bypass. **Code Security** covers code scanning, Copilot Autofix, dependency review and security campaigns. Both need GitHub Team or Enterprise for private repositories. **Security configurations** apply a chosen set of features to many repositories, and a custom configuration with **Enforce configuration** blocks owners from changing what it sets.
 
-**Security configurations** apply a chosen set of security enablement settings to many repositories at once, either GitHub's recommended configuration or a custom one. A custom configuration's policy can **Enforce configuration**, which blocks repository owners from changing any feature it enables or disables (features left unset aren't enforced). New enterprise-level options (September 2026) can also stop organization owners from overriding them. **Think of security configurations as a building's fire code**: individual tenants can decorate as they like, but they can't remove the sprinklers.
+**Think of security configurations as a building's fire code**: tenants can decorate as they like, but they can't remove the sprinklers.
 
-### In Practice
+![Secret Protection groups secret scanning, push protection and custom patterns, Code Security groups code scanning, Autofix and dependency review, and an enforced security configuration applies the chosen features to a class of repositories.](/content/skillup/ghbp/images/ghbp-3-3-security-products.svg)
 
-**What breaks without this**: A team disables secret scanning on a noisy repository "temporarily", and nobody notices for a year because each repository's settings were managed by hand.
+### Real use
 
-**Decision trigger**: Ask: "Which features must be on for every repository in this class, regardless of what its owner prefers?" Put them in a custom security configuration, apply it to that class, and enforce it. Use security overview to track coverage and open alerts.
+A 300-repository organization applies a custom security configuration with push protection, secret scanning and Dependabot to every `tier=critical` and `tier=standard` repository, with Enforce on. Sixty repositories whose owners had switched scanning off are back on, and stay on.
 
-**When you'd choose differently**: For a small organization with a handful of repos and a single security-minded owner, per-repo settings plus the GitHub-recommended configuration may be enough. Enforcement pays off when the number of repo admins grows.
+### How it works
+
+A team disables secret scanning on a noisy repository "temporarily", and nobody notices for a year because each repository's settings were managed by hand.
+
+- Security overview *reports* coverage and alerts; configurations with Enforce *enforce*.
+- Features a configuration leaves unset aren't enforced.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Secret Protection only | The need is credentials and leaks | No code scanning on private repos |
+| Code Security | You need code scanning, Autofix and dependency review | Separate purchase |
+| Enforced custom configuration | Many repo admins and a non-negotiable baseline | Owners can't opt out |
+| GitHub-recommended configuration | A small organization getting started | Less tailored |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Push protection is part of Code Security" is wrong; it's in Secret Protection. "Security overview enforces settings" is wrong; it reports, and security configurations (with Enforce) enforce. "Push protection for users covers private repos" is wrong; it covers your pushes to public repositories only.
-</div>
+<div class="note-trap">"Push protection is part of Code Security" is wrong; it's in Secret Protection. "Security overview enforces settings" is wrong; it reports, and enforced configurations enforce.</div>
+
+### Go deeper
+
+- [About GitHub Advanced Security](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security)
+- [Organization security at scale](https://docs.github.com/en/code-security/concepts/security-at-scale/organization-security)
 
 ---
 
-## 3.4 Dependency Review and License Compliance
+## 3.4 Block vulnerable and non-compliant dependencies with dependency review
 
 ### Key Concept
 
 **Dependabot tells you about vulnerable dependencies you already have; dependency review stops a PR from adding new ones.**
 
-The **dependency review action** (`actions/dependency-review-action`) compares the dependency changes in a pull request against the GitHub Advisory Database and fails the check when a change introduces a vulnerability at or above `fail-on-severity` (`low`, `moderate`, `high`, `critical`). It can scope failures with `fail-on-scopes` (`runtime`, `development`, `unknown`) and enforce licenses with **either** `allow-licenses` **or** `deny-licenses` (not both), using SPDX identifiers.
+The **dependency review action** (`actions/dependency-review-action`) compares a PR's dependency changes against the GitHub Advisory Database and fails when a change introduces a vulnerability at or above `fail-on-severity`. It can scope failures with `fail-on-scopes` and enforce licenses with **either** `allow-licenses` **or** `deny-licenses`, using SPDX identifiers. Like every gate, it blocks only when the check is required.
 
-As with every gate, it only blocks when the check is **required**. Rulesets also offer a "Require license compliance results before merging" rule. **Think of dependency review as customs at the border, and Dependabot alerts as the recall notices for goods already in the country.**
+**Think of dependency review as customs at the border, and Dependabot alerts as recall notices for goods already in the country.**
+
+![A pull request's dependency changes are checked against the advisory database and the license allow list, and a required dependency review check blocks the merge on a high-severity vulnerability or a disallowed license.](/content/skillup/ghbp/images/ghbp-3-4-dependency-review.svg)
+
+### Real use
+
+A software vendor requires dependency review on every PR to `main` with `fail-on-severity: high` and an allow list of MIT, Apache-2.0, BSD-3-Clause and ISC. A PR that pulls in a GPL-licensed package fails before legal ever has to find it.
+
+### How it works
+
+A PR adds a package with a known critical CVE, CI is green because the tests pass, and it reaches production before Dependabot raises an alert on main the next morning.
+
+- Prevention at the PR is dependency review as a required check; learning about existing risk is Dependabot alerts.
+- To make the gate tamper-proof across repos, require it with an organization ruleset (1.6).
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Dependency review as a required check | You must stop new risk at the PR | A check to maintain |
+| Ruleset-required dependency review workflow | Teams must not be able to weaken the gate | Org ruleset needed |
+| Dependabot alerts | Always, to watch merged code as new advisories appear | Detects after merge |
+
+### How to do it
 
 ```yaml
 # .github/workflows/dependency-review.yml
-name: Dependency Review
 on: pull_request
 permissions:
   contents: read
@@ -172,78 +178,55 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/checkout@<full-sha>  # vX.Y.Z
       - uses: actions/dependency-review-action@<full-sha>  # vX.Y.Z
         with:
           fail-on-severity: high
           allow-licenses: MIT, Apache-2.0, BSD-3-Clause, ISC
 ```
 
-### In Practice
-
-**What breaks without this**: A PR adds a package with a known critical CVE, CI is green because the tests pass, and the vulnerability reaches production before Dependabot raises an alert on main the next morning. Or a GPL-licensed package lands in a proprietary product and legal finds it during due diligence.
-
-**Decision trigger**: Ask: "Do we want to *prevent* new risk at the PR, or only *learn* about existing risk?" Prevention means dependency review as a required check. Learning means Dependabot alerts.
-
-**When you'd choose differently**: Teams with a dedicated SCA tool (for example, one that already gates PRs) may skip the action and upload results elsewhere. Still, keep Dependabot alerts on, because they keep watching after merge when new advisories are published.
-
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Enable Dependabot alerts so the PR is blocked" is wrong: alerts don't block PRs. "Code scanning checks dependencies" is wrong: it analyses your code, not your dependency manifests. And "Dependabot flags license violations" is wrong: license gating comes from dependency review (or a ruleset license rule).
-</div>
+<div class="note-trap">Dependabot alerts don't block PRs, and code scanning analyses your code, not your dependency manifests. License gating comes from dependency review (or a ruleset license rule), not from Dependabot.</div>
+
+### Go deeper
+
+- [Dependency review](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review)
 
 ---
 
-## 3.5 Pull Request and Issue Templates
+## 3.5 Structure contributions with pull request and issue templates
 
 ### Key Concept
 
 **Templates move the questions reviewers and triagers always ask to the moment the author is filling in the form.**
 
-A PR template (`.github/pull_request_template.md`, or several under `.github/PULL_REQUEST_TEMPLATE/`) pre-fills the PR description. Issue forms (`.github/ISSUE_TEMPLATE/*.yml`) render real form fields with validation, so "Steps to reproduce" can be required. A `config.yml` in the same folder can turn off blank issues and link to discussions or the security policy.
+A PR template (`.github/pull_request_template.md`, or several under `.github/PULL_REQUEST_TEMPLATE/`) pre-fills the PR description. **Issue forms** (`.github/ISSUE_TEMPLATE/*.yml`) render real form fields with validation, so "Steps to reproduce" can be required. A `config.yml` in the same folder can turn off blank issues and link to discussions or the security policy.
 
-Templates don't enforce code quality, but they make missing context visible. **Think of a template as the airline's pre-flight checklist for authors**: it doesn't fly the plane, but it makes skipping a step a conscious choice.
+**Think of a template as the pre-flight checklist for authors**: it doesn't fly the plane, but it makes skipping a step a conscious choice.
 
-### The Story: "The Description-Free PR"
+![A bug report opened through an issue form must fill required fields before it can be submitted, a PR template prompts for what, why and how it was tested, and config.yml turns off blank issues and sends security reports to private reporting.](/content/skillup/ghbp/images/ghbp-3-5-templates.svg)
 
-A 2,000-line PR lands in the queue. Title: "Fix stuff." No description, no linked issue, no test plan. A reviewer has to read every line to work out the intent. Did this change the authentication flow on purpose? Why was this configuration changed?
+### Real use
 
-Two hours later the reviewer gives up and approves it with "LGTM", because the sprint ends today. The next week the change causes a production incident that takes four hours to diagnose, because nobody understood the original intent.
+An open-source project replaces its Markdown bug template with an issue form that requires version and steps to reproduce, and disables blank issues. First replies stop being "which version?", and triage time drops noticeably.
 
-```markdown
-<!-- .github/pull_request_template.md -->
+### How it works
 
-## What does this PR do?
-<!-- One paragraph describing the change and why -->
+A 2,000-line PR titled "Fix stuff" with no description gets a tired "LGTM", and a week later nobody can tell why the authentication flow changed.
 
-## Linked Issue
-Closes #<!-- issue number -->
+- Issue forms can make fields required; Markdown templates can't.
+- A PR template's checklist makes an omission visible, though it doesn't enforce code quality.
 
-## Type of Change
-- [ ] Bug fix (non-breaking)
-- [ ] New feature (non-breaking)
-- [ ] Breaking change
-- [ ] Refactor (no behaviour change)
-- [ ] Documentation update
-- [ ] Security fix
+### Choose when
 
-## How was this tested?
-- [ ] Unit tests added/updated
-- [ ] Integration tests pass
-- [ ] Manual testing: <!-- describe steps -->
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Issue forms (YAML) | Fields must be required | More setup than Markdown |
+| Markdown issue or PR template | Light prompts are enough | Authors can delete the text |
+| A three-line PR template | Small teams | Less context captured |
 
-## Checklist
-- [ ] Code follows team style guidelines
-- [ ] Self-reviewed my own code
-- [ ] No hardcoded secrets or credentials
-- [ ] Documentation updated (if needed)
-
-## Screenshots (if UI change)
-<!-- Before / After -->
-```
-
-<div class="note-scribble">The checklist is the most valuable part. It makes the author consciously confirm each step. "Have I added tests?" is easy to skip in a hurry; ticking a box takes the same time but makes the omission visible.</div>
+### How to do it
 
 ```yaml
 # .github/ISSUE_TEMPLATE/bug-report.yml
@@ -251,277 +234,225 @@ name: Bug Report
 description: Report a reproducible bug
 labels: [bug, triage]
 body:
-  - type: markdown
-    attributes:
-      value: "Before opening, search for existing issues."
-
-  - type: textarea
-    id: description
-    attributes:
-      label: What happened?
-      description: A clear description of the bug
-    validations:
-      required: true
-
   - type: textarea
     id: reproduction
-    attributes:
-      label: Steps to reproduce
-      placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. See error
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected behavior
-    validations:
-      required: true
-
-  - type: input
-    id: version
-    attributes:
-      label: Version
-      placeholder: "v2.3.1"
-    validations:
-      required: true
+    attributes: { label: Steps to reproduce }
+    validations: { required: true }
 ```
-
-```yaml
-# .github/ISSUE_TEMPLATE/config.yml
-blank_issues_enabled: false
-contact_links:
-  - name: Report a security vulnerability
-    url: https://github.com/OWNER/REPO/security/advisories/new
-    about: Please report security issues privately, not as public issues.
-```
-
-### In Practice
-
-**What breaks without this**: Triage turns into a loop of "which version?" and "can you share steps?" before anyone can start fixing, and the team spends 30% of its time on it.
-
-**Decision trigger**: Ask: "What do we ask for in the first reply to almost every new issue or PR?" Those questions belong in the template as required fields.
-
-**When you'd choose differently**: Very small or internal-only repositories with two maintainers often find a long PR template becomes boilerplate that nobody reads. A three-line template (what, why, how tested) is better than an ignored twenty-line one.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-A "word-count check on PR descriptions" or a "PR size limit" is a distractor when the question is about missing <em>context</em>; the native answer is a PR template. And issue <em>forms</em> (YAML) can make fields required, while Markdown issue templates can't.
-</div>
+<div class="note-trap">A "word-count check on PR descriptions" or a "PR size limit" is the distractor when the problem is missing context; the native answer is a PR template. Only issue forms can make fields required.</div>
+
+### Go deeper
+
+- [About issue and pull request templates](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates)
+- [Syntax for issue forms](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms)
 
 ---
 
-## 3.6 Security Policy and Private Vulnerability Reporting
+## 3.6 Handle vulnerability reports privately with a security policy
 
 ### Key Concept
 
 **Private vulnerability reporting gives researchers a confidential channel; SECURITY.md tells them how you'll handle what they send.**
 
-When owners or admins enable **private vulnerability reporting** on a public repository, reporters can submit details privately from the Security tab as a draft security advisory, and maintainers are notified immediately. It doesn't depend on a SECURITY.md file. **SECURITY.md** is the repository's security policy: supported versions, how to report, and what response time to expect. Without either, researchers often fall back to public issues.
+When owners or admins enable **private vulnerability reporting** on a public repository, reporters submit details privately from the Security tab as a draft security advisory, and maintainers are notified at once. It doesn't depend on a SECURITY.md file. **SECURITY.md** is the policy: supported versions, how to report and expected response times. Maintainers then fix privately in a **repository security advisory**, optionally request a CVE, and publish with the release.
 
-Maintainers then work in a **repository security advisory**: discuss privately, collaborate on a fix (optionally in a temporary private fork), request a CVE ID, and publish the advisory alongside the release. **Think of private reporting as the hospital's side entrance for emergencies**: it exists so the urgent case doesn't have to queue through the public waiting room.
+**Think of private reporting as the hospital's side entrance for emergencies**: the urgent case doesn't have to queue through the public waiting room.
 
-```markdown
-# Security Policy
+![A researcher's report goes privately through the Security tab into a draft advisory seen only by maintainers, who fix it in a private fork, request a CVE and publish the advisory with the release, instead of the report appearing as a public issue.](/content/skillup/ghbp/images/ghbp-3-6-private-reporting.svg)
 
-## Supported Versions
+### Real use
 
-| Version | Security Updates |
-|---------|-----------------|
-| 2.x     | ✅ Supported     |
-| 1.x     | ❌ End of life   |
+A popular parsing library enables private reporting and publishes a SECURITY.md promising a reply within 48 hours. A researcher reports a SQL injection privately, the fix and the advisory ship together, and users learn about the bug with the patch already available.
 
-## Reporting a Vulnerability
+### How it works
 
-**Do not open a public GitHub issue for security vulnerabilities.**
+Without either, a researcher posts "SQL injection with a working exploit" as a public issue, it's indexed within the hour, and every user is exposed before a patch exists.
 
-Use GitHub's private vulnerability reporting:
-1. Go to the Security tab of this repository
-2. Click "Report a vulnerability"
-3. Fill in the details
+- If it already happened: lock or hide the issue, contact the reporter privately, fix and release, then publish an advisory.
+- Deleting the issue doesn't undo indexing; making the repository private breaks every user.
 
-We aim to acknowledge reports within 48 hours and provide a remediation timeline within 7 days.
+### Choose when
 
-## What to Include
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact assessment
-- Suggested remediation (if known)
-```
-
-<div class="note-important"><strong>Enable private vulnerability reporting <em>and</em> publish a SECURITY.md.</strong> Reporting works without the file, but the policy sets expectations (supported versions, response times) and is what researchers look for first. Correction: an earlier version of these notes said the "Report a vulnerability" button needs both; it needs only the feature to be enabled.</div>
-
-### In Practice
-
-**What breaks without this**: A researcher posts "SQL injection in the query builder, with a working exploit" as a public issue, search engines index it within the hour, and every user is exposed before a patch exists.
-
-**Decision trigger**: Ask: "If someone found a critical bug in this project today, where would they tell us, and who would see it first?" If the answer is "a public issue", enable private vulnerability reporting now.
-
-**When you'd choose differently**: Organizations with an established bug bounty or a central security inbox may point SECURITY.md there instead. Even then, enabling private reporting gives researchers who stay on GitHub a safe path.
-
-**If it already happened**: limit further exposure (lock or hide the issue, contact the reporter privately), fix and release, then publish an advisory, with a CVE if appropriate. Enable private reporting so the next report arrives privately. Deleting the issue doesn't undo indexing, and making the repository private breaks every user's dependency.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Private reporting + SECURITY.md | Any public repository | Maintainers must respond |
+| SECURITY.md pointing to a bug bounty | An established external programme exists | Researchers leave GitHub |
+| Neither | Never for public projects | Reports arrive in public |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Private vulnerability reporting requires a SECURITY.md" is false. "Reports go to GitHub's security team" is false; they go directly and privately to the repository's maintainers. And the harm of having neither is <em>premature public disclosure</em>, not "the report isn't tracked".
-</div>
+<div class="note-trap">"Private vulnerability reporting requires a SECURITY.md" is false, and reports go to the repository's maintainers, not GitHub's security team. The harm of having neither is premature public disclosure.</div>
+
+### Go deeper
+
+- [Configuring private vulnerability reporting for a repository](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository)
+- [Adding a security policy to your repository](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/add-security-policy)
 
 ---
 
-## 3.7 Commit Message Standards
+## 3.7 Standardize commit messages with Conventional Commits
 
 ### Key Concept
 
 **Conventional Commits turn commit messages into machine-readable release instructions.**
 
-The format is `<type>(<scope>): <description>`, with an optional body and footers. `feat` maps to a MINOR version bump and `fix` to a PATCH. A breaking change, marked with `!` after the type or scope (`feat!:`) or a `BREAKING CHANGE:` footer, maps to a MAJOR bump in tools such as semantic-release. Squash merging pairs well with this, because each PR becomes one well-formed commit on main.
+The format is `<type>(<scope>): <description>` with an optional body and footers. `feat` maps to a MINOR bump and `fix` to a PATCH; a breaking change, marked with `!` (`feat!:`) or a `BREAKING CHANGE:` footer, maps to MAJOR in tools such as semantic-release. Enforce it with commitlint as a required check, or with a ruleset metadata rule that requires commit messages to match a pattern.
 
-Enforcement can live in CI (commitlint as a required check) or in a ruleset metadata restriction that requires commit messages to match a pattern. **Think of commit types as shipping labels**: the warehouse robot (release tooling) can't read your handwriting, but it can read a barcode.
+**Think of commit types as shipping labels**: the warehouse robot can't read your handwriting, but it can read a barcode.
 
-| Type | Meaning | Example |
+![Commit types map to version bumps: fix to a patch, feat to a minor release, and an exclamation mark or BREAKING CHANGE footer to a major release, feeding an automatic changelog.](/content/skillup/ghbp/images/ghbp-3-7-commit-types.svg)
+
+### Real use
+
+A component library squash-merges every PR with its Conventional Commit title and runs semantic-release on `main`. Version numbers, the changelog and release notes generate themselves, and a `feat!:` change can never sneak out in a minor release.
+
+### How it works
+
+Release notes written by hand from "fix", "wip" and "stuff" mean version numbers stop meaning anything, and consumers get breaking changes in minor releases.
+
+- Squash merging pairs well: each PR becomes one well-formed commit on main.
+- Lint PR titles or commits as a required check, or reject bad messages at push with a ruleset commit-message pattern.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
 |---|---|---|
-| `feat` | New feature (MINOR) | `feat(auth): add OAuth2 login` |
-| `fix` | Bug fix (PATCH) | `fix(api): handle null response from payments endpoint` |
-| `docs` | Documentation | `docs: update API reference for v2 endpoints` |
-| `chore` | Maintenance | `chore(deps): upgrade axios to 1.7.0` |
-| `refactor` | Restructure, no behaviour change | `refactor(db): extract query builder` |
-| `test` | Tests only | `test(auth): cover token expiry edge cases` |
-| `ci` | CI/CD configuration | `ci: add CodeQL scanning workflow` |
-| `!` / `BREAKING CHANGE:` | Breaking API change (MAJOR) | `feat!: remove deprecated v1 endpoints` |
-
-![Flow diagram for "Key Concept": featpayments: add refundwebhook handler, Auto-generatedCHANGELOG, Semantic version bump:MINOR, Automated release notes, fix!: correct rounding errorin tax calc, CHANGELOG — BreakingChanges section, MAJOR version bump, Release notes — highlightsbreaking change](/content/skillup/ghbp/images/ghbp-d3-repo-governance-m1.svg)
-<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d3-repo-governance-m1.mmd -->
-
-```yaml
-# .github/workflows/commitlint.yml
-name: Commit Message Lint
-on:
-  pull_request:
-    branches: [main]
-permissions:
-  contents: read
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-        with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@<full-sha>  # v6.x
-```
-
-### In Practice
-
-**What breaks without this**: Release notes are written by hand from a history of "fix", "wip" and "stuff", so version numbers stop meaning anything, and consumers get breaking changes in minor releases.
-
-**Decision trigger**: Ask: "Do we want versions and changelogs generated from history?" If yes, adopt Conventional Commits, squash-merge with the PR title as the commit message, and lint PR titles or commits as a required check.
-
-**When you'd choose differently**: Applications that deploy continuously and never publish versions get less from strict commit types. A lighter "imperative summary + issue link" convention is often enough.
+| Conventional Commits + release tooling | You publish versions and changelogs | Contributors learn the format |
+| Ruleset commit-message pattern | Messages must be rejected at push | Needs rulesets |
+| Imperative summary + issue link | Apps that deploy continuously without versions | No automatic versioning |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-<code>feat!:</code> is MAJOR, not MINOR, because the <code>!</code> overrides the type. A <code>BREAKING CHANGE:</code> footer does the same. Watch for distractors that read only the type prefix.
-</div>
+<div class="note-trap"><code>feat!:</code> is MAJOR, not MINOR, because the <code>!</code> overrides the type, and a <code>BREAKING CHANGE:</code> footer does the same. Watch for distractors that read only the type prefix.</div>
+
+### Go deeper
+
+- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ---
 
-## 3.8 Visibility, Archiving, Topics and Custom Properties
+## 3.8 Govern visibility, archiving, topics and custom properties
 
 ### Key Concept
 
 **Visibility controls who can see a repository; archiving freezes it; topics and custom properties make it findable and governable.**
 
-There are three visibility levels: **public** (everyone), **private** (only people and teams granted access), and **internal**, which is available with GitHub Enterprise and visible to all members of the enterprise but not to the public or outside collaborators. Internal is the inner-source default. **Archiving** makes the whole repository read-only, including code, issues, PRs and the wiki, and labels it as archived, while it stays viewable and cloneable.
+Repositories are **public**, **private**, or **internal** (GitHub Enterprise: visible to every enterprise member, not to the public or outside collaborators). **Archiving** makes the whole repository read-only, including issues, PRs and the wiki. **Topics** are free-form labels for discovery; **custom properties** are organization-defined, typed metadata (`tier: critical`) that rulesets and security configurations can target.
 
-**Topics** are public, free-form labels for discovery (`org:acme topic:terraform`). **Custom properties** are organization-defined, typed metadata (for example `tier: critical`, `owner-team: payments`) that rulesets and security configurations can target. **Think of topics as hashtags and custom properties as the fields on an asset register**: one helps people find things, the other lets policy act on them.
+**Think of topics as hashtags and custom properties as the fields on an asset register**: one helps people find things, the other lets policy act on them.
 
-Recommended topic taxonomy:
+![Public, internal and private visibility are compared by who can see the repository, archiving freezes a retired repository, topics help people find repositories, and custom properties let rulesets and security configurations target them.](/content/skillup/ghbp/images/ghbp-3-8-visibility.svg)
 
-```
-# Technology stack
-python, node, react, golang, terraform, kubernetes
+### Real use
 
-# Type of project
-microservice, library, framework, tool, documentation, infrastructure
+An enterprise makes shared libraries internal so every engineer can read and reuse them, tags them with topics like `terraform` and `payments`, and sets a required `tier` property that its organization rulesets and security configuration target.
 
-# Status
-active, maintained, deprecated, archived, experimental
+### How it works
 
-# Domain
-payments, auth, notifications, data-pipeline, ml-platform
-```
+An internal tool is made public "so everyone can see it" and is exposed to the internet, or kept private so every team must request access. Meanwhile "protect every production service" is impossible because nothing records which repos are production services.
 
-### In Practice
+- Use topics for discovery and custom properties for governance.
+- Retire one branch with lock branch; retire a whole repository with archive.
 
-**What breaks without this**: An internal tool is made public "so everyone can see it", which exposes it to the internet, or it's kept private, so every new team has to request access. Meanwhile, "apply this ruleset to every production service" is impossible because nothing records which repos are production services.
+### Choose when
 
-**Decision trigger**: Ask: "Will a policy ever need to select this group of repositories?" If yes, define a custom property and set it, ideally required, with a default. Use topics for discovery and custom properties for governance.
-
-**When you'd choose differently**: To retire a single branch rather than a repository, use lock branch. To keep a repository but hide it from most people, change visibility or team access instead of archiving.
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Internal visibility | Inner-source code for the whole enterprise | Needs GitHub Enterprise |
+| Archive | The repository is retired but must stay readable | Everything becomes read-only |
+| Custom properties | A policy must select a group of repositories | Properties must be kept accurate |
+| Topics | People need to find repositories | Policies can't target topics |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"Private with an Everyone team" isn't the same as internal. "Lock all branches" isn't the same as archive, because issues and PRs stay open for activity. And organization rulesets target repositories by name or custom property, not by topic.
-</div>
+<div class="note-trap">"Private with an Everyone team" isn't internal, and "lock all branches" isn't archive, because issues and PRs stay open. Organization rulesets target repositories by name or custom property, not by topic.</div>
+
+### Go deeper
+
+- [Archiving repositories](https://docs.github.com/en/repositories/archiving-a-github-repository/archiving-repositories)
+- [Managing custom properties for repositories in your organization](https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization)
 
 ---
 
-## 3.9 Machine Identities: GitHub Apps, Deploy Keys, PATs and OIDC
+## 3.9 Choose the right machine identity for automation
 
 ### Key Concept
 
 **Automation should authenticate as itself, with short-lived and narrowly scoped credentials, never as a person.**
 
-A **GitHub App** is the recommended identity for organization automation. It isn't tied to a user, doesn't consume a seat, uses fine-grained permissions on selected repositories, and authenticates with installation access tokens that expire after one hour. A **deploy key** is an SSH key for Git access to a single repository, read-only unless you grant write. Use one key per server, read-only by default; deploy keys don't expire automatically. **Personal access tokens** act as a person; fine-grained PATs can be limited to specific repositories, but they still break when that person leaves. **Machine accounts** are allowed by GitHub's Terms of Service, but they consume a seat and need a responsible human owner. **OIDC** removes stored cloud credentials entirely (see D2).
+A **GitHub App** is the recommended identity for organization automation: not tied to a user, no seat, fine-grained permissions on selected repositories, and installation tokens that expire after one hour. A **deploy key** is an SSH key for one repository, read-only unless you grant write, and it doesn't expire. **Personal access tokens** act as a person and break when that person leaves. **OIDC** removes stored cloud credentials (2.3).
 
-For GitHub Packages, classic PATs need `read:packages` to install and `write:packages` to publish. Repository read access alone isn't enough. In Actions, prefer `GITHUB_TOKEN` with `packages: write`. **Think of a GitHub App as a company car with a fuel card limited to work routes**: it belongs to the organization, not to whoever happens to be driving.
+**Think of a GitHub App as a company car with a fuel card limited to work routes**: it belongs to the organization, not to whoever is driving.
 
-![Flow diagram for "Key Concept": Auto-deploy, Required approval, Approved, Production environment settings, Required reviewers: 2 teamleads, Wait timer: 5 min, Deployment branches:main only, Environment secrets notrepo secrets, main branch, Staging env](/content/skillup/ghbp/images/ghbp-d3-repo-governance-m2.svg)
-<!-- diagram source: scripts/diagrams/mermaid/ghbp/ghbp-d3-repo-governance-m2.mmd -->
+![Each automation need maps to its identity: GitHub API work across repositories to a GitHub App with one-hour tokens, a server pulling one repository to a read-only deploy key, cloud deploys to OIDC, and personal scripts to a short-lived fine-grained token.](/content/skillup/ghbp/images/ghbp-3-9-machine-identities.svg)
 
-| Credential | Scope | Lifetime | Use when |
-|---|---|---|---|
-| `GITHUB_TOKEN` | Current repository, per job | Ends with the job | Anything inside this repo's workflows |
-| GitHub App installation token | Selected repos, fine-grained permissions | 1 hour | Cross-repo automation, bots, release tooling |
-| Deploy key | One repository, Git over SSH | Until removed | A server that only needs to `git pull` (read-only) |
-| Fine-grained PAT | Selected repos, as a user | Expiry you set | Personal scripts and testing; not shared automation |
-| Repository / environment secret | Workflows / jobs naming the environment | Until rotated | Credentials for systems that can't federate |
-| OIDC (federated identity) | Cloud role trust policy | Per job | AWS / Azure / GCP deploys: **preferred over stored keys** |
+### Real use
 
-<div class="note-important"><strong>OIDC federation removes long-lived cloud credentials entirely.</strong> Instead of storing <code>AWS_ACCESS_KEY_ID</code> as a secret, the job exchanges a GitHub-issued JWT for temporary cloud credentials, which the cloud provider grants only if the token's claims (repository, environment, branch) match its trust policy.</div>
+A company replaces a departed engineer's PAT in its release pipeline with a "release-bot" GitHub App that has `contents: write` on the release repositories only. Releases keep working through staff changes, and every token the bot uses expires within the hour.
 
-### In Practice
+### How it works
 
-**What breaks without this**: The release pipeline runs on a departed engineer's PAT. Their account is deactivated on their last day and releases stop, or worse, the token keeps working from their laptop after they've left.
+A release pipeline running on a departed engineer's PAT stops when their account is deactivated, or keeps working from their laptop after they've left.
 
-**Decision trigger**: Ask: "If the person who set this up left tomorrow, would this automation keep working, and would their access end?" If the automation would break, or their access would survive, switch to a GitHub App (GitHub API), a read-only deploy key per server (Git pull), or OIDC (cloud).
+- One deploy key per server, read-only by default.
+- GitHub Packages with a classic PAT needs `read:packages` to install and `write:packages` to publish; in Actions, prefer `GITHUB_TOKEN` with `packages: write`.
+- Machine accounts are allowed, but they use a seat and need a responsible human owner.
 
-**When you'd choose differently**: A one-off migration script run by an admin from their own machine is a legitimate PAT use. Set a short expiry and minimal repository scope.
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| GitHub App | Cross-repo automation, bots, release tooling | An app to register |
+| Deploy key (read-only) | A server only needs to `git pull` one repo | No expiry; rotate manually |
+| OIDC | Deploying to AWS, Azure or GCP | Cloud trust policy to maintain |
+| Fine-grained PAT | Personal or one-off scripts | Tied to a person |
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-"A bot account is against GitHub's Terms" is false; machine accounts are permitted, they're just a worse fit than GitHub Apps. A deploy key "with write access shared across servers" combines two separate risks: excess privilege and key reuse. A 401 from GitHub Packages with read access to the repo usually means the PAT lacks <code>read:packages</code>.
-</div>
+<div class="note-trap">"A bot account is against GitHub's Terms" is false. A deploy key "with write access shared across servers" combines two risks: excess privilege and key reuse. A 401 from GitHub Packages usually means the PAT lacks <code>read:packages</code>.</div>
+
+### Go deeper
+
+- [About creating GitHub Apps](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)
+- [Managing deploy keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys)
 
 ---
 
-## 3.10 Audit Log and Webhook Integrity
+## 3.10 Audit changes and verify webhook deliveries
 
 ### Key Concept
 
 **The audit log records who changed what in your organization; webhook signatures prove a payload really came from GitHub.**
 
-The organization **audit log** records security-relevant events with actor and timestamp: membership and permission changes, repository creation, visibility and deletion, branch protection and ruleset changes, secret creation and updates, app and OAuth authorizations, push protection bypasses, and more. On GitHub Enterprise Cloud it can be **streamed** to a SIEM for retention and alerting, and Git events (clones, pushes) are available at enterprise level.
+The organization **audit log** records security-relevant events with actor and timestamp: membership and permission changes, repository visibility and deletion, branch protection and ruleset changes, secrets, app authorizations and push protection bypasses. On GitHub Enterprise Cloud it can be **streamed** to a SIEM. Webhooks configured with a secret are signed with HMAC-SHA256 in `X-Hub-Signature-256`, and the receiver verifies it over the raw body in constant time.
 
-Outbound **webhooks** should be configured with a secret. GitHub then signs each payload with HMAC-SHA256 in the `X-Hub-Signature-256` header, and the receiver recomputes the HMAC over the raw body and compares the two in constant time before trusting anything. **Think of the audit log as the building's sign-in book and the webhook signature as the wax seal on a letter**: one tells you who came in, the other tells you the message wasn't forged.
+**Think of the audit log as the building's sign-in book and the webhook signature as the wax seal on a letter**: one tells you who came in, the other that the message wasn't forged.
+
+![Organization events flow into the audit log and on to a SIEM for alerting, while a webhook receiver recomputes the HMAC signature over the raw body and rejects any payload whose signature doesn't match.](/content/skillup/ghbp/images/ghbp-3-10-audit-webhooks.svg)
+
+### Real use
+
+A bank streams its audit log to its SIEM and alerts on ruleset and branch protection changes, and its deploy service verifies `X-Hub-Signature-256` on every webhook. When someone relaxes a ruleset at 2 am, the security team knows by 2:01.
+
+### How it works
+
+After a breach, nobody can say who turned off a protection rule, because the log was never retained. Separately, a deploy service that accepts any POST claiming to be a push event can be triggered by anyone who can reach it.
+
+- TLS protects the payload in transit but doesn't prove the sender; `X-GitHub-Event` can be set by anyone.
+- IP allowlisting is an extra layer, never a substitute for signatures.
+
+### Choose when
+
+| Option | Choose it when | Trade-off |
+|---|---|---|
+| Audit log streaming to a SIEM | You need retention and real-time alerts | Enterprise Cloud; SIEM costs |
+| Audit log in the UI or API | Occasional investigations | Shorter retention |
+| Webhook secret + signature check | Any webhook receiver | A secret to manage |
+
+### How to do it
 
 ```python
 import hmac, hashlib
@@ -531,19 +462,14 @@ def verify(secret: bytes, body: bytes, header: str) -> bool:
     return hmac.compare_digest(expected, header)
 ```
 
-### In Practice
-
-**What breaks without this**: After a breach, nobody can say when a deploy key was added or who turned off a branch protection rule, because the audit log was never retained or reviewed. Separately, an internal deploy system accepts any POST that claims to be a GitHub push event, so anyone who can reach it can trigger a deployment.
-
-**Decision trigger**: Ask: "Could we reconstruct the last 90 days of permission and protection changes, and could a forged request trigger our automation?" If either answer is no, stream the audit log and verify webhook signatures.
-
-**When you'd choose differently**: IP allowlisting of GitHub's published webhook ranges is a reasonable *additional* layer, but never a substitute for signature verification, since the ranges are shared and they change.
-
 ### Exam Trap ⚠️
 
-<div class="note-trap">
-TLS protects the payload in transit but doesn't prove who sent it. The <code>X-GitHub-Event</code> header can be set by anyone. Only the HMAC signature authenticates the sender. And the git log records commits, not access or permission events; for those, use the audit log.
-</div>
+<div class="note-trap">Only the HMAC signature authenticates the sender; TLS and the <code>X-GitHub-Event</code> header don't. And the git log records commits, not access or permission events; for those, use the audit log.</div>
+
+### Go deeper
+
+- [Reviewing the audit log for your organization](https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/reviewing-the-audit-log-for-your-organization)
+- [Validating webhook deliveries](https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries)
 
 ---
 
