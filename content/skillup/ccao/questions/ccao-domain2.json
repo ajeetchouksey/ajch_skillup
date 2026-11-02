@@ -2,342 +2,795 @@
   {
     "domain": 2,
     "id": "ccao-d2-001",
-    "scenario": "Claude summarises a 12-point contract checklist, and the summary reads well.",
+    "difficulty": "easy",
+    "scenario": "Claude summarises a 12-point contract checklist for a colleague who will act on it, and the summary reads well.",
     "question": "What is the best quick check for completeness?",
     "options": [
-      "Compare the summary against the original checklist to make sure all 12 points are covered",
-      "Check that the summary is well written",
-      "Ask Claude whether its summary is complete",
-      "Check the word count is under the limit"
+      "Ask Claude to confirm that its summary covers each point",
+      "Tick off the 12 checklist points against the summary",
+      "Read the summary again to check that it flows and reads well",
+      "Check that the word count suits a summary of 12 points"
     ],
-    "correct": 0,
-    "explanation": "A is correct: completeness means comparing against the source or brief to see that nothing is missing. B is wrong because good writing can still leave points out. C is wrong because self-assessment isn't verification. D is wrong because length says nothing about coverage.",
+    "correct": 1,
+    "explanation": "B is correct: completeness means checking the output against the request, so ticking off the 12 points shows anything missing. A is wrong because Claude confirming its own coverage isn't an independent check and can repeat the gap. C is wrong because a fluent summary can still skip a point. D is wrong because length says nothing about which points are covered.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "accuracy",
       "completeness"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-002",
-    "scenario": "A team lead asks Claude for a project status report from meeting notes. The report is fluent and confident.",
+    "difficulty": "medium",
+    "scenario": "A team lead asks Claude for a project status report from meeting notes. The report is fluent and confident, and it goes to the project sponsor today.",
     "question": "Which approach best evaluates whether it can be used?",
     "options": [
-      "Accept it, because confident writing usually means correct content",
-      "Check spelling and grammar only",
-      "Check it against the brief and the notes: are the facts right, are all workstreams covered, and does it answer what was asked?",
-      "Ask a colleague who hasn't seen the notes whether it sounds right"
+      "Accept it, since confident, fluent writing usually means correct content",
+      "Run a spelling and grammar check, then send it to the sponsor",
+      "Check it against the notes for facts and the request for coverage",
+      "Ask a colleague who missed the meeting whether it sounds right"
     ],
     "correct": 2,
-    "explanation": "C is correct: evaluating output means checking accuracy against the source and completeness against the request. A is wrong because fluency and confidence aren't signs of accuracy. B is wrong because surface errors aren't the main risk. D is wrong because someone without the source can't check the facts.",
+    "explanation": "C is correct: evaluating output means two checks, accuracy against the source notes and completeness against what was asked. A is wrong because fluency and confidence say nothing about whether the facts are right. B is wrong because a clean spelling check leaves wrong facts and missing workstreams in place. D is wrong because someone without the notes can't tell whether anything is wrong or missing.",
     "tags": [
+      "best-practice",
+      "application",
       "accuracy",
       "evaluation-criteria"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-003",
-    "scenario": "Claude produces a budget table from uploaded expense data. The totals look plausible.",
+    "difficulty": "medium",
+    "scenario": "Claude produces a budget table from uploaded expense data for the monthly finance meeting. The totals look plausible.",
     "question": "What should the analyst do before sharing it?",
     "options": [
-      "Ask Claude to confirm the totals are correct",
-      "Spot-check several rows and recalculate the totals against the source data",
-      "Share it, since Claude used the uploaded data",
-      "Round all numbers so small errors don't show"
+      "Spot-check rows and recalculate totals from the source",
+      "Ask Claude to confirm that the totals in the table are correct",
+      "Share it as is, since Claude worked from the uploaded data",
+      "Ask Claude to recalculate the totals in a new chat and compare"
     ],
-    "correct": 1,
-    "explanation": "B is correct: numbers in generated tables should be checked against the source, especially totals. A is wrong because asking Claude to confirm isn't independent verification. C is wrong because using the data doesn't guarantee correct calculations or transcription. D is wrong because hiding errors doesn't fix them.",
+    "correct": 0,
+    "explanation": "A is correct: rows and totals in a generated table are checked by recomputing them yourself from the source data. B is wrong because Claude confirming its own totals isn't an independent check. C is wrong because working from the right file doesn't prevent calculation or copying errors. D is wrong because a second Claude answer is the same kind of source, and two matching answers can share an error.",
     "tags": [
+      "best-practice",
+      "application",
       "accuracy",
       "calculations"
-    ],
-    "difficulty": "hard"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-004",
-    "scenario": "Claude's summary of a new regulation cites \"Section 14(3)(b)\" for a key requirement. The regulation wasn't provided to Claude.",
-    "question": "What does this most likely call for?",
+    "difficulty": "easy",
+    "scenario": "Claude drafts a press release for a florist group. It says the group's ordering app is \"used by 3 in 4 UK florists\", but nobody supplied that figure and no source was given.",
+    "question": "What should the marketing lead do with the figure?",
     "options": [
-      "Trust it, because specific references are a sign of accuracy",
-      "Remove the citation and keep the claim",
-      "Ask Claude to make the citation more specific",
-      "Treat the specific citation as a possible hallucination and check it against the official text"
+      "Keep it, since a specific figure sounds credible to readers",
+      "Add \"according to industry research\" before the figure",
+      "Ask Claude to make the figure more precise and specific",
+      "Treat it as a possible hallucination: trace it or cut it"
     ],
     "correct": 3,
-    "explanation": "D is correct: very specific details such as section numbers, statistics and quotes are a common form of hallucination, especially when no source was given. A is wrong because specificity can make a fabrication look credible. B is wrong because the claim itself still hasn't been checked. C is wrong because more detail doesn't make it true.",
+    "explanation": "D is correct: an exact statistic that nobody supplied, with no source given, is a classic hallucination signal, so it needs a real source or it comes out. A is wrong because specificity makes an invented figure look credible, not true. B is wrong because a vague attribution adds no evidence. C is wrong because more precision makes an unsupported figure look even more authoritative.",
     "tags": [
+      "scenario-based",
+      "comprehension",
       "hallucination",
       "citations"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-005",
+    "difficulty": "medium",
     "scenario": "In a long market analysis, Claude says the market grew 8% in the executive summary and 12% in the detailed section.",
     "question": "What is the right response?",
     "options": [
-      "Keep the larger figure because it's more positive",
-      "Treat the contradiction as a red flag: check both figures against the source and correct the report",
-      "Average the two figures to 10%",
-      "Leave both, since readers can decide"
+      "Use the detailed section's figure, since it's more specific",
+      "Check both figures against the source data and correct the report",
+      "Use the executive summary's figure, since that's what most readers see",
+      "Leave both figures in, since readers can judge for themselves"
     ],
     "correct": 1,
-    "explanation": "B is correct: internal inconsistency signals at least one error, and the source decides which. A is wrong because optimism isn't evidence. C is wrong because averaging produces a number neither source supports. D is wrong because it passes the error on to readers.",
+    "explanation": "B is correct: two figures for the same thing is an inconsistency, so at least one is wrong and the source decides which. A is wrong because the detailed section may hold the wrong figure; specificity isn't evidence. C is wrong because how many people read a figure doesn't make it true. D is wrong because it passes the contradiction on to readers, who can't check it.",
     "tags": [
+      "troubleshooting",
+      "application",
       "inconsistency"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-006",
-    "scenario": "Claude drafts performance-review summaries for a manager. The summaries for part-time staff consistently use weaker language than those for full-time staff with similar results.",
+    "difficulty": "medium",
+    "scenario": "Claude drafts performance-review summaries from each person's results and the managers' notes. Summaries for part-time staff use weaker language than those for full-time staff with similar results.",
     "question": "What issue does this show, and what should the manager do?",
     "options": [
-      "A hallucination: delete the part-time summaries",
-      "No issue: part-time staff naturally contribute less",
-      "A formatting issue: put all summaries in a table",
-      "A bias in the output: review the summaries against the actual results and correct the wording so equal results are described equally"
+      "A hallucination: delete the part-time summaries and redraft them",
+      "No issue: the wording reflects the managers' notes",
+      "A formatting issue: put the summaries into one consistent table",
+      "Bias: check the results and describe equal results equally"
     ],
     "correct": 3,
-    "explanation": "D is correct: describing equal performance unequally for one group is bias, and outputs about people need checking for it. A is wrong because nothing was invented; the problem is unfair framing. B is wrong because it accepts the bias. C is wrong because formatting doesn't change the wording.",
+    "explanation": "D is correct: describing similar results unequally for one group is bias, and the fix is to compare like with like against the results and correct the wording. A is wrong because nothing was invented; the problem is unfair framing. B is wrong because similar results warrant similar wording, whatever tone the notes used. C is wrong because a table changes the layout, not the biased wording.",
     "tags": [
+      "scenario-based",
+      "analysis",
       "bias",
       "fairness"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-007",
-    "scenario": "Claude provides a statistic about remote-work productivity for a presentation.",
+    "difficulty": "easy",
+    "scenario": "Claude gives a statistic about remote-work productivity for a presentation to senior leaders next week.",
     "question": "Which validation step is most appropriate?",
     "options": [
-      "Find the original source of the statistic and confirm the figure and context before using it",
+      "Find the original source and confirm the figure and its context",
       "Ask Claude the same question again and see if the number matches",
-      "Use the statistic if it sounds reasonable",
-      "Add \"according to research\" in front of it"
+      "Use the statistic if it sounds reasonable for this audience",
+      "Put \"according to research\" in front of the statistic"
     ],
     "correct": 0,
-    "explanation": "A is correct: fact-checking means tracing claims to an authoritative primary source. B is wrong because consistency between two answers isn't verification. C is wrong because plausibility isn't evidence. D is wrong because vague attribution doesn't make the claim checked.",
+    "explanation": "A is correct: fact-checking means tracing the claim to its original source, using evidence Claude didn't produce. B is wrong because two matching answers come from the same source, so agreement isn't verification. C is wrong because sounding reasonable isn't evidence. D is wrong because a vague attribution makes the claim sound checked without anyone checking it.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "fact-checking",
       "sources"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-008",
-    "scenario": "A legal operations specialist gives Claude a 60-page policy and asks what it says about data retention.",
+    "difficulty": "medium",
+    "scenario": "A legal operations specialist gives Claude a 60-page policy and asks what it says about data retention. She must confirm each point before briefing her team.",
     "question": "Which prompt makes the answer easiest to verify?",
     "options": [
-      "Ask Claude to answer in one confident sentence",
+      "Ask Claude to answer in one short, confident sentence",
       "Ask Claude to answer from general knowledge of retention rules",
-      "Ask Claude to quote the relevant passages and give section headings for each point, and to say if the policy doesn't cover something",
-      "Ask Claude not to mention where the information came from, to keep it short"
+      "Ask for a quote and section per point, and allow \"not covered\"",
+      "Ask Claude to leave out where each point came from, to save space"
     ],
     "correct": 2,
-    "explanation": "C is correct: asking for quotes and locations makes each claim quick to check, and permission to say \"not covered\" reduces guessing. A is wrong because it removes the evidence. B is wrong because general rules aren't this policy. D is wrong because hiding the source makes checking harder.",
+    "explanation": "C is correct: a quote plus its location makes each point quick to check in the policy, and permission to say \"not covered\" reduces guessing where the policy is silent. A is wrong because it strips out the evidence she needs. B is wrong because general retention rules aren't what this policy says. D is wrong because dropping the locations makes each point slower to verify.",
     "tags": [
+      "best-practice",
+      "application",
       "fact-checking",
       "quotes"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-009",
-    "scenario": "Claude's Research report on competitor pricing includes citations. One price looks surprisingly low.",
-    "question": "What is the best next step?",
+    "difficulty": "hard",
+    "scenario": "A product team asks Claude, with web search, for competitor prices for a UK review that compares monthly prices on equivalent plans. Each price comes with a source link, and one looks surprisingly low.",
+    "question": "What is the best next step before using that price?",
     "options": [
-      "Trust it, because Research mode always cites correctly",
-      "Delete the competitor from the report",
-      "Open the cited source, confirm the figure and its date, and check whether it's comparable (same plan, region and currency)",
-      "Ask Claude to rewrite the sentence more cautiously"
+      "Use it, since the figure came with a source link",
+      "Open the link and confirm the page shows the same price",
+      "Open the link and check its price, date, plan, region and currency",
+      "Leave that competitor out of the comparison to stay on the safe side"
     ],
     "correct": 2,
-    "explanation": "C is correct: citations make checking possible, but you still have to check that the source says what's claimed, is current and is comparable. A is wrong because cited reports still need verification. B is wrong because removing data hides the question instead of answering it. D is wrong because cautious wording doesn't confirm the number.",
+    "explanation": "C is correct: the deciding constraint is a like-for-like UK monthly comparison, so the source must match on date, plan, region and currency, not just show the number. B is reasonable, but a matching figure may be annual, in dollars or for a smaller plan. A is wrong because a link makes checking possible but isn't a check. D is wrong because dropping the competitor hides the question instead of answering it.",
     "tags": [
+      "scenario-based",
+      "evaluation",
       "fact-checking",
-      "research"
-    ],
-    "difficulty": "hard"
+      "comparability"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-010",
+    "difficulty": "easy",
     "scenario": "Claude drafts two items: an internal team-lunch reminder and a customer notice about a change to contract terms.",
     "question": "Which needs expert human review before it's sent?",
     "options": [
-      "The customer contract notice, because it has legal and customer impact",
+      "The customer notice, because it affects contracts and customers",
       "The lunch reminder, because it goes to more people",
-      "Neither, because Claude wrote both",
-      "Both need the same legal review"
+      "Neither, because Claude drafted both of them carefully",
+      "Both, because anything Claude drafts should be checked the same way"
     ],
     "correct": 0,
-    "explanation": "A is correct: the level of review should match the stakes, and a contract change affects customers and legal obligations. B is wrong because audience size isn't the main risk factor here. C is wrong because AI-drafted content still needs review in proportion to its impact. D is wrong because a low-risk reminder doesn't need legal review.",
+    "explanation": "A is correct: review scales with stakes, and a change to contract terms carries legal and customer impact that needs expert eyes. B is wrong because audience size alone isn't the stakes. C is wrong because AI drafting doesn't remove the need for review. D is wrong because checking a lunch reminder like a contract notice wastes expert time and treats unequal risks as equal.",
     "tags": [
+      "comparison",
+      "comprehension",
       "human-review",
       "stakes"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-011",
+    "difficulty": "medium",
     "scenario": "A clinic administrator uses Claude to draft patient-facing guidance about medication timing.",
     "question": "What is the most appropriate review step?",
     "options": [
-      "Have the administrator check the spelling and publish it",
+      "Have the administrator check spelling and grammar, then publish it",
       "Ask Claude to add a disclaimer and publish it",
-      "Publish it, since the guidance is only advisory",
-      "Have a qualified clinician review the guidance before it is published"
+      "Publish it, since the guidance is advisory rather than clinical",
+      "Get a qualified clinician to review it before it is published"
     ],
     "correct": 3,
-    "explanation": "D is correct: health guidance is high-stakes and needs review by someone with the relevant expertise. A is wrong because spelling checks don't catch medical errors. B is wrong because a disclaimer doesn't make wrong advice safe. C is wrong because advisory health information can still cause harm.",
+    "explanation": "D is correct: medication guidance is high-stakes health content, so someone with clinical expertise must review it before patients rely on it. A is wrong because a spelling check doesn't catch a wrong dose or timing. B is wrong because a disclaimer doesn't make wrong advice safe. C is wrong because patients will act on advisory health guidance, so its errors can still cause harm.",
     "tags": [
+      "best-practice",
+      "application",
       "human-review",
       "expertise"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-012",
-    "scenario": "A team sends hundreds of Claude-drafted replies to routine customer questions each week, and occasional complaints about refunds.",
+    "difficulty": "hard",
+    "scenario": "A team sends hundreds of Claude-drafted replies to routine customer questions each week, plus occasional replies to complaints about refunds.",
     "question": "Which review approach best balances risk and effort?",
     "options": [
-      "Fully review every reply, routine or not",
-      "Spot-check a sample of routine replies, and require full human review of every complaint or refund reply",
-      "Review none, since most replies are routine",
-      "Review only the replies Claude marks as uncertain"
+      "Fully review each reply, whether it is routine or not, before sending",
+      "Sample routine replies and fully review complaint and refund replies",
+      "Skip review, since most of the replies are routine questions",
+      "Review the replies that Claude flags as uncertain"
     ],
     "correct": 1,
-    "explanation": "B is correct: review should scale with stakes: sampling for low-risk, high-volume work, full review where money or complaints are involved. A is wrong because it spends effort where risk is low. C is wrong because it leaves high-stakes replies unchecked. D is wrong because Claude's own uncertainty isn't a reliable risk signal.",
+    "explanation": "B is correct: the deciding constraints are volume and risk together; hundreds of routine replies make sampling proportionate, while refunds and complaints involve money and need full review. A is reasonable but spends review time where risk is low and can't keep pace with hundreds a week. C is wrong because refund replies go unchecked. D is wrong because Claude's own uncertainty doesn't flag confident errors.",
     "tags": [
+      "scenario-based",
+      "evaluation",
       "human-review",
       "risk-matrix"
-    ],
-    "difficulty": "hard"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-013",
-    "scenario": "Claude has written a detailed technical incident report. The same facts now need to go to the executive team.",
+    "difficulty": "easy",
+    "scenario": "Claude has written a detailed technical incident report. The same facts now need to go to the executive team, who must decide on next steps.",
     "question": "What is the best way to adapt it?",
     "options": [
       "Send the technical report as is, since the facts are the same",
-      "Ask Claude to make it longer so executives see the full detail",
-      "Remove all numbers so it is easier to read",
-      "Ask Claude to rewrite it for executives: business impact first, plain language, decisions needed, and under one page"
+      "Ask Claude to lengthen it so the executives can see the full technical detail",
+      "Ask Claude to drop the numbers so it is easier to read",
+      "Ask for a one-page executive version: impact, decisions, plain words"
     ],
     "correct": 3,
-    "explanation": "D is correct: adapting for an audience changes emphasis, language and length while keeping the facts. A is wrong because a technical report doesn't serve an executive reader. B is wrong because executives usually need less detail, not more. C is wrong because key figures like impact and cost often matter most to executives.",
+    "explanation": "D is correct: adapting for executives changes emphasis, language and length while keeping the facts, with business impact and decisions up front. A is wrong because a technical report doesn't serve a reader who must decide quickly. B is wrong because executives need less detail, not more. C is wrong because figures such as impact and cost are often what executives need most.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "audience",
       "editing"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-014",
-    "scenario": "A communications manager asks Claude for two versions of an announcement: one formal, one conversational.",
+    "difficulty": "medium",
+    "scenario": "A communications manager asks Claude for two versions of an announcement to staff: one formal, one conversational.",
     "question": "What is the best way to choose between them?",
     "options": [
-      "Pick the longer one, because it contains more information",
-      "Compare both against the audience and purpose, then combine the strongest parts and edit the result",
-      "Ask Claude which one it prefers and use that",
-      "Send both versions to all staff and let them choose"
+      "Pick the longer one, since it contains more information",
+      "Compare both against the audience and purpose, then combine and edit",
+      "Ask Claude which version it prefers and use that version as the final one",
+      "Send both versions to staff and let them choose"
     ],
     "correct": 1,
-    "explanation": "B is correct: comparing versions against the intended audience and goal, then refining, makes the person the editor. A is wrong because length isn't fitness for purpose. C is wrong because Claude doesn't know the audience better than the manager. D is wrong because two versions confuse the message.",
+    "explanation": "B is correct: versions are judged against who will read the announcement and what it must achieve, and the manager then combines the best parts and edits as the owner. A is wrong because length isn't fitness for purpose. C is wrong because Claude doesn't know this audience better than the manager. D is wrong because two versions of one announcement split and confuse the message.",
     "tags": [
       "comparison",
+      "application",
       "refinement"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-015",
+    "difficulty": "medium",
     "scenario": "A teacher uses Claude to draft a letter to parents. The draft is good, but one paragraph uses phrases the school would never use.",
     "question": "What should she do?",
     "options": [
-      "Send it, since most of it is good",
-      "Delete the whole draft and start again from scratch",
-      "Edit the paragraph into the school's voice and check the whole letter before sending it under her name",
-      "Add a note that the letter was written by AI"
+      "Send it as is, since most of the letter is good",
+      "Delete the draft and start again from scratch",
+      "Edit that paragraph into the school's voice, then check the letter",
+      "Ask Claude to rewrite the whole letter in a more formal tone throughout"
     ],
     "correct": 2,
-    "explanation": "C is correct: AI drafts are a starting point; the sender edits for voice and owns the final content. A is wrong because it sends wording the school wouldn't use. B is wrong because one weak paragraph doesn't make the draft worthless. D is wrong because disclosure doesn't replace editing.",
+    "explanation": "C is correct: a draft is a starting point, so she edits the off-voice paragraph, checks the whole letter and owns what goes out under her name. A is wrong because it sends wording the school would never use. B is wrong because one weak paragraph doesn't make the draft worthless. D is wrong because a blanket rewrite can lose the good parts and still miss the school's voice.",
     "tags": [
+      "best-practice",
+      "application",
       "editing",
       "ownership"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-016",
+    "difficulty": "easy",
     "scenario": "A manager wants Claude to build a project timeline she'll keep updating and share with her team each week.",
     "question": "Which output format fits best?",
     "options": [
-      "An artifact, so the timeline sits beside the chat and can be refined, reused and shared",
+      "An artifact she can refine, reuse and share each week",
       "An inline chat reply, rewritten from scratch each week",
-      "A one-line answer listing the final deadline",
-      "A long paragraph describing each task"
+      "A one-line reply that gives the final deadline",
+      "A long paragraph describing each task in turn"
     ],
     "correct": 0,
-    "explanation": "A is correct: artifacts suit standalone content you'll keep editing, reuse or share. B is wrong because inline replies suit quick answers, not a document maintained over time. C is wrong because it loses the timeline. D is wrong because a paragraph is harder to scan and update than a structured timeline.",
+    "explanation": "A is correct: artifacts open beside the chat and suit content you'll keep editing and sharing, like a weekly timeline. B is wrong because inline replies suit things read once, and rewriting each week loses the edits. C is wrong because a deadline alone loses the timeline the team needs. D is wrong because a paragraph is hard to scan and update compared with a structured timeline.",
     "tags": [
+      "comparison",
+      "comprehension",
       "output-format",
       "artifacts"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-017",
+    "difficulty": "medium",
     "scenario": "An operations analyst needs Claude to extract supplier name, contract value and renewal date from 30 contracts, then paste the results into a spreadsheet.",
     "question": "Which output format should she ask for?",
     "options": [
-      "Structured data: a table or CSV with one row per contract and one column per field",
-      "A narrative paragraph for each contract",
-      "A bullet list mixing all fields together",
-      "A slide deck summarising the contracts"
+      "A table or CSV: one row per contract, one column per field",
+      "A short narrative paragraph for each of the 30 contracts",
+      "A bullet list that groups the fields under each supplier",
+      "A slide deck that summarises the contracts for her manager"
     ],
     "correct": 0,
-    "explanation": "A is correct: data headed for a spreadsheet should come out as structured rows and columns. B is wrong because paragraphs have to be re-keyed. C is wrong because mixed bullets lose the field structure. D is wrong because a deck is for presenting, not for loading data.",
+    "explanation": "A is correct: data headed for a spreadsheet should come out as structured rows and columns that paste straight in. B is wrong because paragraphs have to be retyped field by field. C is wrong because bullets don't map to spreadsheet columns, so each value must be moved by hand. D is wrong because a deck is for presenting, not for loading data.",
     "tags": [
+      "configuration",
+      "application",
       "structured-data",
       "output-format"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 2,
     "id": "ccao-d2-018",
-    "scenario": "A colleague asks a quick question: \"What's the difference between our two leave policies?\"",
+    "difficulty": "medium",
+    "scenario": "A colleague asks a quick question in passing: \"What's the difference between our two leave policies?\"",
     "question": "Which response format is most appropriate?",
     "options": [
-      "A full artifact document with an executive summary and appendices",
-      "A CSV file of every clause in both policies",
-      "A short inline answer, perhaps a brief comparison table, in the chat",
-      "An interactive dashboard"
+      "A full artifact document with a summary and appendices",
+      "A CSV file listing each clause in both leave policies",
+      "A short inline answer in the chat",
+      "A downloadable Word report comparing the two policies"
     ],
     "correct": 2,
-    "explanation": "C is correct: a quick question gets a concise inline answer, curated to what was asked. A is wrong because it over-produces for a simple question. B is wrong because raw clauses aren't curated information. D is wrong because a dashboard is far more than the question needs.",
+    "explanation": "C is correct: a quick question is read once, so a concise inline answer, curated to what was asked, fits best. A is wrong because a full document over-produces for a one-off question. B is wrong because raw clauses aren't curated and leave the colleague to find the difference. D is wrong because a downloadable report suits something that must leave Claude, not a quick answer.",
     "tags": [
+      "comparison",
+      "application",
       "curation",
       "inline"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-019",
+    "difficulty": "medium",
+    "scenario": "An IT consultancy's bid manager has Claude draft a tender response to 14 numbered client requirements. The draft is long and polished, and it is due on Monday.",
+    "question": "How should she check that the draft is complete?",
+    "options": [
+      "Ask Claude to map each requirement to its answer, then check the map herself",
+      "Ask Claude for a requirement map and accept it, since Claude wrote the draft",
+      "Check that each section is within the tender's word limit",
+      "Ask a colleague to read it and say whether it reads as complete"
     ],
-    "difficulty": "medium"
+    "correct": 0,
+    "explanation": "A is correct: a requirement map speeds up the completeness check, but she still verifies it against the 14 requirements herself. B is wrong because Claude's own map can mark a requirement as answered when it isn't. C is wrong because word limits say nothing about coverage. D is wrong because \"reads complete\" is an impression, not a check against the tender's list.",
+    "tags": [
+      "best-practice",
+      "application",
+      "completeness"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-020",
+    "difficulty": "medium",
+    "scenario": "A wine importer's buyer asked Claude eight questions about a new supplier's terms. Each fact in the summary matches the terms document, but it answers seven of the eight questions.",
+    "question": "What is the problem, and what should the buyer do?",
+    "options": [
+      "No problem: send it, since the facts in it are accurate",
+      "It's incomplete: get the missing answer, then check that part",
+      "It's too short: ask Claude to expand each answer with more detail",
+      "It may be inaccurate: check each line against the terms again"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: an answer can be accurate yet incomplete, and here one question is unanswered, so the buyer gets that answer and checks the new part. A is wrong because accurate content still leaves her without one answer. C is wrong because more words don't add the missing answer. D is wrong because the facts already match the terms; the gap is coverage, not accuracy.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "completeness",
+      "accuracy"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-021",
+    "difficulty": "hard",
+    "scenario": "A logistics broker's commercial manager has Claude summarise a haulage supplier's contract. Tomorrow she will use the summary's rates, discounts and notice terms to renegotiate prices with the supplier.",
+    "question": "Which check best fits this summary before the meeting?",
+    "options": [
+      "A quick read-through to confirm the summary makes sense",
+      "A requirement-by-requirement check of the summary against her original request",
+      "A line-by-line check of the figures and terms against the contract",
+      "A request to Claude to flag figures it is unsure about"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is that the rates and terms will be negotiated tomorrow, so each figure must match the contract, which a line-by-line source check confirms. B is reasonable for coverage but shows that each topic is present, not that the numbers are right. A is wrong because a read-through misses wrong figures. D is wrong because Claude's own uncertainty doesn't reveal confident errors.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "accuracy",
+      "verification-level"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-022",
+    "difficulty": "hard",
+    "scenario": "Claude summarises a software licence renewal for a dental practice group, and each item listed in the request is covered. The finance director will use it to decide whether to renew; leaving early costs a termination fee the request didn't mention.",
+    "question": "What should the practice manager do before sending it?",
+    "options": [
+      "Send it, since each requirement in the request is covered",
+      "Ask Claude to confirm that the summary is complete enough for the director to decide",
+      "Add what the director will need to decide, such as the termination fee",
+      "Shorten it to the points the director is likely to read"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is the reader's decision; a director deciding on renewal will expect the exit cost, so checking for omissions matters as much as checking the request. A is reasonable on paper, but covering the request isn't covering what the reader needs. B is wrong because Claude can't independently confirm its own completeness. D is wrong because shortening removes detail instead of adding the missing fee.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "completeness",
+      "omissions"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-023",
+    "difficulty": "medium",
+    "scenario": "Claude builds a table of a garden centre's monthly plant sales by department for the regional manager. The department rows don't add up to the stated total.",
+    "question": "What should the assistant manager do?",
+    "options": [
+      "Trust the total, since Claude calculated it from the data",
+      "Delete the total row so the table no longer contradicts itself",
+      "Ask Claude to fix the maths and use the new number it gives",
+      "Reconcile the rows and total against the original sales data"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a total that doesn't match its parts is an inconsistency, so at least one number is wrong and the sales data shows which. A is wrong because the total may be the wrong figure. B is wrong because hiding the contradiction leaves a wrong row in place. C is wrong because accepting Claude's new number without checking the source can swap one error for another.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "inconsistency",
+      "calculations"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-024",
+    "difficulty": "medium",
+    "scenario": "A cycle-hire scheme's customer team wants Claude to answer staff questions about its 40-page terms of use. Invented answers have reached customers before.",
+    "question": "Which setup best reduces invented answers?",
+    "options": [
+      "Tell Claude to be careful and accurate in its answers",
+      "Switch to a more capable model before asking staff questions about the terms",
+      "Ask Claude to add a confidence rating to each answer",
+      "Give Claude the terms, have it answer from them, and allow \"I don't know\""
+    ],
+    "correct": 3,
+    "explanation": "D is correct: hallucinations are most likely when no source is given, so supplying the terms, keeping answers to them and permitting \"I don't know\" removes the pressure to guess. A is wrong because a request to be careful doesn't give Claude the facts. B is wrong because a stronger model still lacks this scheme's terms. C is wrong because a self-rating comes from the same model and can rate an invented answer highly.",
+    "tags": [
+      "best-practice",
+      "application",
+      "hallucination",
+      "grounding"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-025",
+    "difficulty": "hard",
+    "scenario": "An airline's cabin-crew training manager has Claude summarise two candidates' training records for a promotion panel. Each summary reads fairly on its own, and the panel will use them to choose between the two.",
+    "question": "Which check best catches bias before the panel meets?",
+    "options": [
+      "Ask a second reviewer to read each summary on its own and mark anything biased",
+      "Compare the two summaries side by side against both sets of records",
+      "Ask Claude to rate how neutral each of the two summaries is, out of ten",
+      "Check each summary for spelling errors and a consistent tone"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that the panel compares two people, and unequal description of equal results shows when the summaries sit side by side against the records. A is wrong because a reviewer reading each summary on its own can find each one fair. C is wrong because a self-rating comes from the same model. D is wrong because a consistent tone can still describe equal achievements unequally.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "bias",
+      "fairness"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-026",
+    "difficulty": "hard",
+    "scenario": "Claude summarises a translation agency's freelancer handbook for new recruits. It says freelancers can claim travel costs for any assignment, citing section 7.2. Section 7.2 exists but covers travel for on-site interpreting jobs.",
+    "question": "What should the vendor manager do?",
+    "options": [
+      "Correct the claim to what section 7.2 says",
+      "Keep the claim, since the cited section is real",
+      "Remove the section reference and keep the claim",
+      "Ask Claude to find a second section that supports it"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that section 7.2 is narrower than the claim; a real citation counts only if it supports the claim, so the claim shrinks to on-site interpreting. B is wrong because the section doesn't support the broader claim. C is wrong because the unsupported claim stays, now harder to check. D is wrong because it invites Claude to stretch another passage to fit a claim the handbook doesn't make.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "hallucination",
+      "citations"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-027",
+    "difficulty": "medium",
+    "scenario": "A zoo's education officer asks Claude how long red pandas live, for a new enclosure sign. She asks again in a new chat and gets the same figure. The sign goes to print on Friday.",
+    "question": "What should she do before the sign is printed?",
+    "options": [
+      "Print it, since two separate answers gave the same figure",
+      "Check the figure in an authoritative published reference",
+      "Ask Claude to confirm that it is sure about the figure",
+      "Add \"about\" before the figure in case it is slightly off"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: verification needs evidence Claude didn't produce, so the figure is confirmed in an authoritative source before it's printed. A is wrong because two answers from the same model can repeat the same error; agreement isn't verification. C is wrong because Claude saying it's sure is the same source checking itself. D is wrong because a hedge word doesn't fix a wrong figure on a permanent sign.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "fact-checking",
+      "sources"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-028",
+    "difficulty": "medium",
+    "scenario": "A solar-farm developer's planning officer uses Claude with web search to find a council's planning-application fee. The answer cites a council web page, and she will quote the fee to a landowner.",
+    "question": "How should she verify the fee before quoting it?",
+    "options": [
+      "Treat it as verified, since the answer includes a citation",
+      "Click the link to make sure the cited page still loads",
+      "Open the cited page and confirm it states the same fee",
+      "Ask Claude to quote the fee from the cited page again"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: web search answers include citations so you can verify them, but the check is opening the page and confirming it says what the claim says. A is wrong because a citation makes checking possible; it isn't the check. B is wrong because a page that loads may still state a different fee. D is wrong because Claude quoting again is the same source repeating itself.",
+    "tags": [
+      "best-practice",
+      "application",
+      "fact-checking",
+      "web-search"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-029",
+    "difficulty": "medium",
+    "scenario": "Claude calculates that a bookshop chain's online sales rose 18% year on year, for a slide at Thursday's board meeting. The finance assistant has both years' figures.",
+    "question": "What should she do with the 18% before the slide is final?",
+    "options": [
+      "Trust it, since a percentage change is simple arithmetic",
+      "Ask Claude to show its working and accept it if it looks right",
+      "Round it to 20% so the slide is easier to read at a glance",
+      "Recalculate the change herself from the two years' figures"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: numbers going to a board are recomputed independently, and with both figures to hand it takes a minute. A is wrong because simple calculations still go wrong, for example by using the wrong base year. B is wrong because working that looks plausible can contain the same error. C is wrong because rounding changes the fact the board will rely on.",
+    "tags": [
+      "best-practice",
+      "application",
+      "fact-checking",
+      "calculations"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-030",
+    "difficulty": "hard",
+    "scenario": "An e-bike retailer's brochure will state a motor's range of 120 km. Claude found the figure with web search, and the only source is the motor maker's own marketing page. The brochure goes to print next week.",
+    "question": "What should the marketing assistant do with the figure?",
+    "options": [
+      "Print it, citing the motor maker's page as the source",
+      "Ask Claude whether the maker's figure is likely to be reliable",
+      "Find an independent second source, or leave it out",
+      "Print it with \"up to\" in front to soften the claim"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is a published figure resting on a single source with an interest in it, so it needs independent confirmation or it comes out. A is reasonable for routine use, but citing the maker passes its own claim to customers unchecked. B is wrong because Claude judging the source isn't independent evidence. D is wrong because a softening phrase doesn't make an unconfirmed figure accurate.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "fact-checking",
+      "sources"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-031",
+    "difficulty": "medium",
+    "scenario": "A courier start-up's HR assistant uses Claude to draft the letter confirming a driver's dismissal and his right to appeal.",
+    "question": "What review does the letter need before it is sent?",
+    "options": [
+      "Two careful proofreads by the HR assistant before sending",
+      "A note that AI helped draft it, in place of a legal review",
+      "A check by Claude of the letter against employment law",
+      "A review by someone qualified in employment law"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the letter affects the driver's livelihood and legal rights, so it needs a reviewer qualified in employment law who can change it. A is wrong because proofreading catches typos, not legal errors. B is wrong because telling him AI helped doesn't make wrong legal content right. C is wrong because Claude checking its own draft is the same source checking itself.",
+    "tags": [
+      "best-practice",
+      "application",
+      "human-review",
+      "expertise"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-032",
+    "difficulty": "medium",
+    "scenario": "An insurance broker's team starts using Claude to draft renewal reminder emails to clients, about 200 a week. Nobody has measured its error rate on this task yet.",
+    "question": "How should review be set up for this new use?",
+    "options": [
+      "Sample a few emails from day one, since Claude is usually accurate",
+      "Fully review them at first, then sample once errors prove rare",
+      "Keep fully reviewing them at the same level indefinitely",
+      "Review them for the first week, then stop if it goes well"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a new use earns trust through evidence, so full review comes first and sampling follows once the error rate is shown to be low. A is wrong because \"usually accurate\" isn't evidence for this use yet. C is wrong because full review forever spends effort the evidence no longer justifies. D is wrong because one good week is too little evidence, and stopping leaves 200 client emails a week unchecked.",
+    "tags": [
+      "best-practice",
+      "application",
+      "human-review",
+      "novelty"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-033",
+    "difficulty": "medium",
+    "scenario": "A disability charity's benefits team uses Claude to draft letters advising people whether they qualify for a disability benefit.",
+    "question": "Under Anthropic's Usage Policy, what is needed before each letter is sent?",
+    "options": [
+      "A qualified adviser who can change it reviews it; AI use is disclosed",
+      "A manager signs each letter off but has no power to change the advice",
+      "The person is told AI helped, which replaces the need for review",
+      "An adviser reviews a 10% sample of the letters each week"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: advice on benefit eligibility affects people's finances, so the Usage Policy requires review by a qualified person with authority to change the advice, and telling the person AI was involved. B is wrong because sign-off without authority to change isn't meaningful review. C is wrong because disclosure is required alongside review, not instead of it. D is wrong because sampling leaves most letters unreviewed.",
+    "tags": [
+      "configuration",
+      "application",
+      "human-review",
+      "usage-policy"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-034",
+    "difficulty": "medium",
+    "scenario": "A cinema chain's survey found 38% of customers want earlier weekend screenings. The board version says 38%, but Claude's customer newsletter version says \"about half of customers\".",
+    "question": "What should the marketing officer do with the newsletter version?",
+    "options": [
+      "Keep it, since a customer version is meant to simplify",
+      "Remove the figure from both versions to keep them consistent",
+      "Keep it, since customers are unlikely to check the figure",
+      "Correct it to 38%, or nearly 4 in 10 customers"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a simpler version can drop detail but not change facts, and \"about half\" overstates 38%, so the two audiences would believe different things. A is wrong because simplifying doesn't permit changing a figure. B is wrong because removing an accurate figure loses information both audiences need. C is wrong because whether readers check doesn't make a wrong figure acceptable.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "audience",
+      "consistency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-035",
+    "difficulty": "hard",
+    "scenario": "A water utility's customer team has findings from a review of billing complaints. The executive team reads three lines on their phones; the operations team needs each action with an owner and deadline.",
+    "question": "How should the findings be presented?",
+    "options": [
+      "One full report with a short summary at the top",
+      "One full report sent to both teams, since the facts are the same",
+      "Separate versions for each team, stating identical figures",
+      "A three-line summary for both teams, with the report on request"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is that the teams make different decisions with different reading time, so each needs its own version, checked to state the same figures. A is reasonable, but a full report on a phone still buries the actions and wastes executives' time. B is wrong because one report fits neither reader. D is wrong because the operations team needs actions and owners that three lines can't carry.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "audience",
+      "versions"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-036",
+    "difficulty": "medium",
+    "scenario": "A conference organiser has 90 messy notes from supplier meetings, with repeats and gaps, and must turn them into a briefing for the event director.",
+    "question": "What should she ask Claude to do first?",
+    "options": [
+      "Turn the notes into a nicely formatted briefing document for the director",
+      "Group related items, order by priority, merge repeats, flag gaps",
+      "Paste the notes into an artifact as they are, ready to share",
+      "List each of the 90 notes as a row in a CSV file"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: curation comes before format, so grouping, ordering, merging duplicates and flagging gaps turns 90 notes into material worth briefing on. A is wrong because formatting messy notes gives a polished document with the repeats and gaps still inside. C is wrong because an artifact of raw notes is shareable but still unsorted. D is wrong because a CSV of unsorted notes is the same mess in rows.",
+    "tags": [
+      "best-practice",
+      "application",
+      "curation"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-037",
+    "difficulty": "medium",
+    "scenario": "A dance school administrator on a Team plan asks Claude for the term timetable as a Word file, but Claude replies with text in the chat each time.",
+    "question": "What should she check first?",
+    "options": [
+      "Whether Code execution and file creation is on and allowed",
+      "Whether a more capable model would be able to create the file",
+      "Whether turning on Research would let Claude create it",
+      "Whether asking again more firmly would get the file"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Claude creates Word files through the Code execution and file creation setting, and on a Team plan the owner can disable it, so that is the first thing to check. B is wrong because a different model doesn't add a capability the setting has turned off. C is wrong because Research gathers sources; it doesn't create files. D is wrong because rephrasing can't switch on a disabled setting.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "file-creation",
+      "settings"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccao-d2-038",
+    "difficulty": "hard",
+    "scenario": "A municipal events team has 300 attendee records to import into its registration system, and the events manager also wants to look through them before the import.",
+    "question": "Which output format should the coordinator ask Claude for?",
+    "options": [
+      "An artifact table the manager can read and share",
+      "A CSV with one row per attendee and one column per field",
+      "A Word document listing each attendee's details one after another",
+      "An inline list of the attendees, grouped by session"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is the import, which needs structured rows and columns, and the manager can open the same CSV in a spreadsheet to look through it. A is reasonable for reading and sharing, but the system can't import it, so someone retypes 300 rows. C is wrong because a document has to be re-keyed. D is wrong because an inline list is hard to reuse and isn't importable.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "structured-data",
+      "output-format"
+    ]
   }
 ]

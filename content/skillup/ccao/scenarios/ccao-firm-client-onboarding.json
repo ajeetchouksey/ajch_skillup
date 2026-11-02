@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccao-scenario-005",
+  "title": "Ashby & Cole Redesigns Client Onboarding",
+  "description": "An accountancy firm wants to cut client onboarding from three weeks to one without missing identity checks. The team uses Claude to turn interviews into requirements, map the real process and build the onboarding pack in checked steps. It must also decide when a prototype goes to a developer, test a prompt before it becomes a template and pick the right model family for each job.",
+  "examId": "ccao",
+  "difficulty": "medium",
+  "estimatedMinutes": 16,
+  "domains": [
+    1,
+    3,
+    4
+  ],
+  "taskIds": [
+    "4.1",
+    "4.2",
+    "1.2",
+    "4.3",
+    "1.3",
+    "3.2"
+  ],
+  "scenario": {
+    "background": "New clients at Ashby & Cole wait three weeks to be onboarded, and two left last year before their first meeting; the partners want it down to one week without missing any identity checks. Ashby & Cole is a 40-person accountancy firm using Claude on a Team plan. Its documented onboarding process has five steps, but staff say the real one has grown workarounds. An external developer maintains the practice-management system where client records live. The operations partner wants a redesign agreed within the quarter.",
+    "characters": [
+      {
+        "name": "Helen Ashby",
+        "role": "Operations Partner",
+        "concern": "She wrote the five-step process and is confident it just needs speeding up."
+      },
+      {
+        "name": "Mia Turner",
+        "role": "Client Onboarding Lead",
+        "concern": "She says the real process has workarounds the documented one doesn't show."
+      },
+      {
+        "name": "Raj Mehta",
+        "role": "Practice Manager",
+        "concern": "He wants templates the whole team uses, so every client gets the same experience."
+      },
+      {
+        "name": "Sam Okoro",
+        "role": "External Developer",
+        "concern": "He maintains the practice-management system and wants clear requirements before he builds anything."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccao-scenario-005-q1",
+      "stem": "Mia has notes from eight client interviews and a long thread of staff emails about onboarding. Some accounts disagree about when identity checks happen. How should she use Claude first?",
+      "options": [
+        "Ask Claude to design the final onboarding process straight from the notes and emails",
+        "Ask Claude to settle the contradictions by picking the most common account in the notes",
+        "Get grouped requirements, contradictions and open questions, confirm them, set measures",
+        "Ask Claude for a requirements list and use it as the brief for the redesign as it stands"
+      ],
+      "correct": 2,
+      "explanation": "Claude organises; people confirm. C is correct: Claude can turn messy notes into grouped requirements, flag contradictions such as when identity checks happen, and list open questions, but the people involved confirm them, and success measures (days to onboard, share of clients with complete documents in week one) come before any redesign. A is wrong because it designs on unconfirmed input. B is wrong because a majority view isn't evidence. D is wrong because unconfirmed requirements build the contradictions in."
+    },
+    {
+      "id": "ccao-scenario-005-q2",
+      "stem": "Helen wants Claude to help optimise the documented five-step process, which the partners signed off. Mia brings examples of client details being retyped and ID documents chased by hand outside those steps. What should the team work on?",
+      "options": [
+        "Map how onboarding really runs today, workarounds included, and optimise that",
+        "Optimise the documented five steps, since that is the process the firm signed off",
+        "Ask Claude for general onboarding best practice and apply it to the five steps",
+        "Survey recent clients about their experience and redesign from what they report"
+      ],
+      "correct": 0,
+      "explanation": "Optimise the process as it really runs. A is correct: Helen's process is a sensible reference, but Mia's examples are evidence of work it doesn't capture. Mapping the real process shows the true bottlenecks: client details typed into three places and a manual chase for ID documents. B is wrong because optimising the documented steps fixes the wrong ones. C is wrong because general practice ignores the firm's own workarounds. D is wrong because clients can't see the internal steps."
+    },
+    {
+      "id": "ccao-scenario-005-q3",
+      "stem": "With the real bottlenecks mapped, Raj asks Claude for a new onboarding pack: a document checklist, the fee basis, an engagement letter, a welcome email and an FAQ. The engagement letter depends on the agreed fee basis. How should he structure the work?",
+      "options": [
+        "Ask for the whole pack in one detailed prompt so Claude sees how the parts fit together",
+        "Draft the five parts in separate chats at once, then merge them into one pack at the end",
+        "Start with the welcome email, since clients see it first, then work back to the checklist",
+        "Agree and check the checklist and fee basis, draft the letter from them, then the rest"
+      ],
+      "correct": 3,
+      "explanation": "Decompose when parts depend on each other. D is correct: the engagement letter rests on the fee basis, so the checklist and fee basis are agreed and checked first, the letter is drafted from them, then the welcome email and FAQ follow, with a final consistency pass. A is wrong because one prompt gives shallow parts and hides errors. B is wrong because parallel drafts can't use the agreed basis. C is wrong because the email would describe fees not yet agreed."
+    },
+    {
+      "id": "ccao-scenario-005-q4",
+      "stem": "Mia builds the new checklist as an artifact and uses it with six new clients; it works well. Raj now wants it linked to the practice-management system, with client logins. What should happen next?",
+      "options": [
+        "Mia keeps extending the artifact until it can connect to the practice-management system",
+        "Sam gets the prototype, the requirements and the clients' feedback themes to build it",
+        "Share the artifact with the firm's new clients now, and link it to the system later on",
+        "Paste a weekly export from the practice-management system into the artifact to keep it current"
+      ],
+      "correct": 1,
+      "explanation": "Prototype in an artifact; hand integrations to developers. B is correct: client logins and a link to the system holding client records are production work, so Sam builds it properly from the prototype, the requirements and the feedback themes. A is wrong because a self-built connection would put client data in a tool nobody has secured or supports. C is wrong because clients would log into an unsupported prototype. D is wrong because it copies client records into the artifact and goes stale within days."
+    },
+    {
+      "id": "ccao-scenario-005-q5",
+      "stem": "The welcome-email prompt from the pack finally produced an excellent email for one sole trader. Raj wants to save it as the team template for the 40 new clients due next month. What should happen first?",
+      "options": [
+        "Save it as the template now, since it has already produced an excellent welcome email",
+        "Ask Claude to rate how reliable the prompt is before Raj shares it as the template",
+        "Test it on a sole trader, a company and a charity against the checklist, then fix it",
+        "Make the prompt longer so it covers more types of client before it becomes a template"
+      ],
+      "correct": 2,
+      "explanation": "Test a prompt on varied inputs before it becomes a template. C is correct: one good email for a sole trader doesn't show the prompt handles limited companies or charities, which need different documents, so Raj tests it across client types against the checklist agreed for the pack, fixes what fails and then saves it. A is wrong because one success can be luck. B is wrong because Claude rating its own prompt isn't a test. D is wrong because untested length adds untried instructions."
+    },
+    {
+      "id": "ccao-scenario-005-q6",
+      "stem": "Two Claude jobs remain before Sam starts building: tagging 600 documents in the onboarding archive by type, and reconciling the confirmed interview accounts with the staff emails into one requirements summary. Which model families fit?",
+      "options": [
+        "Haiku for the tagging, tested on a sample first, and Opus for the reconciliation",
+        "Opus for both jobs, to be safe, since the firm can't afford mistakes in either one",
+        "Haiku for both jobs, because speed was the main goal of the whole redesign",
+        "Sonnet for both jobs, because it's the everyday choice for most kinds of work"
+      ],
+      "correct": 0,
+      "explanation": "Match the family to the job. A is correct: tagging 600 documents is simple, high-volume classification that suits Haiku, checked on a sample first, while reconciling conflicting accounts needs multi-step reasoning and judgement, where Opus, the most capable of the three families, pays off. B is wrong because Opus makes the simple job slower and uses more of the limit. C is wrong because the reconciliation needs deeper reasoning. D is wrong because one default ignores both jobs' needs."
+    }
+  ],
+  "keyLearnings": [
+    "Confirm requirements with the people involved and set success measures before redesigning anything.",
+    "Map and optimise a process as it really runs, workarounds included, not as it is documented.",
+    "Decompose work when later parts depend on earlier decisions, and test a prompt on several inputs before it becomes a template.",
+    "Prototype with an artifact, and hand integrations that touch client systems to developers."
+  ]
+}

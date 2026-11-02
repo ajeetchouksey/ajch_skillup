@@ -1,10 +1,10 @@
 # D6: Governance, Risk, and Responsible Use
 
-> **Exam weight**: 15% · **Questions**: ~12 in the bank
+> **Exam weight**: 15% · **Questions**: 27 in the bank
 
 ## Overview
 
-This domain covers using Claude responsibly at work: recognising which uses are appropriate, handling sensitive and regulated data, following your organisation's AI policies and Anthropic's Usage Policy, and understanding the ethical side of using AI, including being open about it and owning the result.
+This domain is about using Claude responsibly at work. It covers which uses are fine, which need a qualified person in the loop and which are off-limits. It also covers handling sensitive and regulated data, following your organisation's policy and admin settings, and the ethics of being open and owning the result. The AI Fluency competency it exercises is **Diligence**, which means taking responsibility for how AI is used.
 
 > 💡 **Human Angle**: Most AI incidents at work aren't dramatic. They're a spreadsheet of customer data pasted into the wrong place, or an AI-drafted decision nobody checked.
 
@@ -14,46 +14,46 @@ This domain covers using Claude responsibly at work: recognising which uses are 
 
 ### Key Concept
 
-**Low-risk drafting, analysis and research with a person accountable are good uses; decisions about people need a qualified human in the loop; some uses aren't allowed at all.**
+**Who is affected, and what happens if Claude is wrong, decides whether you go, add a qualified person, or stop.**
 
-Think in three zones. **Green:** drafting, summarising, analysing, brainstorming and research where a person reviews and owns the result. **Amber:** uses that affect people's health, legal rights, finances, jobs or access to essential services. Anthropic's Usage Policy requires a qualified human who can review and change Claude's recommendation, and disclosure to the person affected. **Red:** uses prohibited by the Usage Policy or your organisation's policy, and tasks that need certainty Claude can't give, such as final legal or medical judgements without an expert.
+Drafting, summarising and research are fine when a person owns the result. Decisions about people need more: the Usage Policy requires a qualified person who can change the recommendation, and the person affected must be told AI was involved. **Think of traffic lights.** Green means go, amber means go with a qualified person in control, and red means stop.
 
-**Think of traffic lights**: green go, amber proceed with a qualified person in control, red stop.
-
-![Three zones of use: green for drafting, summarising and research with a human owner; amber for decisions affecting health, money, legal rights or jobs, which need a qualified human in the loop and disclosure; red for uses prohibited by the Usage Policy or company policy.](/content/skillup/ccao/images/ccao-6-1-use-zones.svg)
+![Three zones of use: green for drafting, summarising and research with a human owner; amber for anything affecting health, money, legal rights, livelihood, housing or education, which needs a qualified person with authority to change the outcome and disclosure to the person affected; red for prohibited uses; a decision wholly in the person's favour may not need review first where the law allows.](/content/skillup/ccao/images/ccao-6-1-use-zones.svg)
 
 ### Real use
 
-An HR team uses Claude to draft job adverts (green) and to summarise interview notes for the hiring panel, where the panel makes the decision (amber, human in the loop). A request to have Claude automatically reject candidates below a score is stopped: it's a decision about people with no human reviewing it.
+A citizens' advice charity's advice team drafts outreach leaflets with Claude (green). For hardship-grant cases, Claude summarises, an adviser decides and the client is told AI helped (amber). A plan to auto-reject applications below a score is stopped.
 
 ### How it works
 
-- **Green:** human owns and reviews the output; low impact if wrong.
-- **Amber:** affects people's health, money, legal rights, livelihood or access to services; needs qualified human review with authority, plus disclosure.
-- **Red:** prohibited by the Usage Policy or company policy.
-- **Ask:** who is affected, and what if Claude is wrong?
+Letting Claude score applications and reject anyone below 60 puts decisions about people's money where no qualified person reviews them.
+
+- **Green:** a person reviews and owns the result, and a mistake would do little harm.
+- **Amber:** anything affecting health, legal rights, finances, livelihood, or access to housing, education or essential services. A qualified person (trained or experienced, and licensed where the law requires it) reviews it before anyone acts, can change it and stays responsible, and the person affected is told. Signing without reading isn't meaningful review. Legal advice and medical diagnosis sit here, not in red: they need a qualified review.
+- **The exception:** where the law allows, a decision wholly in the person's favour, such as paying an insurance claim, needs no review first. A partial approval or reduced amount does, and disclosure may still apply.
+- **Red:** uses the Usage Policy or your organisation prohibits, or that need a certainty nobody qualified can check.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Go ahead | Green: low risk, person owns the result | Still review before use |
-| Human in the loop | Amber: affects people's rights or money | Slower, but required |
-| Don't use Claude | Red, or certainty is required | Do it another way |
+| Go ahead | Green: low impact, and a person owns the result | Still review before use |
+| Qualified person in the loop, plus disclosure | Amber: it affects someone's health, money, rights, livelihood, housing or education | Slower; needs a qualified person |
+| Don't use Claude for this step | Red, or certainty is required | Do it another way |
 
 ### How to do it
 
-1. Ask who is affected and what happens if the output is wrong.
-2. Place the use in green, amber or red.
-3. For amber, put a qualified person in charge of the decision and tell those affected.
+1. Ask who is affected and what happens if it's wrong.
+2. Place the use in a zone.
+3. For amber, put a qualified person in charge and tell the person affected. The fix isn't a better prompt.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Claude scores candidates and the system rejects anyone below 60" is the classic inappropriate use: an automated decision about people with no qualified human in the loop. The fix isn't a better prompt; it's a person who makes the decision.</div>
+<div class="note-trap">Trying to fix an automated decision about people with a better prompt misses the point. The requirement is a qualified person who makes the call.</div>
 
 ### Go deeper
 
-- [Anthropic Usage Policy](https://www.anthropic.com/legal/aup)
+- [Usage Policy](https://www.anthropic.com/legal/aup)
 - [2026 Usage Policy update](https://www.anthropic.com/news/2026-usage-policy-update)
 
 ---
@@ -62,49 +62,48 @@ An HR team uses Claude to draft job adverts (green) and to summarise interview n
 
 ### Key Concept
 
-**Before you paste or upload, ask what the data is, whether you're allowed to share it, and which Claude plan you're using; when in doubt, remove or anonymise it.**
+**Decide what data may leave your hands before you paste it, not after.**
 
-Personal data, customer records, health or financial details, confidential business information and regulated data need care. Your organisation's rules decide what may be used, and on which plan. Plans differ: on consumer plans (Free, Pro, Max), whether chats are used to improve models depends on a privacy setting you control, and incognito chats are not used for training. On Team and Enterprise plans, under commercial terms, Anthropic doesn't use your data to train models. Often the simplest safe step is to remove or anonymise identifiers before uploading.
+Once a file is uploaded it has been shared, and no later instruction takes it back. So classify the data, check the rules and plan, then share only what the task needs. **Think of photocopying for an outside meeting.** You black out what the room doesn't need first.
 
-**Think of photocopying a document for an outside meeting**: black out what the room doesn't need to see.
-
-![A data check before uploading: identify the data type, check the organisation's policy and the plan in use, then remove or anonymise identifiers, use an approved workspace, or don't upload at all.](/content/skillup/ccao/images/ccao-6-2-data-check.svg)
+![A membership spreadsheet with the name, email, date of birth and health columns struck out and a non-identifying member key kept alongside club, month and type; before uploading, identify the data, check the rules and plan, and keep only what the task needs, because asking Claude to forget it or using incognito afterwards is not a control.](/content/skillup/ccao/images/ccao-6-2-data-check.svg)
 
 ### Real use
 
-A project manager wants Claude to find trends in a spreadsheet with customer names and account numbers. Company policy restricts sharing regulated personal data. She removes the names and account numbers, keeps region and product columns, and uploads the anonymised version in the company's Team workspace. The analysis works just as well.
+A gym chain's marketing analyst wants churn by club from an export holding names, emails, dates of birth and health answers. She keeps only club, month and membership type, drops the health column, and works in the company's Team workspace.
 
 ### How it works
 
-- **Classify:** personal, confidential, regulated or public?
-- **Policy:** what your organisation allows, and on which plan.
-- **Minimise:** share only the columns or passages the task needs.
-- **Anonymise:** remove or replace names, IDs and account numbers.
-- **Plan matters:** consumer privacy settings vs commercial (Team/Enterprise) terms.
-- **Incognito** isn't saved to history or memory and isn't used for training, but it doesn't override your company's data policy.
+Upload the full export and the identities and health answers you didn't need are in a chat; asking Claude to forget them isn't a control.
+
+- **Classify:** personal, sensitive (health, financial), confidential, regulated or public. "It's only internal analysis" isn't an exemption.
+- **Know the kind of rule:** personal-data protection laws (for example GDPR in the UK and EU), health-data rules (for example HIPAA in the US), and financial-data and confidentiality rules. Your organisation's policy says what they mean for you; health records need a workspace it has approved.
+- **Minimise:** keep only the columns the task needs, and swap names, emails and account numbers for a non-identifying key (a made-up ID that can't be traced back to the person) so records still group.
+- **Plans differ:** on Free, Pro, Max and Ultra, training depends on your privacy setting. Team and Enterprise chats aren't used for training by default, but a thumbs up or down sends that chat as feedback. Incognito is never used for training, but it's kept 30 days and appears in Team and Enterprise exports, so it's no way round a policy.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Use as is | Public or approved, non-sensitive data | None |
-| Anonymise first | Analysis doesn't need identities | Small preparation step |
+| Minimise and anonymise first | The task doesn't need identities | A small preparation step |
+| Approved workspace only | Policy allows the data only in one plan or workspace | May lack features you have elsewhere |
 | Don't upload | Policy forbids it, or identity is essential and not approved | Do the task another way |
+| Ask the policy owner | You can't tell which rule applies | A short delay |
 
 ### How to do it
 
-1. Identify what kind of data it is.
-2. Check your organisation's policy and which plan you're using.
-3. Remove or anonymise identifiers, or don't upload.
+1. Identify the kind of data, then check the policy and the plan.
+2. Remove or replace identifiers, keeping only what the task needs.
+3. Upload only in the approved workspace.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Upload it, then tell Claude not to remember it" doesn't satisfy a data policy: the data has already been shared. Remove or anonymise before uploading. And "it's only internal analysis" isn't an exemption.</div>
+<div class="note-trap">Pasting the full export and asking Claude to forget it afterwards is too late. The data left your hands at upload.</div>
 
 ### Go deeper
 
-- [Is my data used for model training?](https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training)
-- [Who can view my conversations?](https://support.claude.com/en/articles/8325621-i-would-like-to-input-sensitive-data-into-my-chats-with-claude-who-can-view-my-conversations)
+- [Is my data used for model training? (consumer plans)](https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training)
+- [Is my data used for model training? (Team, Enterprise and API)](https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training)
 
 ---
 
@@ -112,48 +111,48 @@ A project manager wants Claude to find trends in a spreadsheet with customer nam
 
 ### Key Concept
 
-**Your organisation's AI policy decides which plan, data and uses are allowed; follow it, and when it's silent, ask before you act.**
+**Your organisation's policy decides the tools, data and uses; when it's silent, ask before acting.**
 
-Organisations set rules for AI: which tools and plans are approved, what data may be used, which uses need sign-off, and how AI use is disclosed. On Team and Enterprise plans, owners and admins also control settings for everyone, such as whether memory, code execution or certain connectors are available, and which models can be used. Following policy means using the approved workspace rather than a personal account, respecting admin settings rather than working around them, and asking the policy owner when a case isn't covered.
+AI policies set which tools and plans are approved, what data may be used, which uses need sign-off and how AI use is disclosed. Following them includes respecting the settings admins chose. **Think of the company expenses policy.** You don't decide alone what's reimbursable.
 
-**Think of the company expenses policy**: you don't decide alone what's reimbursable, and you ask when something is unusual.
-
-![Policy in practice: use the approved workspace, not a personal account; respect admin settings; follow data and disclosure rules; and when the policy is silent, ask its owner before acting.](/content/skillup/ccao/images/ccao-6-3-policy.svg)
+![A decision path for policy questions: if the policy covers the tool, data and use, follow it in the approved workspace; if a setting or connector blocks legitimate work, request it through the proper route; otherwise ask the policy owner before acting, never using a personal or colleague's account or asking Claude to interpret the policy.](/content/skillup/ccao/images/ccao-6-3-policy.svg)
 
 ### Real use
 
-A marketer wants to analyse customer feedback quickly and thinks of using her personal Claude account at home, where she has more features. Policy says company data goes only into the company's Enterprise workspace. She uses the workspace, and asks the AI governance lead whether a new connector can be enabled.
+A law-firm paralegal is tempted to use her personal Pro account because the firm hasn't enabled a document connector. Policy keeps client matters in the firm's Enterprise workspace, so she works there, uses "Request" for the connector, and follows the client-disclosure rule.
 
 ### How it works
 
-- **Approved tools and plans:** company data stays in the approved workspace.
-- **Admin settings:** memory, code execution, connectors and models may be set centrally.
-- **Data rules:** what can be uploaded, and anonymisation requirements.
-- **Disclosure:** when and how to say AI was used.
-- **Escalate:** ask the policy owner when a case isn't covered.
+Someone copies client files into a personal account "because it has the feature", and the firm's data is now outside every control it set up.
+
+- **Approved workspace:** company data stays in the company's workspace, not a personal account, even with memory off or a plan to delete the chat. Incognito chats still appear in Team and Enterprise data exports.
+- **Admin settings are decisions, not bugs:** Team and Enterprise owners can turn off or restrict code execution, web search, memory, connectors and their actions, Project sharing and skills. On Enterprise, they can also restrict models and effort levels. Browser workarounds and colleagues' accounts are out.
+- **Use the proper route:** "Request" on a connector's page sends it to an owner. It's on by default on Team; on Enterprise, only if an owner turns it on.
+- **Silence isn't permission:** ask the policy owner, not Claude, which can't tell you what your company allows. "Do it once and decide later" is still acting without approval.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Follow the policy | The case is covered | None; it's the rule |
-| Ask the policy owner | Policy is silent or unclear | Short delay |
-| Request a change | A rule blocks legitimate work | Takes time to approve |
+| Approved workspace and settings | The policy covers the tool and the data | Perhaps fewer features than elsewhere |
+| Ask the policy owner | The policy is silent or unclear | A short delay |
+| Request a change | A rule or setting blocks legitimate work | Takes time to approve |
 
 ### How to do it
 
-1. Check the policy for the tool, data and use case.
-2. Use the approved workspace and settings.
-3. If unclear, ask the policy owner before going ahead.
+1. Check the policy for the tool, data and use.
+2. Use the approved workspace.
+3. If it's unclear, ask the owner before acting.
+4. Request changes through the proper route.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">Using a personal account "because it has more features" to work around company settings is the trap. So is assuming that silence in the policy means permission.</div>
+<div class="note-trap">Treating silence in the policy as permission puts the risk on you, and the policy owner finds out after the fact.</div>
 
 ### Go deeper
 
-- [Anthropic Usage Policy](https://www.anthropic.com/legal/aup)
 - [Use connectors to extend Claude's capabilities](https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities)
+- [Use incognito chats](https://support.claude.com/en/articles/12260368-use-incognito-chats)
 
 ---
 
@@ -161,47 +160,47 @@ A marketer wants to analyse customer feedback quickly and thinks of using her pe
 
 ### Key Concept
 
-**Be open about AI's role, own the result you put your name to, and watch for bias and harm to the people affected.**
+**Be open about AI's role, check fairness to the people affected, and own what you send.**
 
-Anthropic's AI Fluency framework calls this **Diligence**: taking responsibility for how AI is used. In practice that means being transparent with colleagues and customers about AI's role where it matters, checking outputs for bias and fairness, respecting intellectual property and other people's data, considering who could be harmed, and remembering that "Claude wrote it" doesn't move accountability away from you.
+This is Diligence in practice: be transparent where AI materially shaped work others rely on, check outputs about people for fairness, and respect others' privacy and intellectual property. Accountability never moves to the tool. **Think of a ghostwriter's client.** Whoever signs the letter answers for it.
 
-**Think of a ghostwriter's client**: whoever signs the letter answers for what it says.
-
-![Four ethical responsibilities: be transparent about AI's role, own and check the result, check for bias and fairness toward the people affected, and respect privacy and intellectual property.](/content/skillup/ccao/images/ccao-6-4-ethics.svg)
+![The accountability chain: Claude drafts, you check fairness, disclose AI's role and edit, the work goes out under your name, and if it is wrong you and your organisation answer for it; saying the AI wrote it does not move responsibility.](/content/skillup/ccao/images/ccao-6-4-ethics.svg)
 
 ### Real use
 
-A teacher uses Claude to draft feedback on student essays. She tells students AI helped draft feedback that she then reviewed, checks that the feedback isn't harsher for students writing in a second language, and changes anything she disagrees with. The grades remain her judgement.
+A reporter on a local news website drafts a court-story summary with Claude. She follows the newsroom's AI disclosure rule, checks the wording is fair to the people named, and doesn't paste in a rival's paywalled article. When a date turns out wrong, she owns the correction.
 
 ### How it works
 
-- **Transparency:** say when AI materially shaped the work, as your context requires.
-- **Accountability:** you own what you send, whoever drafted it.
-- **Fairness:** check for bias, especially in outputs about people.
-- **Respect:** others' privacy, data and intellectual property.
-- **Harm:** ask who could be hurt if the output is wrong or misused.
+An AI-drafted line unfair to a named person goes out, and "Claude wrote it" doesn't stop the complaint landing on the reporter and the newsroom.
+
+- **Transparency:** say when AI materially shaped work others rely on, as your context and policy require; for high-risk advice and decisions it's required (see 6.1). Hiding AI's role so people trust the work more is a transparency failure.
+- **Accountability:** the person and organisation using the output own it. Not the AI, not Anthropic, not "nobody".
+- **Fairness:** compare how outputs describe different groups, such as a neighbourhood or part-time staff. Correct the wording, then check other outputs for the same pattern; a disclaimer fixes nothing.
+- **Respect and harm:** don't paste content you have no right to use, or others' data without a reason. Ask who could be hurt if the output is wrong or misused.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
 | Disclose AI use | AI materially shaped work others rely on | Some readers may trust it less |
-| Extra fairness review | Output describes or judges people | Takes more time |
-| Don't use AI | Using it would mislead or harm | Do the work yourself |
+| Extra fairness review | The output describes or judges people | Takes more time |
+| Don't use AI for this | Using it would mislead someone, breach their rights or harm them | Do the work yourself |
 
 ### How to do it
 
-1. Decide whether and how to disclose AI's role for this audience.
-2. Review outputs about people for bias and fairness.
-3. Take ownership: edit, check and stand behind what you send.
+1. Decide how to disclose AI's role for this audience.
+2. Review outputs about people for fairness.
+3. Edit, check and stand behind what you send.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"The AI produced it, so the AI is responsible" is always wrong. Accountability stays with the person and organisation using it. Hiding AI's role where it matters to the reader is also a transparency failure.</div>
+<div class="note-trap">Saying "the AI wrote that part" after an error reaches a client doesn't move responsibility. The sender still answers for it.</div>
 
 ### Go deeper
 
-- [AI Fluency: Framework & Foundations](https://www.anthropic.com/ai-fluency/overview)
+- [AI Fluency: Framework & Foundations](https://anthropic.skilljar.com/ai-fluency-framework-foundations)
+- [Usage Policy](https://www.anthropic.com/legal/aup)
 
 ---
 
@@ -209,32 +208,42 @@ A teacher uses Claude to draft feedback on student essays. She tells students AI
 
 ### 1. The connective narrative
 
-This domain answers "should we, and how safely?" before "how?". Use cases (6.1) sort work into what's fine, what needs a qualified human in the loop and what's off-limits. Data handling (6.2) decides what can go into Claude at all and in what form. Organisational policy (6.3) sets the local rules and settings, with the policy owner as the person to ask. Ethics (6.4) runs through all of it: be open, be fair, and own the result.
+This domain is Diligence: taking responsibility for how AI is used. It asks "should we, and how safely?" before it asks "how?". Each lesson answers one part of that question.
+
+Sorting the use (6.1) comes first, because it decides how much human control a task needs. Then comes the data (6.2): what may go in at all, and in what form. Your organisation's policy (6.3) is the local rulebook, with an owner to ask when it's silent. Ethics (6.4) runs through all of it: be open about AI's role, be fair to the people affected, and own what you send.
 
 ### 2. Worked scenario
 
-> **Scenario.** A bank's operations team wants Claude to help with loan-application summaries. Summarising for the loan officer is amber: the officer decides and the customer is told AI assisted (6.1). Applicants' account numbers are removed before upload, and only the bank's Enterprise workspace is used (6.2, 6.3). The team checks summaries for unfair wording about applicants and the officer remains accountable for every decision (6.4).
+> **Scenario.** A recruitment agency's compliance lead reviews a proposal to use Claude on 340 applications for a client's 12 warehouse-supervisor roles.
+>
+> 1. **Zone.** *Options:* "Claude ranks them and the top 10 go forward", or "Claude summarises each CV against the client's criteria and a consultant decides". *Why:* shortlisting affects livelihoods, so it's amber, and the first option leaves nobody qualified to change the outcome. *Result:* the second option, and candidates are told AI assisted.
+> 2. **Data.** *Options:* upload the CV export as it is, or strip it first. *Why:* the task doesn't need dates of birth or photos. *Result:* those columns are removed, candidates get non-identifying keys, and the work happens in the agency's Enterprise workspace.
+> 3. **Policy gap.** *Options:* use the client-supplied assessment scores because the AI policy doesn't forbid them, or ask first. *Why:* silence isn't permission. *Result:* she asks the policy owner before anyone uses them.
+> 4. **Fairness.** *Options:* add a disclaimer, or fix the cause. *Why:* a pilot of 60 summaries showed weaker wording for candidates with career breaks, and a disclaimer changes nothing. *Result:* the prompt and the review checklist are changed, and the last 50 summaries are rechecked.
 
 ### 3. Memory aid
 
-**ZONE**: **Z**one the use (green, amber, red) · **O**nly approved data and workspace · **N**otify people affected · **E**thics: own it and check fairness.
+**ZONE**: **Z**one the use (green, amber, red) · **O**nly approved data and workspace · **N**otify the people affected · **E**thics: own it and check fairness.
 
 ### 4. Exam strategy for this domain
 
-Wrong answers prioritise speed or convenience: upload as is, use a personal account, let Claude decide, assume silence means yes. Right answers anonymise first, use the approved workspace, keep a qualified human in the loop and ask the policy owner.
+- Wrong answers put speed or convenience first: upload as is, use a personal account, let Claude decide, assume silence means yes, or rely on incognito.
+- Right answers minimise first, use the approved workspace, keep a qualified person in the loop, disclose, and ask the policy owner.
+- Five minutes before: "If a person could be hurt by a wrong answer, a qualified person decides."
 
 ---
 
 ## Cheat Sheet 📋
 
-| Scenario says… | Answer |
+| Situation | What to do |
 |---|---|
-| Automated decision about people | Qualified human in the loop, plus disclosure |
-| Customer names and account numbers | Remove or anonymise before uploading |
-| "Tell Claude not to retain it" | Not a data control |
-| Personal account has more features | Use the approved workspace |
+| Automated decision about people | A qualified person with authority to change it, plus disclosure |
+| Decision wholly in the person's favour | Review may not be needed first where the law allows; partial approvals still need it |
+| Export with identifiers | Keep only the needed columns; use non-identifying keys |
+| "Tell Claude not to retain it" | Not a data control; the data was shared at upload |
+| Consumer plan (Free, Pro, Max, Ultra) and training | Depends on your privacy setting |
+| Team or Enterprise and training | Not by default; thumbs feedback sends the chat |
+| Incognito | Not in history or memory; kept 30 days; in organisation exports |
+| Personal account has more features | Use the approved workspace and Request the feature |
 | Policy doesn't mention the case | Ask the policy owner |
-| Consumer plan and training | Controlled by your privacy setting |
-| Team or Enterprise and training | Not used for training under commercial terms |
-| "The AI is responsible" | No: the person and organisation are |
-| Output describes people | Check for bias and fairness |
+| "The AI is responsible" | No; the sender and organisation are |

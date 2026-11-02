@@ -2,115 +2,129 @@
   "schemaVersion": "2.0",
   "id": "ccao-scenario-001",
   "title": "Harbour & Pine Sets Up Its Campaign Project",
-  "description": "A homeware retailer's marketing team moves from ad-hoc chats to a shared Claude Project for campaign copy. They have to brief Claude well, choose what goes into knowledge and what should be a connector, decide what needs review before it goes out, and handle a customer-data request safely.",
+  "description": "A homeware retailer's marketing team moves from separate chats to one shared Claude Project for a spring campaign that includes 120 in-store signs. They brief Claude for a data-to-copy task, set up the Project, choose between uploads and a live connector, trace a stale price, fit legal review to a print deadline, and keep customer identities out of a segment analysis.",
   "examId": "ccao",
   "difficulty": "medium",
-  "estimatedMinutes": 15,
+  "estimatedMinutes": 18,
   "domains": [
     1,
     2,
     5,
-    6
+    6,
+    7
   ],
   "taskIds": [
     "1.1",
-    "2.4",
     "5.1",
     "5.2",
+    "5.4",
+    "7.1",
+    "2.4",
     "6.2"
   ],
   "scenario": {
-    "background": "Harbour & Pine sells homeware online and in twelve shops. Its six-person marketing team has used Claude for six months, but everyone works differently: some paste the brand guide into every chat, others don't, and copy quality varies from one campaign to the next. The team is on a Claude Team plan. Next quarter brings a spring campaign across email, social and in-store signs, and the marketing lead wants one shared setup so every draft starts from the same brand voice, product facts and rules, without slowing the team down or creating new risks with customer data.",
+    "background": "Harbour & Pine's spring campaign launches in three weeks across email, social and 120 in-store signs, and every price and offer it states has to be right. The company is a homeware retailer with 12 shops, and its six-person marketing team uses Claude on a Team plan. Until now everyone has worked in their own chats, so some writers paste the brand guide every time, others don't, and copy quality varies from one campaign to the next. Maya, the marketing lead, wants one shared Project so every draft starts from the same voice, product facts and rules. Prices come from a product sheet that changes several times a week, and the CRM team holds the loyalty data the campaign will target.",
     "characters": [
       {
         "name": "Maya Okafor",
         "role": "Marketing Lead",
-        "concern": "She wants consistent, on-brand copy from everyone on the team, and less time spent re-explaining the brand to Claude."
+        "concern": "She wants the campaign to launch on time, with every writer working from the same shared setup."
       },
       {
         "name": "Leo Brandt",
         "role": "Content Writer",
-        "concern": "He writes most of the drafts and is frustrated that Claude's first attempts are generic."
+        "concern": "He writes most of the copy, including the 120 sign texts, and is tired of Claude's generic first drafts."
       },
       {
         "name": "Sana Iqbal",
         "role": "CRM Analyst",
-        "concern": "She owns the customer database and wants to use Claude to find patterns in purchase data for the campaign."
+        "concern": "She wants to target the campaign at loyalty members whose past purchases fit the spring range."
       },
       {
         "name": "Tom Reyes",
         "role": "Legal and Compliance Advisor",
-        "concern": "He signs off anything with promotional terms, prices or claims, and worries about customer data leaving approved tools."
+        "concern": "He signs off prices and offers, can review about 40 items before Friday's print deadline, and guards customer data."
       }
     ]
   },
   "questions": [
     {
       "id": "ccao-scenario-001-q1",
-      "stem": "Leo asks Claude, \"Write a spring email for our garden range.\" The draft is generic and twice as long as the email template allows. Which revised prompt would most improve the result?",
+      "stem": "Leo has the product team's export with four columns: SKU, product name, old price and new price. He needs 120 sign texts of up to 60 characters each. Which request will give him signs he can check and print?",
       "options": [
-        "Ask for the same email again with \"make it better\" added",
-        "Ask Claude to write five emails and pick the longest",
-        "Give the goal (drive visits to the garden range), the audience (existing customers who bought outdoor items last year), the 150-word limit, the three products and offer to feature, and the brand-voice rules",
-        "Ask Claude to research what spring means to customers"
+        "Paste the export and ask Claude to write short, punchy sign copy for each product in the spring range, ready to print",
+        "Name the columns, show one finished sign, give the 60-character limit and £0.00 format, and say to write 'price missing' rather than guess",
+        "Ask Claude for ten creative headline styles first, agree the strongest one with Maya, then paste the export and ask for the 120 signs in that style",
+        "Upload last year's spring signs with the export and ask Claude to work out the layout and price style from those examples"
       ],
-      "correct": 2,
-      "explanation": "C is correct: generic, overlong output signals missing context. Goal, audience, length, key facts and voice turn a vague request into a brief Claude can meet. A is wrong because \"better\" doesn't say what to change. B is wrong because more drafts from the same vague prompt don't fix the brief, and the longest one breaks the limit. D is wrong because research isn't the gap; the brief is."
+      "correct": 1,
+      "explanation": "A technical brief needs the columns, an example and the rules. B is correct: Claude works only from what's on the page, so naming the columns, showing one finished sign, and stating the limit, the price format and what to write when a price is missing gives signs Leo can check line by line. A is wrong because Claude fills every gap with a default. C is wrong because headline style isn't the gap. D is wrong because old signs may carry last year's rules."
     },
     {
       "id": "ccao-scenario-001-q2",
-      "stem": "Maya sets up a shared Project for the campaign. What should go in the Project's instructions, and what in its knowledge?",
+      "stem": "Maya creates the shared \"Spring campaign\" Project for the six-person team. Which setup gives each chat the same starting point without letting anyone quietly change the rules?",
       "options": [
-        "Instructions: the brand voice, audience and format rules for every chat. Knowledge: the brand guide, product fact sheets and approved example copy",
-        "Instructions: the full 40-page brand guide pasted in. Knowledge: nothing",
-        "Instructions: each writer's personal preferences. Knowledge: last year's customer list",
-        "Instructions: left empty, so Claude is free to be creative. Knowledge: every file the team has ever made"
+        "Instructions: the 40-page brand guide pasted in full. Knowledge: product fact sheets. Sharing: Maya and Leo \"Can edit\", the others \"Can view\"",
+        "Instructions: voice, audience, format and \"flag any price not in the current sheet\". Knowledge: brand guide, fact sheets, approved examples. Sharing: \"Can edit\" for the whole team so anyone can fix errors",
+        "Instructions: each writer's own style preferences. Knowledge: brand guide, fact sheets, examples. Sharing: Maya and Leo \"Can edit\", others \"Can view\"",
+        "Instructions: voice, audience, format and \"flag any price not in the current sheet\". Knowledge: brand guide, fact sheets, approved examples. Sharing: Maya and Leo \"Can edit\", others \"Can view\""
       ],
-      "correct": 0,
-      "explanation": "A is correct: Project instructions set standing behaviour for every chat, and knowledge holds the reference documents every chat can draw on. B is wrong because reference material belongs in knowledge, and long instructions are harder to follow. C is wrong because personal preferences belong in account instructions and a customer list raises data issues. D is wrong because no rules means inconsistent copy, and dumping every file adds outdated and conflicting material."
+      "correct": 3,
+      "explanation": "Rules go in instructions, reference files in knowledge. D is correct: instructions set how Claude behaves in each chat, knowledge holds the documents every chat draws on, and \"Can view\" lets the rest of the team use the Project without changing it. A is wrong because a 40-page guide belongs in knowledge, not instructions. B is wrong because \"Can edit\" for everyone lets anyone change the shared rules. C is wrong because personal preferences belong in each writer's account instructions."
     },
     {
       "id": "ccao-scenario-001-q3",
-      "stem": "The product team updates stock levels and prices in a Google Drive sheet several times a week. Leo has been downloading it and uploading it to the Project each Monday. What is the better approach?",
+      "stem": "The current prices live in a Google Sheet that the product team updates several times a week. Leo wants to add it from Drive to the shared Project's knowledge so it stays in sync. What should Maya tell him?",
       "options": [
-        "Connect Google Drive so Claude can read the current sheet from Leo's connected account, and keep stable reference files such as the brand guide as uploaded knowledge",
-        "Upload the sheet every day instead of every Monday",
-        "Paste the prices into the Project instructions",
-        "Ask Claude to estimate current prices from last month's sheet"
+        "Adding Drive files to knowledge works in private Projects, not shared ones, so writers read the live sheet via the Drive connector in the chat",
+        "Add the sheet from Drive to the Project's knowledge anyway, because a Google file added from Drive keeps syncing to its latest version for everyone",
+        "Download the sheet each Monday and upload the new copy to knowledge, so the Project holds this week's prices for the whole team",
+        "Paste the current prices into the Project instructions, and ask whoever changes a price in the sheet to update them there too"
       ],
       "correct": 0,
-      "explanation": "A is correct: connectors suit information that changes often, while uploads suit stable reference material. The connector only sees what Leo's account can access. B is wrong because daily uploads are still stale snapshots and repeated work. C is wrong because instructions are for rules, not changing data. D is wrong because estimates would produce wrong prices in customer copy."
+      "explanation": "Upload what rarely changes; connect what keeps changing. A is correct: adding Drive files to Project knowledge works in private Projects and is disabled in shared ones, so in this shared Project each writer uses the Drive connector in the chat, and Claude sees only what that writer's account can open. The brand guide and fact sheets stay uploaded. B is wrong because the option isn't available here. C is wrong because a Monday upload is stale by Wednesday. D is wrong because instructions hold rules, not changing data."
     },
     {
       "id": "ccao-scenario-001-q4",
-      "stem": "Claude drafts three pieces: an internal team update, social posts with no prices, and in-store signs that say \"30% off all garden furniture until 30 April\". Which needs Tom's review before use?",
+      "stem": "Two weeks later, three shop signs show last month's price for the oak garden bench, although the live sheet is correct. Leo's chats use the Drive connector, as agreed. How should Maya find and fix the cause?",
       "options": [
-        "The internal team update, because it goes to everyone in marketing",
-        "None of them, because the Project instructions were followed",
-        "The in-store signs, because they state a promotional offer and terms that carry legal and customer impact",
-        "All three need the same full legal review"
+        "Switch the Project's chats to a more capable model so Claude reads the live sheet more carefully, then reprint the three signs in the affected shops",
+        "Add \"use the newest prices you can find\" to the Project instructions, then ask Leo to regenerate the bench signs",
+        "Ask Claude which file the bench price came from, remove any old copy it names, add a dated note to the instructions and retest the sign",
+        "Ask Tom to check the price on each sign from now on, since the Project setup has shown it can't be trusted with prices"
       ],
       "correct": 2,
-      "explanation": "C is correct: review should match the stakes, and a public price promotion carries legal and customer risk. A is wrong because an internal update is low risk. B is wrong because following instructions doesn't remove the need to check claims and terms. D is wrong because full legal review of low-risk content wastes the expert's time."
+      "explanation": "Diagnose before you fix: one source per fact. C is correct: asking Claude which file it used is quick evidence for a source problem. Here it names a copy of the sheet Leo uploaded in week one \"as a backup\", a second, stale source. Removing it, recording the change, retesting the same sign and telling the team fixes the cause. A is wrong because a bigger model repeats a stale figure fluently. B is wrong because the old file stays readable. D is wrong because it treats the symptom."
     },
     {
       "id": "ccao-scenario-001-q5",
-      "stem": "Sana wants Claude to find which customer segments bought outdoor items last spring. The export includes names, emails, postcodes, purchase history and loyalty IDs. Tom reminds her that policy restricts sharing personal data. What should she do?",
+      "stem": "The signs print on Friday. Maya says the shops have booked the launch; Tom can properly review about 40 items by then and would rather delay. 30 signs state a price or offer, and 90 only describe products. What is the best plan?",
       "options": [
-        "Upload the full export, since the analysis stays inside the marketing team",
-        "Remove names, emails and loyalty IDs, keep only what the analysis needs (such as region, product category and purchase month), and use the company's Team workspace",
-        "Upload the full export and tell Claude not to remember it",
-        "Upload it to her personal account, which has memory turned off"
+        "Delay the launch until Tom has reviewed each of the 120 signs, since a wrong shelf price creates a legal problem for the shops",
+        "Print on Friday and have Tom review a random sample of 40 of the 120 signs, spreading his time evenly across the batch",
+        "Print on Friday without legal review, since the signs came from the Project's approved rules and the live price sheet",
+        "Tom fully reviews the 30 price and offer signs, authors check the 90 description signs, and Tom samples some of those"
       ],
-      "correct": 1,
-      "explanation": "B is correct: removing identifiers and sharing only the columns the task needs lets the analysis go ahead within policy, in the approved workspace. A is wrong because internal use isn't an exemption from policy. C is wrong because the data has already been shared once uploaded. D is wrong because a personal account is outside approved tools, whatever its settings."
+      "correct": 3,
+      "explanation": "Scale review to what each item states. D is correct: the deciding fact is that only 30 signs carry prices or offers, which fits Tom's capacity of about 40, so the risky category gets full review and the descriptions get an author check plus a sample, and Maya keeps her date. A is wrong because it holds up low-risk copy. B is wrong because a random sample can miss wrong prices. C is wrong because following Project rules isn't review, and the bench showed a stale price can slip through."
+    },
+    {
+      "id": "ccao-scenario-001-q6",
+      "stem": "Sana wants to upload the full loyalty export (names, emails, postcodes, purchase history, loyalty IDs) so Claude can find spring segments and then produce the list of customers to email. Tom points to the data policy. What should she do?",
+      "options": [
+        "Drop names and emails, swap loyalty IDs for a made-up key, keep region, category and month; Claude finds segments, Sana builds the list in the CRM",
+        "Upload the full export in the company's Team workspace, since that workspace is approved and the analysis stays in-house",
+        "Upload the full export, have Claude produce the segments and the email list, then ask it not to keep the customer details",
+        "Upload the export to her personal Pro account with memory turned off, so the customer details stay out of the team's shared workspace and chat history"
+      ],
+      "correct": 0,
+      "explanation": "Keep identities out of analysis that doesn't need them. A is correct: finding segments needs region, category and month, not who the customers are, so Sana removes names and emails, replaces loyalty IDs with a made-up key, and applies the chosen segments in the CRM herself. The customer list never goes into Claude. B is wrong because an approved workspace doesn't make unneeded identities necessary. C is wrong because data is shared once uploaded. D is wrong because a personal account sits outside approved tools."
     }
   ],
   "keyLearnings": [
-    "Generic or overlong drafts usually mean a thin brief: give goal, audience, format, key facts and voice.",
-    "In a Project, instructions set behaviour for every chat and knowledge holds the reference documents.",
-    "Use connectors for information that changes often and uploads for stable reference material.",
-    "Match review to stakes: public offers, prices and legal terms need expert sign-off; low-risk internal content doesn't.",
-    "Before uploading personal data, remove identifiers and share only what the task needs, in the approved workspace."
+    "A technical brief needs the columns, an example and the rules, including what to write when a value is missing.",
+    "Shared Projects take live files through connectors, not knowledge, while stable reference files stay uploaded.",
+    "Keep one source per fact: a stale backup copy is a second source, so trace an answer to its file before changing anything.",
+    "Scale review to what each item states, and keep identities out of analysis that doesn't need them."
   ]
 }

@@ -2,230 +2,463 @@
   {
     "domain": 5,
     "id": "ccao-d5-001",
-    "scenario": "A customer-support lead wants every agent's Claude chats to follow the same returns policy and reply style.",
+    "difficulty": "easy",
+    "scenario": "A customer-support lead on a Team plan wants every agent's Claude chats to follow the same returns policy and reply style.",
     "question": "What is the best setup?",
     "options": [
-      "Ask each agent to paste the policy at the start of every chat",
-      "A shared Project with the returns policy as knowledge and the reply rules as Project instructions",
-      "Put the returns policy in each agent's account instructions",
-      "Use an incognito chat so the policy isn't stored"
+      "Ask each agent to paste the returns policy and reply rules at the start of each chat",
+      "A shared Project with the policy as knowledge and the reply rules as instructions",
+      "Put the returns policy and reply rules in each agent's account instructions",
+      "Email the policy to each agent to upload whenever a returns question comes in"
     ],
     "correct": 1,
-    "explanation": "B is correct: a Project bundles instructions and knowledge so every chat in it starts from the same rules and documents, and it can be shared with the team. A is wrong because repeated pasting is error-prone and inconsistent. C is wrong because account instructions apply to all of a person's chats and aren't meant for reference documents. D is wrong because incognito chats aren't available in Projects and keep nothing.",
+    "explanation": "B is correct: a Project bundles instructions and knowledge, so each agent's chat in it starts from the same policy and rules. A is wrong because repeated pasting drifts, and busy agents skip it. C is wrong because account instructions apply to all of an agent's chats, and each copy goes out of date separately. D is wrong because ad hoc uploads leave each chat with whichever version that agent kept.",
     "tags": [
+      "scenario-based",
+      "application",
       "projects",
       "knowledge"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-002",
-    "scenario": "A team on a paid plan keeps adding documents to a Project, and its knowledge is approaching the context limit.",
-    "question": "What happens?",
+    "difficulty": "medium",
+    "scenario": "A translation agency on a paid plan keeps its client glossaries and style guides in one Project. The knowledge is nearly at the context limit, so the team plans to delete older reference files to make room.",
+    "question": "What should the team do?",
     "options": [
-      "The Project deletes the oldest files",
-      "The Project stops accepting chats",
-      "Retrieval (RAG) switches on automatically, letting the Project hold much more knowledge by searching it for the relevant parts",
-      "Claude reads only the first file"
+      "Delete the oldest glossaries so the newest ones still fit in the Project",
+      "Split the glossaries across several Projects, one per language pair",
+      "Keep the files and name them clearly; retrieval expands capacity",
+      "Paste the most-used glossaries into the instructions and remove the files"
     ],
     "correct": 2,
-    "explanation": "C is correct: on paid plans, Projects switch to retrieval automatically as knowledge nears the context limit, expanding capacity (up to about ten times). A is wrong because files aren't deleted. B is wrong because chats continue normally. D is wrong because retrieval searches across the knowledge.",
+    "explanation": "C is correct: on paid plans, retrieval switches on as knowledge nears the limit, so Claude searches the files and capacity grows up to about ten times; clear names help it find them. A is wrong because it throws away references translators still use. B is wrong because a chat in one Project can't use another Project's files. D is wrong because instructions are for rules, and long reference text there buries them.",
     "tags": [
+      "troubleshooting",
+      "application",
       "projects",
       "rag"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-003",
-    "scenario": "On a Team plan, a manager wants colleagues to use her Project but not change its instructions or files.",
-    "question": "Which sharing option fits?",
+    "difficulty": "medium",
+    "scenario": "On a Team plan, a zoo education team shares its \"School visits\" Project with \"Can edit\" access. Colleagues who only need to chat in it keep changing its instructions by accident.",
+    "question": "What is the best fix?",
     "options": [
-      "Share the Project with \"Can view\" access",
-      "Share it with \"Can edit\" access",
-      "Copy the instructions into each colleague's account settings",
-      "Make the Project public on the internet"
+      "Unshare the Project and email everyone copies of its knowledge files",
+      "Add \"Do not edit these instructions\" to the top of the Project instructions",
+      "Move the instructions into each colleague's account instructions instead",
+      "Change their access to \"Can view\" so they can still use and see the Project"
     ],
-    "correct": 0,
-    "explanation": "A is correct: \"Can view\" lets colleagues use the Project without changing its setup. B is wrong because edit access lets them change instructions and knowledge. C is wrong because copies drift and aren't maintained in one place. D is wrong because company Projects shouldn't be exposed publicly.",
+    "correct": 3,
+    "explanation": "D is correct: \"Can view\" lets colleagues chat in the Project and see its knowledge and instructions without changing them. A is wrong because each person would then work from loose copies with no shared instructions. B is wrong because the note is just text, and edit access still lets anyone change it. C is wrong because account instructions apply to all their chats and drift apart as each person edits their own copy.",
     "tags": [
+      "configuration",
+      "application",
       "projects",
       "sharing"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-004",
-    "scenario": "An executive assistant exports the boss's calendar to a file and uploads it to a Project every morning.",
+    "difficulty": "easy",
+    "scenario": "An executive assistant exports her boss's calendar to a file and uploads it to a Project every morning. Meetings often move during the day.",
     "question": "What is the better approach?",
     "options": [
-      "Connect Google Calendar so Claude can read the live schedule from the connected account",
-      "Upload the calendar twice a day instead",
-      "Paste the calendar into the Project instructions",
-      "Ask Claude to guess the schedule from previous weeks"
+      "Connect Google Calendar to read the live schedule",
+      "Upload a fresh calendar export twice a day instead of once",
+      "Paste each day's calendar into the Project instructions",
+      "Keep one weekly export in knowledge and mention changes in chat"
     ],
     "correct": 0,
-    "explanation": "A is correct: connectors suit information that changes often, such as calendars and email. B is wrong because more uploads are still stale snapshots. C is wrong because instructions are for rules, not daily data. D is wrong because guessing a schedule produces wrong answers.",
+    "explanation": "A is correct: a connector reads the live calendar through her account, so moved meetings show up as soon as they change. B is wrong because each upload is still a snapshot that goes stale between exports. C is wrong because instructions are for standing rules, and a daily paste is the same stale copy. D is wrong because chat mentions get missed, and the weekly file then contradicts them.",
     "tags": [
+      "best-practice",
+      "application",
       "connectors",
       "live-data"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-005",
-    "scenario": "With Gmail connected, Claude drafts a reply to a client.",
-    "question": "What happens by default before the email is sent?",
+    "difficulty": "medium",
+    "scenario": "A florist group's events assistant on a Pro plan has Gmail connected with the default settings. She asks Claude to \"send replies to all 12 wedding enquiries now\".",
+    "question": "What should she expect to happen?",
     "options": [
-      "Claude sends it immediately without asking",
-      "Claude sends it from a shared company account",
-      "Claude asks for the user's approval before sending",
-      "Claude forwards it to the user's manager for approval"
+      "Claude sends the 12 replies in one go because she asked for them",
+      "Claude can draft the replies in Gmail but cannot send any of them",
+      "Claude asks her to approve each send, so she reviews each draft",
+      "Claude sends the replies from the group's shared enquiries address"
     ],
     "correct": 2,
-    "explanation": "C is correct: by default, connector actions such as sending email ask for approval first. A is wrong because sending isn't automatic by default. B is wrong because a connector acts only for the connected account. D is wrong because Claude doesn't route approvals to managers.",
+    "explanation": "C is correct: with default settings, Claude asks for approval before sending, replying to or forwarding email, so she can check each draft before it goes. A is wrong because her request doesn't skip that default prompt. B is wrong because sending works once she approves it. D is wrong because the connector acts only through her own connected Google account, not a shared mailbox she hasn't connected.",
     "tags": [
+      "scenario-based",
+      "application",
       "connectors",
       "approvals"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-006",
-    "scenario": "A team member connects Google Drive and asks Claude to summarise a document that only her manager can access.",
-    "question": "What should she expect?",
+    "difficulty": "medium",
+    "scenario": "A port authority planning officer has Google Drive connected. She needs a summary of a berth-allocation report in her manager's Drive that only the manager can open.",
+    "question": "What is the best way to get the summary?",
     "options": [
-      "Claude can read any document in the company's Drive",
-      "Claude can access only what her connected account can access, so it can't read the manager's private document",
-      "Claude will request the file from the manager automatically",
-      "Claude will summarise it from the document's title"
+      "Ask Claude to request access to the report from her manager",
+      "Ask Claude to summarise the report from its title and folder name",
+      "Reconnect Drive using the authority's Drive administrator account",
+      "Ask her manager to share the report, or to run the summary herself"
     ],
-    "correct": 1,
-    "explanation": "B is correct: connectors only reach the connected account's data and permissions. A is wrong because connectors don't bypass sharing permissions. C is wrong because Claude doesn't request access on her behalf. D is wrong because summarising from a title would be guessing.",
+    "correct": 3,
+    "explanation": "D is correct: Claude inherits her Drive permissions, so it can open only what her connected account can open; sharing the file fixes that. A is wrong because Claude doesn't send access requests on her behalf. B is wrong because a title gives Claude nothing real to summarise, so it would guess. C is wrong because using an administrator account to get round sharing defeats the permissions the manager set.",
     "tags": [
+      "troubleshooting",
+      "application",
       "connectors",
-      "uploads",
       "scope"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-007",
+    "difficulty": "easy",
     "scenario": "A consultant wants every Claude chat to use British spelling and lead with the recommendation, whatever the topic.",
     "question": "Where should this preference go?",
     "options": [
-      "The instructions of one client Project",
-      "A knowledge file in every Project",
-      "The first message of each chat",
-      "Account instructions, which apply to all of her chats"
+      "The instructions of her largest client's Project",
+      "A style-guide file uploaded to each of her Projects",
+      "A reminder line at the start of each new chat",
+      "Her account instructions, in Settings > Your Claude"
     ],
     "correct": 3,
-    "explanation": "D is correct: preferences that apply everywhere belong in account instructions. A is wrong because Project instructions apply only within that Project. B is wrong because knowledge files are reference material, not rules. C is wrong because repeating it in every chat is what standing instructions avoid.",
+    "explanation": "D is correct: account instructions apply to all her conversations, so a preference she wants everywhere belongs there. A is wrong because Project instructions apply only to chats in that Project. B is wrong because knowledge files are reference material, and she'd have to maintain a copy in each Project. C is wrong because retyping it in each chat is what standing instructions remove, and she will forget some days.",
     "tags": [
+      "configuration",
+      "application",
       "instructions",
       "scope"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-008",
-    "scenario": "A bid team is writing the instructions for its client-proposals Project.",
+    "difficulty": "medium",
+    "scenario": "An IT consultancy bid team is writing the instructions for its client-proposals Project. Past drafts guessed at unclear tender requirements.",
     "question": "Which Project instruction is most effective?",
     "options": [
-      "\"Be professional and good.\"",
-      "\"Write for procurement managers. Lead with cost and timeline. Use the attached template's headings. If a requirement is unclear, list it under 'Questions for the client' rather than assuming.\"",
-      "\"Never make any mistakes.\"",
-      "\"Write proposals.\""
+      "Write polished, persuasive proposals in a confident, professional tone that impresses procurement teams",
+      "Write for procurement managers, lead with cost, follow the template, and list unclear points under 'Questions for the client'",
+      "Don't make assumptions or mistakes, and double-check each requirement carefully before you write",
+      "Follow the client's tender document closely and keep each proposal concise, clear and well organised"
     ],
     "correct": 1,
-    "explanation": "B is correct: effective instructions are specific and positive, name the audience and structure, and say what to do when information is missing. A is wrong because it's too vague to change behaviour. C is wrong because it isn't something Claude can act on. D is wrong because it adds nothing about how.",
+    "explanation": "B is correct: it names the audience, the priority, the structure and what to do when information is missing, so Claude has specific actions to take. A is wrong because 'polished' and 'persuasive' leave Claude guessing what the team wants. C is wrong because banning mistakes gives no method, so the guessing carries on. D is wrong because 'concise and clear' names no audience, structure or fallback for unclear requirements.",
     "tags": [
+      "best-practice",
+      "evaluation",
       "instructions",
       "writing"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-009",
-    "scenario": "A user's account instructions say \"always answer in bullet points\", but a Project requires full paragraphs for client letters. Results are inconsistent.",
+    "difficulty": "medium",
+    "scenario": "A user's account instructions say \"answer in bullet points\", but her client-letters Project says to write full paragraphs. Her letters now come out in a mix of both.",
     "question": "What is the best fix?",
     "options": [
-      "Add the same rule to the Project three times so it wins",
-      "Delete the Project",
-      "Ask Claude to choose whichever format it prefers",
-      "Make the instructions consistent: make the account preference conditional or remove it, and keep the letter format in the Project instructions"
+      "Add 'ignore my account instructions' to each client letter she requests",
+      "Move the paragraph rule into her account instructions as well",
+      "Clear her account instructions whenever she works in the Project",
+      "Make the bullet rule conditional; keep letter format in the Project"
     ],
     "correct": 3,
-    "explanation": "D is correct: conflicting standing instructions at different levels cause inconsistent output; each rule should sit at the level where it applies. A is wrong because repetition doesn't resolve a conflict. B is wrong because the Project is useful. C is wrong because it leaves the format unpredictable.",
+    "explanation": "D is correct: when two levels clash, make the broader rule conditional or remove it, so each rule applies where it fits. A is wrong because she must remember it in each request, and missed ones still come out as bullets. B is wrong because the paragraph rule would then fight the bullet rule in all her chats. C is wrong because clearing and restoring her preferences each time is fragile and easily forgotten.",
     "tags": [
+      "troubleshooting",
+      "analysis",
       "instructions",
       "conflicts"
-    ],
-    "difficulty": "hard"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-010",
-    "scenario": "A pricing policy changes. The Project now holds both the old and the new pricing file.",
+    "difficulty": "easy",
+    "scenario": "A dental practice group updates its fee schedule. The reception team's Project now holds both last year's and this year's fee schedule.",
     "question": "What should the Project owner do?",
     "options": [
-      "Remove the old file, keep the single current version, and note the change in the instructions",
-      "Keep both so nothing is lost",
-      "Rename the new file \"FINAL\" and keep both",
-      "Tell users to ignore the old file"
+      "Remove the old file and note the change in the Project instructions",
+      "Keep both files so the team can still look up last year's fees if asked",
+      "Rename the new file \"FINAL\" so Claude knows which one to use",
+      "Tell users to ignore the old file when they ask about fees"
     ],
     "correct": 0,
-    "explanation": "A is correct: one current version avoids Claude using conflicting sources. B is wrong because Claude may draw from either version. C is wrong because a file name doesn't stop Claude reading the old file. D is wrong because users can't control which file Claude uses.",
+    "explanation": "A is correct: one current version means one source, and a dated note tells users what changed. B is wrong because Claude may quote either schedule to a patient. C is wrong because a file name doesn't stop Claude reading and quoting the old figures. D is wrong because users can't control which file Claude draws on, so last year's fees still appear in answers.",
     "tags": [
+      "best-practice",
+      "application",
       "maintenance",
       "versions"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-011",
-    "scenario": "A shared Project is used by 40 people. Nobody has checked its files since it was created a year ago.",
+    "difficulty": "medium",
+    "scenario": "A shared Project at a bookshop chain is used by 40 staff. Nobody has checked its files since it was created a year ago.",
     "question": "Which practice best keeps it reliable?",
     "options": [
-      "Let anyone add files whenever they like",
-      "Delete the Project every year and start again",
-      "Assign an owner, set a review schedule, and test with a few standard questions after each update",
-      "Wait for users to complain"
+      "Give everyone \"Can edit\" so anyone can add files when they spot a gap",
+      "Delete the Project each year and rebuild it from the latest files",
+      "Name an owner, set a review date, and test set questions after updates",
+      "Ask each user to check the files they rely on and report problems"
     ],
     "correct": 2,
-    "explanation": "C is correct: an owner, a review schedule and testing keep a shared configuration current. A is wrong because unmanaged edits create duplicates and conflicts. B is wrong because it throws away good setup. D is wrong because a stale Project fails quietly, answering confidently from old information.",
+    "explanation": "C is correct: an accountable owner, a regular review and a few test questions after each change keep a shared Project current. A is wrong because unmanaged edits add duplicates and conflicting versions. B is wrong because it discards working setup and still leaves nobody responsible. D is wrong because forty people checking their own files gives no single view, so the gaps between them go unnoticed.",
     "tags": [
+      "best-practice",
+      "application",
       "maintenance",
       "ownership"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 5,
     "id": "ccao-d5-012",
-    "scenario": "The owner of a team Project updates the leave policy file and the instructions.",
+    "difficulty": "medium",
+    "scenario": "The owner of a team Project at a garden centre has just replaced the leave policy file and updated the instructions.",
     "question": "What else should she do?",
     "options": [
-      "Nothing; users will notice the answers changed",
-      "Ask users to re-upload the old policy in their chats",
-      "Test the Project with common leave questions and tell users what changed",
-      "Turn off memory for the whole team"
+      "Leave it there; users will notice when the answers change",
+      "Ask users to re-upload the old policy in chats for comparison",
+      "Delete the old chats so nobody sees the old answers",
+      "Test common leave questions and tell users what changed"
     ],
-    "correct": 2,
-    "explanation": "C is correct: after changes, test that answers are right and inform users so they know what changed. A is wrong because silent changes confuse users. B is wrong because it brings back outdated information. D is wrong because memory isn't related to the policy update.",
+    "correct": 3,
+    "explanation": "D is correct: testing standard questions confirms the Project now answers from the new policy, and telling users explains why answers changed. A is wrong because a silent change looks like an error, and nobody confirms it works. B is wrong because it brings the outdated policy back as a second source. C is wrong because past chats aren't the problem, and deleting them loses records people may need.",
     "tags": [
+      "best-practice",
+      "application",
       "maintenance",
       "communication"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-013",
+    "difficulty": "medium",
+    "scenario": "A coffee roaster's marketing lead pasted the company's 40-page brand guide into a Project's instructions, below the rules on voice, format and when to escalate.",
+    "question": "How should she restructure the Project?",
+    "options": [
+      "Leave the guide in the instructions, as instructions are read in each chat",
+      "Cut the guide down to its 10 key pages and keep it in the instructions",
+      "Move the guide into knowledge; keep the rules in the instructions",
+      "Remove the guide and upload it to each chat that needs brand detail"
     ],
-    "difficulty": "medium"
+    "correct": 2,
+    "explanation": "C is correct: instructions say how Claude behaves (voice, format, escalation), while reference documents belong in knowledge, which every chat in the Project can use. A is wrong because forty pages bury the few real rules. B is wrong because it still mixes reference text with rules and drops thirty pages of guidance. D is wrong because per-chat uploads repeat work and drift between versions.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "projects",
+      "knowledge"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-014",
+    "difficulty": "medium",
+    "scenario": "An insurance broker names a Project after one marine client and writes the client's details in its description. In chats, Claude doesn't seem to know which client the work is for.",
+    "question": "What should the broker change?",
+    "options": [
+      "Rename the Project with the client's full legal name",
+      "Write the client details in the Project instructions",
+      "Expand the Project description with more client detail",
+      "Mention the client in the first chat so later chats pick it up"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Claude can't see a Project's name or description, so anything it needs must sit in the instructions or knowledge. A is wrong because a clearer name is still invisible to Claude. C is wrong because Claude doesn't read the description either, however detailed. D is wrong because chats in a Project don't share each other's conversations, so later chats won't know the client.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "projects",
+      "instructions"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-015",
+    "difficulty": "hard",
+    "scenario": "On a Team plan, a film festival's programme manager goes on leave for a month. One co-owner must keep the Project's files up to date while she is away; ten other staff only need to use it.",
+    "question": "How should she set sharing before she leaves?",
+    "options": [
+      "Give the co-owner \"Can edit\" and the ten staff \"Can view\"",
+      "Give everyone \"Can edit\" so anyone can fix an outdated file",
+      "Give everyone \"Can view\" and update the files when she is back",
+      "Give the co-owner \"Can view\" and have changes emailed to the manager"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that only one person needs to change the Project, so only the co-owner gets \"Can edit\" while the rest can still use and see it. B is the tempting option, but it lets ten more people change instructions and files. C is wrong because the files would sit stale for a month. D is wrong because the manager is away, so every change waits for her return.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "projects",
+      "sharing"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-016",
+    "difficulty": "medium",
+    "scenario": "A courier start-up updated its prohibited-items list this month. Its customer-help Project still holds last year's PDF, which Claude keeps quoting.",
+    "question": "What should the Project owner do?",
+    "options": [
+      "Upload the new PDF next to the old one so both are available",
+      "Remove the old PDF from knowledge, then upload the new one",
+      "Tell Claude in a chat that the list changed this month and why",
+      "Rename the old PDF \"OLD - do not use\" and upload the new one"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: an upload is a fixed copy, so replacing it means removing the old file and adding the new one, leaving a single source. A is wrong because two versions are two sources, and Claude may quote either. C is wrong because a chat message stays in that chat and doesn't reach the Project's other chats. D is wrong because Claude can still read the renamed file and quote it.",
+    "tags": [
+      "configuration",
+      "application",
+      "uploads",
+      "versions"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-017",
+    "difficulty": "hard",
+    "scenario": "A municipal events team works in one shared Project. Claude needs the latest version of a Google Doc listing road closures, which the team updates daily.",
+    "question": "What is the best way to give Claude the current document?",
+    "options": [
+      "Add the Doc from Drive to the shared Project's knowledge so it syncs",
+      "Use the Drive connector to open the Doc in each chat that needs it",
+      "Upload the Doc once a week and put the date in its file name",
+      "Copy the day's closures into the Project instructions each morning"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that the Project is shared, and Drive files can be added to knowledge only in private Projects, so the connector reads the live Doc in the chat. A is tempting, as an added Doc syncs, but not in a shared Project. C is wrong because a weekly upload is stale the next day. D is wrong because instructions hold rules, and a daily paste is easily missed.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "connectors",
+      "live-data"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-018",
+    "difficulty": "medium",
+    "scenario": "A wine importer's sales assistant sets up a Project with three sources: a returns policy PDF that rarely changes, her Gmail inbox, and a price sheet in Google Drive updated weekly.",
+    "question": "Which setup fits these sources best?",
+    "options": [
+      "Upload the policy; connect Gmail and Drive for the inbox and price sheet",
+      "Upload the policy and the price sheet; connect Gmail for the inbox",
+      "Upload an inbox export and the price sheet; connect Drive for the policy",
+      "Upload the policy, the price sheet and a weekly export of the inbox"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: upload what rarely changes and connect what keeps changing, so the policy sits in knowledge while the inbox and weekly sheet are read live. B is wrong because the uploaded price sheet goes stale within a week. C is wrong because it's reversed: the changing sources become stale snapshots while the stable policy is fetched live. D is wrong because a weekly inbox export is out of date by the next day.",
+    "tags": [
+      "comparison",
+      "application",
+      "uploads",
+      "connectors"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-019",
+    "difficulty": "medium",
+    "scenario": "A recycling company's site supervisor sometimes needs incident write-ups in the firm's set layout, from whichever chat she is working in. Code execution is on.",
+    "question": "Where should the layout live?",
+    "options": [
+      "In her account instructions, so each chat can use it",
+      "In the instructions of her site-operations Project",
+      "As a skill that loads when she asks for a write-up",
+      "In a saved note she pastes in each time it's needed"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a skill is a saved procedure that loads only when a task calls for it, in any chat, and skills need code execution, which is on. A is wrong because account instructions apply to all her chats, including those with nothing to do with incidents. B is wrong because Project instructions apply only inside that Project. D is wrong because pasting relies on her remembering, and copies drift.",
+    "tags": [
+      "comparison",
+      "application",
+      "skills",
+      "instructions"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-020",
+    "difficulty": "hard",
+    "scenario": "An independent consultant wants British spelling everywhere, client A's terminology only in client A's work, and the firm's audit-report layout only when she asks for an audit report, for any client.",
+    "question": "Which setup puts each rule at the right level?",
+    "options": [
+      "Account: spelling. Client A Project: terms. Skill: audit layout",
+      "Account: spelling. Client A Project: terms and audit layout",
+      "Account: spelling and audit layout. Client A Project: terms",
+      "Account: spelling and client A terms. Skill: audit layout"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: spelling applies everywhere, client A's terms to one client, and the layout to any client on request, which is what a skill does. B is the tempting option, but the deciding constraint is 'for any client': Project instructions would trap the layout in client A's work. C is wrong because account instructions would apply the layout to each chat. D is wrong because client A's terms would leak into other clients' work.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "instructions",
+      "skills"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-021",
+    "difficulty": "hard",
+    "scenario": "A housing developer's sales team no longer uses its \"Show home launch\" Project. An external consultant whose contract has ended still has \"Can edit\" access to it.",
+    "question": "What should the Project owner do?",
+    "options": [
+      "Archive the Project, which ends her access along with the team's",
+      "Remove her in the sharing settings, then archive it if wanted",
+      "Leave it as it is, since nobody is using the Project any more",
+      "Change her access to \"Can view\" and then archive the Project"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding fact is that archiving keeps a Project's members and permission levels, so only removing her in sharing settings ends her access. A is the tempting option, but after archiving she would still reach its knowledge and chats. C is wrong because an unused Project is still open to every member. D is wrong because \"Can view\" still lets her read the instructions and knowledge after her contract has ended.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "maintenance",
+      "sharing"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccao-d5-022",
+    "difficulty": "hard",
+    "scenario": "A water utility's customer team relies on a Project that answers billing-dispute questions and is reviewed each quarter. Mid-quarter, the regulator shortens the complaint-response deadline.",
+    "question": "What should the Project owner do?",
+    "options": [
+      "Wait for the quarterly review, which is when Project changes are made",
+      "Email users about the new deadline and update the Project at review",
+      "Replace the quarterly review with updates when users report errors",
+      "Update the files now, test, tell users, and keep the quarterly review"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that the source has changed, so the Project is wrong now; update it, test common questions and tell users, while the schedule catches slower drift. A is the tempting option, but Claude would quote the old deadline for weeks. B is wrong because users know the new deadline while Claude keeps answering with the old one. C is wrong because waiting for reports lets errors reach customers first.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "maintenance",
+      "ownership"
+    ]
   }
 ]

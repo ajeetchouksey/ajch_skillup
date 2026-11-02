@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccao-scenario-004",
+  "title": "Brookfield College Uses Claude in Student Services",
+  "description": "A college student services team wants Claude's help with letters and casework that affect students' funding, places and wellbeing. The team must put standing rules at the right level, keep high-risk decisions with qualified people, follow the college's AI policy and handle a sensitive chat inside a Project. It must also respond to a fairness problem in drafted letters and recognise a step Claude shouldn't do.",
+  "examId": "ccao",
+  "difficulty": "hard",
+  "estimatedMinutes": 18,
+  "domains": [
+    3,
+    5,
+    6,
+    7
+  ],
+  "taskIds": [
+    "5.3",
+    "6.1",
+    "6.3",
+    "3.4",
+    "6.4",
+    "7.2"
+  ],
+  "scenario": {
+    "background": "Brookfield College's student services team handles bursaries, appeals and wellbeing cases for 6,000 students, and a wrong or unfair letter can cost a student their place or their funding. The college uses Claude on an Enterprise plan. Its owners have enabled memory and the Google Workspace connectors, but not third-party transcription connectors. The college's AI policy, owned by the governance lead, keeps student information in the college workspace and requires students to be told when AI helped with a letter about a decision. The team has a backlog of 300 letters and has just set up shared Projects for its main kinds of work.",
+    "characters": [
+      {
+        "name": "Grace Liu",
+        "role": "Student Services Manager",
+        "concern": "She wants to clear a backlog of 300 letters before the new term starts."
+      },
+      {
+        "name": "Owen Price",
+        "role": "Wellbeing Adviser",
+        "concern": "He is cautious about using Claude anywhere near sensitive student cases."
+      },
+      {
+        "name": "Farah Siddiqui",
+        "role": "Data and AI Governance Lead",
+        "concern": "She owns the college's AI policy and wants every use of Claude to stay within it."
+      },
+      {
+        "name": "Ben Clarke",
+        "role": "Admissions Officer",
+        "concern": "He wants admissions terms used correctly, and kept to admissions work."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccao-scenario-004-q1",
+      "stem": "Grace has three standing rules to set up: plain English and a support-contacts footer on every student letter the team writes, admissions terminology for admissions work, and her own preference for answer-first replies. Where should each rule go?",
+      "options": [
+        "Put the three rules in Grace's own account instructions, since she is the one setting them up",
+        "Letter rules in Student letters, admissions terms in Admissions, her preference in her account",
+        "Put the three rules in the shared Student letters Project so the whole team sees them together",
+        "Ask each adviser to add the footer rule and Ben's terms to their own personal account instructions"
+      ],
+      "correct": 1,
+      "explanation": "Write each rule once, at the level it applies. B is correct: plain English and the footer belong to the team's letters, so they go in the shared Student letters Project instructions; admissions terms go in the Admissions Project; and answer-first is Grace's own preference, so it goes in her account instructions. A is wrong because her account doesn't reach colleagues' chats. C is wrong because admissions terms would spill into other letters. D is wrong because separate copies drift apart."
+    },
+    {
+      "id": "ccao-scenario-004-q2",
+      "stem": "To clear the backlog, Grace proposes that Claude flags students at risk from attendance and grades and automatically sends letters suspending their bursary payments. Owen objects that a wrong flag could cost a student their place. What should the team do?",
+      "options": [
+        "Send the letters automatically, but tell students they can appeal any suspension afterwards",
+        "Automate the letters just for students whose attendance has fallen below 50 per cent",
+        "Write a stricter prompt with clearer thresholds before letting Claude send the letters",
+        "Have Claude draft case summaries, let an adviser decide each case, and tell students"
+      ],
+      "correct": 3,
+      "explanation": "Decisions about funding need a qualified person. D is correct: suspending a bursary affects a student's finances and education, which makes it a high-risk use, so a qualified adviser with authority to change the outcome decides each case, and students are told AI was involved. Grace's backlog is real, and summaries still save time. A is wrong because an appeal comes after the harm. B is wrong because a threshold adds no review. C is wrong because a better prompt doesn't replace a decision-maker."
+    },
+    {
+      "id": "ccao-scenario-004-q3",
+      "stem": "Owen wants transcripts of his student meetings. The college hasn't enabled any third-party transcription connector, but his personal Pro account has one. What should he do?",
+      "options": [
+        "Write up his notes in the college workspace, and ask Farah about transcription there",
+        "Use his personal account for the transcripts, with memory turned off for those chats",
+        "Use his personal account, then delete each chat as soon as the transcript is finished",
+        "Ask Claude in the college workspace whether the policy would allow his personal account"
+      ],
+      "correct": 0,
+      "explanation": "A personal account isn't the workaround. A is correct: the policy keeps student information in the college workspace, so Owen works from his own notes there and raises the need with Farah, the policy owner. On Enterprise, the connector's 'Request' button appears only if an owner has turned it on. B is wrong because a memory setting doesn't change where the data went. C is wrong because deleting the chat comes after the data left the college. D is wrong because Claude doesn't own the policy."
+    },
+    {
+      "id": "ccao-scenario-004-q4",
+      "stem": "A few weeks on, Owen's one long chat in the student letters Project has started mixing up details from different letters, and he wants the decisions made so far kept. What should he do?",
+      "options": [
+        "Keep going in the same chat and correct each mix-up as it appears, since the chat holds the background",
+        "Switch to a faster model in the same chat, which will cope better with the length of the conversation",
+        "Ask for a summary of decisions and open items, then start a new chat in the Project with it",
+        "Start a fresh chat with no summary carried over, so that no old detail can leak into the new letters"
+      ],
+      "correct": 2,
+      "explanation": "Restart with a summary. C is correct: long chats drift and use more of the usage limit, so a summary carries the decisions into a clean chat, and the Project's knowledge already holds the shared rules. A is wrong because the chat keeps growing, so the mix-ups continue. B is wrong because a different model doesn't fix an overlong chat. D is wrong because it throws away the decisions already made, which Owen would have to rebuild."
+    },
+    {
+      "id": "ccao-scenario-004-q5",
+      "stem": "Reviewing a month of drafts from the Student letters Project, Owen notices that letters to students who declared a disability are consistently more negative in tone than the rest. The facts in them are accurate. What should the team do?",
+      "options": [
+        "Correct those letters, check other letter types for the pattern, and fix the instructions",
+        "Add a line to those letters saying AI helped draft them, and send them as they are",
+        "Leave disability details out of future prompts and carry on drafting the rest of the backlog",
+        "Send the letters as they are, since the facts in them are accurate and were checked by advisers"
+      ],
+      "correct": 0,
+      "explanation": "Fairness is part of quality. A is correct: a consistent difference in tone towards disabled students is unfair treatment, so the team corrects those letters, checks other letter types for the same pattern, fixes the Project instructions and keeps following the college's disclosure rule. B is wrong because disclosure doesn't fix unfair wording. C is wrong because it leaves the drafted letters unfixed and may drop details a student's support depends on. D is wrong because accurate facts can still be framed unfairly."
+    },
+    {
+      "id": "ccao-scenario-004-q6",
+      "stem": "Two months on, advisers rewrite nearly every Claude-drafted paragraph explaining an appeal decision, because each one turns on the panel's own judgement. The standard sections of the letters need few changes. What should Grace do?",
+      "options": [
+        "Add more detailed instructions on appeal reasoning and keep Claude drafting that part",
+        "Move the appeal letters to the most capable model and set a higher effort level",
+        "Drop the adviser's review of appeal letters to win back the time that it takes them",
+        "Have the panel write the decision reasoning, and keep Claude for the standard parts"
+      ],
+      "correct": 3,
+      "explanation": "When results show Claude makes a step worse, take it out of that step. D is correct: two months of edits show the reasoning is rewritten almost every time because it depends on the panel's judgement, so the panel writes it and Claude keeps the standard sections it does well. A is wrong because instructions can't supply judgement the panel hasn't made. B is wrong because the gap isn't model capability. C is wrong because it lets weak reasoning reach students."
+    }
+  ],
+  "keyLearnings": [
+    "Put each standing rule at the level where it applies: your account for personal preferences, a Project for shared work.",
+    "Decisions about a person's funding or place need a qualified person with authority to change them, and disclosure that AI helped.",
+    "A personal account is never the workaround for a feature your organisation hasn't enabled; ask the policy owner instead.",
+    "When results show Claude makes a step worse, take Claude out of that step rather than adding more instructions."
+  ]
+}

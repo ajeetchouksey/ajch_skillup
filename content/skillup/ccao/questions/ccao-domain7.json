@@ -2,171 +2,289 @@
   {
     "domain": 7,
     "id": "ccao-d7-001",
-    "scenario": "A sales Project keeps quoting last year's discount. Reps have tried rewording their questions.",
-    "question": "What is the most likely cause, and fix?",
+    "difficulty": "medium",
+    "scenario": "An insurance broker's renewals Project should reply with a comparison table, but replies keep coming back as bullet lists. The table rule is the last line of a long instruction block, and the user's account instructions say \"answer in bullet points\".",
+    "question": "What is the most likely cause, and the fix?",
     "options": [
-      "The questions are too short; ask longer questions",
-      "The model is too small; switch to the most capable model",
-      "Claude is broken; stop using the Project",
-      "An outdated or duplicate pricing file in the Project's knowledge; replace it with the single current version"
+      "The model can't hold the format rule; switch to a more capable model",
+      "A buried rule clashing with the account instruction; move it up and resolve the clash",
+      "Claude loses track of Project rules; paste the table rule into each prompt",
+      "The chat history is confusing Claude; start a new chat in the same Project"
     ],
-    "correct": 3,
-    "explanation": "D is correct: wrong facts usually trace back to a missing or stale source, and fixing the source fixes every chat. A is wrong because rewording doesn't change the source Claude uses. B is wrong because a bigger model answers just as confidently from the same wrong file. C is wrong because the cause is fixable.",
-    "tags": [
-      "diagnosis",
-      "knowledge"
-    ],
-    "difficulty": "medium"
+    "correct": 1,
+    "explanation": "B is correct: an ignored rule points to the instructions, and here it's buried at the end and clashes with the account instruction to use bullet points. Moving it up, making it specific and resolving the clash fixes it across the Project. A is wrong because a bigger model faces the same conflict. C is wrong because pasting it each time treats the symptom. D is wrong because a new chat inherits the same instructions.",
+    "tags": ["troubleshooting", "analysis", "diagnosis", "instructions"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-002",
-    "scenario": "Claude's replies to a request for a project update are generic and could apply to any project.",
+    "difficulty": "easy",
+    "scenario": "In a new chat, a coordinator types one line: \"Write this week's project update.\" The reply is generic and could describe any project.",
     "question": "What is the most likely cause?",
     "options": [
-      "The prompt is missing context: the project's details, audience and goal",
-      "Claude's usage limit has been reached",
-      "The chat needs to be in incognito mode",
-      "The output needs to be an artifact"
+      "The prompt gives no project details, audience or goal",
+      "Claude's usage limit has been reached on this account",
+      "The model is too small to write a useful project update",
+      "The chat has run too long for Claude to stay focused"
     ],
     "correct": 0,
-    "explanation": "A is correct: generic output is the classic symptom of missing context, so the fix is in the prompt. B is wrong because usage limits stop responses rather than making them generic. C is wrong because incognito affects saving, not quality. D is wrong because the format isn't the cause.",
-    "tags": [
-      "diagnosis",
-      "prompt"
-    ],
-    "difficulty": "easy"
+    "explanation": "A is correct: generic output is the classic symptom of missing context, and a one-line request gives Claude nothing specific to work with. B is wrong because a usage limit stops replies rather than making them generic. C is wrong because a bigger model has no more project details to draw on. D is wrong because the chat is brand new, so its length can't be the cause.",
+    "tags": ["troubleshooting", "comprehension", "diagnosis", "prompt"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-003",
-    "scenario": "An analyst's monthly report prompt has started producing worse results. She plans to rewrite the prompt, switch models and add new files all at once.",
+    "difficulty": "hard",
+    "scenario": "An analyst's monthly report prompt has started producing worse results. She plans to rewrite the prompt, switch models and add new files all at once, and next month she'll need to know what fixed it.",
     "question": "Why is this a poor approach?",
     "options": [
-      "Prompts should never be changed once written",
-      "Claude can't use new files and a new model together",
-      "Changing several things at once makes it impossible to tell which change fixed, or caused, the problem",
-      "Switching models deletes the Project"
+      "A new model needs the new files loaded before it can work well",
+      "Claude can't use newly added files and a newly chosen model together",
+      "Changing three things at once hides which one fixed or caused it",
+      "Rewriting the prompt resets the memory the Project has built up"
     ],
     "correct": 2,
-    "explanation": "C is correct: diagnose, then change one thing at a time and retest with the same input, so you know what worked. A is wrong because prompts should improve over time. B is wrong because files and models can be changed together; the issue is diagnosis. D is wrong because changing model doesn't affect the Project.",
-    "tags": [
-      "diagnosis",
-      "one-change"
-    ],
-    "difficulty": "hard"
+    "explanation": "C is correct: her constraint is knowing what fixed it, and only changing one thing and retesting with the same input shows that. A is wrong because a model works with whatever files the chat or Project already holds. B is wrong because files and models can be changed together; the problem is diagnosis. D is wrong because editing a prompt doesn't touch the Project's memory.",
+    "tags": ["anti-pattern", "evaluation", "diagnosis", "one-change"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-004",
-    "scenario": "Editors make the same correction to Claude's newsletter drafts every week: product names in the wrong case.",
+    "difficulty": "easy",
+    "scenario": "Claude drafts a weekly newsletter in a team Project, and editors make the same correction every week: product names in the wrong case.",
     "question": "What is the best response?",
     "options": [
-      "Keep correcting each draft by hand",
-      "Stop using Claude for newsletters",
-      "Add the product-name list and the rule to the Project instructions so the fix applies every time",
-      "Ask a different editor to do the corrections"
+      "Keep correcting the product names by hand in each draft",
+      "Remind Claude of the correct casing in each week's chat",
+      "Hand the corrections to a second editor to share the load",
+      "Add the name list and casing rule to Project instructions"
     ],
-    "correct": 2,
-    "explanation": "C is correct: recurring feedback points to a setup change, which prevents the issue instead of fixing it each time. A is wrong because it repeats the same work indefinitely. B is wrong because the issue is easy to fix. D is wrong because it moves the work rather than removing it.",
-    "tags": [
-      "feedback",
-      "setup"
-    ],
-    "difficulty": "easy"
+    "correct": 3,
+    "explanation": "D is correct: a recurring fix belongs in the setup, at the lowest level that stops it recurring, so each draft starts with the right names. A is wrong because the same work repeats every week. B is wrong because a chat reminder fixes one chat, not next week's. C is wrong because it moves the work to someone else rather than removing it.",
+    "tags": ["best-practice", "application", "feedback", "setup"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-005",
+    "difficulty": "medium",
     "scenario": "A team wants Claude's approved drafts to publish automatically to the company website, which requires connecting to the content management system.",
     "question": "What is the appropriate step for an Associate?",
     "options": [
-      "Escalate the integration to Claude Architects or Developers with clear requirements",
-      "Build the integration themselves through trial and error",
-      "Paste website admin passwords into the Project instructions",
-      "Give up on publishing drafts"
+      "Hand it to Claude Architects or Developers with clear requirements",
+      "Build the connection themselves by trial and error until it works",
+      "Ask Claude for a script and run it on the web server themselves",
+      "Drop auto-publishing and keep copying drafts to the site by hand"
     ],
     "correct": 0,
-    "explanation": "A is correct: technical integrations are beyond the Associate scope and should be escalated with clear requirements. B is wrong because untested integrations risk errors and security problems. C is wrong because credentials should never go into instructions. D is wrong because the goal is achievable through the right people.",
-    "tags": [
-      "escalation"
-    ],
-    "difficulty": "medium"
+    "explanation": "A is correct: connecting Claude to another system is an integration, which Associates escalate with clear requirements rather than build. B is wrong because a trial-and-error build creates something nobody can support or secure. C is wrong because running unreviewed code on a live server is the same unsupported build with more risk. D is wrong because the goal is achievable through the right team.",
+    "tags": ["scenario-based", "application", "escalation"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-006",
-    "scenario": "After trying Claude for a month to draft legal contract clauses, the team's lawyer rewrites almost every draft, and it now takes longer than writing from scratch.",
+    "difficulty": "medium",
+    "scenario": "After a month of refining prompts for legal contract clauses, the team's lawyer still rewrites almost every draft, and it now takes longer than writing from scratch.",
     "question": "What is the best adjustment?",
     "options": [
-      "Keep going, because AI always improves results eventually",
-      "Remove the lawyer's review to save time",
-      "Ask Claude to write longer clauses",
-      "Stop using Claude for that step, or narrow its role (for example, summarising contracts) where results show it helps"
+      "Keep going for another quarter to see whether results improve",
+      "Remove the lawyer's review step so drafts go out faster",
+      "Ask Claude to write longer clauses with more detail in each",
+      "Take Claude off drafting, or narrow it to summarising contracts"
     ],
     "correct": 3,
-    "explanation": "D is correct: adjusting based on results includes removing Claude from steps where it doesn't help, or refocusing it where it does. A is wrong because the evidence shows no gain. B is wrong because legal review is essential. C is wrong because length doesn't address quality.",
-    "tags": [
-      "feedback",
-      "results"
-    ],
-    "difficulty": "medium"
+    "explanation": "D is correct: the results show this step is slower with Claude, so take it out of that step or narrow its role to where it helps. A is wrong because a month of evidence already shows no gain, and waiting isn't a plan. B is wrong because the lawyer's review is what makes the clauses safe to use. C is wrong because length doesn't fix quality.",
+    "tags": ["scenario-based", "evaluation", "feedback", "results"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-007",
+    "difficulty": "easy",
     "scenario": "A recruiter sends Claude ten separate short messages about each candidate's CV, one question at a time.",
     "question": "What is a more efficient approach?",
     "options": [
-      "Send each question in a new chat",
-      "Batch the related questions about each candidate into a single message",
-      "Ask each question twice to be sure",
-      "Use the most capable model for every message"
+      "Keep the messages short so each reply comes back faster",
+      "Put each candidate's questions together in one message",
+      "Send each question in a new chat so answers stay focused",
+      "Use a more capable model so fewer follow-ups are needed"
     ],
     "correct": 1,
-    "explanation": "B is correct: batching related questions reduces the number of messages and repeated context. A is wrong because new chats lose context and still multiply messages. C is wrong because it doubles the work. D is wrong because it adds cost without addressing the message count.",
-    "tags": [
-      "efficiency",
-      "batching"
-    ],
-    "difficulty": "easy"
+    "explanation": "B is correct: batching related questions about one candidate cuts the number of messages and the repeated context. A is wrong because many short messages are exactly what multiplies usage. C is wrong because each new chat loses the CV context and still multiplies messages. D is wrong because a heavier model uses more of the limit without reducing the message count.",
+    "tags": ["best-practice", "application", "efficiency", "batching"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-008",
+    "difficulty": "medium",
     "scenario": "A team uploads the same 50-page handbook into new chats several times a day.",
     "question": "Which change saves the most effort and usage?",
     "options": [
       "Upload a shorter version of the handbook each time",
       "Paste the handbook as text instead of uploading it",
-      "Upload it to every chat twice so Claude reads it more carefully",
-      "Put the handbook in a Project's knowledge, where it's reused across chats"
+      "Keep one long chat with the handbook and ask everything there",
+      "Put the handbook in a Project's knowledge for reuse across chats"
     ],
     "correct": 3,
-    "explanation": "D is correct: Project knowledge is reused across chats, and project content is cached, so repeated use counts less against usage than uploading it fresh. A is wrong because it still repeats the upload and loses content. B is wrong because pasting is still repeated work. C is wrong because it doubles the cost.",
-    "tags": [
-      "efficiency",
-      "projects"
-    ],
-    "difficulty": "medium"
+    "explanation": "D is correct: Project knowledge is reused across chats, and Project content is cached, so it counts less against usage when reused. A is wrong because it still repeats the upload and loses content. B is wrong because pasting is the same repeated work. C is wrong because an ever-longer chat uses more of the limit and starts mixing up details.",
+    "tags": ["best-practice", "application", "efficiency", "projects"]
   },
   {
     "domain": 7,
     "id": "ccao-d7-009",
+    "difficulty": "medium",
     "scenario": "A team switches its weekly report to a faster model and halves the time it takes, but managers now find errors in every report.",
     "question": "How should this be judged?",
     "options": [
-      "It's a success, because the report is faster",
-      "It isn't a real optimisation: efficiency only counts if quality still meets the need",
-      "It's a success if fewer messages were sent",
-      "It doesn't matter, because managers can fix the errors"
+      "A success, because the report now takes half the time to produce",
+      "Not an optimisation, since quality no longer meets the need",
+      "A success, as long as fewer messages are being sent each week",
+      "Acceptable, because managers can correct the errors as they review"
     ],
     "correct": 1,
-    "explanation": "B is correct: optimising a workflow means keeping quality while reducing time or usage. A is wrong because speed with errors isn't effective. C is wrong because message count isn't the goal. D is wrong because it moves work to managers rather than saving it.",
-    "tags": [
-      "efficiency",
-      "quality"
+    "explanation": "B is correct: an optimisation keeps quality while cutting time or usage, and errors in every report mean it no longer meets the need. A is wrong because speed with errors isn't effective. C is wrong because fewer messages alone isn't success. D is wrong because it moves the work to managers instead of saving it. The fix is to restore quality, then sample it.",
+    "tags": ["anti-pattern", "evaluation", "efficiency", "quality"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-010",
+    "difficulty": "medium",
+    "scenario": "A dental practice group's HR Project tells staff they get 25 days' annual leave, but the entitlement rose to 27 in April. The updated policy was added to the Project's knowledge last month.",
+    "question": "What should the Project owner do first?",
+    "options": [
+      "Ask staff to word their questions around the April policy",
+      "Add \"use the latest policy\" to the Project instructions",
+      "Ask which file it used, then remove the stale or duplicate copy",
+      "Switch to a more capable model that can tell which file is newer"
     ],
-    "difficulty": "medium"
+    "correct": 2,
+    "explanation": "C is correct: wrong facts usually trace to the source, and here the old policy likely still sits beside the new one. Asking which file Claude used gives quick evidence, and removing the stale copy fixes it for everyone. A is wrong because rewording doesn't change the files. B is wrong because both versions still compete. D is wrong because a bigger model repeats the stale figure more fluently.",
+    "tags": ["troubleshooting", "application", "diagnosis", "knowledge"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-011",
+    "difficulty": "medium",
+    "scenario": "A conference organiser has spent three hours in one chat planning a 40-session programme. Early answers were accurate, but Claude now mixes up which speaker is in which room.",
+    "question": "What is the best next step?",
+    "options": [
+      "Correct each mix-up in the chat as soon as it appears",
+      "Switch to the fastest model so the long chat keeps up",
+      "Paste the original speaker list back into the same chat",
+      "Summarise the decisions and carry on in a fresh chat"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: details mixing up late in a long chat is the symptom of chat length, so ask for a summary of the decisions, check it, and restart. A is wrong because new mix-ups keep coming while the chat grows. B is wrong because a faster model doesn't shorten the chat. C is wrong because pasting more makes the chat longer still.",
+    "tags": ["troubleshooting", "application", "diagnosis", "long-chat"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-012",
+    "difficulty": "medium",
+    "scenario": "A water utility analyst gives Claude a complete brief, the complaints data and a step-by-step method for linking complaint spikes to burst mains. The reply follows the steps, but its reasoning is shallow.",
+    "question": "What should the analyst change?",
+    "options": [
+      "Raise the effort level, or step up the model if that falls short",
+      "Add more background documents to give Claude extra context",
+      "Rewrite the prompt in capitals so Claude takes the steps seriously",
+      "Start a new chat and paste in the same brief and data"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: shallow reasoning on a well-briefed, multi-step task points to effort and model, not input. Raising effort makes Claude more thorough, and stepping up the model comes next. B is wrong because the brief is already complete. C is wrong because capitals add emphasis, not reasoning depth. D is wrong because a new chat with the same input gives the same depth.",
+    "tags": ["troubleshooting", "analysis", "diagnosis", "effort"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-013",
+    "difficulty": "hard",
+    "scenario": "At a courier start-up, a customer-team member's complaint-reply prompt gave tailored answers yesterday in the team's Project, which holds the delivery policies. Today she runs the same prompt in a plain chat and gets generic replies.",
+    "question": "What should she change first?",
+    "options": [
+      "Switch the plain chat to a more capable model",
+      "Add more detail and examples to the prompt itself",
+      "Run the prompt inside the team's Project again",
+      "Start another plain chat and run the same prompt"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the decider is that the same prompt worked with the Project's context, so the missing piece is the policies in Project knowledge, not model power. A is wrong because a bigger model still has no policies to draw on. B is wrong because the prompt itself already worked. D is wrong because a fresh plain chat still lacks the policies.",
+    "tags": ["troubleshooting", "evaluation", "diagnosis", "projects"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-014",
+    "difficulty": "medium",
+    "scenario": "An IT consultancy bid team added its scoring rules to Project instructions, and the formatting edits stopped. On complex tenders, though, Claude's risk analysis still misses how requirements depend on each other.",
+    "question": "What is the next step?",
+    "options": [
+      "Raise effort or move to a more capable model for those tenders",
+      "Add the same scoring rules to the instructions a second time",
+      "Have bid writers rewrite each risk analysis by hand before it's sent",
+      "Escalate the analysis problem to the company's developers"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the setup fix worked for the recurring format issue, so the remaining gap is a quality ceiling, the next rung up: model, effort or feature. B is wrong because repeating a rule adds nothing the instructions lack. C is wrong because hand fixes spend the time Claude saved. D is wrong because developers handle integrations and custom builds, not reasoning depth.",
+    "tags": ["scenario-based", "application", "feedback", "effort"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-015",
+    "difficulty": "hard",
+    "scenario": "A wine importer's Project summarises supplier contracts. Its instructions have been updated twice, yet 30% of summaries still miss how clauses interact, and reviewers say the reasoning is shallow.",
+    "question": "What should the team try next?",
+    "options": [
+      "Add a third, more detailed instruction on how clauses interact",
+      "Raise effort, then step up the model if summaries still fall short",
+      "Have reviewers correct the clause links in each summary by hand",
+      "Split each contract into single clauses and summarise them apart"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the decider is that two instruction updates haven't helped and reviewers call the reasoning shallow, so it's a depth problem, not a missing rule. Climb to effort, then the model. A is wrong because a third rule adds to a layer that has failed twice. C is wrong because hand fixes undo the time saved. D is wrong because summarising clauses apart hides the interactions.",
+    "tags": ["scenario-based", "evaluation", "feedback", "effort"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-016",
+    "difficulty": "medium",
+    "scenario": "Every Monday, a cinema chain's programming assistant retypes the same long request asking Claude to turn the weekend's ticket figures into a summary for managers.",
+    "question": "Which change saves the most effort?",
+    "options": [
+      "Keep one ongoing chat for the summaries, week after week",
+      "Put the request in account instructions so it applies everywhere",
+      "Save the request as a prompt template and reuse it",
+      "Ask Claude to remember the request for next Monday"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a recurring request is what a prompt template is for, so she pastes the saved wording and adds the new figures. A is wrong because an endless chat grows longer, uses more of the limit and mixes up weeks. B is wrong because account instructions apply to all her conversations, not just Monday's. D is wrong because memory isn't a saved prompt she can check and reuse word for word.",
+    "tags": ["best-practice", "application", "efficiency", "templates"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-017",
+    "difficulty": "medium",
+    "scenario": "A florist group's events planner needs Claude's help with a wedding order: the budget, the venue's rules, the couple's colour notes and a costed flower list as a table. A similar order last week took 14 follow-up messages.",
+    "question": "How should she approach today's request?",
+    "options": [
+      "Plan one complete message: context, questions and format",
+      "Send each question as it occurs to her while she works",
+      "Send a short request first and refine it over many turns",
+      "Split the request across separate chats, one per topic"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: planning the request up front, with the context, the questions and the table format in one message, cuts the back-and-forth that cost 14 follow-ups. B is wrong because drip-fed questions are what caused the follow-ups. C is wrong because a thin first request makes more turns likely. D is wrong because separate chats don't share context, so each needs the details again.",
+    "tags": ["best-practice", "application", "efficiency", "batching"]
+  },
+  {
+    "domain": 7,
+    "id": "ccao-d7-018",
+    "difficulty": "hard",
+    "scenario": "An e-bike retailer moved its order-confirmation summaries to a lighter model to save usage. A 20-summary sample finds 2 missing the delivery date, which customers rely on to plan their day.",
+    "question": "What should the team do?",
+    "options": [
+      "Keep the lighter model, since 90% of the summaries are fine",
+      "Move them back to the heavier setting until a sample passes",
+      "Keep the lighter model and let customers ask for missing dates",
+      "Keep the lighter model and judge it by the usage it saves"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the decider is that customers rely on the delivery date, so a 10% miss rate on that field isn't acceptable quality. Move back, or add a check, until a sample passes. A is wrong because 90% isn't good enough for a field customers depend on. C is wrong because it moves the work to customers. D is wrong because faster but worse isn't an optimisation.",
+    "tags": ["scenario-based", "evaluation", "efficiency", "quality"]
   }
 ]

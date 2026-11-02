@@ -1,10 +1,10 @@
 # D3: Product and Model Selection
 
-> **Exam weight**: 12% · **Questions**: ~12 in the bank
+> **Exam weight**: 12% · **Questions**: 22 in the bank
 
 ## Overview
 
-This domain covers choosing the right part of Claude for the job: a plain chat, a Project, Research or an artifact; Haiku, Sonnet or Opus; the effort and thinking settings; and how to work within the limits of context and memory by knowing when to restart, summarise or save something for later.
+This domain is about choosing the right part of Claude for the job and keeping long work on track. The first lesson covers features: chat, Projects, Research, artifacts, code execution and skills. The next two cover models and effort, and the last covers context and memory. The AI Fluency competency at work is **Delegation**: deciding what to hand to which tool.
 
 > 💡 **Human Angle**: The most capable option isn't the best one for every task. A quick reply doesn't need deep research, and a hundred short drafts don't need the biggest model.
 
@@ -14,49 +14,52 @@ This domain covers choosing the right part of Claude for the job: a plain chat, 
 
 ### Key Concept
 
-**Use chat for one-off tasks, Projects for repeated work with the same context, Research for questions that need many sources, and artifacts for things you'll keep, edit or share.**
+**Pick the lightest feature that fits the shape of the work.**
 
-A **chat** is the quickest route for a single task. A **Project** keeps instructions and knowledge files together, so every chat in it starts with the same context, which makes it ideal for ongoing work like a client account or a team handbook. **Research** runs multiple searches, follows up on what it finds and returns a cited report; it needs web search turned on and is available on paid plans. An **artifact** is a self-contained output beside the chat, such as a document, dashboard or small tool, that you can refine, export and share.
+The shape comes from three questions: is the work one-off or recurring, does it draw on one source or many, and will you read the output once or keep it? Heavier features cost setup, time or usage, so they only pay off when the work needs them.
 
-**Think of a phone call, a shared folder, a research assistant and a finished handout**: each suits a different kind of work.
+**Think of a phone call, a shared folder, a research assistant and a finished handout**: you wouldn't send a research assistant to check a shop's opening hours.
 
-![Matching the need to the feature: a quick one-off question goes to chat, recurring work with the same files and rules to a Project, a question spread across many sources to Research, and something to keep, edit or share to an artifact.](/content/skillup/ccao/images/ccao-3-1-features.svg)
+![A decision path for choosing a feature: recurring files and rules lead to a Project, an answer spread across many sources to Research, numbers to calculate from a file to code execution, something to keep or share to an artifact, and otherwise a plain chat with web search; a procedure repeated the same way is a skill.](/content/skillup/ccao/images/ccao-3-1-features.svg)
 
 ### Real use
 
-An account manager uses a chat to reword one email, a Project for the client account (with the contract, brand guidelines and account history loaded), Research to prepare for a meeting with a prospect in a new industry, and an artifact for the quarterly review deck she keeps updating.
+A partnerships lead at a semi-professional football club writes one sponsor email in chat, runs the sponsorship season from a Project and uses Research to scan a new sector. Code execution charts her uploaded match-day attendance CSV (a plain file of rows and columns that spreadsheets open), and the club's brand-format skill styles the sponsor deck.
 
 ### How it works
 
-- **Chat:** fastest; context lasts only for that conversation.
-- **Projects:** instructions plus knowledge files shared across all chats in the Project.
-- **Research:** multi-step searching with citations; needs web search on; paid plans. On mobile it searches the web only, not your connectors.
-- **Artifacts:** documents, dashboards and tools beside the chat; need the code execution setting enabled.
-- **Web search:** current information for a normal chat.
+Someone runs Research for a quick opening-hours check and waits for a long report, while retyping the same contract into a new chat every Monday.
+
+- **Chat and web search:** fastest for one-off tasks; context lasts only for that chat. Web search adds current facts, with citations in every response.
+- **Project:** instructions and knowledge files shared by every chat in it (see 5.1).
+- **Research:** several searches that build on each other. Paid plans only, with web search on; it uses limits faster, runs on its own model whatever you picked, and on Mobile searches only the web.
+- **Make and run:** artifacts open beside the chat for things you'll keep, edit or share. Code execution runs code on an uploaded file, such as analysing and charting a CSV, and creates Excel, Word, PowerPoint or PDF files. Skills are saved procedures Claude loads only when a task needs them: built-in ones handle those file types, and custom ones capture things like your brand format. All three need the **Code execution and file creation** setting.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Chat | One-off task | Context isn't reused |
-| Project | Same files and rules, many chats | Needs setting up and maintaining |
-| Research | Answer spread across many sources | Slower; verify citations |
-| Artifact | You'll reuse, edit or share the output | Depends on settings |
+| Chat (with web search) | A one-off task or a quick current fact | Context isn't reused |
+| Project | The same files and rules recur across many chats | Needs setting up and keeping current |
+| Research | The answer is spread across many sources | Slower; uses limits faster; open the sources |
+| Artifact | You'll keep, edit or share the output | Needs the setting on |
+| Code execution on an uploaded file | Numbers must be calculated or charted from real data | Check the method and a few results |
+| Skill | A task must be done the same way every time | Someone must build and maintain it |
 
 ### How to do it
 
-1. Ask: is this one-off, recurring, multi-source or something to keep?
-2. Pick chat, Project, Research or artifact accordingly.
-3. Turn on web search before using Research.
+1. Ask: one-off or recurring, one source or many, read or keep?
+2. Pick the lightest feature that fits.
+3. Check that the setting it needs is on.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">Re-uploading the same reference files into a new chat every week is the classic sign you need a Project. And Research isn't needed for a quick fact; a normal chat with web search is faster.</div>
+<div class="note-trap">Using Research for a quick fact that web search answers in seconds burns time and usage on a long report nobody needed.</div>
 
 ### Go deeper
 
-- [What are projects?](https://support.claude.com/en/articles/9517075-what-are-projects)
-- [Use Research on Claude](https://support.claude.com/en/articles/11088861-use-research-on-claude)
+- [Claude 101 (Anthropic Academy)](https://anthropic.skilljar.com/claude-101)
+- [Use research on Claude](https://support.claude.com/en/articles/11088861-use-research-on-claude)
 
 ---
 
@@ -64,48 +67,47 @@ An account manager uses a chat to reword one email, a Project for the client acc
 
 ### Key Concept
 
-**Haiku is the fastest and cheapest, Sonnet balances speed and capability, and Opus is the most capable for complex reasoning.**
+**Haiku suits speed and volume, Sonnet suits everyday work, and Opus suits the hardest reasoning.**
 
-Claude comes in three model families. **Haiku** is built for speed and high volume: short replies, classification, extraction and simple drafting. **Sonnet** is the balanced everyday choice for most business writing and analysis. **Opus** is the most capable, for complex reasoning, long multi-step work and the hardest problems, and it uses more of your usage allowance. Version numbers change over time; the family names tell you where a model sits.
+Judge the task before you pick: how many steps it has, whether its information conflicts and how much judgement it needs, against how simple and repeatable it is. The family name tells you where a model sits, while version numbers change.
 
 **Think of a scooter, a car and a lorry**: each is the right vehicle for a different load.
 
-![Three model families compared: Haiku is fastest and lowest cost for high-volume simple tasks, Sonnet balances speed and capability for everyday work, and Opus is most capable for complex reasoning at the highest cost.](/content/skillup/ccao/images/ccao-3-2-models.svg)
+![Judge the task first, then pick a family: Haiku for high-volume simple tasks, Sonnet for most everyday writing and analysis, and Opus for the hardest multi-step reasoning as the most capable of the three; the model menu also lists other models such as Fable, which sits above Opus.](/content/skillup/ccao/images/ccao-3-2-models.svg)
 
 ### Real use
 
-A support team drafts hundreds of short replies a day with Haiku. Their analysts use Sonnet for weekly reports. Once a quarter, a strategy lead uses Opus to work through a complex pricing analysis with many interacting assumptions.
+A digital-team member at a regional tourism board uses Haiku to tag 600 archived attraction listings by theme and Sonnet to draft the weekly visitor newsletter. Opus untangles a multi-year visitor-numbers analysis whose sources conflict. While choosing, she notices the menu also lists Fable.
 
 ### How it works
 
-- **Haiku:** speed and volume; straightforward tasks.
-- **Sonnet:** everyday work; strong balance of quality and speed.
-- **Opus:** hardest reasoning and long, multi-step work.
-- **Model menu:** next to the send button; changes apply from the next response.
-- **Usage:** more capable models, higher effort and longer thinking use more of your limit.
-- **Admins** on Enterprise plans may restrict which models are available.
+One team runs a simple tagging job on the heaviest model and waits; another runs a tangled pricing analysis on the fastest one and gets a shallow answer. Neither judged the task first.
+
+- **Haiku:** the fastest, lowest-cost family, for high-volume, simple, repeatable tasks such as sorting items into groups or pulling fields out of text. Its job is volume and simplicity, not one task type.
+- **Sonnet:** balances speed and capability, and is a common everyday choice for most writing and analysis. It isn't a sorting-only model either.
+- **Opus:** the most capable of the three families the exam names, for long, multi-step reasoning and the hardest problems. It's slower, uses more of your limit and isn't on the Free plan.
+- **The menu:** it sits next to the send button, and "More models" shows extra options. It also lists other models, such as Fable, which sits above Opus for the most demanding work. On Enterprise, an admin may limit which models you see.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
 | Haiku | High volume, simple, speed matters | Weaker on complex reasoning |
-| Sonnet | Most everyday business tasks | Not the fastest or the deepest |
-| Opus | Complex, high-value reasoning | Slower; uses more of your limit |
+| Sonnet | Most everyday writing and analysis | Not the fastest or the deepest |
+| Opus | Complex, multi-step, high-value reasoning | Slower; uses more of your limit |
 
 ### How to do it
 
-1. Judge how hard the reasoning is and how many times you'll run the task.
-2. Choose the family that fits, using the model menu.
-3. Move up a family only if quality falls short.
+1. Judge the reasoning the task needs.
+2. Judge how often you'll run it.
+3. Pick the family in the model menu.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Always use the most capable model to maximise quality" wastes speed and usage on simple, high-volume work. Match the model to the task.</div>
+<div class="note-trap">Defaulting to the most capable family for everything makes simple, high-volume work slower and uses up your limit without better results.</div>
 
 ### Go deeper
 
-- [Models overview](https://platform.claude.com/docs/en/about-claude/models/overview)
 - [Change the model, effort, and thinking settings](https://support.claude.com/en/articles/8664678-change-the-model-effort-and-thinking-settings)
 
 ---
@@ -114,48 +116,51 @@ A support team drafts hundreds of short replies a day with Haiku. Their analysts
 
 ### Key Concept
 
-**Start with the smallest model that does the job well, and move up only when quality falls short; use effort and thinking for hard problems, not routine ones.**
+**Test the lightest option on a sample, then step up effort or model only where quality falls short.**
 
-Every task trades cost, speed and quality. High-volume, simple work favours speed and low cost; one-off, high-value reasoning favours quality. Besides the model, the menu has **effort** and **thinking** settings: higher effort and thinking help with complex problems but take longer and use more of your usage limit. A practical approach is to test the task on a faster model first, and step up when the results aren't good enough.
+Every task trades cost, speed and quality, and volume multiplies each choice across hundreds of items. A 25-item sample tells you more than a guess.
 
-**Think of choosing a courier**: standard post for routine letters, express only when it really matters.
+**Think of choosing a courier**: standard post does routine letters, and express is for when it really matters.
 
-![Balancing cost, speed and quality: high-volume simple tasks go to a fast model with default effort, everyday work to the balanced model, and complex high-value reasoning to the most capable model with higher effort or thinking.](/content/skillup/ccao/images/ccao-3-3-tradeoffs.svg)
+![A step-up path: run a sample on the lightest option at default effort, keep it if quality is good enough, raise effort if answers are right but shallow on the hard steps, and step up the model family only if that still falls short, remembering that volume multiplies every choice.](/content/skillup/ccao/images/ccao-3-3-tradeoffs.svg)
 
 ### Real use
 
-A marketing team tests product-description drafts on Haiku and finds them good enough for 500 items. For the annual brand strategy memo, the lead uses Opus with higher effort, because the reasoning matters more than the time it takes.
+A data steward at a public library service tests 25 of 4,000 catalogue blurbs on the lightest model at its default effort; quality holds, so she runs the batch. For a tricky comparison of two lending policies, she raises effort first and checks the result before considering a bigger model.
 
 ### How it works
 
-- **Cost:** more capable models and higher effort use more of your limit.
-- **Speed:** smaller models and lower effort respond faster.
-- **Quality:** larger models and thinking help most on complex reasoning.
-- **Volume** multiplies every choice: small savings per task add up.
-- **Test before scaling:** try the cheaper option on a sample first.
+A weekly batch of 300 short summaries runs at maximum effort on the heaviest model, takes all afternoon and eats a large share of the week's usage. A sample would have shown the lightest setting was enough.
+
+- **Start light, on a sample:** run a handful of real items on the lightest model at its Default effort (the level each model marks as recommended) and check them.
+- **Effort:** controls how thorough Claude is with each response. Low and Medium suit routine work and stretch your usage, High is the best balance, and Max is the most thorough; higher effort is slower and uses more of your limit.
+- **Thinking:** on current models in Claude, thinking can't be turned off (on Opus 5.5 it is always on), so effort is the setting you change. Where an older model still shows a thinking toggle, it helps on complex problems. Typing "think harder" into the prompt isn't the lever.
+- **Pick the lever that matches the gap:** right but shallow on the hard steps? Raise effort. Still short, or the task has become harder? Step up the family for that task, not for every task, and recheck when a repeated task changes.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Fast model, default effort | High volume, simple, time-sensitive | May miss nuance |
-| Balanced model | Everyday quality matters | Moderate usage |
-| Most capable + higher effort or thinking | Complex, high-stakes reasoning | Slow, highest usage |
+| Lightest model at default effort | High volume, simple, time-sensitive | May miss nuance; sample it |
+| Raise effort | Same model, but the hard steps come back shallow | Slower; uses more of your limit |
+| Step up the model family | Quality still falls short at higher effort, or the task now needs deeper reasoning | Slower and costlier on every run |
+| Keep the setting as that task's default | The task repeats unchanged | Recheck it when the task changes |
 
 ### How to do it
 
-1. Run a few real examples on the fastest suitable model.
-2. Step up the model or effort only where quality isn't good enough.
-3. Keep the choice for repeated tasks so you don't decide each time.
+1. Run 20–25 real items on the lightest option.
+2. Raise effort where the hard steps are shallow.
+3. Step up the model only if that isn't enough.
+4. Keep the setting for that task.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">For "high volume, short, simple", the answer is the faster, lower-cost model. "Turn on thinking for everything" adds time and usage without helping routine tasks.</div>
+<div class="note-trap">Setting maximum effort on every task, including quick replies, makes routine work slower and drains usage with no gain in quality.</div>
 
 ### Go deeper
 
-- [Choosing a model](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model)
 - [Change the model, effort, and thinking settings](https://support.claude.com/en/articles/8664678-change-the-model-effort-and-thinking-settings)
+- [Usage limit best practices](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)
 
 ---
 
@@ -163,50 +168,51 @@ A marketing team tests product-description drafts on Haiku and finds them good e
 
 ### Key Concept
 
-**When a chat gets long or drifts, summarise what matters and start fresh; anything you'll need again belongs in a Project or memory, not buried in an old chat.**
+**When a chat drifts, carry a summary into a fresh chat; save what you'll reuse in the Project.**
 
-Each conversation has a limited context window (its size depends on the model and plan), and long conversations use more of your usage limit. Very long chats can also drift as earlier details compete with newer ones. Chats in a Project don't share context with each other unless the information is in the Project's knowledge. On paid plans, Claude can search past chats, and memory carries useful details forward; you can view and edit memory, turn it off for a chat, or use an incognito chat that isn't saved to history or memory.
+A chat can only take so much of the conversation into account at once (its context window). Long chats drift as early details compete with later ones, and they use more of your usage limit. Anything you'll need again belongs where it will be found.
 
-**Think of a whiteboard**: when it's full, photograph the key points, wipe it, and start again with just those points.
+**Think of a full whiteboard**: photograph the key points, wipe it and start again.
 
-![Context decisions: a chat that has grown long or drifted is summarised and restarted, information needed in every chat is saved to Project knowledge or instructions, earlier conversations are found with chat search or memory, and a sensitive one-off chat uses incognito.](/content/skillup/ccao/images/ccao-3-4-context.svg)
+![A chat timeline: decisions made early get mixed up a hundred messages later, so you ask for a summary and start a new chat from it, and save anything every chat needs to Project knowledge; for one sensitive chat, use incognito outside a Project or turn memory off inside one.](/content/skillup/ccao/images/ccao-3-4-context.svg)
 
 ### Real use
 
-After a two-hour session planning a product launch, Claude starts mixing up early decisions. The planner asks for a summary of all decisions so far, opens a new chat in the launch Project, and pastes the summary in. She also adds the final launch timeline to the Project's knowledge so every future chat has it.
+A programme coordinator at an international development charity notices a two-hour workshop-planning chat mixing up venues. She asks for a summary of decisions, restarts in the workshop Project and adds the agreed agenda to Project knowledge. For a staff-grievance note she turns memory off for that one chat, as incognito isn't available in Projects.
 
 ### How it works
 
-- **Restart:** when a chat is long, slow or drifting; carry over a summary.
-- **Summarise:** ask Claude for the decisions, facts and open questions so far.
-- **Persist:** Project knowledge or instructions for anything needed repeatedly.
-- **Chat search and memory:** paid plans can search past chats; memory can be viewed, edited or turned off.
-- **Incognito:** not saved to history or memory; not available in Projects.
-- **Usage:** long chats use more of your limit than fresh ones.
+Three hours into one planning chat, Claude mixes up which venue was agreed, because early decisions are buried under a hundred later messages.
+
+- **Restart and persist:** ask for a summary of decisions, facts and open questions, and start a new chat with it. Put what every future chat needs into Project knowledge or instructions (see 5.1).
+- **Memory:** on by default on Free, Pro, Max and Ultra. On Team and Enterprise, owners control it, and it's off for each member until they turn it on. You can view and edit memory, but deleting a chat doesn't remove memory entries made from it.
+- **Chat search** (asking Claude to find a past chat) is for paid plans only.
+- **One sensitive chat, two options:** incognito (outside Projects only) isn't saved to history or memory, but it's still kept for 30 days and, on Team and Enterprise, included in organisation data exports. Memory off for this chat ("+" menu, before the first message) works inside Projects; the chat stays in your history.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
 | Continue the chat | Still short and focused | Grows heavier over time |
-| Summarise and restart | Long, drifting or slow chat | Detail not in the summary is lost |
-| Persist in a Project | Needed in many future chats | Must be kept up to date |
-| Incognito chat | Sensitive one-off you don't want saved | No history, no memory |
+| Summarise and restart | Long, drifting or slow chat | Detail left out of the summary is lost |
+| Save to Project knowledge or instructions | Needed in many future chats | Must be kept current |
+| Memory off for this chat | Keep the chat, but don't use or add to memory | Must be set before the first message |
+| Incognito chat | A one-off you don't want in history or memory | Outside Projects only; can't be reopened once closed |
 
 ### How to do it
 
-1. When a chat drifts or slows, ask for a summary of decisions and open items.
-2. Start a new chat with that summary.
-3. Move anything you'll reuse into Project knowledge or instructions.
+1. When a chat drifts, ask for a summary of decisions and open items.
+2. Start a new chat with it.
+3. Move what you'll reuse into the Project.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Keep everything in one endless chat so Claude remembers it all" is the trap: long chats drift and use more usage. And separate chats in a Project don't see each other's content unless it's added to Project knowledge.</div>
+<div class="note-trap">Keeping one endless chat "so Claude remembers everything" makes it drift and burns usage, and the decisions you need end up buried.</div>
 
 ### Go deeper
 
-- [Usage limit best practices](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)
-- [Chat search and memory](https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context)
+- [Use Claude's chat search and memory to build on previous context](https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context)
+- [Use incognito chats](https://support.claude.com/en/articles/12260368-use-incognito-chats)
 
 ---
 
@@ -214,32 +220,48 @@ After a two-hour session planning a product launch, Claude starts mixing up earl
 
 ### 1. The connective narrative
 
-This domain is about fit. Features (3.1) fit the shape of the work: one-off, recurring, multi-source or reusable. Models (3.2) and settings (3.3) fit the difficulty and volume: fast and cheap for simple work at scale, capable and thorough for hard problems. Context management (3.4) keeps any of it working over time by restarting with summaries and saving what matters where it will be found again.
+Every lesson here is Delegation: deciding what work to hand to which tool, and at what size. Features fit the shape of the work, model families fit its difficulty, and effort and samples fit its volume.
+
+Context habits keep long work honest. A chat is a temporary workspace, a Project is where reusable knowledge lives, and memory and incognito decide what carries forward. Each choice starts light and steps up only when the work shows it needs more.
 
 ### 2. Worked scenario
 
-> **Scenario.** A customer-success team sets up a Project per key account, with contracts and meeting notes as knowledge (3.1). Daily reply drafts run on Haiku; renewal analyses run on Sonnet; the annual risk review uses Opus with higher effort (3.2, 3.3). When a long renewal chat starts confusing two customers' figures, the lead summarises, restarts, and adds the agreed figures to the Project knowledge (3.4).
+> **Scenario.** An architecture practice's office manager is running a studio move.
+>
+> 1. **Where the move lives.** A single chat or a Project? The floor plans and supplier quotes come up in every chat, so she sets up a Project and adds them as knowledge.
+> 2. **Comparing five removal firms.** Research or web search? Web search covers the quick price checks in seconds. She saves Research for one question that spans many sources, the rules on office moves, and opens the sources her conclusions rest on.
+> 3. **Model for 200 label descriptions.** She runs a sample of 20 on the lightest model at default effort. Quality holds, so the other 180 run the same way.
+> 4. **The long chat drifts on day three.** She asks for a summary, restarts from it and saves the final layout to the Project, so every later chat starts from the agreed plan.
 
 ### 3. Memory aid
 
-**C-P-R-A** for features: **C**hat (once), **P**roject (repeat), **R**esearch (many sources), **A**rtifact (keep). And for models: **H**aiku-fast, **S**onnet-steady, **O**pus-deep.
+Five questions, each choosing one thing:
+
+- **Once or again?** Chat or Project.
+- **One source or many?** Web search or Research.
+- **Read or keep?** Inline answer or artifact.
+- **Simple or hard?** Lighter or heavier model.
+- **Short or long?** Continue, or summarise and restart.
 
 ### 4. Exam strategy for this domain
 
-Wrong answers usually reach for the biggest option: the top model, Research for a quick fact, one endless chat. The right answer is the lightest option that meets the need, plus saving reusable context in a Project.
+- Wrong answers reach for the biggest option: the top model, maximum effort, Research for a quick fact, or one endless chat.
+- Right answers pick the lightest fit, test it on a sample and save reusable context in a Project.
+- Five minutes before: lightest fit first; step up only on evidence.
 
 ---
 
 ## Cheat Sheet 📋
 
-| Scenario says… | Answer |
+| Situation | What to do |
 |---|---|
-| Re-uploading the same files every time | Use a Project |
-| Question needs many sources and citations | Research (paid plans; web search on) |
-| Something to keep editing or share | Artifact |
-| Hundreds of short simple drafts | Haiku |
-| Everyday reports and writing | Sonnet |
-| Complex multi-step reasoning | Opus, maybe higher effort |
-| Long chat starts confusing details | Summarise and start a new chat |
-| Need info in every chat | Project knowledge or instructions |
-| Sensitive one-off, don't keep it | Incognito chat |
+| Re-uploading the same files every week | Use a Project |
+| Quick current fact | Chat with web search |
+| Question spread across many sources | Research (paid plans; web search on) |
+| Analyse an uploaded CSV, or make a chart or file | Code execution (setting on) |
+| Repeatable format or procedure | A skill |
+| Hundreds of short simple drafts | Haiku, tested on a sample |
+| Shallow answers on a hard step | Raise effort, then step up the family |
+| Long chat confusing details | Summarise and start fresh |
+| Sensitive one-off outside a Project | Incognito (still kept 30 days) |
+| Sensitive chat inside a Project | Turn memory off for that chat |
