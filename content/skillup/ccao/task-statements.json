@@ -17,7 +17,11 @@
           "questionIds": [
             "ccao-d1-001",
             "ccao-d1-002",
-            "ccao-d1-003"
+            "ccao-d1-003",
+            "ccao-d1-013",
+            "ccao-d1-014",
+            "ccao-d1-015",
+            "ccao-d1-016"
           ]
         },
         {
@@ -27,7 +31,10 @@
           "questionIds": [
             "ccao-d1-004",
             "ccao-d1-005",
-            "ccao-d1-006"
+            "ccao-d1-006",
+            "ccao-d1-017",
+            "ccao-d1-019",
+            "ccao-d1-018"
           ]
         },
         {
@@ -37,6 +44,9 @@
           "questionIds": [
             "ccao-d1-007",
             "ccao-d1-008",
+            "ccao-d1-020",
+            "ccao-d1-021",
+            "ccao-d1-022",
             "ccao-d1-009"
           ]
         },
@@ -47,7 +57,10 @@
           "questionIds": [
             "ccao-d1-010",
             "ccao-d1-011",
-            "ccao-d1-012"
+            "ccao-d1-012",
+            "ccao-d1-023",
+            "ccao-d1-024",
+            "ccao-d1-025"
           ]
         }
       ]
@@ -65,7 +78,11 @@
           "questionIds": [
             "ccao-d2-001",
             "ccao-d2-002",
-            "ccao-d2-003"
+            "ccao-d2-003",
+            "ccao-d2-019",
+            "ccao-d2-020",
+            "ccao-d2-021",
+            "ccao-d2-022"
           ]
         },
         {
@@ -75,7 +92,11 @@
           "questionIds": [
             "ccao-d2-004",
             "ccao-d2-005",
-            "ccao-d2-006"
+            "ccao-d2-006",
+            "ccao-d2-023",
+            "ccao-d2-024",
+            "ccao-d2-025",
+            "ccao-d2-026"
           ]
         },
         {
@@ -85,7 +106,11 @@
           "questionIds": [
             "ccao-d2-007",
             "ccao-d2-008",
-            "ccao-d2-009"
+            "ccao-d2-027",
+            "ccao-d2-028",
+            "ccao-d2-029",
+            "ccao-d2-009",
+            "ccao-d2-030"
           ]
         },
         {
@@ -95,6 +120,9 @@
           "questionIds": [
             "ccao-d2-010",
             "ccao-d2-011",
+            "ccao-d2-031",
+            "ccao-d2-032",
+            "ccao-d2-033",
             "ccao-d2-012"
           ]
         },
@@ -105,7 +133,9 @@
           "questionIds": [
             "ccao-d2-013",
             "ccao-d2-014",
-            "ccao-d2-015"
+            "ccao-d2-015",
+            "ccao-d2-034",
+            "ccao-d2-035"
           ]
         },
         {
@@ -115,7 +145,10 @@
           "questionIds": [
             "ccao-d2-016",
             "ccao-d2-017",
-            "ccao-d2-018"
+            "ccao-d2-018",
+            "ccao-d2-036",
+            "ccao-d2-037",
+            "ccao-d2-038"
           ]
         }
       ]
@@ -133,7 +166,10 @@
           "questionIds": [
             "ccao-d3-001",
             "ccao-d3-002",
-            "ccao-d3-003"
+            "ccao-d3-003",
+            "ccao-d3-013",
+            "ccao-d3-014",
+            "ccao-d3-015"
           ]
         },
         {
@@ -143,7 +179,9 @@
           "questionIds": [
             "ccao-d3-004",
             "ccao-d3-005",
-            "ccao-d3-006"
+            "ccao-d3-006",
+            "ccao-d3-016",
+            "ccao-d3-017"
           ]
         },
         {
@@ -151,9 +189,12 @@
           "title": "Align model selection with task requirements (cost, speed, quality)",
           "shortTitle": "Cost, speed and quality",
           "questionIds": [
+            "ccao-d3-018",
             "ccao-d3-007",
             "ccao-d3-008",
-            "ccao-d3-009"
+            "ccao-d3-019",
+            "ccao-d3-009",
+            "ccao-d3-020"
           ]
         },
         {
@@ -163,7 +204,9 @@
           "questionIds": [
             "ccao-d3-010",
             "ccao-d3-011",
-            "ccao-d3-012"
+            "ccao-d3-012",
+            "ccao-d3-021",
+            "ccao-d3-022"
           ]
         }
       ]
@@ -181,7 +224,10 @@
           "questionIds": [
             "ccao-d4-001",
             "ccao-d4-002",
-            "ccao-d4-003"
+            "ccao-d4-003",
+            "ccao-d4-016",
+            "ccao-d4-017",
+            "ccao-d4-018"
           ]
         },
         {
@@ -191,7 +237,10 @@
           "questionIds": [
             "ccao-d4-004",
             "ccao-d4-005",
-            "ccao-d4-006"
+            "ccao-d4-006",
+            "ccao-d4-019",
+            "ccao-d4-020",
+            "ccao-d4-021"
           ]
         },
         {
@@ -201,6 +250,8 @@
           "questionIds": [
             "ccao-d4-007",
             "ccao-d4-008",
+            "ccao-d4-022",
+            "ccao-d4-023",
             "ccao-d4-009"
           ]
         },
@@ -209,9 +260,13 @@
           "title": "Integrate Claude into existing workflows to augment or redesign them",
           "shortTitle": "Augment or redesign",
           "questionIds": [
+            "ccao-d4-024",
             "ccao-d4-010",
             "ccao-d4-011",
-            "ccao-d4-012"
+            "ccao-d4-012",
+            "ccao-d4-025",
+            "ccao-d4-026",
+            "ccao-d4-027"
           ]
         },
         {
@@ -221,7 +276,9 @@
           "questionIds": [
             "ccao-d4-013",
             "ccao-d4-014",
-            "ccao-d4-015"
+            "ccao-d4-015",
+            "ccao-d4-028",
+            "ccao-d4-029"
           ]
         }
       ]
@@ -239,7 +296,10 @@
           "questionIds": [
             "ccao-d5-001",
             "ccao-d5-002",
-            "ccao-d5-003"
+            "ccao-d5-003",
+            "ccao-d5-013",
+            "ccao-d5-014",
+            "ccao-d5-015"
           ]
         },
         {
@@ -249,7 +309,10 @@
           "questionIds": [
             "ccao-d5-004",
             "ccao-d5-005",
-            "ccao-d5-006"
+            "ccao-d5-006",
+            "ccao-d5-016",
+            "ccao-d5-018",
+            "ccao-d5-017"
           ]
         },
         {
@@ -259,7 +322,9 @@
           "questionIds": [
             "ccao-d5-007",
             "ccao-d5-008",
-            "ccao-d5-009"
+            "ccao-d5-009",
+            "ccao-d5-019",
+            "ccao-d5-020"
           ]
         },
         {
@@ -269,7 +334,9 @@
           "questionIds": [
             "ccao-d5-010",
             "ccao-d5-011",
-            "ccao-d5-012"
+            "ccao-d5-012",
+            "ccao-d5-021",
+            "ccao-d5-022"
           ]
         }
       ]
@@ -287,7 +354,11 @@
           "questionIds": [
             "ccao-d6-001",
             "ccao-d6-002",
-            "ccao-d6-003"
+            "ccao-d6-003",
+            "ccao-d6-013",
+            "ccao-d6-014",
+            "ccao-d6-015",
+            "ccao-d6-016"
           ]
         },
         {
@@ -297,7 +368,12 @@
           "questionIds": [
             "ccao-d6-004",
             "ccao-d6-005",
-            "ccao-d6-006"
+            "ccao-d6-017",
+            "ccao-d6-018",
+            "ccao-d6-019",
+            "ccao-d6-020",
+            "ccao-d6-006",
+            "ccao-d6-021"
           ]
         },
         {
@@ -307,7 +383,10 @@
           "questionIds": [
             "ccao-d6-007",
             "ccao-d6-008",
-            "ccao-d6-009"
+            "ccao-d6-009",
+            "ccao-d6-022",
+            "ccao-d6-023",
+            "ccao-d6-024"
           ]
         },
         {
@@ -317,6 +396,9 @@
           "questionIds": [
             "ccao-d6-010",
             "ccao-d6-011",
+            "ccao-d6-025",
+            "ccao-d6-026",
+            "ccao-d6-027",
             "ccao-d6-012"
           ]
         }
@@ -333,9 +415,13 @@
           "title": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
           "shortTitle": "Diagnosing poor output",
           "questionIds": [
-            "ccao-d7-001",
             "ccao-d7-002",
-            "ccao-d7-003"
+            "ccao-d7-001",
+            "ccao-d7-010",
+            "ccao-d7-011",
+            "ccao-d7-012",
+            "ccao-d7-003",
+            "ccao-d7-013"
           ]
         },
         {
@@ -345,7 +431,9 @@
           "questionIds": [
             "ccao-d7-004",
             "ccao-d7-005",
-            "ccao-d7-006"
+            "ccao-d7-006",
+            "ccao-d7-014",
+            "ccao-d7-015"
           ]
         },
         {
@@ -355,7 +443,10 @@
           "questionIds": [
             "ccao-d7-007",
             "ccao-d7-008",
-            "ccao-d7-009"
+            "ccao-d7-009",
+            "ccao-d7-016",
+            "ccao-d7-017",
+            "ccao-d7-018"
           ]
         }
       ]

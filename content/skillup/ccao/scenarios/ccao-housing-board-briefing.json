@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccao-scenario-003",
+  "title": "Larkspur Housing Briefs Its Board on Damp",
+  "description": "A housing association prepares a board paper on damp-and-mould complaints that the regulator and tenants will scrutinise. The team must research the regulatory standard, check what Research finds against its source, test an analysis for gaps and inconsistencies, and catch framing that blames tenants. Finally, it must adapt the paper for tenants without changing the facts.",
+  "examId": "ccao",
+  "difficulty": "medium",
+  "estimatedMinutes": 16,
+  "domains": [
+    1,
+    2,
+    3
+  ],
+  "taskIds": [
+    "3.1",
+    "1.4",
+    "2.3",
+    "2.1",
+    "2.2",
+    "2.5"
+  ],
+  "scenario": {
+    "background": "Larkspur Housing's board decides next month whether to fund a £1.2m damp-and-mould programme, and the paper behind that decision must survive scrutiny from the regulator and from tenants. Larkspur is a housing association with 9,000 homes, and its staff use Claude on a Team plan, where the owner has enabled web search. Customer Insight has exported 2,300 damp-and-mould complaint records from the last two years as a CSV, with tenant names and contact details removed; it also records inspection visits and repeat cases. The board has set six questions the paper must answer, and the Tenant Panel has asked for a version residents can read.",
+    "characters": [
+      {
+        "name": "Ruth Adeyemi",
+        "role": "Head of Customer Insight",
+        "concern": "She wants every figure in the paper to match the complaint data exactly."
+      },
+      {
+        "name": "Kwame Boateng",
+        "role": "Policy Officer",
+        "concern": "He needs the regulatory standard on response times stated correctly, from a source he can defend."
+      },
+      {
+        "name": "Elena Marsh",
+        "role": "Board Secretary",
+        "concern": "She wants one short paper that puts the board's decision first."
+      },
+      {
+        "name": "Doreen Hall",
+        "role": "Tenant Panel Chair",
+        "concern": "She wants tenants to get a plain, honest version of what the board is told."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccao-scenario-003-q1",
+      "stem": "Kwame needs to know what the regulator's current guidance and two recent ombudsman reports say about how quickly landlords should respond to damp reports. The answer is spread across several documents online. How should he ask Claude?",
+      "options": [
+        "Ask in a plain chat for the standard response time, since Claude will already know the usual figure",
+        "Open a Project holding last year's board papers and ask Claude to state the current standard from them",
+        "Use Research with the exact question, his country's current guidance as scope, and sources to open",
+        "Ask for an artifact summarising what regulators usually expect of landlords when damp is reported"
+      ],
+      "correct": 2,
+      "explanation": "Research questions need sources, not memory. C is correct: the answer is spread across several documents, so Research fits, and Larkspur's Team plan has the web search it needs. A clear question, a scope and a request for sources let Kwame open what his paper rests on. A is wrong because Claude would answer from general knowledge that may be out of date. B is wrong because last year's papers predate current guidance. D is wrong because an artifact only formats what Claude already believes."
+    },
+    {
+      "id": "ccao-scenario-003-q2",
+      "stem": "Research brings back a '14-day' response standard, and Kwame opens the source behind it. It turns out to be a 2023 consultation draft written for a different jurisdiction. What should he do with the figure?",
+      "options": [
+        "Leave it out of the paper until he finds the final standard that applies to Larkspur",
+        "Use the figure, since Research found it in a real document that he has now opened",
+        "Keep the figure but write 'around 14 days' to show that it might be approximate",
+        "Ask Claude in the same chat to confirm whether 14 days is the right standard to use"
+      ],
+      "correct": 0,
+      "explanation": "A source must match the claim. A is correct: a consultation draft for another jurisdiction isn't comparable, because it's neither final nor about Larkspur's country, so the figure stays out until Kwame finds the published standard that applies. B is wrong because a source only helps if it says the same thing for the same place and period. C is wrong because 'around' hides a figure that may not apply at all. D is wrong because Claude confirming its own finding isn't independent evidence."
+    },
+    {
+      "id": "ccao-scenario-003-q3",
+      "stem": "Ruth uploads the CSV with code execution on and asks Claude to answer the board's six questions. The summary is fluent and confident, but it answers five of the six, and its overall total doesn't equal the sum of its per-estate figures. What should she do?",
+      "options": [
+        "Send it to Elena as it stands, since the writing is clear and the main findings look sensible",
+        "Ask Claude to add the missing sixth answer, then use the rest of the summary as it stands",
+        "Ask Claude whether its totals are correct, and keep the figures if it says that they are",
+        "Get the missing question answered and recompute the totals from the CSV before it's used"
+      ],
+      "correct": 3,
+      "explanation": "Check against the request and against the data. D is correct: the summary has two separate faults, a gap against the board's six questions and figures that contradict each other, so Ruth fixes both and recomputes the totals from the CSV before anything reaches the paper. A is wrong because fluency says nothing about accuracy. B is wrong because the total that doesn't add up would still reach the board. C is wrong because Claude checking itself isn't evidence."
+    },
+    {
+      "id": "ccao-scenario-003-q4",
+      "stem": "Ruth's corrected draft says tenants on the Elm Park estate are 'less engaged with maintenance' because they logged fewer damp complaints per home than other estates. She isn't comfortable with the line. What should she do?",
+      "options": [
+        "Keep the line, because the complaint figures for Elm Park do support the conclusion",
+        "Treat it as possible under-reporting, check visits and repeat cases, and reword it",
+        "Remove Elm Park from the paper so that the board isn't drawn into the question",
+        "Keep the line and add a footnote saying the figures come from the complaint logs"
+      ],
+      "correct": 1,
+      "explanation": "Fewer complaints isn't fewer problems. B is correct: low reporting can mean tenants aren't reporting, not that their homes are dry, so Ruth checks the inspection visits and repeat cases in the data and rewords the line to what the data supports. A is wrong because the figures measure reporting, not engagement. C is wrong because dropping the estate hides it from a funding decision. D is wrong because a footnote leaves a biased judgement about tenants in place."
+    },
+    {
+      "id": "ccao-scenario-003-q5",
+      "stem": "Elena wants one short paper that leads with the decision. Doreen wants a version tenants can read, and its draft says 'most repairs are fixed within two weeks', though the data shows 46%. How should the team handle the two audiences?",
+      "options": [
+        "Send the board paper to the Tenant Panel as it is, so both groups read the same words",
+        "Write a tenant version that leaves out repair times, so it stays simple and avoids alarm",
+        "Write a decision-first board paper and a plain tenant version, each giving the 46% figure",
+        "Keep 'most repairs' in the tenant version, since plain language is meant to round off detail"
+      ],
+      "correct": 2,
+      "explanation": "Same facts, shaped for each reader. C is correct: Elena is right that the board needs the decision first, and Doreen is right that tenants need plain words, so two versions serve both, as long as each states the same figure; 'most' becomes 'just under half'. A is wrong because a board paper isn't written for tenants. B is wrong because it hides what tenants care about most. D is wrong because 46% isn't most, so the rounding changed the fact."
+    }
+  ],
+  "keyLearnings": [
+    "Research shapes the question, but the source decides the answer: open it and check that it applies to you.",
+    "Check every output twice, against the request for gaps and against the data for errors.",
+    "Fewer complaints isn't the same as fewer problems, so test a pattern before it becomes a judgement about people.",
+    "Each audience version can change the words, but it states the same figures."
+  ]
+}

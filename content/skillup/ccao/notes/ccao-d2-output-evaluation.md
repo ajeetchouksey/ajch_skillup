@@ -1,10 +1,10 @@
 # D2: Output Evaluation and Validation
 
-> **Exam weight**: 21% · **Questions**: ~18 in the bank
+> **Exam weight**: 21% · **Questions**: 38 in the bank
 
 ## Overview
 
-This is the heaviest domain on the exam. It covers judging what Claude produces before anyone relies on it: checking accuracy and completeness, spotting hallucinations, inconsistencies and bias, verifying facts against real sources, deciding when a person must review, adapting output for its audience, and choosing the right format.
+This is the heaviest domain. It covers judging what Claude produces before anyone relies on it: accuracy and completeness, hallucinations, inconsistency and bias, fact-checking, the right level of review, adapting for the audience, and organising and formatting the result. The AI Fluency competency it exercises is **Discernment**, which means judging what comes back.
 
 > 💡 **Human Angle**: Claude writes fluently whether or not it's right. Fluency is not evidence; the source is.
 
@@ -14,9 +14,9 @@ This is the heaviest domain on the exam. It covers judging what Claude produces 
 
 ### Key Concept
 
-**Check the output against two things: the request (is everything covered?) and the source (is every fact supported?).**
+**Check every output twice, against the request for gaps and against the source for errors.**
 
-Accuracy means each statement is true and matches the source material. Completeness means the output does everything you asked: every requirement, section and question is covered. An answer can be accurate but incomplete (it skipped a requirement) or complete but inaccurate (it covered everything, with a wrong figure). Check both, and recompute any numbers yourself.
+Accuracy means every statement matches the source; completeness means everything you asked for is there. An answer can be one without the other, and fluent writing proves neither.
 
 **Think of checking a delivery against the order form**: every item present, and every item the right one.
 
@@ -24,37 +24,39 @@ Accuracy means each statement is true and matches the source material. Completen
 
 ### Real use
 
-Claude summarises a 40-page contract for a sales director. The summary reads well, but checking it against the request shows the renewal terms were never covered, and against the contract that the notice period is 60 days, not 30. Both are fixed before the summary goes to the customer meeting.
+A procurement officer at a university asks Claude to summarise a 30-page catering framework agreement against her eight questions. Ticking off the questions shows the price-review clause was skipped, and checking against the agreement shows the notice period is wrong. She fixes both before anyone relies on the summary.
 
 ### How it works
 
-- **Completeness:** tick off each requirement from your prompt.
-- **Accuracy:** check each fact, figure and name against the source.
-- **Numbers:** recompute totals, percentages and dates.
-- **Omissions:** ask what's missing that the reader will expect.
-- **Ask Claude for help:** "List each requirement and where you addressed it", then still check yourself.
+A well-written status report reaches the steering group with one workstream missing and a budget total that doesn't match its own lines.
+
+- **Completeness:** tick off each requirement in your request. You can ask Claude to list each requirement and where it answered it, then check that list yourself. Word count or polish tells you nothing about coverage.
+- **Accuracy:** check facts, names, dates and terms against the source.
+- **Numbers:** recompute totals yourself and spot-check several rows of any generated table against the source data. Claude confirming its own totals isn't an independent check.
+- **Omissions:** ask what the reader will expect that isn't there.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Quick read-through | Low-stakes, internal draft | Errors can slip through |
-| Requirement-by-requirement check | Output will be sent or used | Takes a few minutes |
-| Line-by-line source check | Facts or figures matter (contracts, finance) | Slowest, most reliable |
+| Quick read-through | Your own low-stakes draft | Errors can slip through |
+| Requirement-by-requirement check | The output will be sent or used | A few minutes |
+| Line-by-line source check | Figures, terms or names matter (contracts, finance) | Slowest, most reliable |
 
 ### How to do it
 
-1. List the requirements from your prompt and tick each one off.
-2. Check facts and figures against the source; recompute numbers.
-3. Note gaps and ask Claude to fill them, then re-check.
+1. List the requirements from your request and tick each one off.
+2. Check facts against the source, and recompute the numbers.
+3. Ask Claude to fill any gaps, then check again.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"The output is well written and confident, so it's accurate" is the trap. Fluency and confidence say nothing about correctness. Check against the request and the source.</div>
+<div class="note-trap">Treating a fluent, confident summary as accurate lets a missing clause or wrong figure reach the reader, because confidence says nothing about correctness.</div>
 
 ### Go deeper
 
-- [Reduce hallucinations](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations)
+- [AI Capabilities and Limitations (Anthropic Academy)](https://anthropic.skilljar.com/ai-capabilities-and-limitations)
+- [AI Fluency: Framework & Foundations (Anthropic Academy)](https://anthropic.skilljar.com/ai-fluency-framework-foundations)
 
 ---
 
@@ -62,47 +64,49 @@ Claude summarises a 40-page contract for a sales director. The summary reads wel
 
 ### Key Concept
 
-**Be most suspicious of specific details that look authoritative: citations, figures, names, dates and quotes.**
+**Be most suspicious of the specifics that look authoritative, such as citations, figures, names, dates and quotes.**
 
-A hallucination is confident content that isn't true or isn't in the source: an invented citation, a made-up statistic, a policy section that doesn't exist. Inconsistencies are contradictions within the output (a total that doesn't match its parts, a date that changes). Bias shows up as one-sided framing, stereotypes, or assumptions about groups of people. All three can sit inside text that reads perfectly well.
+A hallucination is confident content that isn't true or isn't in the source. An inconsistency is a contradiction inside the output; bias is one-sided framing, stereotypes, or describing equal things unequally.
 
 **Think of a witness who fills gaps in their memory**: the story flows, but some details were never there.
 
-![Red flags matched to checks: an exact citation or section number is checked against the source, a precise statistic is traced to its origin, contradictory figures are reconciled, and one-sided or stereotyped wording is reviewed for bias.](/content/skillup/ccao/images/ccao-2-2-red-flags.svg)
+![A mock Claude-drafted article with its red flags marked: an unsupplied statistic and an unsourced quote as possible hallucinations, two launch dates that disagree as an inconsistency, and wording that assumes engineers are men as bias; asking Claude how confident it is does not count as a check.](/content/skillup/ccao/images/ccao-2-2-red-flags.svg)
 
 ### Real use
 
-A summary of a new regulation cites "Section 4.2(b)" with confidence. The section exists, but says something different. Elsewhere, a candidate-shortlist summary describes one applicant as "energetic and young" and another as "experienced but may struggle with new tools", which is age bias that would never go into a hiring record.
+An internal communications manager at an energy company reviews a Claude-drafted intranet article on a safety programme. It has an unsupplied statistic, a chief executive quote not in her notes, a launch date that changes between paragraphs and wording that assumes engineers are men. She traces or cuts the first two, reconciles the date and rewrites the wording.
 
 ### How it works
 
-- **Hallucination signals:** exact citations, statistics, quotes, URLs, names you didn't provide.
-- **Inconsistency signals:** totals that don't add up, changing dates or names, contradictions between sections.
-- **Bias signals:** loaded wording, stereotypes, assumptions about groups, one-sided comparisons.
-- **Self-reported confidence** is not evidence of accuracy.
-- **Reduce the risk up front:** give Claude the source, ask it to answer only from it, and allow "I don't know".
+A briefing repeats an unsupplied statistic and section number, and three later documents copy both before anyone checks.
+
+- **Hallucination signals:** exact citations, statistics, quotes, links and names you didn't provide, especially when no source was given.
+- **Inconsistency signals:** two figures for one thing, totals that don't match their parts, a changing date. Reconcile against the source; never average or keep the more flattering figure.
+- **Bias signals:** equal results described unequally, assumptions about groups, one-sided comparisons. That's bias, not hallucination or formatting; compare like with like.
+- **Confidence isn't evidence:** a self-rating comes from the same model. Instead, give the source, ask for answers only from it, and allow "I don't know".
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Spot-check high-risk details | Most business outputs | Misses subtle errors |
-| Check every specific claim | Compliance, legal, external content | Time-consuming |
-| Bias review by a second person | Output affects people (hiring, reviews) | Needs a reviewer |
+| Spot-check high-risk specifics | Routine internal output | Misses subtle errors |
+| Check every specific claim | External or published content | Time-consuming |
+| Like-for-like comparison | The output describes or rates people | Needs the records |
+| Second reviewer for bias | It affects people's opportunities | Needs a reviewer |
 
 ### How to do it
 
 1. Highlight every citation, figure, name, date and quote.
-2. Check each against the source, and the totals against their parts.
-3. Read for wording about people and groups; rewrite anything biased.
+2. Check each against the source, and totals against parts.
+3. Compare how groups are described.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Ask Claude how confident it is and trust high confidence" is wrong: self-rated confidence isn't a reliable signal. Verify specific claims against the source.</div>
+<div class="note-trap">Trusting Claude's high rating of its own confidence lets an invented citation through, because the same model produced both.</div>
 
 ### Go deeper
 
-- [Reduce hallucinations](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations)
+- [AI Capabilities and Limitations (Anthropic Academy)](https://anthropic.skilljar.com/ai-capabilities-and-limitations)
 
 ---
 
@@ -110,49 +114,50 @@ A summary of a new regulation cites "Section 4.2(b)" with confidence. The sectio
 
 ### Key Concept
 
-**Verify against authoritative sources, not against Claude: ask for the source and the exact quote, then check them yourself.**
+**Verify against a source outside the conversation; asking Claude "are you sure?" isn't a check.**
 
-Fact-checking means confirming a claim with evidence outside the conversation. Useful techniques: give Claude the source document and ask it to quote the passage behind each claim; ask Research for cited sources and open them; cross-check important facts with a second independent source; recompute numbers; and explicitly allow Claude to say "I don't know" rather than guess. Asking Claude "are you sure?" is not verification.
+Fact-checking means confirming a claim with evidence Claude didn't produce; Claude checking itself is the same source checking itself. Start with the source and the exact passage behind each claim.
 
-**Think of a journalist's two-source rule**: a story runs only when the facts are confirmed independently.
+**Think of a journalist's two-source rule**: a story runs only when independent sources confirm it.
 
-![The fact-checking path: a claim is matched to a quoted passage or cited source, the source is opened and compared, and the claim is kept, corrected or removed; asking Claude whether it is sure is not a check.](/content/skillup/ccao/images/ccao-2-3-fact-check.svg)
+![The fact-checking path: a claim is matched to a quoted passage or cited source, the source is opened and checked for the same date, units, region and currency, and the claim is kept, corrected or removed; asking Claude whether it is sure, or asking again, is not a check.](/content/skillup/ccao/images/ccao-2-3-fact-check.svg)
 
 ### Real use
 
-A policy analyst asks Claude to brief leadership on a new data-protection rule, uploading the official text. She tells Claude to quote the clause supporting each point and to say "not covered" where the text is silent. She then checks three key quotes against the official text before sending.
+A sustainability lead at a furniture maker checks a recycled-timber emissions saving before it goes in a customer brochure. She asks Claude for the source and exact passage, opens it, checks the year, units and region match, and confirms the figure with a second independent source.
 
 ### How it works
 
-- **Ground it:** provide the source; ask Claude to answer only from it.
-- **Quote first:** ask for the exact passage behind each claim.
-- **Cite and open:** Research and web search give citations; open them and check.
-- **Second source:** confirm key facts independently.
-- **Recompute:** do the arithmetic yourself.
-- **Allow uncertainty:** "If the document doesn't say, write 'not stated'."
+A brochure claims a 40% emissions saving from an old study of a different timber in another country; nobody checked that the cited source said what the claim did.
+
+- **Ground it:** ask for the exact passage and section behind each claim, allowing "not stated" where the document is silent.
+- **Open the source:** web search answers include citations you can open. Research (Claude's mode that runs many linked searches) gathers many sources; open the ones your conclusions rest on.
+- **Check it's comparable:** same date, units, product or plan, region and currency as your claim.
+- **Confirm independently:** use a second source for high-stakes facts and recompute numbers. Re-asking, or adding "according to research", isn't verification; correct or remove what you can't confirm.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Quote-from-source | You have the source document | Only as good as the document |
-| Research with citations | Facts are spread across the web | Citations still need opening |
-| Independent second source | High-stakes facts | Takes more time |
+| Quote-from-source | You have the authoritative document | Only as good as the document |
+| Open the cited sources | Facts came from the web or Research | Each one needs opening |
+| Second independent source | High-stakes or published facts | Takes longer |
+| Remove or reword the claim | You can't confirm it | The claim goes |
 
 ### How to do it
 
-1. Give Claude the authoritative source and ask it to quote support for each claim.
-2. Open and check citations or quotes for the important claims.
-3. Remove or correct anything you can't confirm.
+1. Ask for the quote behind each claim.
+2. Open the sources and check they're comparable.
+3. Confirm key facts with a second source; fix or cut the rest.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Ask Claude to double-check its own answer" isn't fact-checking; it's the same source checking itself. Validation needs an authoritative source outside the conversation.</div>
+<div class="note-trap">Taking Claude's "yes" to "double-check your answer" as confirmation repeats the error more confidently, because the same source checked itself.</div>
 
 ### Go deeper
 
-- [Reduce hallucinations](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations)
-- [Use Research on Claude](https://support.claude.com/en/articles/11088861-use-research-on-claude)
+- [Enable and use web search](https://support.claude.com/en/articles/10684626-enable-and-use-web-search)
+- [Use research on Claude](https://support.claude.com/en/articles/11088861-use-research-on-claude)
 
 ---
 
@@ -160,46 +165,49 @@ A policy analyst asks Claude to brief leadership on a new data-protection rule, 
 
 ### Key Concept
 
-**The higher the stakes and the wider the audience, the more a qualified person must check before the output is used.**
+**Scale review to the stakes and the audience; the more that rides on an output, the more qualified its reviewer.**
 
-Not every output needs the same scrutiny. A brainstorm for your own use needs none. An internal summary needs a quick check. Anything external, regulated, financial, legal, medical, or affecting people's jobs or rights needs review by a person qualified to judge it. Anthropic's Usage Policy requires a qualified human in the loop for high-risk uses that affect people's health, legal rights, finances or livelihood.
+Ask who will see it and what happens if it's wrong. For uses affecting someone's health, legal rights, finances, livelihood, or access to housing, education or essential services, Anthropic's Usage Policy requires a qualified reviewer who can change the recommendation, and that the person is told AI was involved.
 
-**Think of the "four eyes" rule in finance**: the bigger the payment, the more sign-offs it needs.
+**Think of the "four eyes" rule in finance**: bigger payments need more sign-offs.
 
-![A review matrix: low-stakes personal work needs no review, internal work a quick check, external or customer-facing work a reviewer, and decisions affecting people's money, health, legal rights or jobs need a qualified expert before use.](/content/skillup/ccao/images/ccao-2-4-review-matrix.svg)
+![A review ladder that rises with the stakes: your own read for personal notes, a quick author check for internal updates, a sample review for routine high-volume replies, and full review by a qualified person for decisions about money, health, legal rights or jobs, who must have authority to change it and must tell the person AI was involved; disclaimers, spelling checks and Claude's own uncertainty flags are not review.](/content/skillup/ccao/images/ccao-2-4-review-matrix.svg)
 
 ### Real use
 
-A team uses Claude for three things: drafting internal meeting notes (author skims them), customer emails (a team lead reviews templates before use), and summarising employee performance feedback for promotion decisions (HR reviews every summary, and the decision stays with the manager).
+A claims team lead at a home insurer sets three review levels: a self-check for internal shift notes, and her own review of customer letter templates before use. A qualified claims handler with authority to change it decides each claim-decline letter, and the customer is told AI helped draft it.
 
 ### How it works
 
-- **Stakes:** what happens if it's wrong? Money, legal exposure, harm to people.
-- **Audience:** just you, your team, the whole company, customers, the public.
-- **Domain expertise:** legal, medical, financial or regulated content needs a qualified reviewer.
-- **Novelty:** first-time use cases get more review until trusted.
-- **Human-in-the-loop:** high-risk decisions about people need a person with authority to change them.
+A team skips review on Claude-drafted refund letters because "it's usually right", and a wrong amount reaches forty customers.
+
+- **Stakes and audience:** money, legal exposure, harm and reputation, and who sees it. Audience size alone isn't the stakes.
+- **Expertise:** health, legal or financial content needs someone qualified in that field. A spelling check, a disclaimer, or replying only where Claude marks itself uncertain isn't review.
+- **Volume and risk together:** sample routine high-volume output, but fully review every item in a risky category such as refunds.
+- **Novelty:** a new use gets more review until it earns trust.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| No review | Personal drafts and ideas | Never for anything shared |
-| Self-check | Internal, low-stakes output | Your own blind spots remain |
-| Expert review | External, regulated or people-affecting | Slower; needs a reviewer |
+| Your own read | Personal drafts | Your blind spots remain |
+| Author's quick check | Internal, low-stakes output | Small errors slip through |
+| Sample review | Routine, high-volume output | Rare errors get through |
+| Full review by a qualified person | External, regulated or people-affecting output | Slower; needs that person |
 
 ### How to do it
 
-1. Ask: who will see this, and what happens if it's wrong?
-2. Match the review level to the answer.
-3. For high-stakes work, a qualified person reviews and owns the decision.
+1. Ask who sees it and what happens if it's wrong.
+2. Match the review level.
+3. For high-risk work, a qualified person with authority decides, and the affected person is told AI was involved.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Claude is usually accurate, so skip review to save time" fails for external or high-stakes work. And "review everything line by line" wastes effort on low-stakes drafts. Scale review to stakes and audience.</div>
+<div class="note-trap">Skipping review on customer letters because "Claude is usually accurate" means a customer finds the first error.</div>
 
 ### Go deeper
 
+- [Usage Policy](https://www.anthropic.com/legal/aup)
 - [2026 Usage Policy update](https://www.anthropic.com/news/2026-usage-policy-update)
 
 ---
@@ -208,47 +216,48 @@ A team uses Claude for three things: drafting internal meeting notes (author ski
 
 ### Key Concept
 
-**Shape the same content for each reader: what they already know, what they need to decide, and how much time they'll give it.**
+**Keep the facts fixed and shape everything else to what each reader knows, decides and has time for.**
 
-One set of findings may need to become an executive summary, a team briefing and a customer FAQ. Each audience needs a different length, vocabulary, level of detail and call to action. Claude adapts well when you name the audience and their need. Asking for two or three versions side by side lets you compare approaches and pick or combine the best.
+Each audience needs a different length, vocabulary, level of detail and call to action. Claude adapts well when you name the reader and their next action, but you stay the editor, and the facts never change between versions.
 
-**Think of explaining the same news to your CEO, your team and a customer**: same facts, three different conversations.
+**Think of telling the same news to your CEO, your team and a customer**: same facts, three different conversations.
 
-![The same project findings adapted for three audiences: a three-line executive summary with the decision needed, a team briefing with actions and owners, and a customer FAQ in plain language.](/content/skillup/ccao/images/ccao-2-5-audiences.svg)
+![One checked survey figure rewritten for three readers: a trustee summary with the decision needed, a volunteer briefing in plain words, and a leaflet line for members, each stating the same figure in different language and length.](/content/skillup/ccao/images/ccao-2-5-audiences.svg)
 
 ### Real use
 
-A product manager has a detailed release report. She asks Claude for a three-line summary for the leadership channel, a version for support agents focused on what changes for customers, and a plain-language customer note. She compares two versions of the customer note and keeps the clearer one.
+A research manager at a charity for older people turns one set of survey findings into a trustee summary, a volunteer briefing and a plain-language leaflet. She compares two leaflet versions against members' next steps and keeps the clearer one, adding a line from the other. A final check confirms all three state the same figures.
 
 ### How it works
 
-- **Name the audience** and what they need to do with the output.
+The same 12-page incident report goes to the board, the support team and customers; the board stops at page two and customers get internal jargon.
+
+- **Name the audience** and what they must do with the output.
 - **Adjust** length, vocabulary, detail and tone.
-- **Compare versions:** ask for two or three and pick or merge.
-- **Edit yourself:** add context Claude can't know; remove anything inaccurate.
-- **Consistency:** every version must state the same facts.
+- **Compare 2–3 versions** against the audience and the purpose, combine the strongest parts, then edit. The longer version, or the one Claude prefers, isn't the test.
+- **Same facts, your voice:** a simpler version may leave detail out but never change it. Edit off-voice passages into your organisation's voice rather than sending them as they are or starting over, and own what goes out under your name.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| One version for all | Everyone has similar needs | Too much detail for some, too little for others |
-| Version per audience | Readers differ in role or expertise | More to review |
-| Side-by-side alternatives | You're unsure which approach works | Extra reading to compare |
+| One version for all | Readers have similar needs | Too much for some, too little for others |
+| Version per audience | Readers differ in role or expertise | More to check |
+| Side-by-side alternatives | You're unsure which approach works | Extra reading |
 
 ### How to do it
 
-1. List each audience and what they need to know or decide.
-2. Ask Claude for a version per audience, or two alternatives to compare.
-3. Check every version states the same facts, then edit for your voice.
+1. List each audience and its next action.
+2. Ask for a version per audience, or two to compare.
+3. Check that every version states the same figures, then edit for voice.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Send the detailed version to everyone so nothing is lost" ignores the reader. And adapting must never change the facts: a simpler version can leave detail out, not alter it.</div>
+<div class="note-trap">Simplifying a version by rounding figures or dropping caveats changes the facts, so two audiences end up believing different things.</div>
 
 ### Go deeper
 
-- [Prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+- [AI Fluency: Framework & Foundations (Anthropic Academy)](https://anthropic.skilljar.com/ai-fluency-framework-foundations)
 
 ---
 
@@ -256,43 +265,45 @@ A product manager has a detailed release report. She asks Claude for a three-lin
 
 ### Key Concept
 
-**Choose the format by what happens next: read once means inline, reuse or share means an artifact or file, and feeding another tool means structured data.**
+**Choose the format by what happens to the output next.**
 
-Inline text in the chat suits quick answers you'll read and move on from. An artifact is a self-contained output beside the chat, such as a document, dashboard or small interactive tool, that you can keep editing, export or share. Claude can also create downloadable files (Word, Excel, PowerPoint, PDF) when file creation is turned on. Structured data, such as a table, CSV or JSON, suits anything another system or spreadsheet will use. Curating means organising content into a clear structure with headings, groups and priorities.
+Read once means inline; keep, edit or share means an artifact or file; feeding a spreadsheet or system means structured data. Organise the material before choosing its format.
 
 **Think of sticky notes, a report and a spreadsheet**: each suits a different next step.
 
-![Format follows the next step: a quick answer stays inline, a document or tool to keep or share becomes an artifact or file, and data for a spreadsheet or another tool becomes structured data such as a table or CSV.](/content/skillup/ccao/images/ccao-2-6-formats.svg)
+![Messy sign-up emails are first grouped, ordered and de-duplicated, then the same information is shown three ways: a one-line inline answer to read once, a rota artifact the team keeps editing, and CSV rows for the volunteer system.](/content/skillup/ccao/images/ccao-2-6-formats.svg)
 
 ### Real use
 
-An event coordinator asks for a quick answer about venue capacity rules (inline), then a run-of-show document she'll edit with the team (artifact, exported to Word), and finally the attendee list cleaned into columns for the registration system (structured data, CSV).
+A volunteer coordinator at a music festival has Claude group and order 140 messy sign-up emails by role, availability, then priority, then picks an inline answer for a quick capacity question, a shift-rota artifact the team edits, and a CSV (a plain file of rows and columns that spreadsheets open) for the volunteer system.
 
 ### How it works
 
-- **Inline:** quick answers, explanations, short drafts.
-- **Artifact:** documents, dashboards, small tools you'll refine, export or share.
-- **Files:** Word, Excel, PowerPoint, PDF via file creation (code execution must be on).
-- **Structured data:** tables, CSV or JSON for spreadsheets and other tools.
-- **Curate:** group, order by priority, add headings and a summary first.
+A volunteer rota pasted as a long chat message is copied, edited and re-sent four times; by Friday, three versions circulate.
+
+- **Curate first:** ask Claude to group related items, order them (priority, time or owner), merge duplicates, flag gaps and add a summary at the top.
+- **Inline:** quick answers you read once, not a full document.
+- **Artifact or file:** artifacts open beside the chat for work you'll keep editing or share; Claude can also make Word, Excel, PowerPoint and PDF files. Both need the **Code execution and file creation** setting, which lets Claude run code and make files.
+- **Structured data:** a table or CSV, with one row per item and one column per field.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Inline | Read once, move on | Hard to reuse |
-| Artifact or file | Reuse, edit, export or share | Needs the capability turned on |
-| Structured data | Another tool or spreadsheet will use it | Less readable as prose |
+| Inline | Read once and move on | Hard to reuse |
+| Artifact | The team will keep editing or sharing it | Needs the setting turned on |
+| Downloadable file | It must leave Claude as Word, Excel, PowerPoint or PDF | Check formatting after export |
+| Structured data (table or CSV) | A spreadsheet or system will use it | Less readable |
 
 ### How to do it
 
-1. Decide what happens to the output next.
-2. Ask for that format explicitly, with columns or sections named.
-3. Check structure and contents before exporting or sharing.
+1. Ask Claude to group, order and summarise the material.
+2. Decide what happens to it next.
+3. Ask for that format, naming the columns or sections.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">Asking for a long prose report when the data is headed into a spreadsheet creates manual rework. Pick the format for the next step. And artifacts and file creation depend on the code execution setting being enabled.</div>
+<div class="note-trap">Asking for a polished report when the data is headed for a spreadsheet means someone retypes every row.</div>
 
 ### Go deeper
 
@@ -305,32 +316,42 @@ An event coordinator asks for a quick answer about venue capacity rules (inline)
 
 ### 1. The connective narrative
 
-This domain is the safety net under everything else. Checking accuracy and completeness (2.1) catches what went wrong; knowing the red flags (2.2) tells you where to look; fact-checking (2.3) is how you confirm. Deciding the review level (2.4) scales that effort to the stakes. Adapting for the audience (2.5) and choosing the format (2.6) make sure correct content actually works for the person who receives it.
+The AI Fluency course names four competencies: Delegation (deciding what work to give AI), Description (telling it clearly what you need), Discernment (judging what comes back) and Diligence (taking responsibility for how it's used). This domain is Discernment. Lessons 2.1 to 2.3 judge the content: did it cover the request, where might it be wrong, and how do you confirm it?
+
+Lesson 2.4 decides how much judging an output needs, and by whom. Lessons 2.5 and 2.6 judge fit: the right reader and the right shape. Running through all six is one refusal: fluency is the thing Discernment won't trust.
 
 ### 2. Worked scenario
 
-> **Scenario.** A compliance associate asks Claude to summarise a new regulation for the sales team. She uploads the official text and asks for quotes behind each point (2.3). One summary cites a sub-clause that says something else, and she corrects it (2.2). She ticks off every requirement in her prompt (2.1). Because the guidance will change how salespeople talk to customers, the legal team reviews it (2.4). She produces a one-page briefing for sales and a short FAQ (2.5), saved as an artifact the team can update (2.6).
+> **Scenario.** A regulatory affairs associate at a pharmacy chain turns new guidance on medicine storage into instructions for 120 stores.
+>
+> 1. **Checking the summary.** She could ask Claude to confirm its draft, or ask for the passage behind each of its 14 instructions. She chose quotes, because a self-check is the same source checking itself. One temperature range had no supporting passage, so she removed it.
+> 2. **Two fridge-check frequencies.** The draft said daily in one place and weekly in another. Keeping the stricter one felt safe but could still be wrong, so she reconciled against the source instead. It said daily.
+> 3. **Review level.** A proofread by her team would be quick, but the instructions change what staff do with medicines. The superintendent pharmacist reviewed them before release.
+> 4. **Format.** One long document would be read once and lost. Store managers got a checklist artifact they can keep up to date, and the stock system got a CSV of the 38 affected products.
 
 ### 3. Memory aid
 
-**SOURCE**: **S**cope covered? · **O**rigin of each fact? · **U**nusual specifics flagged? · **R**eview level set? · **C**hanged for the audience? · **E**xport format right?
+Before anything leaves your hands, ask two questions: **"What has this been checked against?"** and **"Who is qualified to sign it off?"**
 
 ### 4. Exam strategy for this domain
 
-The tempting wrong answers trust signals that aren't evidence: confidence, fluency, formality, or Claude checking itself. The right answer checks against an authoritative source, and scales human review to the stakes and audience.
+- Tempting wrong answers trust signals that aren't evidence: confidence, fluency, length, a disclaimer, or Claude checking itself.
+- Right answers check against an authoritative source and scale review to the stakes and the expertise needed.
+- Five minutes before the exam: find the source, then find the right reviewer.
 
 ---
 
 ## Cheat Sheet 📋
 
-| Scenario says… | Answer |
+| Situation | What to do |
 |---|---|
-| Confident citation or section number | Verify against the official source |
-| "Ask Claude if it's sure" | Not verification |
-| Totals don't match parts | Inconsistency: reconcile |
-| Wording about age or gender in hiring notes | Bias: rewrite and review |
-| Output for customers or regulators | Qualified human review |
-| Decision affects someone's job or money | Human in the loop with authority |
-| Same findings for execs and customers | Version per audience, same facts |
-| Data going to a spreadsheet | Structured data (table or CSV) |
-| Document the team will keep editing | Artifact or file |
+| Confident citation or section number | Check it in the official text |
+| You're tempted to ask Claude if it's sure | That isn't verification; check an outside source |
+| Two figures disagree | Reconcile against the source |
+| Equal results described unequally | Treat it as bias: correct it, and check other outputs |
+| Statistic from the web or Research | Open the source; check the date, units, region and currency |
+| Customer-facing or regulated output | Qualified review before use |
+| Decision affects someone's money, health, rights or job | Qualified person with authority, and tell them AI was involved |
+| Hundreds of routine replies | Sample them; fully review complaints and refunds |
+| Same findings for executives and customers | One version each, with the same facts |
+| Data going into a spreadsheet | Table or CSV, one row per item |

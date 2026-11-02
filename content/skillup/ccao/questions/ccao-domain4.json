@@ -2,282 +2,596 @@
   {
     "domain": 4,
     "id": "ccao-d4-001",
-    "scenario": "An operations lead has a page of rough notes from stakeholders about a new onboarding process.",
+    "difficulty": "easy",
+    "scenario": "An operations lead has a page of rough notes from six stakeholders about a new onboarding process. Some notes disagree, and some topics nobody mentioned.",
     "question": "How can Claude best help at the requirements stage?",
     "options": [
-      "Ask Claude to design the final process immediately, skipping requirements",
-      "Ask Claude to decide which stakeholders are right",
-      "Ask Claude to organise the notes into requirements, flag gaps and conflicts, and list questions to ask stakeholders",
-      "Ask Claude to invent the requirements stakeholders forgot"
+      "Ask Claude to design the final process now, using the notes as background",
+      "Ask Claude to resolve the conflicts so the list is ready to build from",
+      "Ask Claude to group the requirements, flag conflicts and list open questions",
+      "Ask Claude to fill in the requirements the stakeholders forgot to mention, so the list is complete"
     ],
     "correct": 2,
-    "explanation": "C is correct: Claude is useful for structuring requirements and surfacing gaps and conflicts, while people confirm them. A is wrong because design without agreed requirements risks building the wrong thing. B is wrong because resolving priorities is a stakeholder decision. D is wrong because invented requirements aren't requirements; missing ones should become questions.",
+    "explanation": "C is correct: Claude can structure messy notes and surface conflicts and gaps, while the stakeholders confirm them. A is wrong because designing before requirements are agreed builds the wrong process. B is wrong because choosing between stakeholders' needs is their decision, not Claude's. D is wrong because invented requirements look real but nobody asked for them; gaps should become questions.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "requirements",
       "use-cases"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-002",
-    "scenario": "A team lists possible uses for Claude and asks it to help choose where to start.",
+    "difficulty": "medium",
+    "scenario": "A team lists possible uses for Claude. It wants a first pilot that can show results within a month without putting money or people's livelihoods at risk.",
     "question": "Which use case is the best first candidate?",
     "options": [
-      "Drafting first versions of weekly status updates from meeting notes, reviewed by the project lead",
-      "Automatically approving supplier payments without review",
-      "Making final hiring decisions from CVs",
-      "Replacing the company's financial audit"
+      "Drafting weekly status updates from meeting notes, reviewed by the project lead",
+      "Approving supplier payments below a set amount without anyone checking them first",
+      "Shortlisting job applicants from their CVs so managers read fewer of them",
+      "Producing the year-end figures for the external auditors to sign off"
     ],
     "correct": 0,
-    "explanation": "A is correct: a good starting use case is frequent, text-heavy, low risk and has a person reviewing the output. B is wrong because unreviewed financial actions are high risk. C is wrong because decisions about people need a qualified human in the loop. D is wrong because an audit needs certified expertise and accountability.",
+    "explanation": "A is correct: a good first use case is frequent, text-heavy, low-risk and reviewed by a person, which this is. B is wrong because unchecked payments move money with nobody accountable for errors. C is wrong because shortlisting affects people's livelihoods, a high-risk use needing qualified human review. D is wrong because audited figures are accountable, high-stakes output, a poor place to start.",
     "tags": [
+      "scenario-based",
+      "application",
       "use-case-fit"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-003",
-    "scenario": "Before using Claude to improve the customer FAQ, a manager wants to know whether it's worked afterwards.",
+    "difficulty": "medium",
+    "scenario": "Before using Claude to improve the customer FAQ, a manager wants to be able to show, three months later, whether the change worked.",
     "question": "What should she define first?",
     "options": [
-      "Success criteria such as fewer repeat support tickets, accuracy against policy, and time to update",
-      "The longest possible list of features",
-      "Which model version to use for the next five years",
-      "A rule that every answer must be under ten words"
+      "A target for how many FAQ pages the team should rewrite each week of the project",
+      "The full list of features each stakeholder asked for",
+      "Success criteria, such as fewer repeat tickets and policy accuracy",
+      "Which Claude plan and model the team will use for it"
     ],
-    "correct": 0,
-    "explanation": "A is correct: clear success criteria let you judge whether the solution meets the need. B is wrong because a feature list isn't a measure of success. C is wrong because model choices change and aren't success criteria. D is wrong because an arbitrary length rule isn't tied to the goal.",
+    "correct": 2,
+    "explanation": "C is correct: success criteria fixed before the change let her compare results afterwards and show whether the FAQ improved. A is wrong because pages rewritten measures activity, not whether customers stop asking again. B is wrong because a feature wish-list describes inputs, not the outcome to judge. D is wrong because the tool choice says nothing about whether the FAQ now works.",
     "tags": [
+      "best-practice",
+      "application",
       "requirements",
       "success-criteria"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-004",
-    "scenario": "A project manager needs a first draft of a six-week plan for an office move.",
+    "difficulty": "easy",
+    "scenario": "A project manager needs a first draft of a six-week plan for an office move. She knows the move date, the six-person team, the budget and which tasks depend on IT.",
     "question": "What is the most effective way to use Claude?",
     "options": [
-      "Ask for \"a plan\" with no details",
-      "Ask Claude to commit the team to the dates it chooses",
-      "Give the constraints (dates, team, budget, dependencies) and ask for a draft plan with milestones and risks to review",
-      "Ask for a plan only after the move is finished"
+      "Ask for a six-week plan for the office move, then fill in the details by hand later",
+      "Ask Claude to set the dates and owners so the team can follow them",
+      "Ask for a list of general tips on running a smooth office move",
+      "Give the dates, team, budget and dependencies, and ask for a draft with risks"
     ],
-    "correct": 2,
-    "explanation": "C is correct: Claude drafts useful plans when given the real constraints, and the project manager reviews and adjusts them. A is wrong because a plan without constraints is generic. B is wrong because commitments belong to the people responsible. D is wrong because planning is needed before the work.",
+    "correct": 3,
+    "explanation": "D is correct: a planning prompt is only as good as its constraints, and a draft with risks is something she can review and adjust. A is wrong because a plan without her constraints is generic and needs rewriting. B is wrong because committing people to dates is the manager's job, not Claude's. C is wrong because general tips aren't a plan for this move.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "planning"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-005",
-    "scenario": "A finance team's invoice-approval process takes eight steps and two weeks. The manager wants to shorten it.",
+    "difficulty": "medium",
+    "scenario": "A finance team's invoice-approval process takes eight steps and two weeks, and staff say invoices sit for days between steps. The manager wants to shorten it.",
     "question": "How can Claude best help?",
     "options": [
-      "Ask Claude to approve invoices instead of the team",
-      "Describe the current steps and ask Claude to identify bottlenecks, duplication and steps that could be combined, then test the proposal with the team",
-      "Ask Claude to remove every approval step",
-      "Ask Claude for a list of general productivity tips"
+      "Ask Claude to approve routine invoices itself so the team can skip that approval step",
+      "Describe each real step and its delays, and ask for bottlenecks and duplication",
+      "Ask Claude to remove the approval steps that slow the process most",
+      "Ask Claude for general tips on making finance teams more productive"
     ],
     "correct": 1,
-    "explanation": "B is correct: Claude can analyse a described process for bottlenecks and duplication, and people test the redesign. A is wrong because approving payments needs human accountability. C is wrong because some controls are required. D is wrong because generic tips don't address this process.",
+    "explanation": "B is correct: Claude can find bottlenecks and duplication in a process described as it really runs, and the team then tests the redesign. A is wrong because approving payments needs an accountable person. C is wrong because some approval steps are controls the business relies on, and cutting them invites errors or fraud. D is wrong because general tips don't address these eight steps.",
     "tags": [
+      "best-practice",
+      "application",
       "process-optimization"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-006",
-    "scenario": "An events coordinator is choosing between three venues and wants up-to-date information on each.",
+    "difficulty": "medium",
+    "scenario": "An events coordinator is choosing between three venues and needs up-to-date prices and availability. The decision is due Friday and the budget is fixed.",
     "question": "Which approach fits best?",
     "options": [
-      "Ask Claude from memory for each venue's current prices",
-      "Pick the first venue Claude mentions",
-      "Ask Claude to book the cheapest venue",
-      "Use web search or Research to gather current details with sources, then verify key facts directly with each venue"
+      "Use Research and take the prices it finds as final for the budget",
+      "Ask Claude to compare the venues from its own knowledge of them, then make a shortlist",
+      "Ask Claude to recommend one venue so the decision is made by Friday",
+      "Use Research for current details, then confirm price and dates with each venue"
     ],
     "correct": 3,
-    "explanation": "D is correct: current information needs current sources, and key facts like price and availability should be confirmed directly. A is wrong because training knowledge may be out of date. B is wrong because it isn't a comparison. C is wrong because booking commits money and needs a person's decision.",
+    "explanation": "D is correct: current facts need current sources, and price and availability are confirmed with each venue before money is committed. A is wrong because found prices can be out of date or wrong for her dates. B is wrong because Claude's own knowledge can be stale for prices and availability. C is wrong because choosing is the coordinator's decision, and a recommendation built on unchecked facts adds risk.",
     "tags": [
+      "best-practice",
+      "application",
       "research",
       "planning"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-007",
-    "scenario": "A trainer wants to try out an idea for an interactive quiz to show her manager before anyone spends budget on it.",
+    "difficulty": "easy",
+    "scenario": "A trainer wants to try out an idea for an interactive quiz and show it to her manager before anyone spends budget on it.",
     "question": "What is the best way to use Claude?",
     "options": [
-      "Ask Claude to write the full production software for the company's learning system",
-      "Ask Claude to build a quick prototype as an artifact, try it, and refine it based on feedback",
-      "Describe the idea in a long email instead of trying it",
-      "Wait until the developers have time"
+      "Ask Claude to write production software for the company's learning system",
+      "Ask Claude to build a quick artifact prototype and refine it with feedback",
+      "Write up the idea in a detailed proposal for the manager to read",
+      "Add the idea to the developers' backlog and wait until they have a free slot to look at it"
     ],
     "correct": 1,
-    "explanation": "B is correct: artifacts let non-developers prototype an idea quickly and improve it through feedback. A is wrong because production systems and integrations belong to developers. C is wrong because a working prototype communicates better than a description. D is wrong because a quick prototype can test the idea first.",
+    "explanation": "B is correct: an artifact lets her build something her manager can try before any budget is spent, and feedback then improves it. A is wrong because production software and system integration belong to Claude Architects or Developers. C is wrong because a written proposal can't show how the quiz feels to use. D is wrong because waiting delays a test she could run herself today.",
     "tags": [
+      "best-practice",
+      "comprehension",
       "prototype",
       "artifacts"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-008",
-    "scenario": "A prototype built in an artifact works well. The team now wants it connected to the HR system with single sign-on for 3,000 staff.",
+    "difficulty": "medium",
+    "scenario": "A prototype built as an artifact works well with a small test group. The team now wants it connected to the HR system, with single sign-on (one company login), for 3,000 staff.",
     "question": "What is the appropriate next step?",
     "options": [
       "Keep extending the artifact until it connects to the HR system",
-      "Share the artifact link company-wide and skip the integration",
-      "Ask Claude to store employee data in the artifact",
-      "Hand over the prototype and requirements to Claude Architects or Developers for the integration"
+      "Share the artifact link company-wide and leave the integration for later",
+      "Paste the staff list into the artifact so it works with real data",
+      "Hand the prototype and requirements to Claude Architects or Developers"
     ],
     "correct": 3,
-    "explanation": "D is correct: Associates prototype and specify, then escalate integrations, security and scale to Architects and Developers. A is wrong because enterprise integration is outside the Associate scope. B is wrong because it ignores the stated requirements. C is wrong because storing employee data this way raises privacy and governance issues.",
+    "explanation": "D is correct: an HR integration, company logins and staff data at this scale are the hand-over triggers, so the prototype and requirements go to Architects or Developers. A is wrong because an extended artifact holds staff data in a tool nobody has secured or supports. B is wrong because a prototype shared as finished breaks on real logins. C is wrong because it puts personal data where nobody protects it.",
     "tags": [
+      "scenario-based",
+      "application",
       "escalation",
       "solution-design"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-009",
-    "scenario": "A team's first Claude-supported design for a new intake form gets mixed feedback from users.",
+    "difficulty": "hard",
+    "scenario": "A team's Claude-built prototype of a new intake form is meant to cut the time it takes to register a client. Front-desk staff, the larger group, want fewer fields; the case workers who read the forms want more detail.",
     "question": "What is the best way to iterate?",
     "options": [
-      "Group the feedback into themes with Claude's help, change the design for the main themes, and test again with users",
-      "Ask Claude to ignore negative feedback",
-      "Make every change any user requested",
-      "Start a completely different project instead"
+      "Group the feedback into themes, fix the main one for the goal, then retest with both",
+      "Build both groups' changes in as options so each group can use its own preferred version",
+      "Go with the front-desk staff, since they are the larger group of users",
+      "Give Claude both sets of feedback and ask it to choose the better design"
     ],
     "correct": 0,
-    "explanation": "A is correct: structured iteration groups feedback, prioritises the main issues and tests again. B is wrong because ignoring feedback misses real problems. C is wrong because conflicting requests can't all be applied. D is wrong because mixed feedback is normal and useful.",
+    "explanation": "A is correct: the deciding constraint is the goal, cutting registration time; themes show which complaint blocks it, and retesting with both groups checks the fix. B is wrong because two versions double the upkeep and dodge the decision. C is wrong because group size isn't the goal, and case workers' needs still matter. D is wrong because the trade-off belongs to the team, not Claude.",
     "tags": [
+      "scenario-based",
+      "evaluation",
       "iteration",
       "solution-design"
-    ],
-    "difficulty": "hard"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-010",
-    "scenario": "A communications team spends hours each week turning one press release into posts for four channels.",
+    "difficulty": "medium",
+    "scenario": "A communications team spends hours each week turning one press release into posts for four channels. Every post is reviewed by the team before it goes out.",
     "question": "Which approach augments the existing workflow?",
     "options": [
-      "Remove the team's review and publish Claude's drafts automatically",
-      "Stop writing press releases",
-      "Keep the team's process, but have Claude draft each channel's version from the press release for the team to edit and approve",
-      "Ask Claude to choose which channels the company uses"
+      "Replace the four channel posts with a single generic post written by Claude for the team",
+      "Redesign the comms process so Claude publishes to each channel directly",
+      "Keep the process, with Claude drafting each version for the team to approve",
+      "Ask Claude to decide which channels the team should keep using"
     ],
     "correct": 2,
-    "explanation": "C is correct: augmenting keeps the workflow and its controls but speeds up a step. The team edits and approves. A is wrong because it removes the review that protects quality and reputation. B is wrong because it changes the business, not the workflow. D is wrong because channel strategy is a business decision.",
+    "explanation": "C is correct: augmenting keeps today's workflow and its review, and speeds up the slow step of adapting each version. A is wrong because one generic post drops what each channel needs and changes the output itself. B is wrong because it is a redesign that also removes the team's review before publishing. D is wrong because channel strategy is a business decision, not a drafting step.",
     "tags": [
+      "concept",
+      "application",
       "augment",
       "redesign"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-011",
-    "scenario": "A support team copies the same case details into three different forms because each step was designed before AI. Claude could produce all three from one case summary.",
-    "question": "When does redesigning the workflow, rather than just adding Claude to one step, make sense?",
+    "difficulty": "medium",
+    "scenario": "A support team copies the same case details into three different forms because each step was designed for manual entry. Claude could produce all three from one case summary.",
+    "question": "When does redesigning the workflow, rather than adding Claude to one step, make sense?",
     "options": [
-      "Always, because AI should replace every existing process",
-      "Never, because existing processes shouldn't change",
-      "When the current steps exist only because of manual limits, so a redesign removes duplication while keeping necessary checks",
-      "Only when the redesign removes all human review"
+      "As soon as the team is comfortable using Claude day to day",
+      "When the redesign would cut the most steps from the process",
+      "When steps exist because of manual limits, and the needed checks stay",
+      "When Claude can produce the three forms without anyone needing to check them afterwards"
     ],
     "correct": 2,
-    "explanation": "C is correct: redesign is worth it when steps exist only because of old manual limits, and checks that matter are kept. A is wrong because many workflows are better augmented than replaced. B is wrong because duplication like this is exactly what redesign fixes. D is wrong because removing review isn't the goal.",
+    "explanation": "C is correct: copying the same details into three forms is a step created by manual limits, so redesign removes it, provided the checks that catch errors remain. A is wrong because comfort isn't evidence that a redesign pays off. B is wrong because cutting the most steps can remove checks that matter. D is wrong because unchecked forms let one error flow into three places at once.",
     "tags": [
+      "scenario-based",
+      "application",
       "redesign"
-    ],
-    "difficulty": "hard"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-012",
-    "scenario": "A team introduces Claude into its weekly reporting.",
+    "difficulty": "medium",
+    "scenario": "A team of eight is bringing Claude into its weekly reporting. The director wants proof, in three months, that the change is worth keeping.",
     "question": "Which practice makes the change most likely to stick?",
     "options": [
-      "Start with one workflow, measure time and quality before and after, and document the new steps for the team",
-      "Change every workflow at once to save time",
-      "Let each person use Claude however they like with no shared approach",
-      "Skip measuring, since the benefit is obvious"
+      "Start with one workflow, measure it before and after, and document the steps",
+      "Change the team's five workflows at once so that the results show up sooner than planned",
+      "Let each person use Claude in their own way and share tips monthly",
+      "Start using Claude straight away and measure the results at three months"
     ],
     "correct": 0,
-    "explanation": "A is correct: a focused start, a before-and-after measure and shared documentation make adoption visible and repeatable. B is wrong because changing everything at once makes problems hard to trace. C is wrong because inconsistent use gives inconsistent results. D is wrong because without measurement the benefit can't be shown.",
+    "explanation": "A is correct: one workflow with a before-and-after measure gives the director proof, and shared documentation keeps everyone working the same way. B is wrong because changing five at once hides which change caused any problem. C is wrong because inconsistent use gives results nobody can compare. D is wrong because without a baseline the three-month figures have nothing to be compared against.",
     "tags": [
+      "best-practice",
+      "application",
       "integration",
       "change"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-013",
-    "scenario": "A director asks whether Claude can \"just handle\" the monthly board report.",
+    "difficulty": "easy",
+    "scenario": "A director asks whether Claude can \"just handle\" the monthly board report, which includes financial figures and recommendations.",
     "question": "What is the most accurate way to describe Claude's role?",
     "options": [
-      "Claude can produce the final report without anyone checking it",
-      "Claude can't help with reports at all",
-      "Claude is always right about financial figures",
-      "Claude can draft and structure the report quickly, but figures and conclusions need checking and an accountable person signs it off"
+      "Claude can produce the final report, so the review step can be dropped",
+      "Claude is unsuited to board reports, so the team should keep drafting by hand",
+      "Claude is accurate with figures, so the numbers can go in unchecked",
+      "Claude can draft it quickly, but someone checks the figures and signs it off"
     ],
     "correct": 3,
-    "explanation": "D is correct: communicating value honestly includes the limits: fast drafting and structure, with verification and human accountability. A is wrong because it overstates reliability. B is wrong because it understates real value. C is wrong because Claude can make mistakes, including with numbers.",
+    "explanation": "D is correct: describing Claude honestly means stating the value, fast drafting and structure, and the limits, checked figures and an accountable sign-off. A is wrong because Claude can be confidently wrong, and errors would reach the board. B is wrong because it understates real value the director could use. C is wrong because Claude can make mistakes with numbers, so they need checking.",
     "tags": [
+      "concept",
+      "comprehension",
       "stakeholders",
       "limitations"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-014",
-    "scenario": "A manager wants to persuade the leadership team to extend a Claude pilot.",
+    "difficulty": "medium",
+    "scenario": "After a three-month pilot, a manager wants the leadership team to fund Claude for two more departments. Two of the leaders doubt it has made any real difference.",
     "question": "Which evidence is most convincing?",
     "options": [
-      "A list of everything AI might do in the future",
-      "Before-and-after measures from the pilot, such as hours saved and error rates, plus the review steps that kept quality",
-      "A demonstration of Claude writing a poem",
-      "Statements that competitors are also using AI"
+      "A summary of what AI tools may be able to do for organisations in the next few years",
+      "A live demo of Claude drafting an email on a made-up example",
+      "Before-and-after pilot measures, with the review steps that kept quality",
+      "Evidence that the main competitors are already using AI tools"
     ],
-    "correct": 1,
-    "explanation": "B is correct: stakeholders respond to measured results in their own context, along with how risks were managed. A is wrong because speculation isn't evidence. C is wrong because it doesn't relate to the business case. D is wrong because what competitors do doesn't show value here.",
+    "correct": 2,
+    "explanation": "C is correct: doubters respond to measured results on their own work, and the review steps show how quality was protected. A is wrong because future possibilities aren't evidence of value now. B is wrong because a made-up example shows nothing about results on real work, which is what the doubters question. D is wrong because competitors' use says nothing about whether this pilot helped.",
     "tags": [
+      "best-practice",
+      "application",
       "stakeholders",
       "value"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 4,
     "id": "ccao-d4-015",
-    "scenario": "A team expects Claude to know last week's internal decisions without being told.",
-    "question": "What should the team lead explain?",
+    "difficulty": "medium",
+    "scenario": "An IT consultancy's bid team lead is preparing a Claude pilot. The team expects Claude to already know last week's bid decisions and the client's history from past projects.",
+    "question": "What should the team lead set up and explain?",
     "options": [
-      "Claude automatically reads all company email",
-      "Claude learns everything said in the office",
-      "Claude will know if they wait a few days",
-      "Claude only knows what it is given or can access: add decisions to the Project or connect the relevant sources"
+      "Ask Claude at the start of each chat to recall last week's bid meetings",
+      "Add the decisions and client files to Project knowledge, and explain why",
+      "Wait a week into the pilot, so Claude can pick up the recent decisions",
+      "Connect the lead's email, so Claude can read the whole team's inboxes"
     ],
-    "correct": 3,
-    "explanation": "D is correct: setting expectations means explaining that Claude works from what it's given: prompts, Project knowledge and connected sources. A is wrong because connectors only access what a user connects. B is wrong because Claude has no access to conversations it isn't given. C is wrong because waiting doesn't give Claude the information.",
+    "correct": 1,
+    "explanation": "B is correct: Claude works from what it's given or can reach, so the decisions and client history go into Project knowledge, and the team hears why. A is wrong because Claude can't recall meetings it was never given. C is wrong because time passing gives Claude no new information. D is wrong because a connector reaches the connected account's data, not colleagues' mailboxes.",
     "tags": [
+      "scenario-based",
+      "application",
       "limitations",
       "expectations"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-016",
+    "difficulty": "medium",
+    "scenario": "A port authority's admin officer has Claude turn interview notes into requirements for a new purchase-approval process. Claude flags that the harbour team says approvals above £5,000 go to a director, while finance says the limit is £10,000.",
+    "question": "What should she do before the process is built?",
+    "options": [
+      "Use the stricter £5,000 limit, since it carries less financial risk",
+      "Ask Claude which limit is more likely to be the current one",
+      "Note the conflict in the requirements and carry on building",
+      "Confirm the correct limit with both teams and record their decision"
     ],
-    "difficulty": "medium"
+    "correct": 3,
+    "explanation": "D is correct: a contradiction Claude flags is an open question for the people who own the rule, and they decide. A is wrong because picking a limit yourself can block approvals finance expects to pass, and the conflict stays hidden. B is wrong because Claude has only the notes, so it would be guessing. C is wrong because the unresolved limit becomes a built-in mistake.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "requirements"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-017",
+    "difficulty": "medium",
+    "scenario": "A dance school's office manager is deciding how Claude fits three tasks: drafting term-fee reminder letters, summarising bursary applications for the reviewer, and approving fee waivers.",
+    "question": "Which split of automate, augment and keep human fits these tasks?",
+    "options": [
+      "Automate the reminders with checks, augment the summaries, and keep the waivers human",
+      "Automate the reminders, augment the summaries, and let Claude approve waivers that meet the policy",
+      "Keep the reminders human, augment the summaries, and keep the waivers human",
+      "Augment the reminders, automate the summaries, and keep the waivers human"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: reminders are repetitive and low-risk, summaries feed a reviewer's judgement, and waivers are accountable financial decisions. B is wrong because a waiver affects a family's finances, so a person decides. C is wrong because keeping routine reminders manual wastes the clearest automation gain. D is wrong because unchecked summaries could drop details the reviewer relies on, while the reminders gain little from augmenting.",
+    "tags": [
+      "comparison",
+      "application",
+      "delegation",
+      "use-case-fit"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-018",
+    "difficulty": "hard",
+    "scenario": "A wine importer's sales office is choosing its first Claude use case. X is drafting daily order-confirmation emails, low-risk, but nobody has time to review them. Y is drafting the weekly stock-update note, also low-risk, which the team lead will review.",
+    "question": "Which should the office start with, and why?",
+    "options": [
+      "X, because daily volume gives the biggest time saving fastest",
+      "Y, because a first use case needs a person reviewing the output",
+      "X, with Claude asked to double-check its own emails before sending",
+      "Y, because weekly work is easier to automate than daily work"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: both are text-heavy and low-risk, so the deciding constraint is review; Y has a person checking it, and a good first use case is reviewed. A is wrong because unreviewed customer emails let errors repeat daily. C is wrong because Claude checking itself isn't independent review. D is wrong because frequency actually favours X; Y wins on review, not on being weekly.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "use-case-fit"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-019",
+    "difficulty": "medium",
+    "scenario": "A garden centre chain's operations manager has Claude's draft plan for moving the head office, with dates and an owner for each task. Nobody named in it has seen it yet.",
+    "question": "What should she do before treating it as the plan?",
+    "options": [
+      "Send it to the team as the agreed plan so work can start",
+      "Check the dates and tasks with the people who will do the work",
+      "Ask Claude to add buffer days to each task, then send it out",
+      "Ask Claude for a more detailed version with hourly milestones for each task"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Claude's dates are a draft; the owners know their workload and dependencies, so testing the plan with them turns it into a commitment. A is wrong because owners learn of deadlines they never agreed to. C is wrong because buffer days are still guesses nobody has checked. D is wrong because more detail on unchecked dates spreads the same errors further.",
+    "tags": [
+      "best-practice",
+      "application",
+      "planning"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-020",
+    "difficulty": "medium",
+    "scenario": "A coffee roaster's buyer uses Research to find packaging suppliers. It reports one supplier's price per thousand bags, and she needs a budget figure for the board next week.",
+    "question": "What should she do with the price?",
+    "options": [
+      "Use the price as found, since Research gathered it from the web",
+      "Run Research again and use the price if it comes back the same",
+      "Use the price with a 10% margin to cover any difference",
+      "Confirm the price and availability with the supplier directly"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: prices and stock change, and the supplier is the source that can confirm both before a board budget rests on them. A is wrong because a found price can be out of date or for a different quantity. B is wrong because a repeated search can find the same stale page. C is wrong because a margin guesses at the error instead of checking it.",
+    "tags": [
+      "best-practice",
+      "application",
+      "research"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-021",
+    "difficulty": "hard",
+    "scenario": "An insurance broker's manager gives Claude her written description of the claims-handling process and asks for a faster version. In interviews, staff say they use workarounds, such as re-keying claim details into a spreadsheet the written process doesn't mention.",
+    "question": "What should the team do first?",
+    "options": [
+      "Optimise the written process, since it is the official version staff are meant to follow",
+      "Map the process as staff really run it, then look for bottlenecks",
+      "Ask Claude to merge the written process and the workarounds into one",
+      "Optimise the written process, then train staff to stop the workarounds"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the workarounds are the deciding fact; they show the written process isn't how claims really move, so the real steps are mapped first. A is wrong because optimising the official version fixes steps nobody does while the re-keying stays. C is wrong because Claude would be guessing how the two fit together. D is wrong because the workarounds may exist for reasons nobody has examined yet.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "process-optimization"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-022",
+    "difficulty": "medium",
+    "scenario": "A cycle-hire scheme's customer team wants a way for depot staff to log bike faults reported by riders. They aren't sure whether a form, a checklist or a simple tracker would suit the staff best.",
+    "question": "What should they ask Claude for first?",
+    "options": [
+      "Two or three approaches, with the trade-offs of each",
+      "A working fault tracker straight away, based on the first idea",
+      "The best possible solution for logging bike faults at the depots",
+      "A full written specification before anything is built"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: when unsure which approach fits, comparing two or three options with trade-offs lets the team choose before effort goes into building. B is wrong because building the first idea may commit them to the wrong format. C is wrong because asking for the best with no criteria returns one guess and hides the alternatives. D is wrong because a full specification is premature before they know which approach works.",
+    "tags": [
+      "best-practice",
+      "application",
+      "solution-design"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-023",
+    "difficulty": "medium",
+    "scenario": "A recycling company's operations coordinator built an artifact prototype for booking bulky-waste collections and tested it with eight customers. Developers will now connect it to the routing system.",
+    "question": "What should the hand-over include?",
+    "options": [
+      "The prototype, the written requirements and the feedback themes",
+      "The artifact link, so developers can see how it already works",
+      "A list of feature ideas collected from the customer tests",
+      "A request to rebuild it properly, leaving the whole design to the developers"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: developers need to see the prototype, know the agreed requirements and understand what testers found, or they rebuild from guesses. B is wrong because a link shows behaviour but not the requirements or why choices were made. C is wrong because raw ideas lack the agreed requirements and the themes behind them. D is wrong because without a brief they lose what the tests taught.",
+    "tags": [
+      "best-practice",
+      "application",
+      "escalation",
+      "solution-design"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-024",
+    "difficulty": "easy",
+    "scenario": "A housing developer's sales team takes notes in its weekly pipeline meeting. Claude now drafts the minutes from those notes, and the sales manager edits and approves them before they go out.",
+    "question": "What kind of change is this?",
+    "options": [
+      "Redesigning the team's sales process around Claude",
+      "Automating the meeting so no one writes minutes",
+      "Replacing the sales manager's role in reporting",
+      "Augmenting one step of the existing workflow"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the workflow stays the same; Claude speeds up one step, and the manager still edits and approves, so the control is kept. A is wrong because the process itself hasn't changed, only how one step is done. B is wrong because a person still reviews the minutes, so nothing runs on its own. C is wrong because the manager keeps the approval and the responsibility.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "augment"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-025",
+    "difficulty": "medium",
+    "scenario": "A translation agency's project team starts using Claude to draft client cover notes. The operations director asks how they'll know, in two months, whether it has helped.",
+    "question": "What should the team measure?",
+    "options": [
+      "A staff survey on whether people like drafting with Claude",
+      "How many messages the team sends to Claude each week",
+      "Time per note, quality and rework, before and after the change",
+      "Time per note and quality over the two months after the change"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the same measures taken before and after show whether drafting got faster without creating more fixes later. A is wrong because liking a tool doesn't show time saved or quality kept. B is wrong because message counts measure activity, not results. D is wrong because without a baseline the two-month figures have nothing to compare against, and rework goes unmeasured.",
+    "tags": [
+      "best-practice",
+      "application",
+      "measurement"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-026",
+    "difficulty": "hard",
+    "scenario": "A logistics broker's billing team has augmented invoicing with Claude for two months, with measured time savings. Staff still copy the same shipment details into three forms because the old systems needed manual entry, and a final reconciliation check catches real billing errors.",
+    "question": "What should the team do next?",
+    "options": [
+      "Keep augmenting the current steps until the savings are larger",
+      "Redesign so one record feeds the three forms, keeping the reconciliation check",
+      "Redesign so one record feeds the three forms, and drop the check to hit the time target",
+      "Redesign the whole billing process around Claude in one go"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: two measured months are the evidence, and the copying exists because of manual limits, so redesign; the reconciliation check catches real errors, so it stays. A is wrong because more augmenting can't remove copying that the process itself creates. C is wrong because dropping a check that catches real errors trades time for billing mistakes. D is wrong because redesigning everything at once hides which change caused a problem.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "redesign"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-027",
+    "difficulty": "hard",
+    "scenario": "A conference organiser's finance lead approves exceptions to the speaker-expenses policy at the end of each quarter, about four a year, and each needs judgement about the circumstances. A colleague proposes adding Claude to that step.",
+    "question": "What should the finance lead do?",
+    "options": [
+      "Augment it, with Claude drafting a recommendation for each exception",
+      "Leave the step as it is, since it is rare and depends on judgement",
+      "Automate it, with Claude applying the policy and flagging edge cases",
+      "Redesign the exceptions process so Claude screens requests first"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is four cases a year, each needing judgement; setting up and checking Claude here costs more than it saves. A is wrong because drafting four recommendations a year saves little and still needs full review. C is wrong because automating judgement calls removes the person accountable for them. D is wrong because redesigning a rare step adds change for almost no gain.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "augment"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-028",
+    "difficulty": "medium",
+    "scenario": "A bookshop chain's head of operations is writing a briefing note for store managers, who will start using Claude to draft stock-reorder emails to publishers next month.",
+    "question": "Where should the note cover Claude's limits?",
+    "options": [
+      "Up front: confident errors, the review step and the data rules",
+      "If store managers ask about them once the pilot starts",
+      "In an appendix, so the main note stays focused on the benefits",
+      "Leave them out, since they distract from the value of the tool"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: managers will rely on the drafts, so they need to know up front that Claude can be confidently wrong, who reviews what, and which data rules apply. B is wrong because errors arrive before anyone thinks to ask. C is wrong because an appendix is easy to skip, so the limits go unread. D is wrong because hidden limits damage trust at the first mistake.",
+    "tags": [
+      "best-practice",
+      "application",
+      "stakeholders",
+      "limitations"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccao-d4-029",
+    "difficulty": "hard",
+    "scenario": "A car dealership group's admin team piloted Claude for drafting supplier payment queries for eight weeks. The finance director, who must approve extending it, says her worry is errors reaching suppliers.",
+    "question": "What should the team lead put first in the case to her?",
+    "options": [
+      "The hours saved per week, with examples of the drafts it produced",
+      "The hours saved, the team's feedback and the plan for other departments",
+      "A live demo of Claude drafting a supplier query on a fresh, made-up example for her",
+      "The measured error rate, the review step that caught errors, and examples"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is her stated concern, errors, so the case leads with the error rate, the review that caught mistakes and real examples. A is wrong because time saved is real value but doesn't answer her worry. B is wrong because feedback and expansion plans also sidestep errors. C is wrong because one demo shows nothing about the error rate across eight weeks.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "stakeholders",
+      "value"
+    ]
   }
 ]

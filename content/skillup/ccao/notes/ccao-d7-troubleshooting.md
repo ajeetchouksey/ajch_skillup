@@ -1,10 +1,10 @@
 # D7: Troubleshooting and Optimization
 
-> **Exam weight**: 10% · **Questions**: ~9 in the bank
+> **Exam weight**: 10% · **Questions**: 18 in the bank
 
 ## Overview
 
-This domain covers what to do when Claude isn't delivering: diagnosing why a prompt or output is falling short, changing the setup based on what results show, and making workflows faster and lighter without losing quality.
+This domain covers what to do when Claude isn't delivering: working out why a prompt or output falls short, changing the setup based on what the results show, and making workflows lighter without losing quality. It exercises the AI Fluency **Description–Discernment loop**: describe what you need, judge what comes back, then adjust the description.
 
 > 💡 **Human Angle**: The same correction made by hand every week isn't a habit; it's a bug in the setup.
 
@@ -14,48 +14,52 @@ This domain covers what to do when Claude isn't delivering: diagnosing why a pro
 
 ### Key Concept
 
-**Diagnose before you fix: name the symptom, trace it to the prompt, the context, the model or the feature, then change one thing and test again.**
+**Diagnose before you fix: trace the symptom to its cause, change one thing, then retest.**
 
-Poor output has causes. Generic answers usually mean missing context or audience. Wrong facts usually mean no source was given, or the knowledge is out of date. Ignored formatting often means the instruction was vague or buried. Shallow reasoning may need a more capable model or higher effort. A chat that starts confusing details may be too long. Change one thing at a time so you know what fixed it.
+Each symptom has a usual cause. Fixing the wrong layer wastes effort, and a bigger model only repeats a wrong input more fluently. Change one thing at a time, or you won't know what worked.
 
-**Think of a mechanic**: they find which part is failing before replacing anything.
+**Think of a mechanic**: they find the failing part before replacing anything.
 
-![Symptoms traced to causes and fixes: generic output to missing context, wrong facts to a missing or stale source, ignored format to vague instructions, shallow reasoning to the model or effort setting, and mixed-up details to an overlong chat.](/content/skillup/ccao/images/ccao-7-1-diagnose.svg)
+![A yes/no diagnosis path: check that the context is present, that facts come from one current source, that the instruction is specific and not contradicted, and that the chat is still short, fixing the first 'no' found; only then raise effort or step up the model, changing one thing and retesting with the same input.](/content/skillup/ccao/images/ccao-7-1-diagnose.svg)
 
 ### Real use
 
-A sales Project keeps quoting the wrong discount. The rep's first instinct is to reword her question. Diagnosing instead, she finds two pricing files in the Project's knowledge, one from last year. Removing it fixes every chat, not just hers.
+A hospice fundraising officer's donor thank-you drafts turned generic after she moved from the "Donor care" Project to a plain chat. She traced it to missing context, since Project knowledge only reaches chats inside the Project. She changed one thing, moving back into the Project, and retested on the same donor record: the drafts were personal again.
 
 ### How it works
 
-- **Generic or off-target:** add goal, audience, context (1.1).
-- **Wrong facts:** provide or update the source; ask for quotes (2.3).
-- **Format ignored:** make the instruction specific; show an example.
-- **Shallow reasoning:** decompose the task, or step up model or effort (3.3).
-- **Drifting chat:** summarise and restart (3.4).
-- **Change one thing**, then test with the same input.
+Rewording the question for a week doesn't fix answers drawn from an out-of-date file; a bigger model just repeats the stale figure more fluently.
+
+- **Name the symptom precisely,** with one example output.
+- **Check causes in order:** the input (prompt and context: is the chat in the Project that holds it?), the source (missing, stale or duplicate knowledge), the instructions (vague, buried or conflicting across levels), the model and effort, then the chat length. A usage limit, an incognito chat or an artifact doesn't make output generic.
+- **Ask Claude which file or passage it used:** quick evidence of a source problem.
+- **Change one thing and retest with the same input.** Changing the prompt, model and files at once hides what fixed it, or what broke it.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Fix the prompt | Output misses goal, audience or format | Fix may live in one chat only |
-| Fix the source or knowledge | Facts are wrong or outdated | Affects everyone using it |
-| Change model or effort | Reasoning is too shallow | More time and usage |
+| Fix the prompt or context | Output is generic or misses the goal, audience or format | The fix may live in one chat only |
+| Fix the source or knowledge | Facts are wrong or out of date | Affects everyone using it; tell them |
+| Fix the instructions | A rule is ignored, or applied where it shouldn't be | Check other levels don't conflict |
+| Raise effort or step up the model | Reasoning is shallow on a well-briefed task | Slower; uses more of your limit |
+| Summarise and restart | Details get mixed up late in a long chat | Detail not in the summary is lost |
 
 ### How to do it
 
-1. Describe the symptom precisely, with an example.
-2. Check the likely cause: prompt, source, model or chat length.
-3. Change one thing and retest with the same input.
+1. Describe the symptom with an example.
+2. Check the likely causes in order.
+3. Change one thing.
+4. Retest with the same input.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Switch to the most capable model" isn't the answer when the cause is stale knowledge or a vague instruction; a bigger model will answer confidently from the same wrong input. Diagnose first.</div>
+<div class="note-trap">Switching to the most capable model when the cause is a stale file gets the same wrong figure, delivered more fluently.</div>
 
 ### Go deeper
 
-- [Prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)
+- [AI Capabilities and Limitations (Anthropic Academy)](https://anthropic.skilljar.com/ai-capabilities-and-limitations)
+- [My prompt isn't giving me a helpful answer](https://support.claude.com/en/articles/7996857-my-prompt-isn-t-giving-me-a-helpful-answer)
 
 ---
 
@@ -63,48 +67,52 @@ A sales Project keeps quoting the wrong discount. The rep's first instinct is to
 
 ### Key Concept
 
-**Let evidence steer: when the same problem keeps coming back, change the setup (instructions, knowledge, model or workflow) instead of correcting each output by hand.**
+**Fix a problem at the lowest level that stops it recurring; climb only when that level fails.**
 
-Feedback comes from reviewers, users and your own results. One-off issues can be fixed in the chat. Recurring ones point to the setup: a missing rule in the Project instructions, an outdated file, a model that's too small, or a step that shouldn't use Claude at all. If the problem goes beyond what you can configure, such as a needed integration or a custom tool, escalate to Claude Architects or Developers.
+Reviewer feedback and results tell you the level: one-offs belong in the chat, recurring issues in the setup, and anything beyond configuration with another team. Sometimes the evidence says Claude shouldn't do that step at all.
 
 **Think of a recipe that keeps coming out salty**: you change the recipe, not each plate.
 
-![An adjustment ladder: fix a one-off issue in the chat, update the prompt template for repeat tasks, update Project instructions or knowledge for recurring issues, change the model or feature if quality still falls short, and escalate to Architects or Developers when configuration can't solve it.](/content/skillup/ccao/images/ccao-7-2-adjust.svg)
+![An adjustment ladder taken one step at a time, moving on only if the earlier step doesn't stop the problem: fix a one-off in the chat, update the template, instructions or knowledge for a recurring issue, change the model, effort or feature if quality still falls short, and escalate to Architects or Developers when configuration can't solve it; or remove Claude from a step the results show it makes worse.](/content/skillup/ccao/images/ccao-7-2-adjust.svg)
 
 ### Real use
 
-Editors keep fixing the same thing in Claude's newsletter drafts: product names in the wrong case. The writer adds a product-name list and the rule to the Project instructions. The edits stop. Later, the team wants drafts to publish straight to the website, which needs an integration, so she raises it with the platform developers.
+A payroll software company's customer-success lead tracked reviewer edits for two weeks. Typos were fixed in the chat; the recurring "employee → worker" change went into the Project instructions, and those edits stopped. Auto-publishing to the help centre needs an integration (a connection that moves content between systems automatically), so it went to the developers.
 
 ### How it works
 
-- **Collect feedback:** what reviewers change, and how often.
-- **One-off:** fix it in the chat.
-- **Recurring:** update prompt templates, instructions or knowledge.
-- **Quality ceiling:** try a different model, effort setting or feature.
-- **Out of scope:** integrations and custom tools go to Architects or Developers.
-- **Stop:** if Claude doesn't improve a step, take it out of the workflow.
+A team hand-fixes the same table layout every week and calls it "review", and the time Claude saved is quietly spent again.
+
+- **Collect evidence:** what reviewers change, and how often.
+- **Climb the ladder:** once, fix it in the chat; recurring, fix the template, instructions or knowledge; a quality ceiling, change the model, effort or feature. Climb only if the lower step doesn't stop it.
+- **Escalate what configuration can't do:** integrations and custom tools go to Claude Architects or Developers with clear requirements, not trial and error. Never put passwords in instructions.
+- **Stop or narrow:** if results show a step is slower or worse with Claude (a specialist rewrites nearly every draft), remove Claude from it or narrow its role to where it helps. Neither "it'll improve" nor dropping the specialist's review is a plan.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Fix in chat | Happened once | Doesn't prevent repeats |
-| Update instructions or knowledge | Same issue recurring | Affects all users of the setup |
-| Escalate | Needs integration or custom build | Depends on another team |
+| Fix it in the chat | It happened once | Doesn't prevent repeats |
+| Update the template, instructions or knowledge | The same issue recurs | Affects everyone using the setup |
+| Change the model, effort or feature | Quality still falls short after the setup fix | More time and usage |
+| Escalate to Architects or Developers | It needs an integration or a custom build | Depends on another team |
+| Remove or narrow Claude's role | Results show the step is slower or worse with Claude | You lose the gain in that step |
 
 ### How to do it
 
-1. Track what reviewers change and how often.
-2. Move recurring fixes into instructions, knowledge or templates.
-3. Escalate what configuration can't solve, or remove Claude from that step.
+1. Track what reviewers change.
+2. Fix it at the lowest level that stops it.
+3. Climb only if that fails.
+4. Escalate, or remove Claude, where configuration can't help.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">Correcting the same issue by hand every week, or building a technical integration yourself, are both wrong. Fix recurring issues in the setup, and escalate technical builds.</div>
+<div class="note-trap">Building the integration yourself by trial and error, instead of escalating with clear requirements, creates something nobody can support or secure.</div>
 
 ### Go deeper
 
-- [AI Fluency: Framework & Foundations](https://www.anthropic.com/ai-fluency/overview)
+- [AI Fluency: Framework & Foundations (Anthropic Academy)](https://anthropic.skilljar.com/ai-fluency-framework-foundations)
+- [Understanding Claude's personalization features](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)
 
 ---
 
@@ -112,49 +120,51 @@ Editors keep fixing the same thing in Claude's newsletter drafts: product names 
 
 ### Key Concept
 
-**Cut repeated effort: reuse Projects and prompt templates, batch related requests, pick the right model, and stop using Claude where it doesn't help.**
+**Cut repeated effort without cutting quality: reuse context, batch requests, and right-size the model.**
 
-Efficiency means getting the same quality with less time and usage. Practical levers: keep reusable context in Projects instead of re-uploading it (project documents are cached, so reusing them counts less against usage than new content); batch related questions into one message; plan the request so it needs fewer follow-ups; match model and effort to the task; start fresh chats instead of dragging long ones; and save good prompts as templates. Effectiveness means checking that the workflow still produces what's needed.
+Efficiency means the same quality for less time and usage; effectiveness means still producing what's needed. Faster but worse isn't an optimisation: it moves the work to whoever fixes the output.
 
 **Think of a well-organised kitchen**: ingredients prepped, tools within reach, nothing done twice.
 
-![Efficiency levers: reuse Projects instead of re-uploading, batch related requests, pick the right model and effort, restart long chats with a summary, and keep prompt templates, while checking quality still meets the need.](/content/skillup/ccao/images/ccao-7-3-optimize.svg)
+![Before and after: fifteen messages a day that re-paste the same policy become a cached Project, batched questions, a lighter model for summaries and a weekly quality sample; if quality holds the change stays, and faster but worse is not an optimisation.](/content/skillup/ccao/images/ccao-7-3-optimize.svg)
 
 ### Real use
 
-A recruiter sends Claude ten separate messages a day about the same job: one per CV question. She moves the job description into a Project, batches the questions per candidate into one message, uses a faster model for first-pass screening summaries, and saves her best prompt as a template. She gets the same results with a fraction of the messages.
+A travel coordinator at an engineering consultancy sent about 15 messages a day about the same travel policy. She moved the policy into a Project, batched each traveller's questions into one message, used a lighter model for itinerary summaries and saved a request template. A weekly quality sample confirms nothing has slipped.
 
 ### How it works
 
-- **Projects:** cached knowledge, no repeated uploads.
-- **Batching:** related requests in one message.
-- **Planning:** clear, complete requests reduce follow-ups.
-- **Model and effort:** fast for simple, capable for hard.
-- **Fresh chats:** long chats use more of your usage limit.
-- **Templates:** reuse prompts that work.
-- **Effectiveness:** measure quality, not just speed.
+Pasting the same brief into every new chat and asking one question per message makes each answer slower to get, and uses far more of the limit than it needs to.
+
+- **Reuse context:** keep reference material in a Project instead of re-uploading it. Project content is cached (stored for quick reuse), so it counts less against usage when reused; the cache expires after a period of inactivity.
+- **Batch and plan:** put related questions in one message, complete enough up front to need few follow-ups. A new chat per question, or asking twice "to be sure", wastes usage.
+- **Right-size:** a lighter model and lower effort for simple, frequent work (see 3.3); fresh chats from a summary instead of long ones; prompts that work saved as templates.
+- **Check effectiveness:** sample quality after every change. Fewer messages alone isn't success.
 
 ### Choose when
 
 | Option | Choose it when | Trade-off |
 |---|---|---|
-| Batch requests | Several related questions | One longer message to review |
-| Reuse a Project | Same context, many chats | Needs maintaining |
-| Lighter model | Simple, frequent tasks | Check quality holds |
+| Batch requests | Several related questions about the same thing | One longer reply to review |
+| Reuse a Project | The same context across many chats | Needs maintaining |
+| Lighter model or lower effort | Simple, frequent tasks | Check quality holds |
+| Prompt template | The same request recurs | Update it when needs change |
 
 ### How to do it
 
 1. Look for repeated uploads, repeated prompts and many small messages.
-2. Move context into a Project, batch requests and save templates.
-3. Right-size the model, then confirm quality didn't drop.
+2. Move the context into a Project, batch requests and save templates.
+3. Right-size the model.
+4. Sample quality.
 
 ### Exam Trap ⚠️
 
-<div class="note-trap">"Send each small question separately so answers are focused" usually costs more messages and context. Batch related requests. And optimising speed while quality drops isn't an improvement.</div>
+<div class="note-trap">Calling a change an optimisation because it's faster, while errors rise, just moves the work to whoever fixes the output.</div>
 
 ### Go deeper
 
 - [Usage limit best practices](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)
+- [Change the model, effort, and thinking settings](https://support.claude.com/en/articles/8664678-change-the-model-effort-and-thinking-settings)
 
 ---
 
@@ -162,31 +172,43 @@ A recruiter sends Claude ten separate messages a day about the same job: one per
 
 ### 1. The connective narrative
 
-This domain closes the loop on the other six. Diagnosis (7.1) traces a bad output to its cause, so the fix lands in the right place. Adjusting (7.2) turns repeated feedback into setup changes, and recognises when the answer is escalation or not using Claude for that step. Optimisation (7.3) removes waste once things work: reuse context, batch requests, right-size the model, and keep checking that quality holds.
+The AI Fluency course names four skills: Delegation (deciding what work to give AI and how), Description (telling it clearly what you need), Discernment (judging what comes back) and Diligence (taking responsibility for how it's used). This domain runs on the middle two, in a loop. Diagnosis (7.1) is Discernment applied to a failure: what kind of wrong is this, and where did it come from?
+
+Adjusting (7.2) turns that judgement into a better Description at the right level, or into a decision that Claude shouldn't do the step at all. Optimising (7.3) removes waste once things work, and keeps judging quality so the savings are real. That is how this domain closes the loop on the other six: most fixes point back to an earlier lesson, whether the prompt (D1), the model and effort (D3) or the Project setup (D5).
 
 ### 2. Worked scenario
 
-> **Scenario.** A support team's Claude-drafted replies are slow to produce and often need the same edit. The lead diagnoses that the refund policy in the Project is outdated (7.1), replaces it, and adds the recurring edit as a rule in the Project instructions (7.2). She then has agents batch questions per ticket, switches simple replies to a faster model, and saves three reply templates. Response time drops and review edits fall (7.3).
+> **Scenario.** A solar-panel installer's operations coordinator uses Claude to draft installation summaries for customers, and they have started going wrong.
+>
+> **Decision 1: diagnose.** The summaries now leave out the panel count. *Options considered:* a bigger model, a full prompt rewrite, or checking what had changed. *Why this one:* the task hadn't got harder, so something in the input had probably moved. *What happened:* the job-sheet export had gained two new columns, and the prompt's column references were out of date. She corrected the prompt only, retested on last week's three jobs, and the panel count was back in all three.
+>
+> **Decision 2: adjust.** The installers' manager still rewrites the warranty paragraph every time, because the legal wording varies by product. *Options considered:* more instructions, a different model, or taking Claude out of that paragraph. *Why this one:* the results showed Claude added nothing there. *What happened:* the paragraph now comes from the approved template, and Claude no longer drafts it.
+>
+> **Decision 3: optimise.** Each job took five separate messages. *Options considered:* leave them, or batch them and right-size. *Why this one:* the questions were related and the task is routine. *What happened:* the five messages became one, and summaries moved to a lighter model after a 20-job sample matched quality. A weekly 10-job sample checks that the change holds.
 
 ### 3. Memory aid
 
-**DAO**: **D**iagnose the cause · **A**djust the setup · **O**ptimise without losing quality.
+**Symptom → cause → one change → retest; fix it at the lowest level that holds.**
 
 ### 4. Exam strategy for this domain
 
-Wrong answers treat symptoms: reword the question, upgrade the model, fix each output by hand, send more small messages. Right answers find the cause, change the setup, escalate technical work and remove repeated effort.
+- Wrong options treat symptoms: reword the question, upgrade the model, fix each output by hand, change everything at once, or send more small messages.
+- Right options find the cause, change one thing, fix the setup at the right level, escalate technical builds and keep checking quality.
+- The one sentence to carry in: find the cause before you touch anything.
 
 ---
 
 ## Cheat Sheet 📋
 
-| Scenario says… | Answer |
+| Situation | What to do |
 |---|---|
-| Wrong facts in a Project | Check knowledge for stale or duplicate files |
-| Same edit every time | Add a rule to the instructions or template |
-| Shallow analysis | Decompose, or step up model or effort |
+| Wrong facts in a Project | Check its knowledge for stale or duplicate files |
+| Generic output after moving chats | Check whether the context came with it |
+| Several changes made at once | Undo them; change one thing and retest |
+| Same edit every week | Fix it at the lowest level that stops it |
+| Shallow analysis on a good brief | Raise effort, or step up the model |
 | Long chat getting confused | Summarise and restart |
 | Needs integration with another system | Escalate to Architects or Developers |
+| Specialist rewrites almost every draft | Remove or narrow Claude's role in that step |
 | Many small messages | Batch related requests |
-| Re-uploading the same files | Use a Project |
 | Faster but worse | Not an optimisation |

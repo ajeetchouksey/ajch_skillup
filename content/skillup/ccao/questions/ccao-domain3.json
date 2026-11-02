@@ -2,44 +2,49 @@
   {
     "domain": 3,
     "id": "ccao-d3-001",
+    "difficulty": "easy",
     "scenario": "A consultant uploads the same client brand guide and contract into a new chat every week before asking for help with that client.",
     "question": "Which feature would best remove this repeated work?",
     "options": [
-      "Research mode, so Claude searches for the files each time",
-      "A Project for the client, with the brand guide and contract as knowledge and the standing rules as instructions",
-      "An incognito chat, so the files aren't stored",
-      "A longer single chat that is never closed"
+      "Research, so Claude finds the brand guide and contract again each week",
+      "A Project for the client, with the guide and contract saved as knowledge",
+      "An incognito chat each week, so the client's files aren't kept on record",
+      "One running chat for the client, left open so the files stay in context"
     ],
     "correct": 1,
-    "explanation": "B is correct: Projects keep instructions and knowledge files together so every chat in them starts with the same context. A is wrong because Research searches the web and connected sources for questions, not to replace a stable reference set. C is wrong because incognito chats aren't available in Projects and keep nothing. D is wrong because one endless chat grows long and drifts.",
+    "explanation": "B is correct: the same files recur in every chat, and a Project's knowledge is used across all its chats, so he uploads them once. A is wrong because Research runs slower multi-source searches for questions; it doesn't hold a stable reference set. C is wrong because incognito keeps nothing for reuse, so he would still upload weekly. D is wrong because one endless chat drifts and uses more of the limit.",
     "tags": [
+      "best-practice",
+      "application",
       "projects",
       "features"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-002",
-    "scenario": "A strategy lead needs a cited overview of how five competitors have changed their pricing in the past year, drawn from many sources.",
+    "difficulty": "medium",
+    "scenario": "A strategy lead on a Pro plan needs an overview of how five competitors have changed their pricing in the past year, drawn from many sources, and wants to check the evidence behind it.",
     "question": "Which Claude feature best fits this task?",
     "options": [
-      "A plain chat with no web access, answering from training knowledge",
-      "An artifact, since the output will be long",
-      "Account instructions telling Claude to be thorough",
-      "Research, with web search turned on, then check the cited sources"
+      "A plain chat answering from what Claude already knows, with no searching",
+      "An artifact, since the overview will be long and shared with the board",
+      "Account instructions telling Claude to be thorough and cite its sources",
+      "Research, with web search on, then open the sources it found"
     ],
     "correct": 3,
-    "explanation": "D is correct: Research runs several searches, follows up on findings and returns a cited report, which suits multi-source, current questions. It needs web search on. A is wrong because training knowledge may be out of date and gives no citations. B is wrong because an artifact is an output format, not a way to gather sources. C is wrong because instructions don't give Claude access to current sources.",
+    "explanation": "D is correct: the answer is spread across many sources, which suits Research's searches that build on each other; it needs a paid plan and web search, and she opens the sources her conclusions rest on. A is wrong because Claude's existing knowledge misses last year's price changes. B is wrong because an artifact is an output format, not a way to gather sources. C is wrong because instructions don't give Claude new sources.",
     "tags": [
+      "scenario-based",
+      "application",
       "research",
       "features"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-003",
+    "difficulty": "medium",
     "scenario": "An office manager has four Claude tasks this week and wants to use the lightest feature that fits each one.",
     "question": "Which task is the best fit for a plain chat, rather than an artifact or a Project?",
     "options": [
@@ -49,182 +54,406 @@
       "Creating an interactive budget calculator to share with colleagues"
     ],
     "correct": 1,
-    "explanation": "B is correct: a one-off, short task suits a plain chat. A is wrong because a reusable, updated document suits an artifact. C is wrong because ongoing work with shared documents suits a Project. D is wrong because an interactive tool to share is an artifact.",
+    "explanation": "B is correct: rewording one email is a short, one-off task, and a plain chat is the lightest fit. A is wrong because a checklist the team updates monthly is something to keep and edit, which suits an artifact. C is wrong because months of work with shared reference documents suits a Project. D is wrong because an interactive calculator shared with colleagues is an artifact.",
     "tags": [
+      "comparison",
+      "application",
       "artifacts",
       "chat"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-004",
-    "scenario": "A support team drafts several hundred short, routine replies to common questions every day.",
-    "question": "Which model family is usually the best fit?",
+    "difficulty": "easy",
+    "scenario": "A cinema chain's insight team must sort 5,000 short survey comments into eight fixed categories by tomorrow morning. The categories are clear and each comment fits one of them.",
+    "question": "Which model family fits this job best?",
     "options": [
-      "Opus for every reply, to maximise quality",
-      "Whichever model has the newest version number",
-      "Alternate between models at random to compare them",
-      "Haiku, the fastest and lowest-cost family, suited to high-volume straightforward tasks"
+      "Opus, so the trickier edge-case comments are handled safely",
+      "Sonnet for the whole job, since it is the everyday choice for most work",
+      "Haiku, the fast, lower-cost family built for high-volume sorting",
+      "Whichever model in the menu shows the newest version number"
     ],
-    "correct": 3,
-    "explanation": "D is correct: Haiku is built for speed and volume on straightforward tasks. A is wrong because the most capable model wastes speed and usage on simple work. B is wrong because version numbers don't tell you which family fits. C is wrong because random switching isn't a selection strategy.",
+    "correct": 2,
+    "explanation": "C is correct: sorting thousands of items into fixed groups is simple, repeatable and high-volume, which is Haiku's job, and the overnight deadline rewards speed. A is wrong because Opus is slower and uses more of the limit, and clear categories leave few edge cases. B is wrong because Sonnet is slower than this simple sorting needs. D is wrong because version numbers change and don't tell you a family's job.",
     "tags": [
+      "scenario-based",
+      "application",
       "models",
       "haiku"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-005",
+    "difficulty": "medium",
     "scenario": "A strategy director needs to work through a complex pricing decision with many interacting assumptions and trade-offs, once per quarter.",
     "question": "Which model family is the best fit?",
     "options": [
-      "Opus, the most capable family, suited to complex multi-step reasoning",
-      "Haiku, because it's fastest",
-      "Haiku with a shorter prompt",
-      "Any model, since all families reason equally well"
+      "Opus, the most capable of the three families, suited to complex multi-step reasoning",
+      "Haiku, so the director can quickly try many more pricing options",
+      "Sonnet at its default setting, since it's the everyday choice",
+      "Any of the three families, since they reason about pricing equally well"
     ],
     "correct": 0,
-    "explanation": "A is correct: Opus is designed for the hardest reasoning, and an infrequent high-value task justifies the extra time and usage. B is wrong because speed isn't the priority here. C is wrong because a shorter prompt doesn't add reasoning capability. D is wrong because the families differ in capability.",
+    "explanation": "A is correct: interacting assumptions and trade-offs call for long, multi-step reasoning, and a quarterly, high-value decision justifies Opus's extra time and usage. B is wrong because speed matters little for a once-a-quarter decision, and Haiku is weaker on complex reasoning. C is wrong because Sonnet suits everyday writing and analysis, not the hardest problems. D is wrong because the families differ in how deeply they reason.",
     "tags": [
+      "scenario-based",
+      "application",
       "models",
       "opus"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-006",
-    "scenario": "A new team member asks where Sonnet sits among Claude's model families.",
-    "question": "Which statement about Sonnet is correct?",
+    "difficulty": "medium",
+    "scenario": "A port authority's operations team writes a two-page weekly report from structured shift notes. It needs decent quality and has to go out the same afternoon.",
+    "question": "Which model family is the best everyday fit for this report?",
     "options": [
-      "It is the smallest model, used only for classification",
-      "It is the most capable model, reserved for the hardest problems",
-      "It balances capability and speed, making it a strong everyday choice for most business writing and analysis",
-      "It is a feature for searching the web"
+      "Opus, because a report read by senior managers deserves the deepest model",
+      "Haiku, because it is the fastest family and time is short",
+      "Haiku at a higher effort level, to get speed and depth together",
+      "Sonnet, which balances speed and capability for everyday writing"
     ],
-    "correct": 2,
-    "explanation": "C is correct: Sonnet sits between Haiku and Opus as the balanced everyday choice. A is wrong because that describes Haiku, and Haiku isn't limited to classification. B is wrong because that describes Opus. D is wrong because Sonnet is a model family, not a feature.",
+    "correct": 3,
+    "explanation": "D is correct: a short report from tidy notes is everyday writing with a same-day deadline, Sonnet's balance. A is wrong because Opus is slower and uses more of the limit for reasoning this report doesn't need. B is wrong because Haiku suits high-volume, simple tasks such as sorting, not a quality report. C is wrong because higher effort slows Haiku and uses more of the limit, giving up the speed it was chosen for.",
     "tags": [
+      "scenario-based",
+      "application",
       "models",
       "sonnet"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-007",
+    "difficulty": "medium",
     "scenario": "A marketing team will generate descriptions for 2,000 products. They're unsure which model to use.",
     "question": "What is the best approach?",
     "options": [
-      "Use the most capable model for all 2,000, just to be safe",
-      "Pick the model at random, since the descriptions are short",
-      "Test a sample of products on a faster, lower-cost model and move up only if the quality isn't good enough",
-      "Generate all 2,000 on every model and compare them all"
+      "Use the most capable model for the whole batch, just to be safe",
+      "Pick any model, since short descriptions come out much the same",
+      "Test a sample on a lighter model and step up where quality falls short",
+      "Use the balanced family for the whole batch, since it's the safe middle"
     ],
     "correct": 2,
-    "explanation": "C is correct: start with the lightest model that might work, test on a sample, and step up only where quality falls short. Volume multiplies every choice. A is wrong because it may spend far more time and usage than needed. B is wrong because it isn't a decision method. D is wrong because full runs on every model waste effort a sample would avoid.",
+    "explanation": "C is correct: volume multiplies every choice, so a sample on the lightest model that might work shows whether it is enough before 2,000 runs. A is wrong because the heaviest model may spend far more time and usage than the task needs. B is wrong because picking at random isn't a decision; the families differ in speed and cost. D is wrong because the middle family is still a guess, untested on real items.",
     "tags": [
+      "best-practice",
+      "application",
       "cost-speed-quality",
       "testing"
-    ],
-    "difficulty": "medium"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-008",
-    "scenario": "A user turns on extended thinking and the highest effort setting for every task, including quick email replies.",
-    "question": "What is the main drawback?",
+    "difficulty": "medium",
+    "scenario": "An events coordinator at a conference organiser sets effort to Max for every task, including quick replies to speaker emails.",
+    "question": "What is the main drawback of this habit?",
     "options": [
-      "Routine tasks become slower and use more of the usage limit without a meaningful quality gain",
-      "Thinking makes Claude refuse simple tasks",
-      "Higher effort disables Projects",
-      "There is no drawback; higher settings are always better"
+      "Quick replies get slower and use up the limit sooner, with no better result",
+      "Higher effort makes Claude's answers shorter and less detailed",
+      "Max effort switches off web search for the rest of the chat",
+      "There is no drawback, since Max is the most thorough level"
     ],
     "correct": 0,
-    "explanation": "A is correct: higher effort and thinking help on complex problems but add time and usage, so they're wasted on routine work. B is wrong because thinking doesn't cause refusals. C is wrong because effort settings don't affect Projects. D is wrong because the trade-off is real.",
+    "explanation": "A is correct: effort sets how thorough each response is, and higher levels take longer and use more tokens, so routine replies gain nothing while the limit arrives sooner. B is wrong because higher effort makes Claude more thorough, not briefer. C is wrong because effort doesn't change which tools are available. D is wrong because thoroughness costs time and usage that quick replies don't repay.",
     "tags": [
-      "effort",
-      "thinking"
-    ],
-    "difficulty": "medium"
+      "anti-pattern",
+      "application",
+      "effort"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-009",
-    "scenario": "An analyst runs a weekly report on a fast model. Recently the reports have needed complex judgements about conflicting data, and reviewers are finding shallow conclusions.",
+    "difficulty": "hard",
+    "scenario": "An analyst runs a weekly report on a fast model. Recently the reports have needed complex judgements about conflicting data, and reviewers are finding shallow conclusions. The team's other tasks haven't changed.",
     "question": "What is the most appropriate change?",
     "options": [
-      "Keep the fast model and add \"think harder\" to the end of the prompt",
-      "Switch every team task to the most capable model",
-      "Stop using Claude for reports altogether",
-      "Step up to a more capable model, or raise effort, for this report and check whether conclusions improve"
+      "Keep the setup and add \"think harder about the conflicts\" to the prompt",
+      "Move the team's whole workload onto the most capable family to be safe",
+      "Turn on thinking for the fast model and leave its effort level alone",
+      "Raise effort, or step up the family, for this report and check the conclusions"
     ],
     "correct": 3,
-    "explanation": "D is correct: when task requirements change, model selection should follow: step up for the task that now needs deeper reasoning, then check the result. A is wrong because wording doesn't add the capability the task needs. B is wrong because one task's needs don't apply to every task. C is wrong because the problem is fit, not the tool.",
+    "explanation": "D is correct: the deciding constraint is that only this report changed, so extra depth belongs there, and checking shows whether more effort is enough. B is the close alternative, but the other tasks are unchanged, so moving them wastes time and usage. A is wrong because prompt wording isn't the lever; effort is. C is wrong because thinking can't be turned off on current models, so effort is the setting to change.",
     "tags": [
-      "cost-speed-quality"
-    ],
-    "difficulty": "hard"
+      "scenario-based",
+      "evaluation",
+      "cost-speed-quality",
+      "effort"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-010",
+    "difficulty": "easy",
     "scenario": "After a three-hour planning chat, Claude starts mixing up decisions made early in the conversation.",
     "question": "What is the best next step?",
     "options": [
-      "Keep going in the same chat and correct each mistake",
-      "Ask Claude for a summary of decisions and open items, then start a new chat with that summary",
-      "Delete the chat and start from nothing",
-      "Switch to the fastest model to speed up the chat"
+      "Keep going in the same chat and correct each mix-up as it appears",
+      "Ask for a summary of decisions and open items, then start a new chat with it",
+      "Delete the chat and start a fresh one without carrying anything over",
+      "Switch to the fastest model so the long chat starts responding more quickly"
     ],
     "correct": 1,
-    "explanation": "B is correct: long chats drift and use more of the usage limit. Summarising and restarting keeps what matters and clears the rest. A is wrong because the chat will keep growing and drifting. C is wrong because it throws away the decisions. D is wrong because a different model doesn't fix an overlong context.",
+    "explanation": "B is correct: long chats drift as early details compete with later ones, and they use more of the limit; a summary keeps the decisions and a fresh chat clears the rest. A is wrong because the chat keeps growing and the mix-ups come back. C is wrong because it throws away the decisions already made. D is wrong because a different model doesn't shorten an overloaded chat.",
     "tags": [
+      "best-practice",
+      "application",
       "context",
       "restart"
-    ],
-    "difficulty": "easy"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-011",
+    "difficulty": "medium",
     "scenario": "A team discussed the agreed launch date in one chat in their Project. In a new chat in the same Project, Claude doesn't know it.",
-    "question": "Why, and what is the fix?",
+    "question": "Why does this happen, and what is the lasting fix?",
     "options": [
-      "Projects only remember the first chat; delete the others",
-      "It's a bug; report it and wait for a fix",
-      "Turn on incognito mode so the chats share context",
-      "Chats in a Project don't share each other's conversations; add the launch date to the Project's knowledge or instructions"
+      "A Project keeps context in its first chat, so continue the work there",
+      "Rename the Project after the launch so Claude links its chats together",
+      "Ask Claude in each new chat to search the earlier chat for the date",
+      "Chats don't share conversations, so add the date to Project knowledge"
     ],
     "correct": 3,
-    "explanation": "D is correct: shared context in a Project comes from its knowledge and instructions, not from other chats. Anything needed repeatedly should be saved there. A is wrong because Projects don't work that way. B is wrong because this is expected behaviour. C is wrong because incognito chats are saved to neither history nor memory, and aren't available in Projects.",
+    "explanation": "D is correct: chats in a Project share its knowledge and instructions, not each other's conversations, so saving the date there reaches every future chat. A is wrong because the first chat has no special role, and continuing it only makes it longer. B is wrong because Claude can't see the Project's name or description. C is wrong because chat search is paid-only and has to be repeated in every new chat.",
     "tags": [
+      "troubleshooting",
+      "application",
       "context",
-      "projects",
-      "persist"
-    ],
-    "difficulty": "medium"
+      "projects"
+    ]
   },
   {
     "domain": 3,
     "id": "ccao-d3-012",
-    "scenario": "A manager wants to ask Claude a one-off sensitive question about a personal matter and doesn't want it saved to chat history or memory.",
-    "question": "Which option fits?",
+    "difficulty": "medium",
+    "scenario": "A team manager at an insurance broker works in her team's Project. She wants to ask one sensitive question about a staff matter without it being used in or added to memory, but she wants to keep the chat in her history.",
+    "question": "What should she do?",
     "options": [
-      "A Project with the question saved in its knowledge",
-      "An incognito chat, which isn't saved to history or memory",
-      "A normal chat, then ask Claude to forget it",
-      "Account instructions telling Claude never to remember anything"
+      "Turn off Memory in the + menu for that chat, before the first message",
+      "Start an incognito chat inside the Project for just this question",
+      "Ask the question normally, then tell Claude to forget it afterwards",
+      "Add an account instruction telling Claude not to remember sensitive topics"
     ],
-    "correct": 1,
-    "explanation": "B is correct: incognito chats aren't saved to chat history or memory. A is wrong because it stores the question for reuse. C is wrong because asking Claude to forget doesn't remove a saved chat. D is wrong because instructions don't control what is saved.",
+    "correct": 0,
+    "explanation": "A is correct: turning memory off for one chat works inside Projects, keeps the chat in her history and stops it using or adding to memory, but it has to be set before the first message. B is wrong because incognito chats aren't available in Projects and aren't saved to history. C is wrong because asking afterwards doesn't undo what was already shared. D is wrong because the per-chat switch, not an instruction, controls memory.",
     "tags": [
+      "scenario-based",
+      "application",
       "memory",
       "incognito"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-013",
+    "difficulty": "medium",
+    "scenario": "A zoo's education team has two years of monthly school-visit bookings in a CSV file. The head of learning wants a chart for trustees showing the exact monthly totals.",
+    "question": "How should she get the chart from Claude?",
+    "options": [
+      "Paste the numbers into a chat and ask Claude to estimate the trend",
+      "Use Research so Claude cross-checks the bookings against other sources",
+      "Upload the CSV and have Claude run code on it, with code execution on",
+      "Ask for a chart artifact describing the bookings, without the data file"
     ],
-    "difficulty": "medium"
+    "correct": 2,
+    "explanation": "C is correct: exact totals mean calculating from the real data, and code execution lets Claude analyse an uploaded CSV with Python and chart it, provided the Code execution and file creation setting is on. A is wrong because an estimated trend isn't an exact total. B is wrong because Research gathers web and connected sources, not her own figures. D is wrong because without the file Claude has no real numbers to chart.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "code-execution",
+      "features"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-014",
+    "difficulty": "medium",
+    "scenario": "A translation agency wants each client delivery report to follow its house layout. Reports are written in many different client Projects, and the layout shouldn't affect other chats.",
+    "question": "Where should the agency put the layout?",
+    "options": [
+      "In account instructions, so it applies in each conversation",
+      "In a custom skill that Claude loads when a report is requested",
+      "Pasted into each chat by whoever asks for a delivery report",
+      "In the instructions of the busiest client Project the agency has"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a skill is a saved procedure that loads only when a task calls for it and works across Projects; it needs code execution switched on. A is wrong because account instructions apply to all conversations, so the layout would leak into other chats. C is wrong because pasting by hand drifts from colleague to colleague. D is wrong because Project instructions reach only that one Project's chats.",
+    "tags": [
+      "comparison",
+      "application",
+      "skills",
+      "features"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-015",
+    "difficulty": "hard",
+    "scenario": "A bid manager at an IT consultancy has Research on her paid plan and Google Docs connected. On the train with only her phone, she needs an answer that draws on the web and the team's past bids in Google Docs; it's due tomorrow.",
+    "question": "What should she do to get an answer that uses both sources?",
+    "options": [
+      "Start Research on her phone now, since it searches the web and connectors",
+      "Start Research from the web or Desktop app once she is at her laptop",
+      "Start Research on her phone and ask it to include the team's Google Docs",
+      "Use web search on her phone now, since Research is too slow for this"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is the phone. Research on Mobile searches only the web and silently skips connectors, while on web and Desktop it also searches tools such as Google Docs; with a deadline of tomorrow, waiting costs little. A is the close alternative but would miss the past bids. C is wrong because asking doesn't add connectors on Mobile. D is wrong because web search can't reach her Google Docs either.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "research",
+      "connectors"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-016",
+    "difficulty": "medium",
+    "scenario": "An operations lead at a cycle-hire scheme has four tasks this week and wants to use Opus where its extra time and usage pay off.",
+    "question": "Which task most needs Opus?",
+    "options": [
+      "Reconciling three years of conflicting ridership data using judgement",
+      "Tagging 400 returned-bike photos as damaged or undamaged for repairs",
+      "Reformatting a list of 120 docking stations into a sorted, tidy table",
+      "Drafting a short service-update email to members about roadworks"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: conflicting sources over several years need multi-step reasoning and judgement, which is where Opus earns its extra time and usage. B is wrong because tagging hundreds of photos is simple, high-volume work that suits Haiku. C is wrong because reformatting a list is a simple, repeatable task for a lighter family. D is wrong because a short email is everyday writing that Sonnet handles well.",
+    "tags": [
+      "comparison",
+      "analysis",
+      "models",
+      "opus"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-017",
+    "difficulty": "hard",
+    "scenario": "A recycling company's governance officer must turn well-structured notes into a 30-page monthly board pack within the hour. The content needs moderate reasoning, not deep analysis.",
+    "question": "Which model family should she pick?",
+    "options": [
+      "Opus, because a board pack is high-stakes and deserves the deepest model",
+      "Haiku, because the one-hour deadline makes speed the main concern",
+      "Sonnet, balancing speed and capability for substantial drafting",
+      "Opus at a lower effort level, to get depth while saving some time"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraints are moderate reasoning and a one-hour deadline, which fit Sonnet's balance. A is the close alternative: Opus would also work, but it is slower and uses more of the limit for no gain here. B is wrong because 30 pages of board drafting goes beyond the simple, repeatable work Haiku suits. D is wrong because it is still the slower family, chosen for depth the task doesn't need.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "models",
+      "sonnet"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-018",
+    "difficulty": "easy",
+    "scenario": "A florist group's office manager uses Claude all day for quick, routine jobs such as rewording delivery notes and confirming staff rota swaps.",
+    "question": "Which setting best suits these quick tasks?",
+    "options": [
+      "Keep the model's default effort, or drop to Low or Medium",
+      "Set effort to Max so each reply is as polished as possible",
+      "Switch to the most capable family for each of these tasks",
+      "Turn thinking off so the replies come back more quickly"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: for everyday tasks the default effort works well, and Low or Medium suit routine work and stretch usage. B is wrong because Max takes longer and uses more tokens with nothing to gain on short rewording. C is wrong because the heaviest family is slower and uses more of the limit. D is wrong because thinking can't be turned off on current models; effort is the setting to change.",
+    "tags": [
+      "best-practice",
+      "application",
+      "effort"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-019",
+    "difficulty": "medium",
+    "scenario": "A pricing analyst at a wine importer gives Claude a clear brief and the data. The answers are correct but shallow on the hardest step: weighing three exchange-rate scenarios.",
+    "question": "What should she change first?",
+    "options": [
+      "Switch to the fastest family so she can rerun the analysis more often",
+      "Lengthen the prompt and add \"be thorough\" before each step",
+      "Raise the effort level for this analysis and compare the result",
+      "Start a new chat and paste the same brief and data in again"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the brief is already clear and the answers are right but shallow, which is the gap effort closes; step up the family only if that falls short. A is wrong because the fastest family reasons less deeply. B is wrong because the brief isn't the problem, and wording doesn't change thoroughness the way effort does. D is wrong because a fresh chat with the same settings gives the same depth.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "effort"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-020",
+    "difficulty": "hard",
+    "scenario": "A logistics broker extracts 800 fields from delivery notes each day on Sonnet at High effort, and quality is fine. The manager wants it faster and cheaper, but the figures feed invoicing, so quality has to hold on every run.",
+    "question": "What should the team do next?",
+    "options": [
+      "Switch the whole job to Haiku from tomorrow, since extraction is its job",
+      "Test a sample of real notes on Haiku at default effort before switching",
+      "Keep Sonnet but drop to Low effort across the job straight away",
+      "Leave it on Sonnet at High, since the current setup already works"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that quality has to hold on every run, so a sample shows whether Haiku keeps it before invoicing depends on it. A is the close alternative: extraction suits Haiku, but switching untested risks errors reaching invoices. C is wrong because it also changes the job without checking quality. D is wrong because it ignores the manager's valid goal when a lighter option may well work.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "cost-speed-quality",
+      "testing"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-021",
+    "difficulty": "medium",
+    "scenario": "A receptionist joins a dental practice group on the Team plan. She says Claude doesn't carry her preferences between chats, although it did on her personal Pro plan.",
+    "question": "What is the most likely reason?",
+    "options": [
+      "Memory is a consumer-plan feature, so Team accounts don't offer it",
+      "It's a known fault with new Team seats that support has to fix",
+      "Team chats are kept separate, so she should paste preferences each time",
+      "On Team, each member's memory stays off until she turns it on"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: on Team and Enterprise, owners control whether memory is available (it is on for the organisation by default), but it stays off for each member until they turn it on; on Pro it is on by default. A is wrong because Team plans can offer memory. B is wrong because this is expected behaviour, not a fault. C is wrong because pasting works around a setting she can turn on.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "memory"
+    ]
+  },
+  {
+    "domain": 3,
+    "id": "ccao-d3-022",
+    "difficulty": "hard",
+    "scenario": "A buyer at a bookshop chain deleted an old chat that contained a supplier's outdated terms. Claude still mentions those terms in her new chats.",
+    "question": "What should she do to stop it?",
+    "options": [
+      "Delete any other older chats that might mention the same supplier's terms",
+      "Tell Claude in a new chat to forget the supplier's old terms",
+      "Find and edit or delete that entry in Settings > Your Claude > Manage",
+      "Reset memory so everything is wiped and Claude starts again"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding fact is that deleting a chat doesn't remove memory entries made from it, so the entry itself has to be edited or deleted. A is the close alternative, but deleting more chats leaves the memory untouched too. B is wrong because asking in a chat isn't how memory entries are removed; the Manage page is. D is wrong because Reset deletes all memory, including project memory, to fix one entry.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "memory"
+    ]
   }
 ]
