@@ -1,0 +1,542 @@
+[
+  {
+    "domain": 8,
+    "id": "ccdv-d8-001",
+    "difficulty": "easy",
+    "scenario": "Harlow Warehousing gives Claude two order-status tools. One is named lookup and described as \"Gets data\"; the other is named fetch and described as \"Gets info\". Claude picks between them inconsistently.",
+    "question": "What is the most direct fix?",
+    "options": [
+      "Add a third tool with a similar purpose so that Claude has more options and capability to choose from",
+      "Rewrite each description to say what the tool does, when to use it and what its inputs mean",
+      "Raise max_tokens so that Claude has more room to reason about which of the two tools to call",
+      "Set tool_choice to name one of the two tools on each request so the choice is removed"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the description is the only documentation Claude reads about a tool, so vague, overlapping text causes random choices. A is wrong because a third similar tool adds more ambiguity. C is wrong because a larger token limit does not clarify what either tool is for. D is wrong because forcing one tool removes the other from use and hides the real problem.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "tool-descriptions"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-002",
+    "difficulty": "easy",
+    "scenario": "A podcast transcript tool's harness gets a response with stop_reason set to tool_use. It contains one block that names a search_transcripts function the developer wrote.",
+    "question": "What does the harness do next?",
+    "options": [
+      "Wait for Anthropic's servers to run the function and then send the original request again with the output",
+      "Reply with an assistant message that contains the search results as plain text for the next turn",
+      "Reply with a message that has the role tool and holds the output of the function it ran",
+      "Run the function itself, then reply in a user message with a tool_result block carrying the tool_use id"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the model only emits a request, so the harness executes the function and returns a tool_result matched by tool_use_id in a user message. A is wrong because a developer-defined function is a client tool and Anthropic does not run it. B is wrong because results do not belong in an assistant message. C is wrong because the API has no tool role.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "tool-dispatch-loop"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-003",
+    "difficulty": "easy",
+    "scenario": "A wine-club shop assistant needs live web results about wine regions and also a function that reads the shop's own stock database. The developer wants to know which side runs which code.",
+    "question": "Which statement about where each tool runs is correct?",
+    "options": [
+      "Web search runs on Anthropic infrastructure, while the stock function is a client tool the shop's app runs",
+      "Both run on Anthropic infrastructure, because Claude executes any tool that it decides to call itself",
+      "Both run inside the shop's application, because web search is a client tool just like the stock function",
+      "The stock function runs on Anthropic infrastructure, and web search is executed by the shop's own application code"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: server tools such as web search run on Anthropic infrastructure, while a user-defined function is a client tool that the application executes and answers with a tool_result. B is wrong because Claude never runs anything itself. C is wrong because web search is a server tool. D is wrong because it reverses the two roles.",
+    "tags": [
+      "comparison",
+      "comprehension",
+      "client-vs-server-tools"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-004",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine's cancel_booking tool fails when a booking is past its free-cancellation window. Today it returns the bare text \"Error\", and Claude then tells guests that something went wrong.",
+    "question": "What should the tool return in this case?",
+    "options": [
+      "A tool_result with is_error set to true and the single word failed, so that Claude decides what went wrong",
+      "A thrown exception that ends the loop and shows the guest a raw stack trace from the server",
+      "A tool_result with is_error true that says the window has closed and suggests a date change or support",
+      "A successful-looking tool_result with empty content, so that Claude simply retries until the call works"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an error result should say what went wrong and what to try next, so Claude can act on it. A is wrong because a generic failed message gives Claude nothing to correct or relay. B is wrong because crashing the loop discards the chance to recover and exposes internals. D is wrong because empty content hides the failure and invites pointless retries.",
+    "tags": [
+      "best-practice",
+      "application",
+      "error-results"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-005",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch app defines get_driver_eta, get_driver_location, get_driver_status and get_driver_info as four tools. Each has a one-line description, they overlap heavily, and Claude often picks the wrong one.",
+    "question": "Which change best follows tool-set construction guidance?",
+    "options": [
+      "Consolidate the lookups into one get_driver tool with a field parameter and a detailed description",
+      "Add more near-duplicate tools for edge cases, since more tools give Claude more capability to use",
+      "Keep the four tools but shorten each description, so that there is less text to confuse Claude",
+      "Remove the descriptions and rely on the tool names, which are already specific to each lookup"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a few distinct tools with detailed descriptions beat many overlapping ones, and related operations can share one tool with a parameter. B is wrong because more tools raise the chance of a wrong pick rather than adding capability. C is wrong because shorter text gives Claude less to decide with. D is wrong because names alone do not explain when to use each tool.",
+    "tags": [
+      "best-practice",
+      "application",
+      "tool-set-design"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-006",
+    "difficulty": "medium",
+    "scenario": "A municipal permit portal's assistant has a revoke_permit tool. The council requires a named officer to confirm each revocation before it takes effect.",
+    "question": "Where should that confirmation be enforced?",
+    "options": [
+      "In the system prompt, by asking Claude to check politely with the user before it revokes anything",
+      "In the tool description, by adding a note that revocations need approval and trusting Claude to follow it",
+      "In the model's own reasoning, by asking it to explain why the revocation is safe before calling",
+      "In the harness, which pauses before executing the tool and runs it after the officer approves"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: approval for write actions belongs in the code that executes the tool, so nothing runs until a person says yes. A is wrong because a prompt request can be skipped or misread. B is wrong because a description note guides choice but does not block execution. C is wrong because the model's explanation is not a control and involves no human.",
+    "tags": [
+      "best-practice",
+      "application",
+      "write-approval"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-007",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor dashboard assistant only has to answer questions about past sensor readings. The sensor platform's API also offers calibration changes and record deletion.",
+    "question": "Which tool set fits this assistant best?",
+    "options": [
+      "Every endpoint of the sensor API as a tool, so that Claude has the widest capability possible",
+      "Read-only history tools, leaving out calibration and deletion functions that the task does not need",
+      "Read and write tools, with a description asking Claude to avoid the write tools unless a user asks for one",
+      "One tool that accepts raw queries, so that any future question can be answered without changes"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the task only reads data, so a small read-only set gives the least risk and the clearest choices. A is wrong because extra write tools add risk and confusion without helping the task. C is wrong because a polite description is not a restriction. D is wrong because a raw-query tool is vague and gives the model broad access.",
+    "tags": [
+      "best-practice",
+      "application",
+      "least-privilege"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-008",
+    "difficulty": "medium",
+    "scenario": "A recipe app's response holds two tool_use blocks, for get_recipe and get_pantry. The developer replies with one user message that starts with the text \"Here are the results\" and then adds two tool_result blocks. The API returns a 400 error.",
+    "question": "What is the fix?",
+    "options": [
+      "Send each tool_result in its own message that uses the role tool",
+      "Send the first tool_result and skip the second, since one result is enough to continue",
+      "Put both tool_result blocks first in the same user message, matched by tool_use_id, with any text after them",
+      "Merge both outputs into one tool_result block that carries the id of the first call"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: results for parallel calls go together in one user message, each matched by tool_use_id, and tool_result blocks must come before any text. A is wrong because the API has no tool role. B is wrong because a skipped call still needs a result, marked as an error if not run. D is wrong because each block needs its own result.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "tool-results"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-009",
+    "difficulty": "hard",
+    "scenario": "A library catalogue service exposes search_books and find_books. Both call the same endpoint with the same title and author parameters and return the same fields. Only the names differ, and Claude alternates between them.",
+    "question": "Which fix is best?",
+    "options": [
+      "Sharpen both descriptions so each says when it is preferred, and keep both tools in the set",
+      "Add input_examples to each tool so that Claude learns which one the team prefers",
+      "Force one tool with tool_choice and keep the other in the definitions for later use",
+      "Merge them into one tool with one detailed description, as nothing separates their behaviour"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that the tools behave identically, so no honest description can tell them apart and one tool removes the choice. A is wrong because invented distinctions would mislead Claude. B is wrong because examples cannot separate duplicate behaviour. C is wrong because forcing a tool leaves a dead duplicate and constrains every request.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "overlapping-tools"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-010",
+    "difficulty": "hard",
+    "scenario": "An e-bike retailer's assistant has list_orders (read) and cancel_order (write). A developer wants one manage_order tool with an action parameter to keep the set small. Cancellations need human approval, and the approval rule matches on the tool name.",
+    "question": "What should the team do?",
+    "options": [
+      "Keep two tools with precise descriptions, so approval covers cancel_order and not the reads",
+      "Merge them, because fewer tools is better and the approval rule can simply match manage_order",
+      "Merge them and ask Claude in the description to request approval when the action is cancel",
+      "Keep two tools but give both the same description, so that Claude treats them consistently"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that approval is tied to the tool name, so merging would either gate every read or leave cancellation ungated. B is wrong because it forces approval on harmless reads. C is wrong because a request in a description is not enforcement. D is wrong because identical descriptions recreate the overlap problem.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "write-approval"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-011",
+    "difficulty": "hard",
+    "scenario": "A film-festival ticketing assistant answers screening questions and must also refund tickets when customers ask. Refunds are a business requirement, and a staff member is on shift to review each one.",
+    "question": "Which design fits these constraints?",
+    "options": [
+      "A tool set limited to reads, with customers told to email the festival for refunds",
+      "A refund tool that runs at once, with the system prompt limiting it to valid cases",
+      "Free read tools plus a refund tool that waits for staff approval in the harness",
+      "A refund tool that runs at once, with the log reviewed by staff on the following morning"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraints are that refunds must be handled and reviewers are available, so an approval gate gives both. A is wrong because a read-only scope suits tasks without writes and drops the stated requirement. B is wrong because a prompt limit is not enforcement. D is wrong because after-the-fact review cannot undo a refund already paid.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "write-approval"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-012",
+    "difficulty": "easy",
+    "scenario": "Dunmore Staffing builds an MCP server for Claude. Employee leave balances change daily and need a lookup per employee, while the leave policy handbook is a fixed reference document.",
+    "question": "Which MCP feature fits each need?",
+    "options": [
+      "Both as tools, because tools are the feature that Claude uses to read anything it needs",
+      "The balance lookup as a tool and the handbook as a resource",
+      "Both as prompts, because prompts carry reference text into the conversation for Claude",
+      "The balance lookup as a resource and the handbook as a tool"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a per-employee lookup is a function the model calls, so it is a tool, while a fixed reference document is context the application can read, so it is a resource. A is wrong because making reference data a tool forces a call for each lookup. C is wrong because prompts are templates the user picks. D is wrong because it reverses the roles.",
+    "tags": [
+      "comparison",
+      "comprehension",
+      "tools-resources-prompts"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-013",
+    "difficulty": "easy",
+    "scenario": "A developer is building an MCP server for a school timetable tool and reads that MCP has hosts, clients and servers. A colleague asks which of these is the client.",
+    "question": "In MCP terms, which part is the client?",
+    "options": [
+      "The server process that exposes the timetable functions",
+      "The model, which sends requests straight to the timetable database",
+      "The chat window in which the teacher types",
+      "A connector inside the host application that keeps the link to one server"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the host application contains clients, and each client is a connector that maintains a connection to one server. A is wrong because the process that exposes functions is the server. B is wrong because the model does not talk to the database; the host's client relays requests. C is wrong because the chat window is part of the host's interface.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "mcp-roles"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-014",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine's MCP server offers a 400-line house-rules document through a get_house_rules tool, and Claude calls it on nearly every guest message. The host application supports MCP resources.",
+    "question": "What change fits MCP's design best?",
+    "options": [
+      "Expose the document as a resource that the application can attach as context",
+      "Convert it to a prompt so that the model controls when it is loaded",
+      "Split it into forty tools, one per rule, so that Claude loads the rule it needs",
+      "Paste it into the description of another tool so that it loads with the tool list"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: read-only reference data is what resources are for, and the application decides when to attach them, so the model no longer spends a call on each lookup. B is wrong because prompts are user-selected templates. C is wrong because forty tools bloat the tool set. D is wrong because pasting reference text into a description wastes context on every request.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "mcp-resources"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-015",
+    "difficulty": "medium",
+    "scenario": "A wine-club shop deploys an MCP server at a public HTTPS address. It returns member order histories. A colleague says authentication can be skipped because only the shop's own app knows the address.",
+    "question": "What is the right approach?",
+    "options": [
+      "Accept requests that carry the right Origin header and skip tokens",
+      "Keep the address secret and rotate it each month",
+      "Require OAuth bearer tokens issued for this server and reject requests without one",
+      "Forward the member's token from another service to the order database without checking it"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a remote server is a resource server, so it should validate bearer tokens issued for it and reject others. A is wrong because Origin checks guard against browser abuse but do not identify a caller. B is wrong because an obscure address is not authentication. D is wrong because passing through tokens meant for other services is forbidden.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "mcp-authentication"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-016",
+    "difficulty": "medium",
+    "scenario": "A developer writes a local MCP server in Python for a recipe app and wants Claude Desktop to start it on the same laptop.",
+    "question": "Which step makes Claude Desktop launch the server?",
+    "options": [
+      "Publish the server at a public address and paste it into a Messages API server list",
+      "Have the server print its tool list to standard output at start-up so that Desktop can read it",
+      "Add the server's address in the Anthropic Console under the workspace settings",
+      "Add an entry under the mcpServers key in claude_desktop_config.json with the command that starts it"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Claude Desktop registers local servers under the mcpServers key in its config file and launches the command as a subprocess. A is wrong because a public address is for remote servers and the API connector. B is wrong because extra output on stdout corrupts the protocol messages on stdio. C is wrong because the Console does not register local servers.",
+    "tags": [
+      "configuration",
+      "application",
+      "mcp-registration"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-017",
+    "difficulty": "hard",
+    "scenario": "Two developers at an escape-room company want Claude Code to query a test database on their own laptops. A manager suggests hosting it as one remote MCP server for the whole company. Nobody else needs the data, and it holds test records.",
+    "question": "Which setup fits these constraints?",
+    "options": [
+      "A remote server with OAuth, so that the setup is production-ready from the first day",
+      "A local stdio server launched by Claude Code, with credentials from the environment",
+      "A remote server without authentication, since it holds test records",
+      "A local stdio server reached through the Messages API connector, so it can be shared later"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that this is developer-only, so a local stdio subprocess limits access to the client and keeps credentials in the environment, without a service to run. A is wrong because it builds shared infrastructure nobody needs. C is wrong because an open remote endpoint exposes the data. D is wrong because the connector cannot reach local stdio servers.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "mcp-transports"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-018",
+    "difficulty": "easy",
+    "scenario": "Oakhurst Support wants Claude to follow a one-page procedure for wording refund replies whenever it drafts one. No live system is involved, and only one team uses the procedure.",
+    "question": "Which extension is the lightest fit?",
+    "options": [
+      "An MCP server that serves the procedure to any application",
+      "A Skill whose SKILL.md holds the procedure, loaded when relevant",
+      "A custom tool that the harness runs to return the text of the procedure",
+      "The built-in bash tool, reading a text file of the procedure"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a Skill is packaged instructions loaded on demand, which suits a short procedure with no live system. A is wrong because an MCP server adds hosting and upkeep for a page of text. C is wrong because a custom tool needs code in the harness to return static text. D is wrong because the bash tool does not tell Claude when the procedure applies.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "choosing-extension"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-019",
+    "difficulty": "easy",
+    "scenario": "A developer wants Claude to run shell commands and edit files inside a sandboxed project directory for a crop-sensor dashboard. These are generic operations.",
+    "question": "Which mechanism should the developer choose first?",
+    "options": [
+      "Anthropic's built-in bash and text editor tools, run by the harness",
+      "A new MCP server that wraps the shell and the file system",
+      "A Skill that describes in prose how to type shell commands",
+      "Custom tools named run_shell and edit_file with hand-written schemas"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: generic operations are covered by built-in tools, whose schemas Claude is trained on, so it calls them more reliably than an equivalent custom tool. B is wrong because a new server adds upkeep for something that already exists. C is wrong because instructions alone do not run commands. D is wrong because hand-written schemas are less reliable than the trained-in ones.",
+    "tags": [
+      "best-practice",
+      "application",
+      "built-in-tools"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-020",
+    "difficulty": "medium",
+    "scenario": "A team has installed forty Skills for a school timetable tool and worries that they will fill the context window before any work starts.",
+    "question": "What do the Skills cost in context before any of them is triggered?",
+    "options": [
+      "The full SKILL.md body of each Skill sits in the system prompt",
+      "No tokens until triggered, because Skills are read from disk after the first user message",
+      "Each Skill's bundled scripts and reference files are loaded in full",
+      "Each Skill's name and description, about 100 tokens, with the body loaded on trigger"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: Skills use progressive disclosure, so only a short name and description are always present, and the body loads when the Skill is triggered. A is wrong because bodies are not preloaded. B is wrong because the descriptions must be visible for Claude to choose a Skill. C is wrong because bundled files load only when read, and scripts add only their output.",
+    "tags": [
+      "concept",
+      "application",
+      "context-cost"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-021",
+    "difficulty": "medium",
+    "scenario": "Three internal apps, a ride-dispatch app, a timetable tool and a permit portal, each need the same live lookup against a shared staff directory. All three can connect to MCP servers.",
+    "question": "Which mechanism fits best?",
+    "options": [
+      "Copy one custom tool definition into each app's harness and maintain three versions",
+      "One shared MCP server that the three apps connect to",
+      "A Skill describing how to query the directory, shared between the apps",
+      "The built-in web search tool, pointed at the directory"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a live system needed by several MCP-capable apps is the case MCP serves, with one implementation to maintain. A is wrong because three copies drift apart and triple the upkeep. C is wrong because a Skill carries instructions and cannot reach a live directory. D is wrong because web search runs on the public web and cannot read an internal directory.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "mcp-reuse"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-022",
+    "difficulty": "medium",
+    "scenario": "A developer finds a community MCP server for a film-festival API. It has few users, and the developer wants to connect it to the company's Claude Code setup. It fetches external content.",
+    "question": "What is the best step before connecting it?",
+    "options": [
+      "Install it, since a directory listing means Anthropic has audited the code",
+      "Install it at user scope so each project gets it, then review it when time allows later",
+      "Review what it does and who maintains it, as it can feed outside content into the session",
+      "Install it and turn off permission prompts, so that approvals do not slow the team down"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: third-party servers should be trusted before use, and one that fetches external content can expose the session to prompt injection. A is wrong because Anthropic reviews directory listings against criteria but does not audit or manage the servers. B is wrong because wider scope spreads an unreviewed server further. D is wrong because removing prompts removes a safeguard.",
+    "tags": [
+      "best-practice",
+      "evaluation",
+      "third-party-trust"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-023",
+    "difficulty": "medium",
+    "scenario": "A colleague shares a Skill archive found online with the team's e-bike retailer workspace. It bundles several scripts and promises to speed up invoice checks.",
+    "question": "What should the team do first?",
+    "options": [
+      "Audit SKILL.md and every bundled script, since a malicious Skill can misuse tools",
+      "Trust it, because a Skill is only text and cannot cause harm to the workspace or its data",
+      "Skip the review, because Skills have no network access on any surface",
+      "Upload it to the whole organisation straight away, so that testing is shared"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: Skills should come from trusted sources and every bundled file should be audited, because scripts and instructions can misuse tools or exfiltrate data. B is wrong because bundled scripts can run. C is wrong because network access depends on the surface, and Claude Code Skills have full access. D is wrong because spreading an unreviewed Skill widens the risk.",
+    "tags": [
+      "best-practice",
+      "application",
+      "skill-trust"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-024",
+    "difficulty": "medium",
+    "scenario": "A library catalogue team has a repeatable procedure for cataloguing donated books, plus a script that validates ISBNs. They want it available only when a cataloguing task comes up.",
+    "question": "Where should the procedure live?",
+    "options": [
+      "In the system prompt of each session, so that the procedure is present at the start",
+      "In an MCP server that hosts the script as a tool for other apps",
+      "In a Skill that bundles the instructions and the validation script",
+      "In a custom tool per step, each defined in the harness"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a Skill packages a procedure with its script and loads on demand, and the script's output, not its code, enters context. A is wrong because a standing prompt costs context in each session. B is wrong because a server adds hosting and upkeep for a procedure that no other app asked for. D is wrong because one tool per step needs harness code.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "skills"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-025",
+    "difficulty": "medium",
+    "scenario": "A returns assistant carries a one-page refund procedure in its system prompt. Every request pays for the full text, though only refund chats need it, and the team wants to avoid running a new server.",
+    "question": "Which change cuts the cost without adding a server?",
+    "options": [
+      "Move it into a custom tool whose description holds the full procedure",
+      "Move it into a Skill so only its name and description load until a refund chat triggers it",
+      "Host it on an MCP server so the text is fetched when needed",
+      "Cut it to one line and drop the rarely used steps from the prompt"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a Skill keeps only its name and description in context until it is triggered, and it needs no running service. A is wrong because tool descriptions are sent with every request, so the cost stays. C is wrong because an MCP server adds hosting and upkeep for static text. D is wrong because dropping steps loses procedure the agent needs.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "skill-sharing"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-026",
+    "difficulty": "hard",
+    "scenario": "A payments team wants Claude to follow a nine-step reconciliation procedure that rarely changes, using figures from a ledger system that changes by the minute. One engineer proposes a single MCP server for both.",
+    "question": "Which split fits best?",
+    "options": [
+      "A Skill for the procedure and an MCP server for the live ledger",
+      "One Skill holding the procedure and a weekly export of the ledger",
+      "One MCP server that returns both the procedure text and the ledger",
+      "A custom tool for the procedure and a Skill for the ledger"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that one part is a stable procedure, which suits a Skill, and the other is a live system, which suits an integration such as MCP. B is wrong because a weekly export is stale. C is wrong because serving fixed instructions through a server adds upkeep. D is wrong because it reverses the roles.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "skill-vs-mcp"
+    ]
+  },
+  {
+    "domain": 8,
+    "id": "ccdv-d8-027",
+    "difficulty": "hard",
+    "scenario": "One ride-dispatch harness, built and owned by a two-person team, needs a function that reads a surge multiplier from an internal service. A platform engineer wants an MCP server for future reuse, but no second app is planned.",
+    "question": "Which approach is best?",
+    "options": [
+      "Build an MCP server now, because any capability should be exposed through the protocol for reuse",
+      "Use the built-in bash tool to call the internal service directly from a shell command",
+      "Write a Skill, because Skills are the lightest extension of the four",
+      "Define a custom tool in the harness and run it there, moving to MCP if a second app needs it"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that only one harness needs the function, so a custom tool is the lightest fit and can move to MCP later. A is wrong because a server adds hosting and upkeep for reuse that may never happen. B is wrong because a shell call is an unreviewed route to an internal service. C is wrong because a Skill cannot read a live service.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "custom-tool-vs-mcp"
+    ]
+  }
+]

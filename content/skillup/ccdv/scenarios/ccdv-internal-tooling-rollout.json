@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-004",
+  "title": "Rolling Out Claude Code Across Engineering",
+  "description": "Ostrander Labs gives 40 engineers Claude Code and wants one internal build-status service available to it. The team must decide where guidance lives, how the service is exposed, how a long procedure is packaged, how versions stay fixed and how sessions stay clean. Each choice builds on the one before it.",
+  "examId": "ccdv",
+  "difficulty": "medium",
+  "estimatedMinutes": 18,
+  "domains": [
+    2,
+    3,
+    8
+  ],
+  "taskIds": [
+    "8.2",
+    "8.3",
+    "3.1",
+    "2.6",
+    "2.5"
+  ],
+  "scenario": {
+    "background": "Ostrander Labs has two weeks to put Claude Code in front of 40 engineers without creating 40 different setups, because the release manager will not accept results that depend on whose laptop ran them. The company also runs an internal build-status service that engineers currently check by hand, and other internal applications are expected to want the same data later. Release notes follow a four-page checklist that is used only when a release is cut. Security has asked that no credentials sit on individual machines, and the platform team wants every behaviour-changing setting reviewed like code.",
+    "characters": [
+      {
+        "name": "Wanjiru Mbeki",
+        "role": "Platform lead",
+        "concern": "Wants one consistent setup for all 40 engineers that is cheap to maintain and reusable by other applications."
+      },
+      {
+        "name": "Kasper Lind",
+        "role": "Developer advocate",
+        "concern": "Wants engineers to get value on day one and prefers putting everything where Claude will always see it."
+      },
+      {
+        "name": "Priti Nair",
+        "role": "Security",
+        "concern": "Wants no shared secrets on laptops and no unnecessary context or trust surface in every session."
+      },
+      {
+        "name": "Owen Hale",
+        "role": "Release manager",
+        "concern": "Wants releases to behave the same way every time and generated files left untouched."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-004-q1",
+      "stem": "Owen insists that nobody may edit the generated files under dist/, and the team also repeats a build-and-release routine. Where should the conventions, the dist/ prohibition and the routine each go?",
+      "options": [
+        "Put the three items together in CLAUDE.md, because Claude Code reads that file at the start of each session and follows it",
+        "Have each engineer keep the guidance in their own user-level settings so that it suits their personal habits",
+        "Conventions in CLAUDE.md, the dist/ ban as a settings.json permission rule, the routine as a skill",
+        "Link a wiki page from the onboarding email and let engineers paste the relevant parts into their prompts"
+      ],
+      "correct": 2,
+      "explanation": "Match the mechanism to the need: C is correct because CLAUDE.md is guidance, settings.json permissions are enforced, and skills or commands package repeatable workflows, so Owen's hard prohibition does not depend on the model complying. A is wrong because a prohibition in CLAUDE.md is only context. B is wrong because per-person settings give 40 setups. D is wrong because pasted wiki text is inconsistent and lost each session."
+    },
+    {
+      "id": "ccdv-scenario-004-q2",
+      "stem": "Following that split, the build-status service must reach 40 engineers without tokens on laptops, and later other applications. How should Wanjiru expose it to Claude Code?",
+      "options": [
+        "A remote MCP server with authentication: build status as resources, actions such as re-runs as tools",
+        "A local stdio server on each laptop, with the 40 engineers configured to use the same shared token",
+        "A separate custom tool for each consuming application, each one wrapping the status API again from scratch",
+        "A script that pastes the latest build status text into the start of each prompt before the engineer types"
+      ],
+      "correct": 0,
+      "explanation": "Expose a capability once: A is correct because an authenticated remote server gives every engineer and later application one integration, with no secret on laptops, and the resource and tool split fits read-only data versus actions. B is wrong because a shared token on 40 machines breaks Priti's constraint. C is wrong because it repeats the integration per application. D is wrong because pasted status goes stale and spends context on every prompt."
+    },
+    {
+      "id": "ccdv-scenario-004-q3",
+      "stem": "Release notes follow a four-page checklist used only when a release is cut. Kasper wants it always visible, Wanjiru wants other apps to reuse it, and Priti worries about context cost. What should hold it?",
+      "options": [
+        "An MCP server that returns the checklist text so that any internal application can fetch and reuse it",
+        "A custom tool in the harness that returns the checklist text whenever Claude asks for it",
+        "Four more pages in CLAUDE.md so that the checklist is present in each session without any lookup",
+        "A skill, so only its name and description sit in context until a release needs the checklist"
+      ],
+      "correct": 3,
+      "explanation": "Pick the lightest extension that fits: D is correct because a skill is packaged instructions loaded on demand, so the four pages cost context only when a release is cut. A is wrong because an MCP server suits live systems and actions, such as the status service in the previous decision, not static instructions. B is wrong because a custom tool adds code to maintain. C is wrong because it spends context in every session."
+    },
+    {
+      "id": "ccdv-scenario-004-q4",
+      "stem": "Two engineers get different release notes from the same skill: one has a newer plugin build and the other a different model. Owen wants a setup that changes only on purpose. What should the team do?",
+      "options": [
+        "Point both at moving aliases so that engineers receive the latest improvements without any manual work",
+        "Pin the plugin to a commit or tag and the model to an exact ID in reviewed config; upgrade after an eval",
+        "Let each engineer choose the plugin build and the model that suit their own workflow and preferences",
+        "Leave versions unpinned for now and compare the outputs in a monthly review meeting with the team"
+      ],
+      "correct": 1,
+      "explanation": "Version every behaviour-changing setting: B is correct because pinned versions in reviewed config make drift a deliberate change, and an eval shows whether a new version is safe; one that fails stays on the pin. A is wrong because aliases move without warning and recreate the drift. C is wrong because individual choice gives 40 behaviours. D is wrong because a monthly review finds problems only after they ship."
+    },
+    {
+      "id": "ccdv-scenario-004-q5",
+      "stem": "Engineers say Claude drags yesterday's debugging details into unrelated tasks and answers get worse. Given where the durable guidance now lives, what working habit should Wanjiru recommend?",
+      "options": [
+        "Keep one long session per engineer so that Claude builds up knowledge of the whole project over time",
+        "Paste the previous session's notes into the first prompt of each new task so that no detail is forgotten",
+        "Start a fresh session per task, clear between unrelated tasks and compact deliberately in long ones",
+        "Turn off memory files such as CLAUDE.md so that old context cannot carry over between tasks"
+      ],
+      "correct": 2,
+      "explanation": "Session hygiene: C is correct because a fresh session per task drops stale detail, deliberate compaction trims a long task, and nothing durable is lost since conventions live in CLAUDE.md rather than in the conversation. A is wrong because the stale context is the cause of the decline. B is wrong because pasting notes reintroduces it. D is wrong because disabling CLAUDE.md removes the shared conventions from the first decision."
+    }
+  ],
+  "keyLearnings": [
+    "Put guidance where its strength matches the need: context files advise, permission settings enforce and skills package procedures that load only when used.",
+    "Expose a live capability once through an authenticated remote server so many clients can reuse it without secrets on individual machines.",
+    "Choose the lightest extension that fits, and keep static instructions out of integrations built for live systems.",
+    "Pin versions in reviewed config, upgrade only after an eval, and keep sessions short and task-focused so stale context does not drive results."
+  ]
+}

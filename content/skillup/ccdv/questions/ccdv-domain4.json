@@ -1,0 +1,122 @@
+[
+  {
+    "domain": 4,
+    "id": "ccdv-d4-001",
+    "difficulty": "easy",
+    "scenario": "Halden Pay calls the Messages API from its reconciliation job. After a model upgrade, every request fails at once with HTTP 400 and an invalid_request_error body that names the prefilled final assistant turn.",
+    "question": "What is the right recovery for this error class?",
+    "options": [
+      "Retry with exponential backoff, since the service may be briefly unavailable to you",
+      "Remove the prefilled assistant turn and send the request again",
+      "Fall back to a larger model, since the current one cannot cope with this input",
+      "Rewrite the system prompt so the model stops rejecting the whole conversation"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a 400 invalid_request_error means the request itself is wrong, and newer models reject a prefilled final assistant turn, so you fix the request. A is wrong because retrying an identical bad request fails every time. C is wrong because a bigger model rejects the prefill too. D is wrong because the prompt text is not the cause.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "error-handling"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccdv-d4-002",
+    "difficulty": "easy",
+    "scenario": "A recipe app asks for a full weekly meal plan. Users see plans that stop mid-sentence on day five. The logged response has stop_reason set to max_tokens, and the request sets max_tokens to 800.",
+    "question": "What should the developer change first?",
+    "options": [
+      "Rewrite the prompt with firmer instructions to complete each day of the plan",
+      "Retry the same request a few times until a complete plan comes back",
+      "Raise max_tokens so that the whole plan fits in the response",
+      "Switch to a smaller model that tends to write shorter meal plans"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: stop_reason max_tokens means the output hit the cap, so the fault is the limit, not the wording. A is wrong because firmer wording cannot lift a token cap. B is wrong because the same request truncates at the same point. D is wrong because a model swap changes behaviour and cost without removing the cap.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "truncation"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccdv-d4-003",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch app runs a tool loop. The call that returns a tool result fails with HTTP 400, saying tool_use ids were found without tool_result blocks immediately after. The logged user message puts a text note before the tool_result block.",
+    "question": "Where does the fault lie, and what fixes it?",
+    "options": [
+      "In the model's output, so tighten the tool description to stop bad calls",
+      "In the integration, so put the tool_result block first in the message",
+      "In a transient outage, so retry the call with exponential backoff",
+      "In the prompt, so add an instruction telling the model to wait for results"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the request is malformed because tool_result blocks must come first in the user content, with any text after them; that is an integration bug. A is wrong because the model produced a valid tool call. C is wrong because a 400 is not transient. D is wrong because the model never builds this message; your code does.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "integration-bug"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccdv-d4-004",
+    "difficulty": "medium",
+    "scenario": "A municipal permit portal assistant quoted the wrong fee in one case. The team logged request ids, inputs, tool calls and outputs for the whole twelve-step conversation, and the final answer is the only step anyone has read so far.",
+    "question": "What is the most reliable way to locate the cause?",
+    "options": [
+      "Replay the logged input against a fixed request to find the first divergence",
+      "Rewrite the system prompt with extra fee rules and then test it on live users",
+      "Ask the model to explain why it chose that fee and act on its explanation",
+      "Lower the temperature to zero and re-run the conversation until the fee is stable"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: replaying the same input against a fixed request makes the failure repeatable, and the first divergence shows which layer broke before anything is changed. B is wrong because changing the prompt first guesses at the layer. C is wrong because a self-explanation is not evidence from the trace. D is wrong because temperature cannot be set on current models.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "trace-analysis"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccdv-d4-005",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine produced check-in dates in the wrong format for one rare locale. The team found the cause and fixed the prompt. Last quarter a similar fix quietly broke again after a later prompt edit.",
+    "question": "What should the team do so this fix stays fixed?",
+    "options": [
+      "Add the failing input to the eval set with an automated grading check",
+      "Add a line to the changelog describing the locale and the date format fix",
+      "Ask a tester to try that locale by hand before each future release",
+      "Add the same date instruction twice to the prompt so it carries more weight"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: turning the failing input into an automated eval case means every later prompt edit is checked against it, which catches the regression that happened last quarter. B is wrong because a note does not run. C is wrong because manual checks are skipped under pressure. D is wrong because repeating text does not prove the behaviour holds.",
+    "tags": [
+      "best-practice",
+      "application",
+      "eval-cases"
+    ]
+  },
+  {
+    "domain": 4,
+    "id": "ccdv-d4-006",
+    "difficulty": "hard",
+    "scenario": "A wine-club shop agent shows two failures in its traces. During a sale, some calls return HTTP 429 with a retry-after header. Separately, the model sometimes passes the quantity to the order tool as the string \"two\" instead of a number.",
+    "question": "Which pairing of recoveries fits the two failures?",
+    "options": [
+      "Back off using retry-after for the 429s; tighten the tool schema for the quantity",
+      "Back off and honour retry-after for both, since each is a temporary fault in the service",
+      "Tighten the tool schema for the 429s; retry the quantity error after a short delay",
+      "Rewrite the system prompt for both, since each is a sign of weak instructions"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a 429 with retry-after is a capacity signal, so you wait, while the string quantity is the model's own output, so you tighten the schema and description. B is wrong because waiting never corrects the model's argument. C is wrong because a schema cannot lift a rate limit. D is wrong because the prompt changes neither failure.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "error-classification"
+    ]
+  }
+]

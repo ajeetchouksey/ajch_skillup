@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-006",
+  "title": "Shipping a Prompt and Model Upgrade",
+  "description": "A ticketing team must ship a prompt change and consider a newer model before a hard sales deadline. The decisions cover rollout, review, versioning, upgrade gating and post-release diagnosis. Each choice protects the team's ability to roll back.",
+  "examId": "ccdv",
+  "difficulty": "medium",
+  "estimatedMinutes": 18,
+  "domains": [2, 4, 5],
+  "taskIds": ["2.2", "2.4", "2.6", "4.1", "5.3"],
+  "scenario": {
+    "background": "Hartwell Ticketing has nine days before its biggest sale of the year, and a bad release of its event-summary feature would land on the busiest traffic of the year. The feature turns organiser notes into short event summaries and returns them as JSON for the listing page. Ahmed has a prompt change that shortens summaries and wants to move to a newer model in the same release. The current model is pinned, and its published retirement date falls some weeks after the sale. Gwen wants both changes live before the sale, Lea has an eval suite of about 300 real organiser notes, and Noor will be on call.",
+    "characters": [
+      {
+        "name": "Gwen Torres",
+        "role": "Product manager",
+        "concern": "Wants the shorter summaries and the new model live before the sale, because the date cannot move."
+      },
+      {
+        "name": "Ahmed Rahim",
+        "role": "Backend engineer",
+        "concern": "Owns the prompt and the model call, and wants a simple change that is easy to reason about."
+      },
+      {
+        "name": "Lea Brandt",
+        "role": "QA engineer",
+        "concern": "Wants every behaviour change proven on the eval suite before customers see it."
+      },
+      {
+        "name": "Noor Kapoor",
+        "role": "Site reliability engineer",
+        "concern": "Wants any release to be reversible within minutes while she is on call during the sale."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-006-q1",
+      "stem": "Gwen wants the prompt change live for all customers the day before the sale. Noor wants it reversible. Which rollout plan serves both?",
+      "options": [
+        "Release to the whole customer base the day before the sale, so that any problem shows up while the team is still at their desks and can react",
+        "Release to a small share first, watch error and quality metrics, widen in steps, and keep a rollback ready",
+        "Test it thoroughly in the development environment and then release to the whole customer base once the tests pass, with no later staging step",
+        "Release to the whole customer base and, if summaries look wrong during the sale, edit the prompt directly in production as a quick hotfix"
+      ],
+      "correct": 1,
+      "explanation": "A staged rollout is correct: a small share limits the damage, metrics show whether the change behaves, and a ready rollback gives Noor her minutes-level reversal. A fails because a full release exposes every customer at once. C fails because development traffic does not match real organiser notes. D fails because an untracked production edit is exactly the change nobody can roll back."
+    },
+    {
+      "id": "ccdv-scenario-006-q2",
+      "stem": "Ahmed opens a pull request containing the new prompt text and a small code change. Gwen says it is only wording and should merge today. How should the team handle review?",
+      "options": [
+        "Merge it quickly because a prompt is just text and not code, and rely on the canary to catch any real problem that appears",
+        "Review just the code change, since reviewers cannot judge prompt wording and the code is the part that can really break",
+        "Approve once Ahmed confirms that the feature ran successfully on his own machine with one sample organiser note",
+        "Review the prompt diff like code, check for secrets, and attach the eval run"
+      ],
+      "correct": 3,
+      "explanation": "Reviewing the prompt as code is correct: a prompt change alters behaviour as much as a code change, so the diff, secrets check and attached eval run belong in the review. A fails because the canary is a safety net, not a substitute for review. B fails because the prompt is the riskiest part of the diff. C fails because one successful run says nothing about 300 varied notes."
+    },
+    {
+      "id": "ccdv-scenario-006-q3",
+      "stem": "To make the q1 rollback a single step, where should the prompt and the model choice live?",
+      "options": [
+        "The prompt in a versioned repository file, and the model pinned by a specific id in configuration",
+        "The prompt text in an admin dashboard so that product can tune it live, and the model chosen by a floating alias that tracks releases",
+        "The prompt text in a versioned file, with the model chosen by a short alias so that it follows newer releases automatically",
+        "The model pinned by a specific id, with the prompt kept in a dashboard so that either side can be changed quickly by staff"
+      ],
+      "correct": 0,
+      "explanation": "Versioning the prompt and pinning the model is correct: both are release artefacts, so a rollback restores a known pair of values. B fails because a dashboard edit leaves no reviewed history and a floating alias can change behaviour unannounced. C fails because the alias can move the model under a fixed prompt. D fails because an unversioned prompt cannot be restored to the previous state."
+    },
+    {
+      "id": "ccdv-scenario-006-q4",
+      "stem": "In staging, the newer model returns summaries whose JSON fails Ahmed's parser on some notes. The old pin still works and its retirement is after the sale. What is the right move?",
+      "options": [
+        "Upgrade now because the newer model is the recommended one, and patch the parser in production if failures appear",
+        "Loosen the parser in production so that it accepts both formats, and blame the SDK if the failures continue",
+        "Read the migration notes, run the eval against it, keep the pin until it passes, and escalate the date choice to Gwen if it cannot",
+        "Ask the new model to review its own output format and approve the upgrade if it says the output is valid"
+      ],
+      "correct": 2,
+      "explanation": "Gating the upgrade on the eval is correct: the notes may explain the format change, the eval from q2 shows whether it is fixed, and the pin keeps customers safe. If time runs out, the trade-off belongs to Gwen, not to the model. A ships an unproven change into the sale. B guesses at the cause. D uses the model as its own judge, where a deterministic check is needed."
+    },
+    {
+      "id": "ccdv-scenario-006-q5",
+      "stem": "The release went out as planned on the pinned model from q3. Two days later the failure rate rises. What should Noor and Ahmed do first?",
+      "options": [
+        "Rewrite the prompt with firmer wording, since prompt wording is the usual cause of rising failures in a feature like this",
+        "Retry failed calls more aggressively and more often until the failure rate drops back to its usual level",
+        "Scale up the workers and request capacity in case the sale traffic is overloading the service during peak hours",
+        "Classify the failures by error type, replay a failing request, and compare it with the previous pin"
+      ],
+      "correct": 3,
+      "explanation": "Diagnosing first is correct: grouping errors by type separates integration faults from output problems, and a replay against the previous pin shows whether the change caused it. A fails because a rewrite without evidence may add a new regression. B fails because retries cannot fix a deterministic fault and can worsen rate limits. C fails because capacity is only one of several possible causes."
+    }
+  ],
+  "keyLearnings": [
+    "Treat prompts and model versions as release artefacts: review them like code, version them, and release them in stages with a rollback ready.",
+    "Pin the model and keep the prompt in version control, so that a rollback restores a known pair and an upgrade is a deliberate, tested change.",
+    "Gate a model upgrade on your own eval results, not on how new the model is or on the model's opinion of its own output, and escalate a deadline trade-off to the person who owns it.",
+    "When failures rise after a release, classify the errors and compare a replayed failing request with the last known good version before changing anything."
+  ]
+}

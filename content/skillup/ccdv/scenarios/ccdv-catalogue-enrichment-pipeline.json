@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-001",
+  "title": "Enriching a Back Catalogue Before Relaunch",
+  "description": "A bookseller must generate descriptions and tags for 120,000 titles before a site relaunch while still serving new releases within seconds and staying under a fixed budget. You turn vague goals into requirements, split the work by latency need, choose model tiers with evidence, cut repeated prompt cost, and decide where generated claims need verification.",
+  "examId": "ccdv",
+  "difficulty": "medium",
+  "estimatedMinutes": 18,
+  "domains": [
+    2,
+    5,
+    6
+  ],
+  "taskIds": [
+    "2.1",
+    "2.3",
+    "5.3",
+    "5.4",
+    "6.3"
+  ],
+  "scenario": {
+    "background": "Tamsin Bookworks relaunches its website in six weeks and every one of its 120,000 back-catalogue titles needs a description and a set of tags by then, inside a spend cap that finance has already fixed. The team will use Claude to generate both. New releases arrive one at a time from publishers and must show enriched pages in under 5 seconds, so the same content has to be produced by two very different workloads. Editorial has seen earlier machine-written copy that praised books for prizes they never won, and refuses to publish anything it cannot trust. Nobody has yet written down what ready for relaunch and affordable actually mean in engineering terms.",
+    "characters": [
+      {
+        "name": "Ines Calloway",
+        "role": "Engineering lead",
+        "concern": "Wants the relaunch to hit its date at the lowest sensible cost, without a rewrite late in the project."
+      },
+      {
+        "name": "Dev Anand",
+        "role": "Backend engineer",
+        "concern": "Wants the simplest design he can maintain, ideally one code path for all enrichment."
+      },
+      {
+        "name": "Corin Webb",
+        "role": "Editorial manager",
+        "concern": "Wants no invented facts on any product page, even if that slows the pipeline."
+      },
+      {
+        "name": "Pia Lund",
+        "role": "Finance partner",
+        "concern": "Owns the spend cap and wants the cost per title predictable before the run starts."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-001-q1",
+      "stem": "Ines says the brief is ready for relaunch and affordable. What should the team do before choosing any model or writing pipeline code?",
+      "options": [
+        "Benchmark the largest tier on a sample of titles, then derive the latency and cost targets from whatever that tier delivers",
+        "Start building with a mid-tier model and let editorial define what counts as good quality once real descriptions exist",
+        "Set measurable targets per path plus a cost cap per title, and write acceptance cases with editorial that become the eval set",
+        "Leave the cap open during the build so quality is not constrained early, then watch the billing dashboard for surprises"
+      ],
+      "correct": 2,
+      "explanation": "Requirements first: the deciding constraint is that vague goals cannot be tested. C is correct because per-path latency, volume, a per-title cost cap and agreed acceptance cases turn into eval cases later. A lets one tier's output set the targets, which is backwards. B defers quality criteria until after the build. D ignores Pia's fixed cap, so overspend is discovered too late."
+    },
+    {
+      "id": "ccdv-scenario-001-q2",
+      "stem": "The targets are agreed: 120,000 back-catalogue titles by relaunch, and each new release enriched in under 5 seconds. Dev wants one code path and Pia wants low cost. How should the work be routed?",
+      "options": [
+        "Send the back catalogue through batch requests and serve new releases with a synchronous request",
+        "Send the whole catalogue and new releases through batch, because the discount lowers cost and a single path keeps the code simple",
+        "Run everything as synchronous requests in parallel so both workloads share one path and finish together",
+        "Submit new releases as single-request batches and poll until each result is ready, keeping one batch integration"
+      ],
+      "correct": 0,
+      "explanation": "Split by latency need. A is correct: the back catalogue has no per-item deadline, so batch halves its cost, while releases need an answer within 5 seconds. B cannot meet that limit because batches can take up to an hour. C pays full price for work that can wait. D polls a queue that gives no latency promise. Note one batch holds at most 100,000 requests, so use two and match by custom_id."
+    },
+    {
+      "id": "ccdv-scenario-001-q3",
+      "stem": "On the eval set built in q1, the smallest tier matches the larger tiers on tags, but Corin rejects its descriptions as flat. Both the batch and realtime paths exist. How should tiers be assigned?",
+      "options": [
+        "Use the largest tier for tags and descriptions, since description quality is what editorial and customers will notice",
+        "Use the smallest tier for tags and descriptions, since tags passed and editors can polish the weak copy later",
+        "Choose tiers from the published price list alone and revisit the choice if editorial complains after launch",
+        "Route by task: the cheapest tier that passes its eval for tags, and a stronger tier for descriptions"
+      ],
+      "correct": 3,
+      "explanation": "Match the tier to each task using eval evidence. D is correct: tagging passes cheaply, and the extra capability is bought only where descriptions need it, which also protects Pia's cap. A overspends on tags that gained nothing. B ships copy the eval already rejected and shifts cost to editors. C skips measurement, so price alone cannot show whether quality passes."
+    },
+    {
+      "id": "ccdv-scenario-001-q4",
+      "stem": "Both paths send the same 3,000-token house style guide with each title's metadata, on the tiers chosen in q3. Pia wants the repeated input cost reduced without lowering quality. What is the best change?",
+      "options": [
+        "Put the title metadata first and the style guide after it so the model reads the specific item before the rules",
+        "Put the style guide first, mark it for caching, and place each title's metadata after it",
+        "Cut the style guide to a few hundred tokens to reduce spend, accepting some drift from house style",
+        "Skip caching because each request carries different title text, so no two requests would share a prefix"
+      ],
+      "correct": 1,
+      "explanation": "Cache the stable prefix. B is correct: a cache hit needs an identical beginning, so the unchanging guide goes first and the varying title follows, which makes the repeated 3,000 tokens cheap to read. A breaks the prefix on every request. C saves tokens by degrading quality, which Corin will notice. D misunderstands caching: only the leading portion must match, not the whole request."
+    },
+    {
+      "id": "ccdv-scenario-001-q5",
+      "stem": "In the first pilot run, some descriptions state that a book won a prize that its metadata does not list. Corin asks what stops this reaching the site. Which control fits best?",
+      "options": [
+        "Add a second model call asking it to double-check each description for invented facts before publishing",
+        "Publish when the output parses as valid JSON against the schema, since structured output keeps fields well formed",
+        "Compare each claimed award with the supplied metadata in code, and send any mismatch to the editorial queue",
+        "Remove the awards field from the prompt template and rely on that to stop awards appearing in the text"
+      ],
+      "correct": 2,
+      "explanation": "Do not trust generated claims; verify against your source of truth and escalate. C is correct: a deterministic check against the supplied metadata is not a model judgement, and mismatches go to people. A asks the same model to grade itself, which reduces errors but does not remove them. B confirms shape, not truth. D leaves the model free to recall awards from memory."
+    }
+  ],
+  "keyLearnings": [
+    "Turn vague goals into measurable requirements, with a target per workload, a cost cap and acceptance cases, before choosing models, because those same cases become the evals that settle later decisions.",
+    "Split work by latency need: deadline-free bulk work belongs on a discounted batch path, while interactive work needs a synchronous path, and one shared code path is not worth missing a latency target.",
+    "Place stable instructions at the start of the prompt and variable content after them so repeated input can be served from cache, and choose model tiers per task using eval results rather than price lists.",
+    "Treat generated factual claims as untrusted: check them in code against your own data, and route disagreements to a human instead of asking the model to vouch for itself."
+  ]
+}

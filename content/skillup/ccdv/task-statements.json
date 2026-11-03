@@ -1,0 +1,521 @@
+{
+  "schemaVersion": "1.0",
+  "examCode": "CCDV-F",
+  "source": "Claude Certified Developer – Foundations Exam Guide v1.0 (effective July 2026)",
+  "sourceUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542875%2FClaude+Certified+Developer+%E2%80%93+Foundations+Exam+Guide.pdf",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Agents and Workflows",
+      "weight": 14.7,
+      "officialWeight": "14.7%",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "Agent Architecture",
+          "shortTitle": "Agent architecture",
+          "officialWeight": "4.5%",
+          "questionIds": [
+            "ccdv-d1-001",
+            "ccdv-d1-002",
+            "ccdv-d1-003",
+            "ccdv-d1-004",
+            "ccdv-d1-005",
+            "ccdv-d1-006",
+            "ccdv-d1-007",
+            "ccdv-d1-008",
+            "ccdv-d1-009",
+            "ccdv-d1-010",
+            "ccdv-d1-011"
+          ]
+        },
+        {
+          "id": "1.2",
+          "title": "Agent Construction with Claude",
+          "shortTitle": "Building agents",
+          "officialWeight": "5.3%",
+          "questionIds": [
+            "ccdv-d1-012",
+            "ccdv-d1-013",
+            "ccdv-d1-014",
+            "ccdv-d1-015",
+            "ccdv-d1-016",
+            "ccdv-d1-017",
+            "ccdv-d1-018",
+            "ccdv-d1-019",
+            "ccdv-d1-020",
+            "ccdv-d1-021",
+            "ccdv-d1-022",
+            "ccdv-d1-023",
+            "ccdv-d1-024"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Agent Patterns and Frameworks",
+          "shortTitle": "Patterns and frameworks",
+          "officialWeight": "4.9%",
+          "questionIds": [
+            "ccdv-d1-025",
+            "ccdv-d1-026",
+            "ccdv-d1-027",
+            "ccdv-d1-028",
+            "ccdv-d1-029",
+            "ccdv-d1-030",
+            "ccdv-d1-031",
+            "ccdv-d1-032",
+            "ccdv-d1-033",
+            "ccdv-d1-034",
+            "ccdv-d1-035",
+            "ccdv-d1-036"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Applications and Integration",
+      "weight": 33.1,
+      "officialWeight": "33.1%",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "Understanding Requirements",
+          "shortTitle": "Requirements",
+          "officialWeight": "3.4%",
+          "questionIds": [
+            "ccdv-d2-001",
+            "ccdv-d2-002",
+            "ccdv-d2-003",
+            "ccdv-d2-004",
+            "ccdv-d2-005",
+            "ccdv-d2-006",
+            "ccdv-d2-007",
+            "ccdv-d2-008"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Systems Life Cycle",
+          "shortTitle": "Life cycle",
+          "officialWeight": "2.8%",
+          "questionIds": [
+            "ccdv-d2-009",
+            "ccdv-d2-010",
+            "ccdv-d2-011",
+            "ccdv-d2-012",
+            "ccdv-d2-013",
+            "ccdv-d2-014",
+            "ccdv-d2-015"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Claude API Mechanics",
+          "shortTitle": "API mechanics",
+          "officialWeight": "6.8%",
+          "questionIds": [
+            "ccdv-d2-016",
+            "ccdv-d2-017",
+            "ccdv-d2-018",
+            "ccdv-d2-019",
+            "ccdv-d2-020",
+            "ccdv-d2-021",
+            "ccdv-d2-022",
+            "ccdv-d2-023",
+            "ccdv-d2-024",
+            "ccdv-d2-025",
+            "ccdv-d2-026",
+            "ccdv-d2-027",
+            "ccdv-d2-028",
+            "ccdv-d2-029",
+            "ccdv-d2-030",
+            "ccdv-d2-031"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Software Engineering Foundations",
+          "shortTitle": "Engineering foundations",
+          "officialWeight": "7.4%",
+          "questionIds": [
+            "ccdv-d2-032",
+            "ccdv-d2-033",
+            "ccdv-d2-034",
+            "ccdv-d2-035",
+            "ccdv-d2-036",
+            "ccdv-d2-037",
+            "ccdv-d2-038",
+            "ccdv-d2-039",
+            "ccdv-d2-040",
+            "ccdv-d2-041",
+            "ccdv-d2-042",
+            "ccdv-d2-043",
+            "ccdv-d2-044",
+            "ccdv-d2-045",
+            "ccdv-d2-046",
+            "ccdv-d2-047",
+            "ccdv-d2-048",
+            "ccdv-d2-049"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Claude Application Design",
+          "shortTitle": "Application design",
+          "officialWeight": "8.6%",
+          "questionIds": [
+            "ccdv-d2-050",
+            "ccdv-d2-051",
+            "ccdv-d2-052",
+            "ccdv-d2-053",
+            "ccdv-d2-054",
+            "ccdv-d2-055",
+            "ccdv-d2-056",
+            "ccdv-d2-057",
+            "ccdv-d2-058",
+            "ccdv-d2-059",
+            "ccdv-d2-060",
+            "ccdv-d2-061",
+            "ccdv-d2-062",
+            "ccdv-d2-063",
+            "ccdv-d2-064",
+            "ccdv-d2-065",
+            "ccdv-d2-066",
+            "ccdv-d2-067",
+            "ccdv-d2-068",
+            "ccdv-d2-069",
+            "ccdv-d2-070"
+          ]
+        },
+        {
+          "id": "2.6",
+          "title": "Configuration Management",
+          "shortTitle": "Configuration",
+          "officialWeight": "4.1%",
+          "questionIds": [
+            "ccdv-d2-071",
+            "ccdv-d2-072",
+            "ccdv-d2-073",
+            "ccdv-d2-074",
+            "ccdv-d2-075",
+            "ccdv-d2-076",
+            "ccdv-d2-077",
+            "ccdv-d2-078",
+            "ccdv-d2-079",
+            "ccdv-d2-080"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Claude Code",
+      "weight": 3.1,
+      "officialWeight": "3.1%",
+      "tasks": [
+        {
+          "id": "3.1",
+          "title": "Claude Code Operation",
+          "shortTitle": "Claude Code",
+          "officialWeight": "3.1%",
+          "questionIds": [
+            "ccdv-d3-001",
+            "ccdv-d3-002",
+            "ccdv-d3-003",
+            "ccdv-d3-004",
+            "ccdv-d3-005",
+            "ccdv-d3-006",
+            "ccdv-d3-007"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Eval, Testing, and Debugging",
+      "weight": 2.6,
+      "officialWeight": "2.6%",
+      "tasks": [
+        {
+          "id": "4.1",
+          "title": "Debugging and Error Handling",
+          "shortTitle": "Debugging",
+          "officialWeight": "2.6%",
+          "questionIds": [
+            "ccdv-d4-001",
+            "ccdv-d4-002",
+            "ccdv-d4-003",
+            "ccdv-d4-004",
+            "ccdv-d4-005",
+            "ccdv-d4-006"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Model Selection and Optimization",
+      "weight": 16.8,
+      "officialWeight": "16.8%",
+      "tasks": [
+        {
+          "id": "5.1",
+          "title": "LLM Fundamentals",
+          "shortTitle": "LLM fundamentals",
+          "officialWeight": "5.2%",
+          "questionIds": [
+            "ccdv-d5-001",
+            "ccdv-d5-002",
+            "ccdv-d5-003",
+            "ccdv-d5-004",
+            "ccdv-d5-005",
+            "ccdv-d5-006",
+            "ccdv-d5-007",
+            "ccdv-d5-008",
+            "ccdv-d5-009",
+            "ccdv-d5-010",
+            "ccdv-d5-011",
+            "ccdv-d5-012"
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Technical Fundamentals",
+          "shortTitle": "Technical fundamentals",
+          "officialWeight": "6.1%",
+          "questionIds": [
+            "ccdv-d5-013",
+            "ccdv-d5-014",
+            "ccdv-d5-015",
+            "ccdv-d5-016",
+            "ccdv-d5-017",
+            "ccdv-d5-018",
+            "ccdv-d5-019",
+            "ccdv-d5-020",
+            "ccdv-d5-021",
+            "ccdv-d5-022",
+            "ccdv-d5-023",
+            "ccdv-d5-024",
+            "ccdv-d5-025",
+            "ccdv-d5-026",
+            "ccdv-d5-027"
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Model Selection and Tradeoffs",
+          "shortTitle": "Model selection",
+          "officialWeight": "2.7%",
+          "questionIds": [
+            "ccdv-d5-028",
+            "ccdv-d5-029",
+            "ccdv-d5-030",
+            "ccdv-d5-031",
+            "ccdv-d5-032",
+            "ccdv-d5-033",
+            "ccdv-d5-034"
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Cost and Token Management",
+          "shortTitle": "Cost and tokens",
+          "officialWeight": "2.8%",
+          "questionIds": [
+            "ccdv-d5-035",
+            "ccdv-d5-036",
+            "ccdv-d5-037",
+            "ccdv-d5-038",
+            "ccdv-d5-039",
+            "ccdv-d5-040",
+            "ccdv-d5-041"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Prompt and Context Engineering",
+      "weight": 11.0,
+      "officialWeight": "11.0%",
+      "tasks": [
+        {
+          "id": "6.1",
+          "title": "Context Engineering",
+          "shortTitle": "Context engineering",
+          "officialWeight": "3.8%",
+          "questionIds": [
+            "ccdv-d6-001",
+            "ccdv-d6-002",
+            "ccdv-d6-003",
+            "ccdv-d6-004",
+            "ccdv-d6-005",
+            "ccdv-d6-006",
+            "ccdv-d6-007",
+            "ccdv-d6-008",
+            "ccdv-d6-009"
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Prompt Engineering",
+          "shortTitle": "Prompt engineering",
+          "officialWeight": "4.6%",
+          "questionIds": [
+            "ccdv-d6-010",
+            "ccdv-d6-011",
+            "ccdv-d6-012",
+            "ccdv-d6-013",
+            "ccdv-d6-014",
+            "ccdv-d6-015",
+            "ccdv-d6-016",
+            "ccdv-d6-017",
+            "ccdv-d6-018",
+            "ccdv-d6-019",
+            "ccdv-d6-020"
+          ]
+        },
+        {
+          "id": "6.3",
+          "title": "Output Handling",
+          "shortTitle": "Output handling",
+          "officialWeight": "2.6%",
+          "questionIds": [
+            "ccdv-d6-021",
+            "ccdv-d6-022",
+            "ccdv-d6-023",
+            "ccdv-d6-024",
+            "ccdv-d6-025",
+            "ccdv-d6-026"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Security and Safety",
+      "weight": 8.1,
+      "officialWeight": "8.1%",
+      "tasks": [
+        {
+          "id": "7.1",
+          "title": "AI Application Security",
+          "shortTitle": "App security",
+          "officialWeight": "3.2%",
+          "questionIds": [
+            "ccdv-d7-001",
+            "ccdv-d7-002",
+            "ccdv-d7-003",
+            "ccdv-d7-004",
+            "ccdv-d7-005",
+            "ccdv-d7-006",
+            "ccdv-d7-007",
+            "ccdv-d7-008"
+          ]
+        },
+        {
+          "id": "7.2",
+          "title": "Guardrails and Safe Deployment",
+          "shortTitle": "Guardrails",
+          "officialWeight": "2.3%",
+          "questionIds": [
+            "ccdv-d7-009",
+            "ccdv-d7-010",
+            "ccdv-d7-011",
+            "ccdv-d7-012",
+            "ccdv-d7-013",
+            "ccdv-d7-014"
+          ]
+        },
+        {
+          "id": "7.3",
+          "title": "Claude Hooks",
+          "shortTitle": "Hooks",
+          "officialWeight": "1.0%",
+          "questionIds": [
+            "ccdv-d7-015",
+            "ccdv-d7-016",
+            "ccdv-d7-017",
+            "ccdv-d7-018",
+            "ccdv-d7-019",
+            "ccdv-d7-020"
+          ]
+        },
+        {
+          "id": "7.4",
+          "title": "Identity, Secrets, and Key Management",
+          "shortTitle": "Secrets and keys",
+          "officialWeight": "1.6%",
+          "questionIds": [
+            "ccdv-d7-021",
+            "ccdv-d7-022",
+            "ccdv-d7-023",
+            "ccdv-d7-024",
+            "ccdv-d7-025",
+            "ccdv-d7-026"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Tools and MCPs",
+      "weight": 10.6,
+      "officialWeight": "10.6%",
+      "tasks": [
+        {
+          "id": "8.1",
+          "title": "Tool Implementation",
+          "shortTitle": "Tool implementation",
+          "officialWeight": "4.4%",
+          "questionIds": [
+            "ccdv-d8-001",
+            "ccdv-d8-002",
+            "ccdv-d8-003",
+            "ccdv-d8-004",
+            "ccdv-d8-005",
+            "ccdv-d8-006",
+            "ccdv-d8-007",
+            "ccdv-d8-008",
+            "ccdv-d8-009",
+            "ccdv-d8-010",
+            "ccdv-d8-011"
+          ]
+        },
+        {
+          "id": "8.2",
+          "title": "MCP Server Development",
+          "shortTitle": "MCP servers",
+          "officialWeight": "2.1%",
+          "questionIds": [
+            "ccdv-d8-012",
+            "ccdv-d8-013",
+            "ccdv-d8-014",
+            "ccdv-d8-015",
+            "ccdv-d8-016",
+            "ccdv-d8-017"
+          ]
+        },
+        {
+          "id": "8.3",
+          "title": "Agentic Customization",
+          "shortTitle": "Agentic customization",
+          "officialWeight": "4.1%",
+          "questionIds": [
+            "ccdv-d8-018",
+            "ccdv-d8-019",
+            "ccdv-d8-020",
+            "ccdv-d8-021",
+            "ccdv-d8-022",
+            "ccdv-d8-023",
+            "ccdv-d8-024",
+            "ccdv-d8-025",
+            "ccdv-d8-026",
+            "ccdv-d8-027"
+          ]
+        }
+      ]
+    }
+  ]
+}
