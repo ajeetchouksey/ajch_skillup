@@ -75,6 +75,8 @@ Curriculum Engineer (L1 orchestrator, "Exam Commander")
   └─ Scenario Engineer    → writes RichScenario JSON to scenarios/*.json only
 ```
 
+Models are tiered per agent (set upstream in `ajch_platform`, see its `docs/agent-framework.md` "Model tiering"): Curriculum Engineer on Opus 5.5; Assessment, Docs, Scenario, Skill-Track, gap-analyst, UX-designer and AppSec on Sonnet 5.5; Learning Analytics and Exam Coach on Haiku 5.5. Assessment Engineer's output must pass `node scripts/check-option-lengths.mjs` (length-bias rule in the `question-generator` skill).
+
 Each specialist agent is scoped to write to exactly one subdirectory and stops/reports if asked to write elsewhere. Each bumps `contentVersion` in `index.json` after writing (see protocol above), and confirms the relevant registry array (`questionFiles[]`/`scenarioFiles[]`/`domains[].notesFile`) references the file it just wrote.
 
 - **Docs Engineer** notes have a strict required shape (see `.claude/agents/docs-engineer.md` and the sibling `docs-engineer-writing-framework.md`): every domain note needs a `## Deep Dive` section (connective narrative + worked scenario + memory aid + exam strategy — pointer-only notes fail review), every `### Key Concept` block follows a one-line-claim-then-two-paragraphs shape ending in a bolded analogy, and every topic section needs an `### In Practice` block (what breaks without this / decision trigger / when you'd choose differently) before the Exam Trap callout.
