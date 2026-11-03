@@ -1,0 +1,824 @@
+[
+  {
+    "domain": 5,
+    "id": "ccdv-d5-001",
+    "difficulty": "easy",
+    "scenario": "Lumen Learning's quiz-answer classifier labelled a student answer 'correct' in testing, then labelled the identical text 'partly correct' in production.",
+    "question": "What is the most likely reason the same input produced two different labels?",
+    "options": [
+      "The API stores the first label and returns a fresh guess once its cache expires",
+      "The production request lost its history, so the model forgot how it labelled the answer",
+      "Claude picks each next token by sampling, so repeated calls on one input can differ",
+      "The answer text was longer than the context window, so part of it was dropped"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: output is generated one token at a time by sampling, so identical input can yield different text and the classifier needs validation. A is wrong because the API does not store labels for reuse. B is wrong because each request is stateless and carries its own input. D is wrong because a short student answer sits far below the window.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "non-determinism"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-002",
+    "difficulty": "easy",
+    "scenario": "A library catalogue assistant sends a system prompt, tool definitions, 40 earlier messages and several tool results with each request.",
+    "question": "Which of these count toward the context window for one request?",
+    "options": [
+      "The system prompt, tool definitions, messages and tool results, plus the output including thinking",
+      "Just the newest user message, because earlier turns are held on the server and replayed between requests",
+      "The messages and the reply, while the system prompt and tool definitions sit outside the window",
+      "The input, since the reply is generated after the window has been measured"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the window holds everything sent plus the output, thinking included, and the Messages API is stateless so history travels with each call. B is wrong because the API keeps no conversation between requests. C is wrong because the system prompt and tool definitions occupy the window. D is wrong because output shares the same budget.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "context-window"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-003",
+    "difficulty": "easy",
+    "scenario": "A ride-dispatch app asks Claude to tag driver notes as 'delay', 'safety' or 'other'. With instructions alone, the tag wording and edge-case choices drift between calls.",
+    "question": "Which prompt change most directly steadies the tags?",
+    "options": [
+      "Raise max_tokens so the reply has room to restate the full tag list on each call",
+      "Repeat the instruction 'be consistent' several times in capital letters",
+      "Send each note twice in the same request and keep the second answer",
+      "Add a few diverse example notes, each with its exact tag, to the prompt"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: few-shot examples show the format and the boundary cases, so the model copies the pattern instead of guessing. A is wrong because output room does not change which tag is chosen. B is wrong because louder wording adds no information about edge cases. C is wrong because a duplicate input doubles tokens and still samples freely.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "few-shot"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-004",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript tool sets max_tokens to 1,000 with adaptive thinking switched on. Some chapter summaries come back very short or cut off.",
+    "question": "What best explains the short or truncated summaries?",
+    "options": [
+      "Thinking tokens are free and sit outside max_tokens, so the cap applies to the summary alone",
+      "Thinking counts as billed output toward max_tokens, leaving less room for the visible summary",
+      "max_tokens is soft guidance, so the model picks its own length and sometimes stops early",
+      "The input transcript shrinks the output cap, because input and output share one limit of 1,000"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: thinking counts as output, so a tight max_tokens is shared between reasoning and the summary. A is wrong because thinking is billed and counts toward the cap. C is wrong because max_tokens is the strict limit, while effort is the soft guidance. D is wrong because max_tokens caps output and the window is a separate budget.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "thinking-tokens"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-005",
+    "difficulty": "medium",
+    "scenario": "A recipe app sends temperature 0 on each request to get repeatable ingredient lists. After moving to a current Claude model, the requests return a 400 error.",
+    "question": "What is the right fix?",
+    "options": [
+      "Send top_p of 0.5 instead, since that control was left in place",
+      "Retry the same request, because a 400 on a sampling field is a transient overload",
+      "Remove temperature and rely on a clear format, examples and validation in code",
+      "Switch to an older model permanently so temperature 0 keeps working"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: current models reject non-default sampling parameters, so consistency comes from prompts, examples, structured output and validation. A is wrong because top_p is rejected in the same way. B is wrong because a 400 is a request error and a retry repeats it. D is wrong because it gives up a current model, and temperature 0 did not promise identical output anyway.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "sampling-parameters"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-006",
+    "difficulty": "medium",
+    "scenario": "A school timetable tool asks Claude to explain why two lessons clash. The explanations are shallow, and the request uses the default effort level on a current model.",
+    "question": "Which setting raises reasoning depth on a current model?",
+    "options": [
+      "Set output_config.effort to a higher level such as high or xhigh",
+      "Send thinking type enabled with a budget_tokens value of 10,000 for deeper reasoning",
+      "Set effort to 'adaptive', which switches the model over to deeper reasoning",
+      "Raise the temperature so the model explores more possibilities"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: effort is set with output_config.effort and needs no beta header, and higher levels buy deeper reasoning. B is wrong because manual budget_tokens thinking returns 400 on current models. C is wrong because adaptive is a thinking mode, not an effort value. D is wrong because sampling parameters are rejected and would not add depth anyway.",
+    "tags": [
+      "configuration",
+      "application",
+      "effort-level"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-007",
+    "difficulty": "medium",
+    "scenario": "A wine-club chat runs on an Opus tier model. Answer quality is fine, but long replies stream slowly and the team will pay more for speed.",
+    "question": "What does setting speed to 'fast' on the request change?",
+    "options": [
+      "It swaps in a smaller model with lower effort, so answers are shorter and cheaper",
+      "It removes the wait before the first token, leaving output speed unchanged",
+      "It sends the request through the batch queue at a discount, trading time for price",
+      "It runs the same model with faster output generation, at premium pricing"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: fast mode is the same model with faster inference, gaining output tokens per second at a higher price. A is wrong because it is not a smaller model or a lower effort setting. B is wrong because the gains are in output speed, not time to first token. C is wrong because fast mode is not available with the Batch API.",
+    "tags": [
+      "concept",
+      "application",
+      "fast-mode"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-008",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's returns classifier uses five examples, and all five are battery complaints. It labels brake and frame complaints poorly.",
+    "question": "How should the team improve the examples?",
+    "options": [
+      "Add twenty more battery examples so the format is learnt thoroughly",
+      "Use a diverse set that covers each label and borderline case",
+      "Drop the examples, since any example biases the model toward one label",
+      "Wrap the five examples in XML tags, which fixes label coverage by itself"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: examples should be relevant, diverse and structured, roughly three to five, so each label and edge case is shown. A is wrong because more of one kind deepens the bias toward batteries. C is wrong because examples are what teach the labelling pattern. D is wrong because tags structure examples but cannot supply missing label coverage.",
+    "tags": [
+      "best-practice",
+      "application",
+      "few-shot"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-009",
+    "difficulty": "medium",
+    "scenario": "A film-festival ticketing assistant caches 300,000 tokens of programme notes at the front of each request. A teammate says the cached notes no longer count against the context window.",
+    "question": "What is accurate about the cached programme notes?",
+    "options": [
+      "They are free after the first call, so the window has room for as many notes as needed",
+      "They count toward the window but are skipped when the output budget is calculated",
+      "They still occupy the window; caching changes their price, not whether they count",
+      "They leave the window once cached, which is why a cache entry has a lifetime"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a cached prefix still sits in the context window, and caching only lowers what you pay to read it. A is wrong because cache reads are cheaper, not free, and the window limit still applies. B is wrong because input does not reduce the separate output budget in that way. D is wrong because cache lifetime has nothing to do with window membership.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "context-window"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-010",
+    "difficulty": "hard",
+    "scenario": "A crop-sensor dashboard labels alerts 'irrigation', 'pest' or 'hardware'. Clear cases are right, but borderline readings flip between 'pest' and 'hardware' across calls, because the team's own rule for them appears nowhere in the prompt.",
+    "question": "Which change should the team try first?",
+    "options": [
+      "Add a few examples of borderline readings with the team's chosen labels",
+      "Raise the effort level to max so the model reasons longer about each reading",
+      "Move to a larger tier, which will infer the house rule from the readings",
+      "Run each alert three times and keep the most frequent label"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the disagreement is about a convention the model cannot infer, so examples that show it settle the labels. B is wrong because deeper reasoning cannot invent a missing rule. C is wrong because a larger tier faces the same gap in information. D is wrong because voting hides the inconsistency at triple the cost without teaching the rule.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "few-shot",
+      "effort-level"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-011",
+    "difficulty": "hard",
+    "scenario": "An escape-room booking tool asks Claude whether a group's slot clashes after combining overlapping bookings across time zones. The prompt already holds five varied worked examples, yet answers are wrong on multi-step cases.",
+    "question": "Which change should the team try first?",
+    "options": [
+      "Add five more worked examples in the same format to reinforce the pattern",
+      "Delete the examples so the model is not distracted from the arithmetic",
+      "Ask for the answer in JSON so the model makes fewer arithmetic slips",
+      "Raise the effort level, because the failures need more reasoning steps"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the examples already cover the format, and the errors come from multi-step reasoning, which higher effort supports. A is wrong because repeating a covered pattern adds little. B is wrong because the examples are not what causes the slips. C is wrong because a schema enforces the shape of an answer, not correct reasoning.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "effort-level"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-012",
+    "difficulty": "hard",
+    "scenario": "A municipal permit portal uses Claude to flag incomplete applications. One application returned the same decision on 50 test runs, so the team plans to skip output checks. Auditors want the same decision for the same file.",
+    "question": "What is the sound way to get audit-grade consistency?",
+    "options": [
+      "Treat the 50 matching runs as proof of determinism and log decisions without any further output checks",
+      "Constrain output with a schema, validate it in code and track decisions against a fixed eval set",
+      "Pin the model ID, because a pinned snapshot returns identical text for identical input",
+      "Set temperature to 0 on the request so sampling no longer varies"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: outputs can vary, so consistency comes from structured output, validation and an eval that catches drift. A is wrong because 50 matching runs on one file say nothing about other inputs. C is wrong because a pinned snapshot fixes weights, yet serving changes and sampling still allow variation. D is wrong because the parameter is rejected on current models and did not promise determinism.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "non-determinism",
+      "validation"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-013",
+    "difficulty": "easy",
+    "scenario": "Ridgeway Fitness's mobile coach chat calls client.messages.create in Python. A teammate wants to reproduce the failing call with curl.",
+    "question": "Which raw request does that SDK call correspond to?",
+    "options": [
+      "A POST to the messages path with a JSON body of model, max_tokens and messages",
+      "A GET to the messages path with the whole prompt sent in the query string",
+      "A PUT to a per-conversation URL, since the server keeps the chat history for you",
+      "A websocket upgrade to a coach channel that carries each conversation turn as a frame"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the SDK wraps a POST to the v1 messages endpoint, with the key and version in headers and the conversation in the JSON body. B is wrong because prompts are not sent as query strings. C is wrong because the Messages API is stateless and takes the full history each time. D is wrong because the call is an ordinary HTTP request, not a websocket.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "sdk-vs-http"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-014",
+    "difficulty": "easy",
+    "scenario": "A hotel booking engine team tests the Messages endpoint with curl. The body is valid JSON with model, max_tokens and messages, but the call is rejected.",
+    "question": "Besides the API key, which headers does a raw request need?",
+    "options": [
+      "A JSON content-type, because the key already selects the API version",
+      "anthropic-beta with the feature list, plus a JSON content-type",
+      "anthropic-version and a JSON content-type of application/json",
+      "A session cookie from the Console login, plus a content-type"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a raw request needs a version header and a JSON content type in addition to the key, which the SDK adds for you. A is wrong because the key does not choose the API version. B is wrong because the beta header opts into features and is not required. D is wrong because a Console session does not authenticate API calls.",
+    "tags": [
+      "configuration",
+      "comprehension",
+      "auth-headers"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-015",
+    "difficulty": "easy",
+    "scenario": "A developer pastes the API key as a string literal into a Python file for a small crop-sensor service, then commits it.",
+    "question": "What is the safer way to supply the key to the SDK or a raw request?",
+    "options": [
+      "Base64-encode the key in the source file so the committed text is not readable",
+      "Read it from an environment variable or secret store at start-up",
+      "Send the key in the JSON body, which is not written to server logs",
+      "Put the key in the system prompt so Claude can authenticate on its own"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: keys belong in the environment or a secret store, so the repository and build logs do not hold them. A is wrong because encoding is trivially reversed. C is wrong because the key travels in a header, not the body. D is wrong because the API authenticates the request, and the model does not.",
+    "tags": [
+      "best-practice",
+      "application",
+      "api-key"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-016",
+    "difficulty": "easy",
+    "scenario": "A library catalogue chat should show words as they are generated, instead of waiting for the full answer.",
+    "question": "How does the Messages API deliver a streamed reply?",
+    "options": [
+      "Open a websocket to a separate streaming host and receive each token as a frame",
+      "Poll a job id each second and read the next chunk of text that is ready",
+      "Send several requests with small max_tokens values and join the pieces",
+      "Set stream to true and read server-sent events on the same HTTP response"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: stream true returns a flow of message_start, content block deltas and message_stop over the original request. A is wrong because the API streams over HTTP, not a websocket. B is wrong because a normal streamed call has no job id to poll. C is wrong because chunked requests lose context and waste input tokens.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "streaming"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-017",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch dashboard parses Claude's streamed events with a switch statement. After an API update it throws an exception on an event type it has not seen before.",
+    "question": "How should the parser treat an unrecognised event type?",
+    "options": [
+      "Close the stream and retry, since an unknown type signals a corrupt response",
+      "Raise an error, because the event list is frozen for each API version",
+      "Skip or log it and keep reading, because new event types may be added",
+      "Convert it to a text delta so the user still sees something"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the docs say new event types may be added within a version, and ping events can appear anywhere, so unknown events are handled gracefully. A is wrong because an unknown type is not corruption and a retry repeats the cost. B is wrong because a version keeps existing fields but may add new outputs. D is wrong because invented text would show garbage to users.",
+    "tags": [
+      "best-practice",
+      "application",
+      "streaming"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-018",
+    "difficulty": "medium",
+    "scenario": "An escape-room booking chat streams replies. The code handles non-200 status codes, yet one user sees a reply stop mid-sentence with no error logged.",
+    "question": "What most likely happened?",
+    "options": [
+      "An error event arrived inside the stream after the 200 and the loop ignored it",
+      "The 200 status proves the whole reply finished, so the browser dropped the tail",
+      "A streamed reply cannot fail after it starts, so the model chose to stop early",
+      "The SDK retried the request twice and discarded the first partial reply it saw"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a stream can fail after HTTP 200 with an in-stream error event such as overloaded_error, which bypasses status-code handling. B is wrong because a 200 confirms only that the stream began. C is wrong because failures mid-stream do happen. D is wrong because retries apply to failed requests and would not silently cut a reply.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "streaming-errors"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-019",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor service wraps each SDK call in its own loop of three retries with a fixed one-second pause, after seeing intermittent 429 and 529 responses.",
+    "question": "What does the SDK already do for transient failures?",
+    "options": [
+      "It makes no retries unless you pass a retry policy when you create the client",
+      "It retries three times with a fixed pause and ignores any retry-after header it receives",
+      "It retries any failed status, including 400 and 401, until the request succeeds",
+      "It retries transient errors twice with exponential backoff, honouring retry-after"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the default is two retries with exponential backoff, tunable with max_retries, so a hand-written loop multiplies attempts. A is wrong because retries are on by default. B is wrong because the count is two and retry-after is honoured. C is wrong because 400 and 401 are request or credential faults that a retry cannot fix.",
+    "tags": [
+      "concept",
+      "application",
+      "sdk-retries"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-020",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine hits a 429 whose body shows error_code enforced_spend_limit_reached and carries no retry-after header. The SDK's retries all fail.",
+    "question": "Why do the retries keep failing?",
+    "options": [
+      "A burst of requests tripped the token bucket, and a short pause will refill it soon",
+      "A monthly spend cap blocks access until it resets, so a short wait will not help",
+      "The client sent large images, so the request is over the size limit for the call",
+      "The retry count is too low, so raising max_retries will get a request through in time"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: this 429 is a tier spend cap with no retry-after, so retries, SDK ones included, fail until access resumes. A is wrong because a bucket refill would show retry-after and recover quickly. C is wrong because oversized requests return 413. D is wrong because more retries repeat the same refusal.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-021",
+    "difficulty": "medium",
+    "scenario": "A wine-club backend catches a BadRequestError from the SDK. The message is vague, and the developer cannot tell which field the API rejected.",
+    "question": "What is the best way to diagnose the failure?",
+    "options": [
+      "Avoid raw HTTP, because the SDK already exposes everything the API returned to you",
+      "Match on the exception message text and branch on the wording",
+      "Replay the call as raw HTTP, then read the error body and log the request-id",
+      "Raise max_retries so the SDK reveals the hidden reason on a later attempt"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the wire request shows the exact headers and body, the error body names the problem, and the request-id lets support trace the call. A is wrong because the SDK wraps the response and can hide fields. B is wrong because message text is brittle; catch typed exceptions instead. D is wrong because a 400 repeats identically and retries add nothing.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "sdk-vs-http"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-022",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript tool makes a non-streaming call with a very large max_tokens for a long edit. The SDK raises an error saying the request may exceed ten minutes.",
+    "question": "What is the right fix?",
+    "options": [
+      "Stream the response, or use the Batches API if no one is waiting",
+      "Lift the SDK timeout to an hour and keep the non-streaming call as it is",
+      "Drop max_retries to zero, since retries are what extend the expected time",
+      "Split the system prompt across two requests to halve the duration of each"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: long requests should use streaming or Batches, because the SDK checks that a non-streaming call will finish inside its ten-minute window. B is wrong because the SDK rejects the call up front rather than waiting. C is wrong because retries are not what pushes the expected duration over. D is wrong because splitting the prompt loses shared context.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "timeouts"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-023",
+    "difficulty": "medium",
+    "scenario": "A school timetable backend in Python needs typed errors, automatic retries and stream helpers. One teammate proposes raw HTTP for every call, and another proposes a websocket per user.",
+    "question": "Which approach suits production code?",
+    "options": [
+      "Use raw HTTP everywhere, because the SDK adds hidden state to each call",
+      "Use a websocket per user, because it is the standard transport for chat",
+      "Use raw HTTP in production and the SDK in tests alone",
+      "Use the SDK, and keep a raw HTTP replay for debugging a failing call"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the SDK gives typed exceptions, retries and stream helpers, and knowing the wire request lets you reproduce failures. A is wrong because the SDK holds no hidden conversation state; the API is stateless. B is wrong because the Messages API streams over HTTP, so a websocket adds a layer without need. C is wrong because it drops those helpers where they matter most.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "sdk-vs-http"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-024",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's shell script posts to the Messages endpoint with x-api-key and a content-type header, and the body is valid. The call is rejected.",
+    "question": "What is missing from the raw request?",
+    "options": [
+      "A beta header, which each request needs before the endpoint will respond",
+      "The anthropic-version header, which the SDKs add for you",
+      "The key repeated in the JSON body next to the model field and message list",
+      "A session id header so the server can find the earlier turns of the chat"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the version header is required on every request, and SDKs set it automatically, which is why hand-written scripts trip on it. A is wrong because beta headers enable specific features and are not general. C is wrong because the key belongs in a header. D is wrong because the API is stateless and has no session to look up.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "auth-headers"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-025",
+    "difficulty": "hard",
+    "scenario": "A film-festival ticketing site has one chat box. The visitor sends a message, then watches one answer appear token by token. The visitor sends nothing while the answer streams, and the server has no other live push to make.",
+    "question": "Which transport fits the path from Claude through the server to the browser?",
+    "options": [
+      "Open a persistent websocket for each visitor, because chat needs a two-way channel",
+      "Return the full answer in one response, because streaming needs a websocket anyway",
+      "Poll the server each second for new tokens held in a database",
+      "Stream over HTTP with server-sent events, and relay the tokens the same way"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the traffic is one-way and request-shaped, and the API already streams over HTTP, so a websocket would add connection state without a two-way need. A is wrong because a persistent two-way channel pays off only when both sides send during a session. B is wrong because streaming works over HTTP. C is wrong because polling adds delay and storage for no gain.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "streaming"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-026",
+    "difficulty": "hard",
+    "scenario": "Two nightly jobs fail with 429 after the SDK's retries. Job A's response has a retry-after header and rate-limit headers showing no requests remaining. Job B's body shows error_code enforced_spend_limit_reached and has no retry-after.",
+    "question": "What is the right handling for each job?",
+    "options": [
+      "Job A: back off and ramp up gradually; job B: stop retrying until the cap resets",
+      "Both jobs: raise max_retries so the SDK keeps waiting until quota returns",
+      "Job A: pause for the month as a spend cap; job B: retry at once since no wait is advised",
+      "Both jobs: switch to streaming so the 429 appears as an in-stream error that can be ignored"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: A hit a token-bucket limit, so slowing down recovers it, while B hit a monthly cap that retries cannot beat. B is wrong because more retries repeat B's refusal. C is wrong because it swaps the two diagnoses and hammers a capped account. D is wrong because streaming removes neither limit.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-027",
+    "difficulty": "hard",
+    "scenario": "A recipe app streams a long plain-text answer from a current model. The connection drops 800 tokens in, and the team wants to keep the text already received instead of regenerating it.",
+    "question": "Which recovery fits?",
+    "options": [
+      "Resend the history with the partial text as a final assistant message for Claude to extend",
+      "Reopen the stream with the old message id so the server resumes from the last event",
+      "Send a new request with the partial text in a user message and a continue instruction",
+      "Restart with the same request, since partial text cannot be reused in any form"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: on current models the documented recovery puts the partial response in a user message with a continue instruction. A is wrong because a prefilled final assistant turn returns 400 on these models. B is wrong because the documented recovery is a fresh request, not a resume. D is wrong because only tool_use and thinking blocks cannot be partly recovered.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "streaming-errors"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-028",
+    "difficulty": "easy",
+    "scenario": "Saltmarsh Media's content pipeline tags 200,000 short headlines a day by topic. The step is simple, high in volume and sensitive to latency.",
+    "question": "Which tier is the natural first candidate for the tagging step?",
+    "options": [
+      "Opus, because the largest tier gives the safest accuracy on any task",
+      "Haiku, described for high-volume classification and extraction",
+      "Fable, because it is built for the hardest long-horizon reasoning",
+      "Sonnet at maximum effort, to match the quality of the larger tiers"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Haiku is the fastest and cheapest tier and is described for latency-sensitive classification, so test it first against the eval. A is wrong because the largest tier costs and delays more than a simple step needs. C is wrong because that capacity suits demanding agentic work. D is wrong because maximum effort adds cost and latency to a simple step.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "model-tiers"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-029",
+    "difficulty": "easy",
+    "scenario": "A hotel booking engine's parser expects the model to return a particular JSON layout. The team wants to move to a newer release of the same tier.",
+    "question": "What should the team do before switching?",
+    "options": [
+      "Change the ID in config and watch the error logs, since a newer release is a drop-in",
+      "Keep the old ID until the day it retires, then change it without testing",
+      "Switch to a dateless alias, which floats to the latest release automatically",
+      "Read the release notes, pin the new ID and re-run the evals on the new release"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: releases can change behaviour, so read the notes, pin the exact ID and let the eval show whether the parser still works. A is wrong because an upgrade can silently change output format. B is wrong because retirement comes with at least 60 days' notice, and untested last-minute changes are risky. C is wrong because recent dateless IDs are fixed snapshots, not floating aliases.",
+    "tags": [
+      "best-practice",
+      "application",
+      "model-upgrades"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-030",
+    "difficulty": "medium",
+    "scenario": "A media pipeline has three steps: tag 200,000 headlines a day, draft short summaries, and reconcile conflicting facts across many long reports. Each step has its own eval.",
+    "question": "Which routing does the quality, latency and cost triangle point to?",
+    "options": [
+      "Haiku for tagging, Sonnet for summaries, Opus for reconciliation, each behind its eval",
+      "Opus for the whole pipeline, so quality does not depend on any routing rule or eval",
+      "Haiku for the whole pipeline, since the lowest price wins in a cost-led design",
+      "Sonnet for the whole pipeline, since its speed and intelligence balance suits any step"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: each step gets the cheapest tier that passes its own eval, so high-volume work stays cheap and the hard step gets capability. B is wrong because the largest tier overpays for simple steps. C is wrong because the cheapest tier may fail the reconciliation eval. D is wrong because one middle tier overpays on tagging and may still miss on reconciliation.",
+    "tags": [
+      "comparison",
+      "application",
+      "model-routing"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-031",
+    "difficulty": "medium",
+    "scenario": "A team's request sends thinking type disabled and runs on a Haiku tier model. They copy the same request to an Opus tier model for a harder step, and it returns a 400.",
+    "question": "What is the right adjustment for the Opus tier?",
+    "options": [
+      "Send thinking type enabled with a budget_tokens value to force reasoning on",
+      "Add a beta header so the Opus tier accepts the disabled setting for this step",
+      "Omit thinking or use adaptive, and tune depth with the effort setting",
+      "Lower max_tokens to zero so no thinking tokens can be produced for the request"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the Opus tier always thinks and rejects disabled, so leave thinking adaptive and control depth with effort. A is wrong because manual enabled with budget_tokens returns 400 on current models. B is wrong because no beta header changes that rejection. D is wrong because a max_tokens of zero generates no output at all.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "thinking-config"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-032",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's pipeline relied on a prefilled assistant turn to force JSON. After moving to a current Sonnet tier model, requests return 400, and forcing a tool through tool_choice fails too.",
+    "question": "Which replacement gives reliable JSON on the new model?",
+    "options": [
+      "Keep the prefill and add an anthropic-beta header that re-enables it",
+      "Use structured outputs, or strict tool use with tool_choice left on auto",
+      "Force a tool with tool_choice set to any, which makes the model return valid JSON",
+      "Ask for JSON in the user turn and parse the first content block by position"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: prefill and forced tool_choice both return 400 on these models, so use structured outputs or strict tools with auto. A is wrong because no beta header restores prefill. C is wrong because forced tool use is itself rejected on these tiers. D is wrong because prompting alone gives no schema guarantee, and responses can begin with thinking blocks, so position is unreliable.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "model-upgrades"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-033",
+    "difficulty": "hard",
+    "scenario": "A school timetable tool's eval has 300 labelled cases and a pass bar of 95 percent. Haiku scores 96, Sonnet 97 and Opus 97. A manager asks for the largest tier 'to be safe'. The tool answers on a live screen.",
+    "question": "Which tier should the team ship?",
+    "options": [
+      "Haiku, the cheapest tier that clears the bar, re-checked on each release",
+      "Opus, because the largest tier removes the need for ongoing evals",
+      "Sonnet, because the extra point proves it is more reliable on future inputs",
+      "Haiku at maximum effort, to push its score higher before launch"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is the pass bar, and the cheapest tier that clears it also suits a live screen. B is wrong because no tier removes the need to re-run evals. C is wrong because a one-point gap on 300 cases is too small to justify the higher price. D is wrong because extra effort adds cost and latency to a tier already passing.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "model-tiers"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-034",
+    "difficulty": "hard",
+    "scenario": "A podcast tool tags episodes with Haiku. The eval shows a 97 percent pass rate on interviews and monologues but 78 percent on panel shows, which are 8 percent of volume. The bar is 95 percent on each format.",
+    "question": "What should the team do?",
+    "options": [
+      "Move the whole pipeline to Opus, since one weak slice proves the cheap tier is unreliable",
+      "Keep Haiku everywhere and lower the bar for panel shows to 78 percent",
+      "Move the whole pipeline to Sonnet and skip further evals because it is mid-sized",
+      "Keep Haiku where it passes and route panel shows to a higher tier, then re-run the eval"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the eval locates the gap in one format, so upgrade where it shows and keep the cheap tier elsewhere, then verify the new routing. A is wrong because it overpays on the 92 percent of volume that already passes. B is wrong because it moves the bar instead of fixing quality. C is wrong because a mid-sized tier still needs an eval to prove it passes.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "model-routing"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-035",
+    "difficulty": "easy",
+    "scenario": "Cobalt Insights wants to model the cost per request for a long system prompt. A developer opens a response to see how many tokens were billed.",
+    "question": "Which response fields show cached and uncached input?",
+    "options": [
+      "Just usage.input_tokens, because cached tokens are folded into that one field",
+      "input_tokens, cache_creation_input_tokens and cache_read_input_tokens in usage",
+      "The stop_reason and stop_sequence fields, which report token counts at the end",
+      "The request-id header, which returns the token totals for the whole call"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: total input equals cache reads plus cache creation plus uncached input_tokens, so a cost model needs all three. A is wrong because input_tokens counts just the tokens after the last breakpoint. C is wrong because those fields describe why generation ended. D is wrong because the request-id identifies the call for support and holds no totals.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "usage-fields"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-036",
+    "difficulty": "easy",
+    "scenario": "A permit portal puts the current time at the start of a 20,000-token system prompt, followed by fixed policy text. Cache reads stay at zero.",
+    "question": "Where should the changing timestamp go?",
+    "options": [
+      "At the start, so the model reads the date before it reads the policy text",
+      "In the tool definitions, which are cached separately from the system prompt",
+      "After the stable policy text, so the repeated prefix stays identical",
+      "Nowhere, because a date in a prompt breaks caching wherever it sits"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: caching matches an identical prefix in the order tools, system, messages, so changing text belongs after the stable block. A is wrong because a changing first line makes each prefix differ. B is wrong because tools come first and changing them invalidates everything. D is wrong because a date placed after the cached prefix leaves caching intact.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "prompt-caching"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-037",
+    "difficulty": "medium",
+    "scenario": "A model is priced at $2 per million input tokens and $10 per million output tokens. One request uses 50,000 input tokens and 2,000 output tokens, with no caching.",
+    "question": "What does that one request cost?",
+    "options": [
+      "$0.10",
+      "$0.012",
+      "$1.20",
+      "$0.12"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: 50,000 input tokens at $2 per million is $0.10, and 2,000 output tokens at $10 per million is $0.02, so the total is $0.12. A is wrong because it leaves out the output charge. B is wrong because it is out by a factor of ten. C is wrong because it is also out by a factor of ten, in the other direction.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "cost-formula"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-038",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch screen shows Claude's tag for a driver note within seconds of submission. Finance asks the team to move the calls to the Batch API for its 50 percent discount.",
+    "question": "What is the right response?",
+    "options": [
+      "Stay on realtime; batch halves the price but results can take hours",
+      "Move to batch, because it keeps the discount and returns results within a second or two",
+      "Move to batch and enable fast mode, which stacks with the batch discount",
+      "Move to batch and add the one-hour cache, which makes results return sooner"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: batch halves input and output prices, but results can take up to 24 hours, so a live screen needs realtime calls. B is wrong because batch is not low-latency. C is wrong because fast mode is not available with the Batch API. D is wrong because caching lowers cost and does not shorten batch processing time.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "batch-vs-realtime"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-039",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor summary averages 150 tokens, but a few runs ramble to 4,000 tokens and spike the bill. The team wants a hard ceiling on output spend per call.",
+    "question": "Which control gives a hard ceiling on output tokens?",
+    "options": [
+      "Lower the effort level, which strictly caps the number of tokens generated",
+      "Add a stop sequence that matches the end of the expected summary text",
+      "Set max_tokens to a sensible limit, plus a brevity instruction",
+      "Shorten the system prompt, which caps the length of the reply"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: max_tokens is the strict limit on output, while a brevity instruction keeps normal replies short. A is wrong because effort is soft guidance and does not cap output. B is wrong because a stop sequence fires just when the model writes that text. D is wrong because input length does not bound how long the reply runs.",
+    "tags": [
+      "best-practice",
+      "application",
+      "output-caps"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-040",
+    "difficulty": "hard",
+    "scenario": "A support tool reuses a 30,000-token stable prefix. Requests for it arrive about every 20 minutes, around the clock. It uses the default cache lifetime, and usage shows cache writes on most calls and almost no cache reads.",
+    "question": "Which change cuts the cost?",
+    "options": [
+      "Keep the five-minute lifetime, because each use refreshes it at no extra cost",
+      "Use the one-hour cache lifetime, since the next request lands before expiry",
+      "Add more breakpoints, so a longer share of the prefix can be read",
+      "Switch caching off for good, since a write costs more than the saving"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: caching pays only if the prefix is read again within its lifetime; a 20-minute gap outlasts five minutes but fits one hour, which pays back after two reads. A is wrong because a refresh happens only when the entry is used inside the window. C is wrong because breakpoints cannot help entries that expired. D is wrong because the longer lifetime saves money at this rhythm.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "prompt-caching"
+    ]
+  },
+  {
+    "domain": 5,
+    "id": "ccdv-d5-041",
+    "difficulty": "hard",
+    "scenario": "A hotel booking engine puts a per-request session id in the system prompt ahead of a 25,000-token policy, with a breakpoint after the policy. Calls arrive seconds apart, yet usage shows cache creation tokens each time and zero cache reads.",
+    "question": "What change makes cache reads appear?",
+    "options": [
+      "Switch to the one-hour lifetime, since the five-minute entries are expiring",
+      "Send a pre-warm request with max_tokens set to 0 before each real request",
+      "Lower the effort level, so the cache key matches across calls",
+      "Move the session id after the policy and put the breakpoint at its end"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the changing id sits inside the cached prefix, so each request differs; moving it after the stable text restores an identical prefix. A is wrong because calls seconds apart cannot outlast five minutes. B is wrong because a warm-up with a changing prefix writes a new entry again. C is wrong because an effort change can invalidate cached messages instead of matching them.",
+    "tags": [
+      "scenario-based",
+      "troubleshooting",
+      "prompt-caching"
+    ]
+  }
+]

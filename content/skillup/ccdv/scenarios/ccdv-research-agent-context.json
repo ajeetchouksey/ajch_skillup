@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-005",
+  "title": "Keeping a Long Research Agent Reliable",
+  "description": "A research agent that runs for hours loses quality after the first hour and reaches different conclusions on repeat runs. The team must manage context growth, judge variation with evidence, diagnose a streaming timeout, tame rate limits from a worker fleet and stop a standing rule being lost. The choices span context, evaluation and operational design.",
+  "examId": "ccdv",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    2,
+    5,
+    6
+  ],
+  "taskIds": [
+    "6.1",
+    "5.1",
+    "5.2",
+    "2.4",
+    "6.2"
+  ],
+  "scenario": {
+    "background": "Quillfeather Analytics must deliver client briefings that analysts can defend line by line, yet its research agent gets less reliable the longer it runs. The agent searches, fetches reports and writes findings for hours at a time, and each fetch can return tens of thousands of tokens of text. After about an hour it forgets early findings and ignores the rule that it may cite only sources on the client's approved list. Two runs on the same question have also ended with different conclusions, and the streamed progress view sometimes dies behind the company proxy. A fleet of fifty workers now runs briefings in parallel, which has started to produce rate-limit errors.",
+    "characters": [
+      {
+        "name": "Nadia Petrov",
+        "role": "Research lead",
+        "concern": "She wants conclusions that are stable and defensible, because clients quote the briefings in their own decisions."
+      },
+      {
+        "name": "Sam Okafor",
+        "role": "Backend engineer",
+        "concern": "He wants the smallest change that works, and would rather not rebuild the agent loop."
+      },
+      {
+        "name": "Lila Ward",
+        "role": "Site reliability engineer",
+        "concern": "She wants predictable load and failures she can diagnose from logs, not guesses."
+      },
+      {
+        "name": "Ben Cho",
+        "role": "Analyst",
+        "concern": "He wants every fetched source kept in full so he can audit a finding, even if the agent does not need it any more."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-005-q1",
+      "stem": "Nadia reports that after many fetches the agent misses findings it made an hour earlier, while Ben wants the full source text kept for audit. Which change addresses the drift and respects Ben's need?",
+      "options": [
+        "Clear older tool results from the working context, log them in full elsewhere, and delegate bulky lookups to a subagent that returns a summary",
+        "Move the run to a model with a larger context window and leave the loop and its tool output as they are today, since capacity is the problem",
+        "Restart the run with an empty context at the end of each hour and carry no findings over, so that stale material from earlier fetches cannot interfere",
+        "Raise max_tokens on each request so the model has more room to reason about the growing pile of tool results from earlier fetches"
+      ],
+      "correct": 0,
+      "explanation": "Curate the context: recall degrades as tool output fills the window. A is correct: stale tool results leave the working context, Ben's audit copy stays in your own log, and a subagent keeps bulky lookups out of the main window. B is wrong because a bigger window still suffers context rot. C is wrong because earlier findings are lost entirely. D is wrong because max_tokens limits output, not the input that is crowding the run."
+    },
+    {
+      "id": "ccdv-scenario-005-q2",
+      "stem": "Two runs on the same question reach different conclusions, and Nadia wants them to match. Sam notes that sampling settings are rejected by the current models. What is the sound response?",
+      "options": [
+        "Set the sampling temperature to zero so that each run becomes repeatable and the conclusions then agree across the whole team",
+        "Expect variation, score several runs per question against agreed criteria, and tighten the prompt with examples and a fixed format",
+        "Keep the run whose conclusion matches last quarter's report and discard the others as outliers before anyone reviews them in detail",
+        "Rerun the question until two runs agree, then publish the conclusion they share as the confirmed result for the client"
+      ],
+      "correct": 1,
+      "explanation": "Non-determinism is a property to measure, not remove. B is correct: running several times against criteria shows how stable the agent really is, and clearer instructions with examples narrow the spread. A is wrong because current models reject sampling parameters, and repeatability was never guaranteed anyway. C is wrong because it discards evidence to suit a prior belief. D is wrong because two agreeing runs can still share the same error."
+    },
+    {
+      "id": "ccdv-scenario-005-q3",
+      "stem": "Lila finds that the progress stream works from a laptop but the dashboard behind the company proxy times out during long gaps. Sam suggests asking the agent to debug itself. What should the team do first?",
+      "options": [
+        "Move the research workers to a smaller tier so that replies finish before the proxy gives up waiting on a silent connection during a long tool call",
+        "Replace the streaming connection with a websocket layer in the dashboard before confirming where the events actually stall in the network",
+        "Compare event timing at the client and the dashboard, then configure the proxy to pass streamed events through with a suitable timeout",
+        "Turn streaming off and send plain requests, accepting that very long requests are then more likely to fail outright"
+      ],
+      "correct": 2,
+      "explanation": "Diagnose the transport before changing the model or protocol. C is correct: the symptom appears only behind the proxy, so event timing at both ends shows where buffering or an idle timeout cuts the stream, and Lila can fix it by hand without the agent. A is wrong because tier does not alter proxy behaviour. B is wrong because a new protocol is a guess. D is wrong because non-streaming requests that run long can fail."
+    },
+    {
+      "id": "ccdv-scenario-005-q4",
+      "stem": "Fifty workers now start briefings together and many calls return rate-limit errors. Sam proposes letting the agent decide when to pause. Lila wants load she can predict. What should the harness do?",
+      "options": [
+        "Let the workers run unthrottled, since the API will queue the excess requests and serve them in turn as capacity frees up, so no limiter is needed",
+        "Retry each failed call immediately in a loop until it succeeds, so that no briefing is delayed by the rate limit for long",
+        "Add more workers so that a larger number of calls complete within each rate-limit window and the backlog clears quickly",
+        "Cap in-flight requests with a shared limiter, and retry 429 errors with exponential backoff and jitter, honouring retry-after"
+      ],
+      "correct": 3,
+      "explanation": "Pacing belongs in deterministic harness code, not in model judgement. D is correct: a bounded limiter keeps load predictable, and backoff with jitter stops synchronised retries from re-creating the burst while retry-after is respected. A is wrong because excess requests are rejected, not queued. B is wrong because tight retries add to the overload. C is wrong because more workers raise demand against the same quota."
+    },
+    {
+      "id": "ccdv-scenario-005-q5",
+      "stem": "After the changes in question 1, long runs still lose the rule that only approved sources may be cited, which was given once in an early user message. How should the team keep it in force?",
+      "options": [
+        "Repeat the rule at the end of each user message, so that it sits among the most recent text the model reads",
+        "Keep standing rules in the system prompt, and re-inject only the few run facts that must survive compaction",
+        "Shorten the rule to a single sentence so that the summary written at compaction is more likely to keep it intact",
+        "Trust the summary to carry it forward, because the rule was stated clearly at the start of the run and left unchanged"
+      ],
+      "correct": 1,
+      "explanation": "Standing rules need a durable home. B is correct: the system prompt is sent with every request, so pruning and compaction cannot remove it, and re-injecting only the few run facts that must persist keeps context lean, which question 1 set out to do. A is wrong because it bloats each turn. C is wrong because a shorter rule can still be dropped. D is wrong because summaries may omit early instructions."
+    }
+  ],
+  "keyLearnings": [
+    "Long-running agents need curated context: clear stale tool output, delegate bulky lookups to a subagent that returns a summary, and keep a full copy outside the window when auditors need it.",
+    "Variation between runs is normal, so judge stability by scoring several runs against criteria and by tightening instructions and examples, not by demanding identical output or picking the run you prefer.",
+    "When a streaming failure appears only on one network path, diagnose the transport with timing evidence before changing models, protocols or streaming itself.",
+    "Pace parallel callers with a bounded limiter plus backoff and jitter in harness code, and keep standing rules in the system prompt rather than in conversation text that pruning or compaction can drop."
+  ]
+}

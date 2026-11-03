@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0",
+  "contentVersion": "1.0.0",
+  "contentUpdatedAt": "2026-11-03",
+  "provider": "Anthropic",
+  "palette": {
+    "color": "#fbbf24",
+    "bg": "rgba(245,158,11,0.10)",
+    "border": "rgba(245,158,11,0.38)",
+    "glow": "rgba(245,158,11,0.18)",
+    "btn": "linear-gradient(135deg, #d97706, #b45309)"
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-11-03",
+      "type": "major",
+      "summary": "Initial release, built by the agent team against the official Claude Certified Developer – Foundations Exam Guide v1.0 (effective July 2026). 8 domains with the official weights and all 25 skills as lessons (titles verbatim) in the lessons format, with worked Python and configuration examples and one worked-example diagram per lesson. 249 single-answer questions (22% hard) allocated by skill weight with at least 6 per skill, and 6 case studies that reach all 25 skills. Product facts come from the live Claude documentation as read on 2 November 2026. Known limit: the real exam also has multiple-response items, which SkillUp's practice mode does not support yet."
+    }
+  ],
+  "id": "ccdv",
+  "examCode": "CCDV-F",
+  "title": "Claude Certified Developer – Foundations",
+  "shortTitle": "CCDV-F",
+  "contentLevel": "201",
+  "description": "For software engineers who build, integrate and ship applications, agents and workflows on Claude. Covers agent architecture, API integration, Claude Code, evals and debugging, model selection and cost, prompt and context engineering, security and guardrails, and tools and MCP servers. Python and TypeScript.",
+  "questions": 249,
+  "duration": "120 min",
+  "passScore": "720/1000",
+  "passThreshold": 72,
+  "examFee": "$125 USD",
+  "available": true,
+  "accentColor": "#d97706",
+  "colorScheme": "amber",
+  "domains": [
+    {
+      "id": 1,
+      "title": "Agents and Workflows",
+      "weight": 14.7,
+      "color": "bg-violet-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d1-agents-workflows.md"
+    },
+    {
+      "id": 2,
+      "title": "Applications and Integration",
+      "weight": 33.1,
+      "color": "bg-blue-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d2-applications-integration.md"
+    },
+    {
+      "id": 3,
+      "title": "Claude Code",
+      "weight": 3.1,
+      "color": "bg-emerald-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d3-claude-code.md"
+    },
+    {
+      "id": 4,
+      "title": "Eval, Testing, and Debugging",
+      "weight": 2.6,
+      "color": "bg-amber-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d4-eval-testing-debugging.md"
+    },
+    {
+      "id": 5,
+      "title": "Model Selection and Optimization",
+      "weight": 16.8,
+      "color": "bg-sky-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d5-model-selection-optimization.md"
+    },
+    {
+      "id": 6,
+      "title": "Prompt and Context Engineering",
+      "weight": 11.0,
+      "color": "bg-rose-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d6-prompt-context-engineering.md"
+    },
+    {
+      "id": 7,
+      "title": "Security and Safety",
+      "weight": 8.1,
+      "color": "bg-gray-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d7-security-safety.md"
+    },
+    {
+      "id": 8,
+      "title": "Tools and MCPs",
+      "weight": 10.6,
+      "color": "bg-orange-600",
+      "notesFile": "content/skillup/ccdv/notes/ccdv-d8-tools-mcps.md"
+    }
+  ],
+  "questionFiles": [
+    "content/skillup/ccdv/questions/ccdv-domain1.json",
+    "content/skillup/ccdv/questions/ccdv-domain2.json",
+    "content/skillup/ccdv/questions/ccdv-domain2b.json",
+    "content/skillup/ccdv/questions/ccdv-domain3.json",
+    "content/skillup/ccdv/questions/ccdv-domain4.json",
+    "content/skillup/ccdv/questions/ccdv-domain5.json",
+    "content/skillup/ccdv/questions/ccdv-domain6.json",
+    "content/skillup/ccdv/questions/ccdv-domain7.json",
+    "content/skillup/ccdv/questions/ccdv-domain8.json"
+  ],
+  "scenarioFiles": [
+    "content/skillup/ccdv/scenarios/ccdv-catalogue-enrichment-pipeline.json",
+    "content/skillup/ccdv/scenarios/ccdv-support-agent-launch.json",
+    "content/skillup/ccdv/scenarios/ccdv-inbox-assistant-security.json",
+    "content/skillup/ccdv/scenarios/ccdv-internal-tooling-rollout.json",
+    "content/skillup/ccdv/scenarios/ccdv-research-agent-context.json",
+    "content/skillup/ccdv/scenarios/ccdv-release-pipeline-upgrade.json"
+  ],
+  "resources": [
+    {
+      "label": "Official Exam Guide",
+      "url": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542875%2FClaude+Certified+Developer+%E2%80%93+Foundations+Exam+Guide.pdf"
+    },
+    {
+      "label": "Anthropic Partner Academy certifications",
+      "url": "https://anthropic-partners.skilljar.com/page/partner-certifications"
+    },
+    {
+      "label": "Claude Developer Platform docs",
+      "url": "https://platform.claude.com/docs/en/home"
+    },
+    {
+      "label": "Claude Code docs",
+      "url": "https://code.claude.com/docs/en/overview"
+    },
+    {
+      "label": "Model Context Protocol docs",
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro"
+    }
+  ],
+  "taskStatementsFile": "content/skillup/ccdv/task-statements.json"
+}

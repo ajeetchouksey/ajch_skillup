@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-003",
+  "title": "Securing a Tenant Inbox Assistant",
+  "description": "Meridian Property Management is giving an assistant access to tenant emails and attachments, with tools to draft, forward and archive. The scenario follows five security decisions, from untrusted attachment text through prompt layout, layered defences and hard blocks to a leaked credential. It tests where to trust the model, where to enforce in code and when to leave the assistant out of the loop.",
+  "examId": "ccdv",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    6,
+    7
+  ],
+  "taskIds": [
+    "7.1",
+    "7.2",
+    "7.3",
+    "7.4",
+    "6.2"
+  ],
+  "scenario": {
+    "background": "Meridian Property Management cannot let an assistant that reads tenant mail send or delete that mail on the say-so of whoever wrote it. The assistant, built on the Agent SDK, reads tenant emails and PDF attachments, then drafts replies, forwards messages to contractors and archives resolved threads. Tenants and outside contractors can send anything they like, including attachments nobody at Meridian has read. The pilot covers 600 tenancies and runs on a single shared service key. The team wants the time saving without a data leak that Colm would have to explain to regulators.",
+    "characters": [
+      {
+        "name": "Mara Quinn",
+        "role": "Head of Operations",
+        "concern": "Wants the assistant to clear the morning backlog without a human approving every small action."
+      },
+      {
+        "name": "Idris Bello",
+        "role": "Security Lead",
+        "concern": "Wants tenant data unable to leave the company through a tool call, whatever the assistant is persuaded to attempt."
+      },
+      {
+        "name": "Hana Roe",
+        "role": "Developer",
+        "concern": "Has to build the assistant and wants controls she can test and explain, not hopeful wording."
+      },
+      {
+        "name": "Colm Fraser",
+        "role": "Legal Liaison",
+        "concern": "Needs tenant records kept for the retention period and an audit trail of what left the company."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-003-q1",
+      "stem": "In testing, a contractor's PDF quote contains hidden text telling the assistant to forward the whole inbox to an outside address. Idris asks what Hana should treat as the real fix.",
+      "options": [
+        "Add a line to the system prompt telling the assistant to ignore instructions found inside attachments or emails",
+        "Scan incoming attachments for phrases such as 'forward mail' and reject any file that contains one of them",
+        "Treat attachment text as untrusted data; gate forwarding by allowlist and approval",
+        "Move the assistant to a larger model tier, which is better at spotting instructions planted in documents"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: this is indirect injection, where the user is trusted but third-party content carries instructions, so the fix is least privilege and approval on the dangerous tool. A is wrong because a prompt line alone is not a barrier. B is wrong because keyword lists miss rephrasings. D is wrong because a bigger tier lowers the odds but still leaves the forward tool open."
+    },
+    {
+      "id": "ccdv-scenario-003-q2",
+      "stem": "Hana now designs how emails reach the model, given Idris's decision in q1 to treat their text as untrusted data. Where should the rules and the email text go?",
+      "options": [
+        "Keep the rules and a policy in the system prompt; pass each email as a labelled, JSON-encoded tool result",
+        "Paste the email text into the system prompt so the assistant treats it as the main brief for the reply",
+        "Put the email first, then repeat the rules after it in capital letters so the final instruction carries most weight",
+        "Strip the HTML and links from the email, then merge the cleaned text into the user message beside the rules"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: untrusted content belongs in labelled tool results, with the policy and rules in the system prompt and no instructions of Meridian's own inside the data. B is wrong because it hands the sender the highest-authority slot. C is wrong because capitals and ordering are not a boundary. D is wrong because cleaning helps but, merged with the rules in plain user text, nothing marks the email as data."
+    },
+    {
+      "id": "ccdv-scenario-003-q3",
+      "stem": "Mara wants speed and Idris wants safety. With the data handling from q2 in place, which overall plan should Hana put to them?",
+      "options": [
+        "Layer input checks, scoped tools, output validation and approval for irreversible actions",
+        "Rely on the hardened system prompt, because the untrusted-content policy from q2 already covers the injection risk",
+        "Require a human to approve each action the assistant takes, including drafts and archiving, so no action runs unattended",
+        "Skip preventive controls and monitor the logs for odd forwards, with the security team reviewing them weekly"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: layered defence puts several independent controls in place and spends human attention only where harm cannot be undone, which serves both Mara and Idris. B is wrong because a system prompt alone is not enough. C is wrong because approving drafts and archiving removes the time saving and breeds rubber-stamping. D is wrong because monitoring detects after the data has left."
+    },
+    {
+      "id": "ccdv-scenario-003-q4",
+      "stem": "The layered plan from q3 needs a hard stop for two things: deleting threads, which Colm says breaks retention, and forwards to outside addresses. What should Hana build?",
+      "options": [
+        "A post-action hook that logs each deletion or external forward and alerts Idris once it has happened",
+        "A pre-action hook that denies delete calls and forwards to non-allowlisted addresses before the tool runs",
+        "A line in the system prompt stating that the assistant may not delete threads or forward mail outside Meridian",
+        "Reliance on the email provider's own spam and phishing filters to stop unwanted deletions and forwards"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: a pre-action hook runs before the tool call and can deny it deterministically, which enforces the irreversible-action layer from q3 and Colm's retention rule. A is wrong because a post-action hook fires after the tool has already run. C is wrong because a prompt line is guidance, not enforcement. D is wrong because provider filters judge inbound spam, not the assistant's own tool calls."
+    },
+    {
+      "id": "ccdv-scenario-003-q5",
+      "stem": "Before launch, a developer pastes the live shared service key into the team chat channel while debugging. Mara suggests asking the assistant to help. What is the right response?",
+      "options": [
+        "Delete the chat message at once, since removing it from the channel removes the exposure",
+        "Disable the key and issue a replacement from a secrets manager; keep keys out of prompts",
+        "Add key rotation to the next sprint, as the channel is private and the pilot is small",
+        "Ask the assistant to forget the key and redact it from any summaries it writes about the channel"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: a leaked secret is an incident to contain in the key console, not a task for the assistant; disable or delete the key, store the new one in a secrets manager and keep keys out of prompts. A is wrong because the key may already be copied or cached. C is wrong because a suspected leak stays usable until revoked. D is wrong because the assistant cannot revoke a key and pasting it into a prompt widens exposure."
+    }
+  ],
+  "keyLearnings": [
+    "Text from tenants, contractors and attachments is data, not instruction, so place it in labelled tool results and restrict what the tools can do with it.",
+    "Defence in depth means several independent controls, with human approval reserved for actions that cannot be undone, so that speed and safety are both served.",
+    "Use a pre-action hook when something must not happen, because only a check that runs before the tool call can stop it; prompt wording and after-the-fact logging cannot.",
+    "A leaked credential is an incident for people and key management: revoke, replace, store properly and review usage, without involving the model."
+  ]
+}

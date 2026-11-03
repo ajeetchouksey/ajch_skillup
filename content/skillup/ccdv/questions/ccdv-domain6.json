@@ -1,0 +1,539 @@
+[
+  {
+    "domain": 6,
+    "id": "ccdv-d6-001",
+    "difficulty": "easy",
+    "scenario": "Eastbrook Research runs a 40-turn research agent. By turn 30 the context holds about 30,000 tokens of old search results, and the agent has started ignoring a source-quality constraint added at turn 28.",
+    "question": "What is the most likely cause, and the best fix?",
+    "options": [
+      "The context window is too small, so moving to a model with a much bigger window will stop the drift",
+      "Old tool output is crowding out the constraint, so prune results the next step does not need",
+      "The constraint was not loud enough, so repeat it in capital letters at the end of each turn",
+      "The model forgets after a fixed number of turns, so restart the conversation after ten turns"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: recall drops as stale results pile up, so keeping only what the next step needs restores focus. A is wrong because a bigger window adds capacity, not attention, and recall still degrades as context grows. C is wrong because capitals do not remove the 30,000 stale tokens competing with the rule. D is wrong because restarting throws away useful state and fixes no cause.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "context-bloat"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-002",
+    "difficulty": "easy",
+    "scenario": "A hotel booking agent calls a search tool that returns about 400 lines of JSON per call, yet the next step needs only the price, room type and cancellation terms.",
+    "question": "What should the developer do with each tool result?",
+    "options": [
+      "Keep the full result and rely on prompt caching to stop it counting towards the window",
+      "Add each result as is and summarise the conversation once the task ends",
+      "Raise max_tokens so the model has more room to read the long results",
+      "Trim each result to the fields the next step needs before it is added"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: trimming at the source keeps the window small and the signal high. A is wrong because cached prefixes still occupy the context window. B is wrong because the bloat harms the steps before the task ends. C is wrong because max_tokens sets output length, not input room.",
+    "tags": [
+      "best-practice",
+      "application",
+      "tool-output-pruning"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-003",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript agent was told at the start to leave out guests' phone numbers. After the application compacts a long session, the new summary omits that instruction and phone numbers appear.",
+    "question": "Which change best keeps the instruction in force after compaction?",
+    "options": [
+      "Keep the rule in the system prompt or re-inject it after each compaction",
+      "Rely on the summary to carry it, and ask the summariser to be more detailed",
+      "Turn compaction off so the early instruction stays in the history",
+      "Move the rule into the first user message, where it will be kept verbatim"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a summary can lose early instructions, so a constraint that must survive belongs where it is supplied afresh. B is wrong because more detail gives no assurance the rule is kept. C is wrong because switching compaction off lets context grow until recall decays or the window overflows. D is wrong because the first user message is exactly what gets summarised.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "compaction",
+      "constraints"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-004",
+    "difficulty": "medium",
+    "scenario": "A developer tells Claude Code in chat to leave the checkout module of an e-bike shop's repository untouched. Hours later, after auto-compaction, Claude edits that module.",
+    "question": "Which change keeps that instruction across compaction?",
+    "options": [
+      "Restate it in chat whenever it comes to mind and trust each later summary to keep it",
+      "Run /clear after each edit so the conversation stays short",
+      "Add it to the project-root CLAUDE.md, which is re-read after compaction",
+      "Tell Claude to remember it, without saving it to any file"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the project-root CLAUDE.md is re-read and re-injected after compaction, unlike chat-only instructions. A is wrong because chat-only text is again at risk at the next summary. B is wrong because /clear wipes the whole conversation, instruction included. D is wrong because unsaved memory lives in a conversation that gets summarised.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "claude-md",
+      "compaction"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-005",
+    "difficulty": "medium",
+    "scenario": "A school timetable agent reassigns rooms across several working sessions. Each new session starts with an empty context, and the agent keeps redoing rooms it already changed.",
+    "question": "Which approach lets later sessions pick up where earlier ones stopped?",
+    "options": [
+      "Keep one conversation open for the whole project and rely on a much bigger window",
+      "Have the agent save progress notes to external memory and read them at start",
+      "Count on the compaction summary from the last session to carry over",
+      "Paste the full earlier transcript into each new session's system prompt"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: notes stored outside the window survive context resets and can be loaded when needed. A is wrong because one long conversation suffers context rot, and sessions end regardless. C is wrong because compaction works within one conversation, so a fresh session has no summary. D is wrong because pasting refills the window with the bloat it was meant to avoid.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "external-memory"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-006",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch agent's short reasoning notes are valuable, but fifty old route-lookup results make up most of its context. The team wants old results gone without paraphrasing the reasoning.",
+    "question": "Which mechanism fits best?",
+    "options": [
+      "Clear the oldest tool results by rule and keep the most recent few",
+      "Summarise the whole conversation into one block, reasoning included",
+      "Hand each future lookup to a fresh subagent and drop the main history",
+      "Raise the context limit and leave the old results in place"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: tool-result clearing removes bulk by rule and leaves the reasoning text untouched. B is wrong because a summary paraphrases the reasoning and can lose detail. C is wrong because subagents do nothing for the existing history and add token cost. D is wrong because extra capacity does not stop recall decaying.",
+    "tags": [
+      "comparison",
+      "application",
+      "context-editing",
+      "compaction"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-007",
+    "difficulty": "medium",
+    "scenario": "A support team uses API compaction with a custom instructions value reading 'Keep open ticket numbers'. Summaries now keep ticket numbers but lose the agent's goal and the decisions agreed so far.",
+    "question": "Why did the summaries change, and what is the fix?",
+    "options": [
+      "The trigger value is too low, so raise it until the goal is retained in the summary",
+      "The instructions are appended to the default prompt, so shorten them to avoid crowding out the goal",
+      "Custom instructions replace the default prompt, so name goal, decisions and tickets",
+      "The summariser ignores custom wording, so remove the field and accept the default"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a custom value replaces the default summarisation prompt entirely, so it must name everything the summary needs. A is wrong because the trigger controls when compaction fires, not what the summary keeps. B is wrong because the instructions are not appended, so the default goal wording is gone. D is wrong because the field is honoured, which is why ticket numbers survive.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "compaction",
+      "configuration"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-008",
+    "difficulty": "hard",
+    "scenario": "A film-festival ticketing agent has built a long refund plan in its main context. It now needs a verdict on 300 pages of raw payment logs, and none of that raw detail may enter the main context.",
+    "question": "Which approach satisfies the constraint?",
+    "options": [
+      "Read the logs in the main context, then compact when the threshold is reached",
+      "Read the logs, then clear those tool results once the verdict is written",
+      "Raise the context limit so the logs and the plan fit side by side",
+      "Delegate the log analysis to a subagent and take back a short summary"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a subagent works in its own window, so raw logs stay out of the main context, which is the deciding constraint. A is wrong because the logs enter first, and the summary may paraphrase the plan. B is wrong because the logs still crowd the plan while they sit there. C is wrong because capacity does not keep detail out, and recall decays as context grows.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "subagents",
+      "compaction"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-009",
+    "difficulty": "hard",
+    "scenario": "In Claude Code, a recipe-app build prints a 150,000-token log. Each time auto-compaction summarises, the next build refills the window, and Claude Code reports repeated compaction errors.",
+    "question": "What should the developer change?",
+    "options": [
+      "Lower the compaction threshold so that summaries happen much sooner during the build",
+      "Cut the output at source by writing the log to a file and reading failing lines",
+      "Run /compact more often with a focus on the build output and the failing tests",
+      "Move the build instructions into CLAUDE.md so that they survive each summary"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the output refills the window right after each summary, so compaction cannot help; shrinking it at source breaks the loop. A is wrong because an earlier summary is refilled just as quickly by the next build. C is wrong because more frequent summaries meet the same refill. D is wrong because CLAUDE.md preserves instructions but does nothing about the log volume.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "compaction",
+      "tool-output-pruning"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-010",
+    "difficulty": "easy",
+    "scenario": "Pinecrest Support uses Claude to draft replies. The team wants a standing rule, escalate any legal threat to a human, applied to every draft whatever the customer writes.",
+    "question": "Where should the rule live?",
+    "options": [
+      "In the system prompt, so it applies to each request automatically",
+      "In the customer's message, added by hand to each ticket before a draft is requested",
+      "In the description of the ticket-lookup tool that the drafting step can call",
+      "In a note on the support dashboard that staff read before they send a draft"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: standing rules belong in the system prompt, which frames each request. B is wrong because hand-added text depends on staff remembering it every time. C is wrong because a tool description tells the model about the tool, not about reply policy. D is wrong because a dashboard note never reaches the model.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "prompt-placement"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-011",
+    "difficulty": "easy",
+    "scenario": "A wine-club shop asks Claude for tasting notes. Replies vary: some are paragraphs, some are bullet lists, some add a heading, and the page template needs one consistent shape.",
+    "question": "Which change most directly fixes the inconsistency?",
+    "options": [
+      "Write FORMAT STRICTLY in capital letters at the top and again at the bottom of the prompt",
+      "Set temperature to zero so that the shape stays the same across runs",
+      "Add three to five varied example notes in the target shape, in example tags",
+      "Ask the model to choose whichever shape reads best for each wine"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: relevant, diverse and structured examples show the exact shape to copy. A is wrong because capitals add emphasis but no pattern to follow. B is wrong because temperature cannot be sent on newer models and promises no fixed shape. D is wrong because letting the model choose adds the very variation being removed.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "few-shot"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-012",
+    "difficulty": "easy",
+    "scenario": "A permit portal asks Claude to summarise planning notices for a text-message alert. Summaries run to a full page, but the alert can carry about three sentences.",
+    "question": "Which prompt change is the clearest fix?",
+    "options": [
+      "Ask the model to be brief and trust it to judge the length",
+      "Set max_tokens low so long summaries are cut off at the limit",
+      "Start the assistant turn with a short opening for the model to continue from",
+      "State the limit and format: three sentences, plain text, with the reason"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: an explicit limit with its reason lets the model plan a complete answer inside it. A is wrong because brief has no measurable limit. B is wrong because a low max_tokens cuts a summary off mid-sentence. C is wrong because starting the assistant turn is rejected on newer models.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "output-constraints"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-013",
+    "difficulty": "medium",
+    "scenario": "An escape-room site inserts customer comments between review tags in a prompt template. One comment contains a closing review tag followed by a line telling the model to give each room five stars.",
+    "question": "Which safeguard best protects the template?",
+    "options": [
+      "Move the comments above the instructions so the model reads the instructions last",
+      "Escape or strip tag characters in comments, and state that tagged text is data",
+      "Ask customers on the form not to include tags in their comments",
+      "Wrap the comment in a second pair of tags and leave the comment text unchanged"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: untrusted text must be delimited and neutralised so it cannot close its own delimiter. A is wrong because position does not stop a comment from breaking out of its tags. C is wrong because a request on a form cannot be trusted to hold. D is wrong because an outer pair is closed the same way by the injected tag.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "input-sanitisation",
+      "delimiters"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-014",
+    "difficulty": "medium",
+    "scenario": "A dental clinic's reminder bot produced one reply that was too casual, so the team added a formality rule to the prompt. They hold forty saved cases covering cancellations, fees and urgent pain.",
+    "question": "What should they do before shipping the new rule?",
+    "options": [
+      "Re-run the full set of saved cases and compare against the old prompt",
+      "Re-test the single casual case, since that is the one that failed",
+      "Ask two colleagues to read the new rule and judge whether the tone is right",
+      "Ship it and watch the live complaints that arrive over the following week"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a new rule can change behaviour elsewhere, and saved cases expose such regressions before users do. B is wrong because the one case cannot reveal breakage in fees or urgent pain. C is wrong because reading a rule does not show how replies change. D is wrong because live complaints are a late and costly test.",
+    "tags": [
+      "best-practice",
+      "application",
+      "prompt-iteration",
+      "regression-cases"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-015",
+    "difficulty": "medium",
+    "scenario": "A film-festival assistant has two tools, find_screening and find_refund_policy. It keeps calling the refund tool when guests ask about screening times.",
+    "question": "What is the best fix?",
+    "options": [
+      "Add a reminder naming the right tool to each guest message at run time, as a patch",
+      "Force find_screening on each request using tool_choice so the model cannot err",
+      "Shorten both descriptions so extra detail does not distract the model from the task",
+      "Rewrite both descriptions to say what each does, when to use it and when not"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: descriptions are the main signal for tool choice, and stating when and when not removes the overlap. A is wrong because a per-message patch leaves the unclear descriptions in place. B is wrong because forcing a tool breaks refund questions. C is wrong because shorter descriptions remove the guidance the model relies on.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "tool-descriptions"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-016",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor assistant receives about 60,000 tokens of field reports plus a short question. The question comes first, then the reports, and answers often miss details in the reports.",
+    "question": "Which restructuring should help most?",
+    "options": [
+      "Keep the question first so the model knows the goal while reading",
+      "Cut each report to its first page so the prompt stays short",
+      "Put the reports first in tagged documents and the question last",
+      "Repeat the question after each report to keep the model focused"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: for long inputs, documents at the top with the query last can improve quality. A is wrong because a leading question is the layout that gave poor answers. B is wrong because trimming discards details the answers depend on. D is wrong because repeating the question bloats the prompt and splits the reports.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "long-context",
+      "xml-tags"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-017",
+    "difficulty": "medium",
+    "scenario": "A garden-centre team wants each Claude Code session on their repository to follow the same test style and run the linter. Developers currently type these instructions into each session.",
+    "question": "Where should the instructions go?",
+    "options": [
+      "In each developer's personal user-level CLAUDE.md file on their own machine",
+      "In the project CLAUDE.md, committed to the repository",
+      "In the description of a tool that wraps the linter script for the team",
+      "In a README that Claude Code is expected to find and read unprompted"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a committed project CLAUDE.md is loaded as context in each session and shared by the team. A is wrong because personal files differ between developers. C is wrong because a tool description covers one tool, not session conventions. D is wrong because a README is not loaded automatically.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "claude-md",
+      "prompt-placement"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-018",
+    "difficulty": "hard",
+    "scenario": "A cottage-booking assistant's tone and refund policy change about once a quarter, while each request carries a different guest name and booking reference. Reviewers want to edit the policy in one place.",
+    "question": "Which placement fits best?",
+    "options": [
+      "Policy and tone in the system prompt; guest details in the user turn",
+      "Everything in the system prompt, rebuilt for each request that arrives",
+      "Everything in the user turn, so that the model sees it most recently",
+      "Policy in the user turn of each request and booking details in the system prompt"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the policy is a standing rule and the booking data is per request; the deciding constraint is one place for policy edits. B is wrong because rebuilding the system prompt per request spreads policy edits across request code. C is wrong because a user-turn policy is repeated and edited in many places. D is wrong because this swaps the two roles.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "prompt-placement"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-019",
+    "difficulty": "hard",
+    "scenario": "A pool-booking bot sorts messages into four categories. Its prompt holds forty edge-case rules that sometimes conflict, and accuracy drops each time another rule is added.",
+    "question": "Which change should the team make?",
+    "options": [
+      "Keep adding a rule for each new misclassification until the list covers the cases",
+      "Mark the most important rules in capital letters so that they win any conflicts",
+      "Replace the rules with short definitions and three to five canonical examples",
+      "Split the rules across several user messages so that each is read separately"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a curated set of diverse canonical examples beats an edge-case rule list; the deciding constraint is that rules conflict as they grow. A is wrong because more rules deepen the conflicts. B is wrong because capitals add emphasis, not consistency. D is wrong because splitting spreads the same conflicts over more text.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "few-shot",
+      "prompt-design"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-020",
+    "difficulty": "hard",
+    "scenario": "A bakery order-bot prompt has forty saved cases. A new rule fixes case 12 but breaks cases 5 and 31. The owner asks to ship because case 12 was the customer's complaint.",
+    "question": "What is the best next step?",
+    "options": [
+      "Add separate exception rules for cases 5 and 31 and ship without re-running the others",
+      "Ship the rule, since the reported complaint is now resolved",
+      "Drop the rule and mark case 12 as a model limitation",
+      "Reword the rule with its scope and reason, then re-run the full set"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a rule that fixes one case and breaks two is a net regression; the saved set is the deciding evidence, so scope it and re-test. A is wrong because new exceptions may break further cases that nobody re-ran. B is wrong because this ignores two known regressions. C is wrong because the failure is a prompt problem that a scoped rule can fix.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "prompt-iteration",
+      "regression-cases"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-021",
+    "difficulty": "easy",
+    "scenario": "Garnet Finance extracts invoice fields with Claude. The JSON parses and matches the schema, so the developer plans to post each result straight to the ledger.",
+    "question": "What is missing from this plan?",
+    "options": [
+      "Business-rule checks, such as line items summing to the total, before posting",
+      "No change is needed, because JSON that parses and matches the schema is correct",
+      "A request asking the model to rate its confidence, posting when it is high",
+      "A second identical call, posting when both responses parse"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a schema validates shape, not truth, so arithmetic and other rules need checking in code. B is wrong because valid JSON can still hold a wrong total. C is wrong because self-reported confidence is not evidence. D is wrong because two parseable answers can both be wrong.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "validation",
+      "output-handling"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-022",
+    "difficulty": "easy",
+    "scenario": "A venue-enquiry tool asks Claude for JSON, but replies sometimes arrive inside markdown code fences, and the parser throws on those.",
+    "question": "Which handling is best?",
+    "options": [
+      "Catch the error and substitute an empty record so the pipeline keeps running",
+      "Strip the fences or extract the JSON object, then parse in a try block",
+      "Add a louder instruction against fences and keep the parser unchanged",
+      "Parse the reply with a regular expression that grabs any numbers"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: model output is untrusted data, so parse defensively and handle failure explicitly. A is wrong because an empty record hides the failure and passes bad data on. C is wrong because emphasis does not guarantee a format and leaves the parser fragile. D is wrong because grabbing numbers discards the structure.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "defensive-parsing"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-023",
+    "difficulty": "medium",
+    "scenario": "A language-school tool asks for a 40-field JSON lesson plan. Some responses stop mid-object, and the response's stop_reason is max_tokens.",
+    "question": "How should the application handle these?",
+    "options": [
+      "Close the open brackets automatically and use the fields that were produced",
+      "Treat the stop as a refusal and resend the request to a different model",
+      "Treat them as incomplete and retry with a higher max_tokens",
+      "Parse what arrived and fill missing fields with default values"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: max_tokens means the output was cut off, so the remedy is more room, not guesswork. A is wrong because closing brackets invents a complete-looking record. B is wrong because a refusal has its own stop reason, not max_tokens. D is wrong because defaults hide missing data.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "truncation",
+      "stop-reason"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-024",
+    "difficulty": "medium",
+    "scenario": "A lettings tool asks Claude whether a lease allows pets. It answers confidently that clause 9 permits them, and staff plan to tell the tenant.",
+    "question": "Which step best reduces the risk of acting on a wrong claim?",
+    "options": [
+      "Accept it, because a confident tone signals the claim is grounded",
+      "Add a line to the system prompt against inventing facts and skip further checks",
+      "Ask the model to repeat the answer with a one-line confidence score",
+      "Require a verbatim quote and check in code that it appears in the lease"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a quote verified against the source grounds the claim; prompts reduce errors but critical facts still need validating. A is wrong because confidence is not correctness. B is wrong because a prompt line lowers the risk but does not remove it. C is wrong because a score is the model's own opinion, not evidence.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "verification",
+      "hallucination"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-025",
+    "difficulty": "medium",
+    "scenario": "In a wine-club billing job, an extracted invoice fails the totals check even after one repair retry that quoted the discrepancy back to the model.",
+    "question": "What should the pipeline do with this invoice?",
+    "options": [
+      "Post the model's total and flag the mismatch for a later review by finance",
+      "Route it to a human review queue with the failed check and model output",
+      "Keep retrying in a loop until the totals happen to match, then post it",
+      "Drop the invoice from the batch and carry on with the others in the run"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: failing closed sends unresolved checks to a person instead of the ledger. A is wrong because posting first lets a wrong total reach the ledger. C is wrong because an open-ended loop wastes spend and may accept a coincidence. D is wrong because dropping the invoice loses a real bill.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "fail-closed",
+      "human-review"
+    ]
+  },
+  {
+    "domain": 6,
+    "id": "ccdv-d6-026",
+    "difficulty": "hard",
+    "scenario": "A catering firm's extraction output passes its JSON schema each time, yet some line items add up to 412.50 while the stated total reads 421.50. A colleague suggests retrying with the message 'invalid JSON'.",
+    "question": "Which response is right?",
+    "options": [
+      "Add a code check that items sum to the total; on a mismatch retry or escalate",
+      "Retry with the message invalid JSON, since the repair loop already exists for that",
+      "Tighten the schema so the total field has to equal the sum of the items",
+      "Accept the output as correct, because it passed the schema validation"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the output is valid JSON with a wrong total, so a rule check is needed; repair cannot help with parseable output. B is wrong because the message would be false and fix nothing. C is wrong because a schema describes shape and cannot compare fields. D is wrong because valid shape says nothing about the arithmetic.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "validation",
+      "business-rules"
+    ]
+  }
+]

@@ -1,0 +1,722 @@
+[
+  {
+    "domain": 1,
+    "id": "ccdv-d1-001",
+    "difficulty": "easy",
+    "scenario": "Orrin Freight handles shipment exceptions in three steps that never change: classify the exception, look up the carrier policy, then draft the customer message. Each step's output feeds the next.",
+    "question": "Which design fits this job best?",
+    "options": [
+      "A single open-ended agent with the full tool set, because agents are more capable than chains",
+      "A supervisor with three subagents, one per step, so each step can decide how to proceed",
+      "A fixed workflow that runs the three steps in code, with one model call per step",
+      "One agent whose prompt lists the three steps and is trusted to follow them in order"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the steps are known and ordered, so code can enforce them without extra autonomy. A is wrong because added capability brings cost and the risk of a skipped step on a fixed job. B is wrong because a hierarchy adds tokens and handoff failures. D is wrong because a prompt cannot enforce order.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "workflow-vs-agent"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-002",
+    "difficulty": "easy",
+    "scenario": "A library catalogue service wants a genre label for each new book record. One short record goes in, one label comes out, and no outside data is needed.",
+    "question": "What is the simplest design that meets this need?",
+    "options": [
+      "A five-step prompt chain that drafts, critiques and revises each label in turn",
+      "An agent loop with a search tool so it can look up each book online first",
+      "A single model call with a clear prompt and a few labelled examples",
+      "A supervisor that sends each record to a genre-specific subagent for labelling"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: one input and one output with no outside data is a single call, and starting simple means adding structure only when it measurably helps. A is wrong because extra steps add latency and cost without shown gain. B is wrong because the task needs no lookups. D is wrong because delegation adds failure points for no benefit.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "start-simple"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-003",
+    "difficulty": "easy",
+    "scenario": "A podcast transcript tool has a research agent that checks ten unrelated claims per episode. Each check pulls in long search results, and the main context is close to full.",
+    "question": "What does delegating each claim check to its own subagent give the main agent?",
+    "options": [
+      "Each subagent inherits the main agent's full history, so the parent needs no briefing for it",
+      "Each subagent's full transcript is appended to the main context, so no detail is lost",
+      "Each check runs in a fresh context and returns a summary, so the main context barely grows",
+      "Each subagent runs on a cheaper model by default, so total cost falls with each delegation"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a subagent starts with fresh context and returns only its final response, so the parent grows by a summary rather than a transcript. A is wrong because only the prompt string passes to the child. B is wrong because that would refill the context. D is wrong because model choice is configured, not implied.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "subagent-context"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-004",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine's assistant must check room availability with four partner systems before replying. None of the four checks needs another's result.",
+    "question": "How should the checks be structured to reduce waiting time?",
+    "options": [
+      "Run them one after another, so each check can use what the previous check found out first",
+      "Give the four checks to a single agent that works through them one by one in one long context",
+      "Run the four checks in parallel as independent calls or subagents, then combine the results",
+      "Add a fifth subagent that decides the order in which the other four checks should be run"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: independent work can run at the same time, so latency approaches the slowest check rather than the sum. A is wrong because independent checks have nothing to learn from each other and the delay adds up. B is wrong because it serialises the work and fills one context. D is wrong because order is irrelevant when nothing depends on anything.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "parallel-subagents"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-005",
+    "difficulty": "medium",
+    "scenario": "A municipal permit portal drafts a decision in three steps, and each step needs the exact output of the one before. The team finds it slow and proposes adding subagents to speed it up.",
+    "question": "What is the best response to the proposal?",
+    "options": [
+      "Give each step to its own subagent, so that the three steps can be run at the same time",
+      "Replace the chain with a supervisor that decides the order of the steps at run time instead",
+      "Run the three steps in parallel on the original input and then merge the drafts afterwards",
+      "Keep the chain, since dependent steps cannot overlap; shorten steps or use a faster model"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a step that needs the previous output cannot start earlier, so parallel subagents cannot help, while trimming step work can. A is wrong because the subagents would simply wait on each other. B is wrong because a run-time supervisor adds cost to a known order. C is wrong because the merged drafts would lack each step's input.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "sequential-dependency"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-006",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor dashboard team gets free-text fault reports. Each fix needs a log lookup, and what to check next depends on what the lookup shows; cases take between two and fifteen steps. A developer proposes a fixed five-step chain because it costs less.",
+    "question": "What is the best response?",
+    "options": [
+      "Keep the five-step chain, because a lower cost per run outweighs how well it fits the job",
+      "Extend the chain to fifteen steps with skip conditions, so each possible path is coded in advance",
+      "Use a supervisor with one subagent per sensor type, because hierarchy is the safe default here",
+      "Use one agent loop with a turn cap, because the next step depends on what each result shows"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the number and order of steps depend on results, which is when an agent earns its cost, and a turn cap bounds it. A is wrong because a chain that cannot follow the path fails cases. B is wrong because enumerating every path is brittle. C is wrong because hierarchy adds cost without addressing an open path.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "workflow-vs-agent"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-007",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's returns assistant answers most questions with one order lookup and a template reply. A lead proposes a supervisor with six specialist subagents for future growth.",
+    "question": "What is the main drawback of that hierarchy for today's job?",
+    "options": [
+      "Subagents cannot receive instructions that differ from the supervisor's, so specialising adds no value",
+      "Subagents cannot return results to the supervisor, so replies would lose detail",
+      "A hierarchy reduces accuracy because each subagent has to run on a smaller model",
+      "More tokens and more handoffs that can fail, for work a fixed chain already handles"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a hierarchy costs extra tokens and adds coordination failure points, which is wasteful for a simple lookup-and-template job. A is wrong because subagents can have their own instructions and tools. B is wrong because a subagent returns its final response to the parent. C is wrong because model size is a choice, not a consequence of hierarchy.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "hierarchy-cost"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-008",
+    "difficulty": "medium",
+    "scenario": "A school timetable tool must turn a teacher's free-text request into a structured change. The team is debating an agent with planning and memory before any prototype exists.",
+    "question": "What should the team do first?",
+    "options": [
+      "Build the full agent first, then remove the parts that prove unnecessary once it is running",
+      "Try one well-prompted call, measure where it fails, and add structure only for those failures",
+      "Start from a framework, so the design can grow later without any rework of the core loop",
+      "Begin with a supervisor and subagents, so the system is ready to scale from the first release"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the guidance is to start with the simplest solution and add complexity where measured results justify it. A is wrong because removing unneeded parts later costs more than adding needed ones. C is wrong because a framework adds abstraction before the need is known. D is wrong because unneeded scale adds cost and failure points.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "start-simple"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-009",
+    "difficulty": "hard",
+    "scenario": "A wine-club shop corrects billing errors in four fixed steps: verify the order, compute the refund, post to the ledger, notify the customer. A wrong ledger posting costs real money, and auditors expect the same order each time.",
+    "question": "Which design fits, and what decides it?",
+    "options": [
+      "An agent, because its flexibility on edge cases outweighs the risk that a step gets skipped now and then",
+      "A fixed workflow with checks between steps, because the steps are known and a skipped one is costly",
+      "An agent whose prompt lists the four steps in capitals, which is what makes the order dependable",
+      "A supervisor whose subagents each own one step, so that autonomy is spread across the whole process"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that steps are known and a wrong or skipped step is costly, so code should enforce the order. A is wrong because improvisation is a risk here, not a benefit. C is wrong because emphasis in a prompt is not enforcement. D is wrong because each subagent can still improvise.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "workflow-vs-agent"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-010",
+    "difficulty": "hard",
+    "scenario": "An escape-room bookings desk gets payment failures, double bookings, access requests and group changes. Which tools to call, and in what order, depends on what each lookup shows, and new complaint types appear weekly.",
+    "question": "Which design fits, and what decides it?",
+    "options": [
+      "A routing workflow with a branch per complaint type, extended each time a new complaint type appears",
+      "A supervisor with one subagent per complaint type, created from the first release of the desk tool",
+      "A single agent loop with a turn cap, because the path depends on results and is not known in advance",
+      "A fixed chain that calls the full tool set on each request, so that no complaint case is missed"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an unpredictable, result-dependent path is the deciding constraint for an agent, and a turn cap bounds its cost. A is wrong because maintaining a branch per new type lags the real variety. B is wrong because hierarchy adds cost and handoffs without solving the open path. D is wrong because calling everything wastes tokens and ignores what lookups reveal.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "workflow-vs-agent"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-011",
+    "difficulty": "hard",
+    "scenario": "A ride-dispatch app's analyst agent must audit 40 city zones. Each zone needs about 60,000 tokens of logs, the zones are independent, and a single agent's context overflows around the fifth zone.",
+    "question": "Which design fits, and what does it cost?",
+    "options": [
+      "One agent with a higher turn cap, so that it keeps working until the forty zones have been audited in turn",
+      "A fixed chain of 40 steps that passes each step's full log output on to the next model call",
+      "A supervisor whose subagents receive the supervisor's full history, so that they share its context",
+      "A supervisor delegating zones to subagents that return short summaries, at the price of extra tokens"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that one context cannot hold the work, so isolating each zone in a subagent and returning summaries fits, though a hierarchy costs more tokens. A is wrong because a turn cap does not enlarge the context. B is wrong because passing full output reproduces the overflow. C is wrong because shared history refills each subagent.",
+    "tags": [
+      "scenario-based",
+      "analysis",
+      "subagent-context"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-012",
+    "difficulty": "easy",
+    "scenario": "Fernwick Retail's returns agent can issue refunds, and refunds above 200 pounds need a human to approve them.",
+    "question": "Where should the refund cap be enforced so that it holds on every run?",
+    "options": [
+      "In the system prompt, written in capital letters so that the model treats it as a top priority",
+      "In the tool description, as a sentence that tells the model the cap and the approval route",
+      "In a hook that checks the refund amount before the tool runs and blocks it above the cap",
+      "In a follow-up message that asks the model to double-check large refunds before it sends them"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a hook runs deterministic code at a lifecycle point, so a rule that must hold is enforced whatever the model decides. A is wrong because emphasis in a prompt is guidance, not enforcement. B is wrong because a description informs the model but cannot block a call. D is wrong because a re-check relies on the model again.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "hooks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-013",
+    "difficulty": "easy",
+    "scenario": "A recipe app's hand-written agent loop kept calling tools through the night; one run made hundreds of calls before anyone noticed.",
+    "question": "Which change would have bounded the run?",
+    "options": [
+      "Raise the temperature so the model varies its steps and tends to finish in fewer tool calls",
+      "Add a maximum turn count and a spending budget that stop the loop and report",
+      "Lengthen the system prompt with a reminder to be efficient and sparing with tool calls",
+      "Rely on the model to stop by itself once it judges that the task has been finished"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a turn cap and budget are loop controls the harness enforces, so a runaway run ends predictably. A is wrong because temperature changes randomness, not whether the loop ends. C is wrong because a reminder is a request, not a limit. D is wrong because a model can keep calling tools that look useful, so the harness needs its own stop.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "turn-caps"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-014",
+    "difficulty": "easy",
+    "scenario": "A film-festival ticketing team wants an agent that reads files, edits them and runs shell commands. They would rather not write the tool loop, the built-in tools or the context handling.",
+    "question": "Which approach fits best?",
+    "options": [
+      "A hand-written loop on the Messages API, with their own file and shell tools and context handling",
+      "The Claude Agent SDK, which supplies Claude Code's tools, loop and context management",
+      "A single long prompt that describes the files and asks for the edits to be written out as plain text",
+      "A routing workflow that picks between prewritten shell scripts according to each request"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the SDK embeds Claude Code's agent loop, built-in tools and context management, trading some control for much less effort. A is wrong because it rebuilds exactly what the team wants to avoid. C is wrong because text output cannot read or edit files. D is wrong because prewritten scripts cannot cover open-ended edits.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "agent-sdk"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-015",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript tool uses the Agent SDK to tidy transcripts, with a maximum of 20 turns. One run reaches the cap.",
+    "question": "What does the application receive when the cap is hit?",
+    "options": [
+      "A normal success result that holds the best partial answer found by the time the cap was hit",
+      "An error result for maximum turns with no final response, which the code has to handle",
+      "A pause that asks the model whether it wants more turns, then carries on from where it stopped",
+      "A restart of the run from the first turn, with the cap doubled for the second attempt"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: reaching the turn cap ends the run with an error subtype for maximum turns and no result text, so the caller needs a fallback. A is wrong because partial answers are not returned as success. C is wrong because the SDK does not ask the model to extend the cap. D is wrong because the run does not restart itself.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "turn-caps"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-016",
+    "difficulty": "medium",
+    "scenario": "A small shop team with no platform engineers needs an agent that works for hours on background tasks and keeps its sessions between runs. It has no special sandbox or data-location rules.",
+    "question": "Which deployment fits best?",
+    "options": [
+      "An Anthropic-hosted agent, where the harness and sandbox run on managed infrastructure",
+      "A self-run service built on the Agent SDK, where the team provisions and patches the sandbox itself",
+      "A hand-written loop on the Messages API, run on servers that the team builds and maintains",
+      "A routing workflow of short single calls scheduled by a cron job on a server the team runs"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: with no sandbox or residency rule and no operations staff, hosting the harness and sandbox with Anthropic minimises work, and sessions persist server-side. B is wrong because self-running means provisioning and patching a sandbox. C is wrong because the team would also write and operate the loop. D is wrong because short calls do not suit hours-long work.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "hosted-agents"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-017",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's support agent has a shell tool. Policy says it may not run commands that delete files, and a breach would be costly.",
+    "question": "How should the policy be implemented?",
+    "options": [
+      "A PreToolUse hook whose matcher is the text of the delete command, so it fires on that command",
+      "A line in CLAUDE.md telling the agent not to delete files, loaded on each request",
+      "A Stop hook that scans the session for deletions after the run finishes",
+      "A PreToolUse hook on the shell tool that reads the command and denies deletion commands"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a matcher selects tool names, so the hook attaches to the shell tool and inspects the command input before it runs. A is wrong because matchers match tool names, not command text. B is wrong because CLAUDE.md is context, not enforcement. C is wrong because a Stop hook acts after the deletions have happened.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "hooks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-018",
+    "difficulty": "medium",
+    "scenario": "A shell-command hook for a film-festival ticketing agent checks a price limit and exits with code 1 on a violation. Over-limit calls still go through.",
+    "question": "Why does the hook fail to block them?",
+    "options": [
+      "Exit code 1 blocks only after the tool has finished, which is too late to stop the action",
+      "Only exit code 2 blocks on blockable events; other non-zero codes are non-blocking errors",
+      "Command hooks time out after thirty seconds, and a timeout lets the call carry on regardless",
+      "Hooks cannot block tool calls and can only log them so that a person can review them later"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: for events that can block, exit code 2 signals a block with stderr as the reason, while exit code 1 is a non-blocking error and the action proceeds. A is wrong because exit code 1 does not block at any point. C is wrong because the cause is the code, not a timeout. D is wrong because PreToolUse hooks can deny calls.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "hooks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-019",
+    "difficulty": "medium",
+    "scenario": "A municipal permit portal's agent computes fees from a formula: area times a rate plus a fixed charge. It sometimes returns the wrong total, and each error becomes a billing complaint.",
+    "question": "What is the best fix?",
+    "options": [
+      "Add worked examples to the prompt and ask the model to calculate step by step before answering",
+      "Move the calculation into a tool written as ordinary code and have the agent use its output",
+      "Add a second model call that re-checks the arithmetic produced by the first model call",
+      "Rewrite the instruction in capitals, telling the model to calculate very carefully each time"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a fixed formula is deterministic, so it belongs in code that returns the same total each time rather than in model arithmetic. A is wrong because examples improve the odds but leave errors possible. C is wrong because a second model can repeat the mistake and adds cost. D is wrong because emphasis does not make arithmetic exact.",
+    "tags": [
+      "best-practice",
+      "application",
+      "deterministic-code"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-020",
+    "difficulty": "medium",
+    "scenario": "A school timetable team wants to own the loop: decide after each tool result whether to call the model again, apply its own retry rules and log every request in a house format.",
+    "question": "Which approach gives that control?",
+    "options": [
+      "The Agent SDK, because it is the lowest-effort route to a working agent",
+      "A custom loop on the Messages API, accepting the effort of writing and maintaining it",
+      "An Anthropic-hosted agent, because the managed harness takes the loop off the team's hands",
+      "A single call per request, because it avoids having any loop logic to own"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the Messages API leaves the loop to the developer, giving full control of each step at the cost of effort. A is wrong because the SDK runs Claude Code's loop for you, so control is shared. C is wrong because a hosted harness moves the loop away from the team. D is wrong because one call cannot make tool decisions between steps.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "custom-loop"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-021",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine's SDK agent lists Read and Grep as allowed tools, hoping to make it read-only. In testing, the agent edited a file.",
+    "question": "Why did the edit happen, and what is the fix?",
+    "options": [
+      "Allowed tools is advice that is added to the prompt, so the fix is a firmer written instruction",
+      "Allowed tools works in default mode alone, so the fix is to switch to another permission mode",
+      "Allowed tools only auto-approves the listed tools; add Edit and Write to disallowed tools",
+      "A subagent ignored the parent's list, so the fix is to forbid subagents from being used altogether"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the allowed list approves tools without prompting but does not restrict others, while disallowed tools removes them. A is wrong because the list is a permission setting, not prompt text. B is wrong because changing mode does not turn an approval list into a restriction. D is wrong because the cause is the list's meaning, not subagents.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "agent-sdk"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-022",
+    "difficulty": "hard",
+    "scenario": "A hotel chain's agent runs generated scripts. Security requires execution inside the company's own network under its own egress rules, and the platform team is small.",
+    "question": "Which setup fits, and what decides it?",
+    "options": [
+      "A self-hosted sandbox on company infrastructure, because fixed network rules outweigh the operations cost",
+      "An Anthropic-managed cloud sandbox, because minimal operations matters more than the location where the generated scripts run",
+      "An Anthropic-managed cloud sandbox plus a system prompt that forbids outbound requests from the scripts",
+      "A run with no sandbox, relying on the script review that the model performs before execution"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that code must run inside the company's network under its own egress rules, which a self-hosted sandbox provides at the price of operating it. B is wrong because it ignores the stated rule. C is wrong because a prompt cannot enforce network policy. D is wrong because model review is not isolation.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "self-hosted"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-023",
+    "difficulty": "hard",
+    "scenario": "A library catalogue agent has two requirements: replies should be warm and brief, and it must not write to the patrons table under any circumstances. The team wants one mechanism for both.",
+    "question": "What is the best split of the two requirements?",
+    "options": [
+      "Put the tone in the system prompt and enforce the table rule in a hook that blocks writes",
+      "Put both in the system prompt, because clear instructions are generally followed in practice",
+      "Put both in CLAUDE.md, because it is reloaded on each request and so stays in view of the model",
+      "Put both in hooks, because hooks are the supported place for giving instructions to an agent"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: tone is a preference the prompt handles well, while the table rule must hold on every run and so needs deterministic enforcement in a hook. B is wrong because a prompt cannot enforce a hard rule. C is wrong because CLAUDE.md is context, not enforcement. D is wrong because hooks run code at lifecycle points and do not shape tone.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "hooks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-024",
+    "difficulty": "hard",
+    "scenario": "A ride-dispatch team blocks edits to a production config file with a hook on the Write and Edit tools. The file still changed when the agent ran a sed command through the shell tool.",
+    "question": "What closes the gap?",
+    "options": [
+      "Change the matcher on the existing hook to the config file path, so that it covers any route",
+      "Tell the model in the system prompt to use Write and Edit instead of the shell tool for changes",
+      "Move the check to a PostToolUse hook, so that it can revert the file after a change is made",
+      "Add a PreToolUse hook on the shell tool that reads the command and denies writes to that file"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a hook on Write and Edit does not cover the shell tool, and matchers select tool names, so the shell command must be inspected before it runs. A is wrong because matchers do not match file paths. B is wrong because a prompt is not enforcement. C is wrong because PostToolUse runs after the change and cannot block it.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "hooks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-025",
+    "difficulty": "easy",
+    "scenario": "Quarry Lane Software's ticket-triage assistant has two tools, one to look up a customer and one to add a label. The team is tracing what happens after the model asks for a tool.",
+    "question": "What does the loop do next?",
+    "options": [
+      "The model runs the tool on Anthropic's servers and returns just the final answer to the harness",
+      "The harness returns the output as a system message and then ends the turn for the model",
+      "The harness runs the tool, sends back the output as a tool result, and calls the model again",
+      "The harness repeats the same request unchanged until the model stops asking for a tool"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the model emits a tool request, the harness runs the tool, sends back a tool result and repeats until the model replies without a tool request. A is wrong because custom tools run in your code, not on Anthropic's servers. B is wrong because results go back in a user message as tool results. D is wrong because an unchanged request just repeats the same tool request.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "tool-use-loop"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-026",
+    "difficulty": "easy",
+    "scenario": "A wine-club shop's assistant should remember a customer's taste preferences across visits weeks apart.",
+    "question": "Which kind of memory fits?",
+    "options": [
+      "The context window of the current session, which carries preferences into later sessions",
+      "An external store the agent reads at session start and updates with new preferences",
+      "A longer system prompt that a developer rewrites by hand after each customer visit",
+      "A summary kept in memory inside the running process, ready for the customer's next session"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: preferences must outlive a session, so they belong in an external store or files that the agent loads when a session starts. A is wrong because a context window ends with the session. C is wrong because hand-editing does not scale and ignores the individual customer. D is wrong because process memory is lost when the process restarts.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "agent-memory"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-027",
+    "difficulty": "easy",
+    "scenario": "An e-bike retailer's developers are told that adopting an agent framework will make their agent more accurate.",
+    "question": "Which statement about frameworks is correct?",
+    "options": [
+      "A framework wraps the same loop; it adds structure, not model accuracy",
+      "A framework adds hidden verification passes that raise accuracy on tool-heavy tasks",
+      "A framework replaces the need to write clear tool definitions and descriptions",
+      "A framework is required before Claude can call tools in a loop"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: frameworks wrap the same tool-use loop and add structure such as state graphs, typed outputs and tracing, at the cost of indirection. B is wrong because accuracy depends on prompts, tools and the model, not hidden passes. C is wrong because tool definitions still need care. D is wrong because a plain loop on the API calls tools directly.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "frameworks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-028",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript agent runs for over a hundred turns. Early tool outputs are bulky and no longer needed, and the context is close to its limit.",
+    "question": "Which technique should the developer apply?",
+    "options": [
+      "Clear stale tool results and compact older turns, keeping the key findings in notes",
+      "Keep the whole history so that no detail is lost, and move to a larger context window instead",
+      "Remove the system prompt from later requests to free space for the new tool results",
+      "Restart the conversation empty on each turn, so that the history cannot grow any further"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: clearing stale tool results and compacting older turns recovers space while notes keep what matters, which are standard context-engineering techniques. B is wrong because unlimited history still degrades and eventually overflows. C is wrong because the system prompt carries the agent's instructions. D is wrong because an empty restart loses all progress.",
+    "tags": [
+      "best-practice",
+      "application",
+      "context-management"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-029",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor dashboard's triage agent must read a 200-page vendor manual to answer a single question, and the pages would fill most of its context.",
+    "question": "Which pattern avoids the problem?",
+    "options": [
+      "Load the whole manual into the main context, since the agent already has the tools to read it",
+      "Split the manual across parallel calls and append each full output to the main agent's history",
+      "Have the main agent read the manual in full, then summarise it for its own later use",
+      "Delegate the reading to a subagent that returns a short answer with its source"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a subagent absorbs the bulky reading in its own context window and hands back a short summary, so the parent stays small. A is wrong because it fills the context the problem is about. B is wrong because appending full outputs still floods the history. C is wrong because reading in full already uses the space; summarising afterwards is too late.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "subagent-pattern"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-030",
+    "difficulty": "medium",
+    "scenario": "A hand-written loop for a municipal permit portal gets a 400 error after the developer adds an explanatory note to the message that returns tool output.",
+    "question": "What is the likely cause?",
+    "options": [
+      "Tool output belongs in a system message, not in a user message, so the request was malformed",
+      "The tool result block should carry the tool's name rather than the id of the original request",
+      "The note's text sits before the tool result blocks, which must come first in the message",
+      "Text is not permitted next to tool results, so the note has to go in a separate user message"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: tool result blocks must immediately follow the tool request and come first in the user content, with any text after them; otherwise the API returns a 400. A is wrong because there is no system-message route for tool results. B is wrong because results are matched by id. D is wrong because text after the results is allowed.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "tool-use-loop"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-031",
+    "difficulty": "medium",
+    "scenario": "In a hand-written loop for an escape-room bookings agent, a customer-lookup tool sometimes times out, and the exception crashes the whole run.",
+    "question": "How should the loop report the failure?",
+    "options": [
+      "Return a tool result flagged as an error, with a clear message the model can act on",
+      "Skip the tool result and send a plain user message saying that the lookup has failed",
+      "End the loop and return a generic apology to the customer as soon as a timeout occurs",
+      "Retry the lookup silently, with no limit, until it finally returns a usable result"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: an error-flagged tool result keeps the request and result paired and gives the model an instructive message to act on. B is wrong because a tool request left without its result breaks the message sequence. C is wrong because it gives up when the model might recover. D is wrong because unbounded retries can hang or loop.",
+    "tags": [
+      "best-practice",
+      "application",
+      "tool-use-loop"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-032",
+    "difficulty": "medium",
+    "scenario": "A school timetable team adopted a framework for its agent. A tool call now returns odd data, and nobody can see the prompt actually sent to the model.",
+    "question": "What is the best way to diagnose and prevent this?",
+    "options": [
+      "Rely on the framework's abstraction, since it already records tool calls for debugging purposes",
+      "Add more instructions to the prompt asking the model to explain why it chose each tool call",
+      "Switch to a framework with more layers, which will surface more diagnostic data for the team",
+      "Log each model request and tool call yourself, and read the code that builds the prompts"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: frameworks can obscure prompts and responses, so you need your own logging and an understanding of what the framework sends. A is wrong because a framework does not remove the need to log tool calls. B is wrong because the model's explanation is not the actual request. C is wrong because more layers add more opacity.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "frameworks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-033",
+    "difficulty": "medium",
+    "scenario": "A hotel concierge assistant holds long conversations. Earlier decisions such as dates and budget must stay available, but the verbatim chat no longer fits in the context.",
+    "question": "Which memory approach fits best?",
+    "options": [
+      "Delete the oldest half of the messages and keep the rest of the conversation unchanged",
+      "Keep the full transcript and paste a copy of it into the system prompt on each call",
+      "Ask the customer to repeat their earlier choices whenever the history grows too long",
+      "Replace older turns with a running summary of decisions and keep recent turns verbatim"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: summaries preserve decisions in compact form while recent turns stay exact, which is the summarising memory kind. A is wrong because dropped messages take the dates and budget with them. B is wrong because moving the transcript does not shrink it. C is wrong because it pushes the burden onto the customer.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "agent-memory"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-034",
+    "difficulty": "hard",
+    "scenario": "Six services at a wine-club shop each run a three-tool agent that must return a nested, typed order object. Each team hand-wrote the same validation and retry-on-invalid code, with small differences.",
+    "question": "Which choice fits, and what decides it?",
+    "options": [
+      "Adopt a typed-output framework, because validated output is code the teams keep rewriting",
+      "Keep the raw loops, because frameworks add indirection and each loop is small enough to maintain",
+      "Adopt a graph-style framework, because state graphs are the main benefit of any framework for agents",
+      "Move validation into the prompt and ask the model to check its own output against the schema"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is repeated validation and retry code across services, which a typed-output framework removes, justifying its indirection. B is wrong because duplicated code across six services is the work a framework should absorb. C is wrong because the need is typed output, not graphs. D is wrong because self-checking by prompt is not validation.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "frameworks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-035",
+    "difficulty": "hard",
+    "scenario": "A film-festival refund agent has branches for eligible, escalate and missing-documents cases. It must pause for days awaiting human approval, then resume at the same step after a restart.",
+    "question": "Which choice fits, and what decides it?",
+    "options": [
+      "A graph-style framework with persistence, since it supplies branching and resumption",
+      "A raw loop that holds its state in process memory, because the loop is the simplest design",
+      "A single call per refund request, because each refund is independent of the other refunds",
+      "A supervisor with subagents, because delegation gives each case its own resumable state"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: durable state, branching and resuming after a pause are what graph-style frameworks provide, so adopting one removes real work. B is wrong because in-memory state is lost on restart. C is wrong because the workflow spans days and branches. D is wrong because delegation does not persist or resume state.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "frameworks"
+    ]
+  },
+  {
+    "domain": 1,
+    "id": "ccdv-d1-036",
+    "difficulty": "hard",
+    "scenario": "A library catalogue assistant has two tools, search and place-hold, a linear flow and one developer. The lead wants a graph framework now, for tracing and future growth.",
+    "question": "Which choice fits, and what decides it?",
+    "options": [
+      "A raw tool loop with a turn cap and logged tool calls, since no branching or resuming is needed",
+      "A graph framework now, because adding one later costs more than starting with it from day one",
+      "A typed-output framework, because tracing comes free and the loop then needs no logging of its own",
+      "A supervisor with one subagent per tool, because separate tools suggest that separate agents are needed"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is a small linear agent with no branching, resumption or typed-output need, so a framework removes no work while adding indirection. B is wrong because later migration is cheaper than carrying unneeded abstraction. C is wrong because logging is still yours to do. D is wrong because hierarchy adds cost for two tools.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "raw-loop"
+    ]
+  }
+]

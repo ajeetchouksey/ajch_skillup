@@ -1,0 +1,982 @@
+[
+  {
+    "domain": 2,
+    "id": "ccdv-d2-032",
+    "difficulty": "easy",
+    "scenario": "Penrose Games launches a player-support backend. At launch, 400 chats start within seconds and the logs fill with rate-limit errors while some replies are dropped.",
+    "question": "Which change best keeps the burst within the limits without dropping requests?",
+    "options": [
+      "Raise max_tokens so each call finishes with fewer round trips and frees capacity sooner",
+      "Create a new client for each request so each one gets its own separate limit",
+      "Cap in-flight calls with a semaphore so extra requests wait their turn",
+      "Switch the calls to streaming so that rate limits no longer apply to them"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a semaphore bounds concurrency, so the burst queues instead of tripping limits. A is wrong because output length does not change how many requests start at once. B is wrong because limits attach to the account, not the client object. D is wrong because streaming still counts against the same limits.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "concurrency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-033",
+    "difficulty": "easy",
+    "scenario": "A ride-dispatch app wraps its model call. The logs show an occasional 500 server error and, after a template edit, a 400 invalid request error on every call to one route.",
+    "question": "Which behaviour should the retry wrapper have for these two errors?",
+    "options": [
+      "Retry the 500 with a short backoff and leave the 400 alone",
+      "Retry the 400 too, because a second attempt may parse the body differently",
+      "Retry both three times in a tight loop, to be safe against failures",
+      "Retry neither, because any failed call needs manual review by an engineer"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a 500 is often transient, while a 400 describes a request that will fail identically each time. B is wrong because resending the same malformed body just repeats the failure. C is wrong because a tight loop adds load without waiting for recovery. D is wrong because it discards recoverable calls.",
+    "tags": [
+      "best-practice",
+      "comprehension",
+      "retries"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-034",
+    "difficulty": "easy",
+    "scenario": "A library catalogue service reads tool arguments from the model with string matching. After a model change, titles containing quotation marks started breaking the parser.",
+    "question": "What is the most robust fix for reading those arguments?",
+    "options": [
+      "Add another matching pattern for each escape style seen so far in the logs",
+      "Add a prompt rule asking the model to avoid quotation marks in titles",
+      "Strip the quotation marks from titles before the call is made",
+      "Parse the arguments with a real JSON parser"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: tool arguments are JSON, and the escaping of strings can differ between models, so a real parser handles any valid form. A is wrong because patterns chase variants one at a time. B is wrong because a prompt rule cannot fix the output form. C is wrong because it corrupts titles.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "json-handling"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-035",
+    "difficulty": "easy",
+    "scenario": "A developer on a recipe app changes the system prompt, adds a tool and renames six files, then proposes one 2,000-line commit pushed straight to the main branch.",
+    "question": "Which practice fits version control for this change?",
+    "options": [
+      "Push to main now, since users get the improved prompt sooner that way",
+      "Split it into small commits and open a pull request",
+      "Keep one large commit so the project history stays short and tidy",
+      "Email the prompt text to a reviewer and merge after they reply"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: small commits on a branch make each change reviewable and revertable, and a pull request puts the prompt diff in front of a reviewer. A is wrong because it skips review and CI. C is wrong because one big commit hides which change broke things. D is wrong because email leaves no auditable record.",
+    "tags": [
+      "best-practice",
+      "comprehension",
+      "version-control"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-036",
+    "difficulty": "medium",
+    "scenario": "A job runs 200 workers against the API. When a 429 arrives, each worker waits exactly 2 seconds and retries, so the workers collide again and the errors repeat in waves.",
+    "question": "What change breaks the repeating waves?",
+    "options": [
+      "Shorten the fixed wait to one second so the queue clears sooner",
+      "Add random jitter to exponential backoff so retries spread out",
+      "Add more workers so some of them succeed while the others wait",
+      "Retry straight away in a loop until a response finally arrives"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: identical waits keep the workers synchronised, and jitter on a growing backoff spreads their retries. A is wrong because a shorter fixed wait still synchronises them and adds pressure. C is wrong because more workers add load to a limited service. D is wrong because tight loops hammer the limit.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "backoff"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-037",
+    "difficulty": "medium",
+    "scenario": "A support tool receives a 429 whose response carries a retry-after header of 20 seconds. The wrapper currently retries after a fixed one second.",
+    "question": "What should the wrapper do on this response?",
+    "options": [
+      "Ignore the header and keep the fixed one-second delay between attempts",
+      "Retry at once, since a 429 usually means a brief network blip",
+      "Treat the 429 as a permanent failure and drop the request",
+      "Wait at least the retry-after period, then back off"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: retry-after states when capacity is expected back, so waiting at least that long avoids wasted attempts. A is wrong because retrying early burns attempts and may extend the limit. B is wrong because a 429 is a rate limit, not a network blip. C is wrong because rate limits are transient and the request is recoverable.",
+    "tags": [
+      "configuration",
+      "application",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-038",
+    "difficulty": "medium",
+    "scenario": "A film-festival ticketing backend allows 20 calls at a time. A few model calls hang for several minutes, and after a while the 20 slots are all taken by hung calls and nothing moves.",
+    "question": "What fixes the stall most directly?",
+    "options": [
+      "Set a per-request timeout so a hung call frees its slot for a retry",
+      "Raise the concurrency limit until a few hung calls no longer matter",
+      "Remove the limit entirely so hung calls cannot block other work",
+      "Retry hung calls without cancelling the first, so one of them finishes"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a timeout bounds how long any call can hold a slot, so the pool keeps moving and the call can be retried. B is wrong because a higher limit only delays the same stall. C is wrong because unbounded calls bring rate-limit errors back. D is wrong because duplicates add load and still hold slots.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "timeouts"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-039",
+    "difficulty": "medium",
+    "scenario": "A wine-club shop lets the model call a create-order tool. After a network timeout the wrapper retried the call, and the customer was charged twice because the first call had succeeded.",
+    "question": "Which design change prevents duplicate orders on retry?",
+    "options": [
+      "Lengthen the timeout so that retries do not need to happen, which keeps the order flow simple",
+      "Delete the duplicate orders found by a nightly cleanup job",
+      "Send an idempotency key with the write so a repeat has no second effect",
+      "Change the order call to a GET so it is safe to repeat"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: with an idempotency key, the service recognises the repeat and returns the original result instead of acting again. A is wrong because any timeout can still fire. B is wrong because the customer has already been charged. D is wrong because a GET should not change state.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "idempotency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-040",
+    "difficulty": "medium",
+    "scenario": "A backoff loop has run for hours against the API. Every response is a 429 with no retry-after header and an error code saying a spend limit was enforced.",
+    "question": "What should the team change?",
+    "options": [
+      "Raise the backoff ceiling so that a later retry eventually succeeds",
+      "Add jitter to the waits, which clears this kind of 429 response",
+      "Hand the retries to the SDK's built-in retry setting instead",
+      "Stop retrying, alert the owner, and resume once the limit is raised"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a spend-limit 429 does not clear by waiting briefly, so retries fail until access resumes and a person must act. A is wrong because longer waits only delay the same refusal. B is wrong because jitter fixes collisions, not caps. C is wrong because SDK retries fail the same way.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-041",
+    "difficulty": "medium",
+    "scenario": "A pull request changes the system prompt of a school timetable assistant and adds a function that parses the model's reply. The author says it works in one manual chat.",
+    "question": "Which review check matters most before approving?",
+    "options": [
+      "Check that the prompt reads well in one chat, since wording is subjective",
+      "Check eval results for the prompt diff, secrets, and tests for the parser",
+      "Check that the code matches the style guide and leave the rest to taste",
+      "Check that the prompt is as long as possible so it covers more cases"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a prompt change is a behaviour change, so review looks for eval evidence, secret leaks and tested parsing code. A is wrong because one manual chat is not a test. C is wrong because formatting ignores behaviour and security. D is wrong because length is not quality and adds cost.",
+    "tags": [
+      "best-practice",
+      "evaluation",
+      "code-review"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-042",
+    "difficulty": "medium",
+    "scenario": "While reviewing a pull request for a podcast transcript tool, you notice an API key hard-coded in a test fixture. The author says it is just a test project key.",
+    "question": "What should the review ask for?",
+    "options": [
+      "Approve it, because a test project key carries no real risk",
+      "Comment the key out so that the code no longer runs with it",
+      "Block the merge, rotate the key, and load it from a secret store",
+      "Delete the key in a follow-up commit and merge the pull request now"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: once a key is in a commit it is exposed in history, so it must be rotated and kept outside the code. A is wrong because test keys can still be abused. B is wrong because the key stays in the file history. D is wrong because a later delete does not remove it from earlier commits.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "secrets"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-043",
+    "difficulty": "medium",
+    "scenario": "A school timetable tool has a 1,500-line prompt builder with no tests. The team wants to restructure it so new subjects can be added more easily.",
+    "question": "What is the best first step?",
+    "options": [
+      "Write tests that pin the current output, then refactor in small steps",
+      "Rewrite the builder cleanly first and add the tests once it works and the output looks right",
+      "Refactor it, then compare the new output with one sample by eye",
+      "Freeze the builder and wrap new features in another layer on top"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: tests that capture current behaviour let each small step be checked, so the refactoring cannot silently change prompts. B is wrong because testing after a rewrite cannot show what changed. C is wrong because one sample hides regressions. D is wrong because wrapping layers grows the problem.",
+    "tags": [
+      "best-practice",
+      "application",
+      "refactoring"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-044",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor dashboard summarises 300 readings each time a user presses Refresh, and the user waits on the page. A sequential loop takes several minutes, and the 300 calls are independent.",
+    "question": "Which pattern fits this interactive refresh?",
+    "options": [
+      "Async calls bounded by a semaphore so that the 300 run in parallel",
+      "The batch API, because its discount lowers the cost of 300 calls",
+      "A sequential loop, with a longer timeout to cover the whole run",
+      "An unbounded async gather that starts the 300 calls at the same time"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: independent calls can run in parallel, and the bound keeps them inside rate limits while the user waits. B is wrong because batch results can take up to a day, which fits no interactive page. C is wrong because the wait stays at minutes. D is wrong because an unbounded burst trips limits.",
+    "tags": [
+      "comparison",
+      "analysis",
+      "concurrency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-045",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript tool streams its summaries. Sometimes the stream stops with an overloaded error event after an HTTP 200, and the code shows the half-finished summary as complete.",
+    "question": "What should the code add?",
+    "options": [
+      "Treat a 200 as success, since the status code on the request is the final word",
+      "Turn streaming off, because streams cannot report errors",
+      "Handle error events inside the stream, then retry or surface them",
+      "Raise max_tokens so the stream ends before any errors occur"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an error can arrive inside the stream after the 200, so the status code alone cannot show success. A is wrong because the headers were sent before the failure. B is wrong because non-streamed calls are not the cure and lose latency benefits. D is wrong because output length does not cause overload.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "streaming-errors"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-046",
+    "difficulty": "hard",
+    "scenario": "After a deploy, a summariser logs a burst of failures: some are 429 responses with retry-after, others are 400 invalid-request errors from a broken template. The wrapper retries every error three times, and the queue is growing.",
+    "question": "Which change best clears the backlog?",
+    "options": [
+      "Retry both with a longer backoff, since both errors signal overload",
+      "Retry the 429s with backoff and fix the template causing the 400s",
+      "Drop the 429s and retry the 400s, since rate limits are permanent",
+      "Keep three retries on each error but add jitter to the waits"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that a 400 fails identically each time, while a 429 clears with waiting. A is wrong because a 400 is not overload. C is wrong because it reverses the two classes. D is wrong because jitter helps collisions, not requests that can never succeed.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "retries"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-047",
+    "difficulty": "hard",
+    "scenario": "A ride-dispatch app has a 6,000-line prompt-assembly module with thin tests. A launch in six weeks needs two new features that touch it, and a failed release would need a quick rollback.",
+    "question": "Which approach best fits the deadline?",
+    "options": [
+      "Rewrite the whole module on a branch and switch over on launch day",
+      "Bolt the new features onto the old module and skip the tests",
+      "Replace the whole module in a single pull request so review happens once",
+      "Move one feature at a time to a new, tested module; keep the old path live"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraints are the deadline and thin tests, so an incremental strangler path ships value early and keeps the old route as a rollback. A is wrong because a big-bang switch has no safe fallback. B is wrong because untested changes raise risk. C is wrong because one huge review misses defects.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "refactoring"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-048",
+    "difficulty": "hard",
+    "scenario": "A hotel booking engine jumps from no traffic to 400 simultaneous model calls at 09:00 and receives 429 errors, although its daily volume is far below the quota for its tier.",
+    "question": "What is the best fix?",
+    "options": [
+      "Retry the 429s at once, since quota is clearly not exhausted and the spike will pass",
+      "Request a higher tier, because the quota is plainly too low",
+      "Ramp concurrency up gradually, since a sharp spike can hit limits",
+      "Add a daily request counter that halts calls near the limit"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding fact is that volume is low yet the spike is sharp, and a sudden jump can produce 429s even under quota. A is wrong because immediate retries repeat the spike. B is wrong because quota is not the problem. D is wrong because a daily counter does not address a sudden burst.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-049",
+    "difficulty": "hard",
+    "scenario": "A refund tool call times out after 30 seconds, and it is unknown whether the payment provider processed it. The provider supports idempotency keys, and a duplicate refund is a financial loss.",
+    "question": "What should the wrapper do?",
+    "options": [
+      "Retry with a fresh key so the provider treats it as a new attempt",
+      "Retry with the same idempotency key so a first success is returned",
+      "Skip the retry and mark the refund as failed for the customer",
+      "Ask the model whether the first call looks successful, then decide"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is an unknown outcome plus a costly duplicate, and the same key makes a retry safe either way. A is wrong because a fresh key could refund twice. C is wrong because it may tell the customer a refund failed when it succeeded. D is wrong because the model has no knowledge of the provider state.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "idempotency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-050",
+    "difficulty": "easy",
+    "scenario": "Verrin Telecom tested a support prompt in a chat app and it behaved well. After shipping the same text through the Messages API from a backend service, the answers changed.",
+    "question": "What is the most likely explanation?",
+    "options": [
+      "The API sees the request alone, so context the chat app supplied is missing",
+      "The API randomly ignores instructions that a chat app would follow in production calls",
+      "The API keeps session memory that overrides the newly sent prompt",
+      "The model was swapped overnight on one of the two surfaces"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the API sees what each request contains, so a prompt is not automatically portable across surfaces. B is wrong because the difference is in the context supplied, not random behaviour. C is wrong because the API is stateless. D is wrong because nothing in the scenario suggests a model swap.",
+    "tags": [
+      "scenario-based",
+      "comprehension",
+      "portability"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-051",
+    "difficulty": "easy",
+    "scenario": "A municipal permit portal pastes the text of citizen emails into a prompt that also holds the assistant's instructions. A citizen's email contains lines that look like new rules.",
+    "question": "Where should the email text go?",
+    "options": [
+      "Appended to the system prompt so the model weighs it as policy",
+      "Written inline with the instructions so the context stays together in one block",
+      "Placed in an assistant message so it reads as the model's own text",
+      "In a labelled data block in the user turn, rules kept in the system prompt"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: separating trusted instructions from untrusted data with roles and labelled delimiters makes the boundary clear to the model. A is wrong because system text carries the most authority. B is wrong because mixing blurs the boundary. C is wrong because assistant turns are treated as the model's own words.",
+    "tags": [
+      "best-practice",
+      "application",
+      "content-boundaries"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-052",
+    "difficulty": "easy",
+    "scenario": "A developer uses Claude Code for a hotfix, then for an unrelated report script, then for a data migration, all in one long session. Replies are drifting toward details of the first task.",
+    "question": "What habit would prevent this?",
+    "options": [
+      "Keep a single session so context builds up for the next task",
+      "Run /clear between unrelated tasks so old context does not carry over",
+      "Ask the model in a message to forget the earlier task and carry on in the same chat",
+      "Rename the session after each task so it is easy to find"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a fresh session per unrelated task removes stale context, and /clear does that. A is wrong because accumulated context is the cause of the drift. C is wrong because a request to forget does not remove tokens from context. D is wrong because a name changes no context.",
+    "tags": [
+      "best-practice",
+      "comprehension",
+      "session-hygiene"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-053",
+    "difficulty": "easy",
+    "scenario": "A ticket classifier returns a category that a router uses to pick a queue. The allowed categories are billing, outage and account, and any other value breaks the router.",
+    "question": "How should the output schema define the category field?",
+    "options": [
+      "Free text, with the allowed values described in prose in the field",
+      "An optional field, so the model can skip cases it is unsure about",
+      "A required field limited by an enum of the allowed values",
+      "Any string, validated with a regex later on inside the router"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an enum on a required field makes the allowed set explicit and keeps invalid values from reaching the router. A is wrong because prose invites spelling variants. B is wrong because a missing category also breaks routing. D is wrong because late validation finds errors after the model has finished.",
+    "tags": [
+      "configuration",
+      "application",
+      "schema-design"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-054",
+    "difficulty": "easy",
+    "scenario": "A team wants every developer on one repository to have the same plugin, but not on their personal projects.",
+    "question": "Which install scope fits?",
+    "options": [
+      "User scope, installed on each developer's own laptop one by one",
+      "Local scope, which the repository shares with the team through git as part of its normal files",
+      "A copy of its files placed in each developer's home folder",
+      "Project scope, which declares it in the repository's shared settings"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: project scope is recorded in the committed project settings, so the team shares it for that repository alone. A is wrong because user scope applies to every project on the machine. B is wrong because local scope is kept out of git. C is wrong because copied files give no shared declaration or version.",
+    "tags": [
+      "configuration",
+      "comprehension",
+      "plugins"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-055",
+    "difficulty": "medium",
+    "scenario": "A service built on the Agent SDK in Python works well from the terminal because CLAUDE.md holds its coding rules. In production the rules are ignored.",
+    "question": "What is the likely fix?",
+    "options": [
+      "Rename the file to AGENTS.md so that the SDK can find it",
+      "Add the project source to the SDK's setting sources",
+      "Copy the rules into the README so the SDK reads them there",
+      "Raise the maximum number of turns allowed for each run"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the Python SDK loads CLAUDE.md only when the project setting source is included, unlike the terminal. A is wrong because AGENTS.md is read only when no CLAUDE.md exists. C is wrong because a README is not loaded as instructions. D is wrong because turns do not control file loading.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "claude-md"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-056",
+    "difficulty": "medium",
+    "scenario": "A team keeps its tone and formatting rules in CLAUDE.md. A new backend calls the Messages API directly, and its answers ignore those rules.",
+    "question": "How should the rules reach the backend's calls?",
+    "options": [
+      "Put them in the system field of each request that is sent",
+      "Commit CLAUDE.md to the repo root so the API picks it up on each call",
+      "Send them once in the first call so the API keeps them",
+      "Set a request header that names the path of CLAUDE.md"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a raw API call has no filesystem loading, so the rules must travel in the request itself. B is wrong because the API cannot read a repository. C is wrong because the API is stateless and keeps nothing between calls. D is wrong because no such header exists to load a file.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "statelessness"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-057",
+    "difficulty": "medium",
+    "scenario": "A multi-user assistant server keeps one global list of messages and sends it with every call. Users are starting to see references to other people's questions.",
+    "question": "What is the correct fix?",
+    "options": [
+      "Add a system rule telling the model not to mention other users",
+      "Share one history but trim it to the most recent 20 turns",
+      "Keep a separate history per user and send just that one",
+      "Issue a separate API key per user so histories separate themselves"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the API is stateless and replies to what is sent, so isolation has to come from the history your server builds for each call. A is wrong because the data is still in the prompt. B is wrong because trimming still mixes users. D is wrong because keys do not partition history.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "session-hygiene"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-058",
+    "difficulty": "medium",
+    "scenario": "A scheduling tool has a date parameter. The model keeps filling it with values such as tomorrow or next Friday, and the booking code rejects them.",
+    "question": "Which schema change helps most?",
+    "options": [
+      "Make the field optional so the model can leave the date out when unsure",
+      "Shorten the tool name so the model attends to it more closely",
+      "Add a general reminder to be careful to the system prompt",
+      "Describe the expected date format, with an example, in the field"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the field description is where the model learns the expected format, and an example makes it concrete. A is wrong because an omitted date still fails booking. B is wrong because the tool name does not describe the format. C is wrong because a vague reminder gives no format.",
+    "tags": [
+      "configuration",
+      "application",
+      "schema-design"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-059",
+    "difficulty": "medium",
+    "scenario": "A tool in an escape-room bookings assistant returns the contents of a customer-supplied notes file. Some notes contain sentences written as commands to the assistant.",
+    "question": "How should the notes be handled?",
+    "options": [
+      "Wrap the notes in delimiters as data and gate risky actions with permissions",
+      "Trust the notes, since the text came back from your own trusted tool",
+      "Move the notes into the system prompt so the model weighs them more",
+      "Cut any note longer than 500 characters before sending it on"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: tool output can carry untrusted text, so mark it as data and back that with permissions for actions with side effects. B is wrong because the tool just relays customer text. C is wrong because system placement raises authority. D is wrong because short text can still carry instructions.",
+    "tags": [
+      "best-practice",
+      "application",
+      "content-boundaries"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-060",
+    "difficulty": "medium",
+    "scenario": "A developer has corrected Claude Code twice in the same session on one task, and the replies are still wrong.",
+    "question": "What should the developer do next?",
+    "options": [
+      "Keep correcting in the same session, as the context keeps helping",
+      "Run /clear and restart with a better prompt that adds what was learned",
+      "Repeat the same correction again, this time in capital letters",
+      "Switch to another surface and paste the same prompt in there"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: after two failed corrections the context is cluttered with misses, so a fresh start with a sharper prompt works better. A is wrong because more corrections add to the clutter. C is wrong because emphasis does not add information. D is wrong because the same prompt on another surface repeats the weak instruction.",
+    "tags": [
+      "best-practice",
+      "application",
+      "session-hygiene"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-061",
+    "difficulty": "medium",
+    "scenario": "A developer wants to install a plugin from an unfamiliar GitHub repository because its description matches a task. It contains hooks and an MCP server.",
+    "question": "What is the safest approach?",
+    "options": [
+      "Install it, since plugins run inside a sandbox that limits any harm",
+      "Install it at local scope, which isolates it from your own files",
+      "Review its hooks, scripts and server code, and pin a reviewed commit",
+      "Enable it and watch whether anything odd happens in the session"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: an enabled plugin runs hooks and servers as the user, so its code needs review and a fixed commit so it cannot change unseen. A is wrong because plugins are not sandboxed. B is wrong because scope controls where it is installed, not what it can access. D is wrong because harm may not be visible.",
+    "tags": [
+      "best-practice",
+      "evaluation",
+      "plugins"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-062",
+    "difficulty": "medium",
+    "scenario": "A developer has enabled thirty plugins in one project. Sessions start slowly, and the context shows many skill descriptions that the work never uses.",
+    "question": "What is the right change?",
+    "options": [
+      "Raise the model's context window until the descriptions fit",
+      "Merge their descriptions into a single CLAUDE.md file to save space and startup time",
+      "Move the plugins to user scope so that they load less often",
+      "Disable plugins the project does not need to trim context and hooks"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: each enabled plugin adds descriptions to context and can start servers and hooks in every session, so trimming the set reduces both. A is wrong because a larger window does not remove the clutter. B is wrong because merging keeps the same text. C is wrong because scope does not change loading cost.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "plugins"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-063",
+    "difficulty": "medium",
+    "scenario": "A nightly job asks for JSON output through a schema. Occasionally the response does not contain the expected object, and its stop reason is refusal.",
+    "question": "What should the code do?",
+    "options": [
+      "Check the stop reason before parsing and route refusals to review",
+      "Make each field optional so that any response passes validation",
+      "Retry the same request three times in a loop until it parses",
+      "Add a line to the system prompt asking the model to be helpful"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a schema does not rule out a refusal, so code should read the stop reason first and handle it separately. B is wrong because an empty response would pass validation silently. C is wrong because the same request tends to give the same refusal. D is wrong because a vague plea does not change policy.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "structured-output"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-064",
+    "difficulty": "medium",
+    "scenario": "An extraction schema has a confidence field with a minimum of 0 and a maximum of 100. Now and then a stored value is 105, and the model's output is trusted as already valid.",
+    "question": "What should the team add?",
+    "options": [
+      "A longer system prompt that repeats the allowed range five times",
+      "A larger max_tokens so that the number is not cut off mid-reply",
+      "Range checks in application code, not just in the schema",
+      "A second model call that rewrites the value so it looks valid"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: some numeric constraints are handled by SDK transformation rather than enforced on the wire, so your own validation is the safeguard. A is wrong because repetition does not enforce a bound. B is wrong because 105 is not a truncation. D is wrong because a rewrite hides the defect.",
+    "tags": [
+      "configuration",
+      "application",
+      "schema-design"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-065",
+    "difficulty": "medium",
+    "scenario": "A contracts assistant receives three documents in one prompt. The model sometimes quotes a clause from the wrong document.",
+    "question": "Which prompt design change helps most?",
+    "options": [
+      "Join the documents with blank lines to save a few tokens",
+      "Wrap each document in its own labelled tag",
+      "Move the three documents into the system prompt for more weight",
+      "Sort the documents alphabetically before they are sent"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: labelled delimiters give each source a clear identity the question can cite. A is wrong because blank lines give no source markers. C is wrong because it adds no labels and gives untrusted text system authority. D is wrong because order does not tell the model which clause came from where.",
+    "tags": [
+      "best-practice",
+      "application",
+      "content-boundaries"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-066",
+    "difficulty": "medium",
+    "scenario": "A rule in CLAUDE.md says not to read the secrets file, yet a session read it. The team wants the block to hold regardless of what Claude decides.",
+    "question": "Where should the control live?",
+    "options": [
+      "CLAUDE.md again, with the rule repeated several times over",
+      "The very top of CLAUDE.md, where the file is read first by Claude",
+      "CLAUDE.md again, with the rule written in capital letters",
+      "A PreToolUse hook or settings deny rule, since CLAUDE.md is not enforced"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: CLAUDE.md shapes behaviour but is not enforced, while hooks and deny rules run outside the model's choice. A is wrong because repetition is still advice. B is wrong because position does not turn advice into a block. C is wrong because emphasis does not force compliance.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "enforcement"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-067",
+    "difficulty": "hard",
+    "scenario": "Verrin's assistant rules (tone, refusal policy) live in CLAUDE.md. The same assistant will also run from a backend using the raw API and from an Agent SDK service. Behaviour must be identical on every surface.",
+    "question": "Where should the rules live?",
+    "options": [
+      "CLAUDE.md alone, because the other surfaces read that file too",
+      "The first user message of each session, repeated as the history grows",
+      "The system prompt your code sends, plus hooks or deny rules for blocks",
+      "The settings.local.json file, which each surface would read"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is identical behaviour across surfaces, and what your code sends is what arrives, with hooks or deny rules covering enforcement. A is wrong because the raw API reads no files. B is wrong because that message can be trimmed away or ignored. D is wrong because the API does not read that file either.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "portability"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-068",
+    "difficulty": "hard",
+    "scenario": "A triage schema returns a priority that a router uses to choose a queue. The business adds a new priority roughly monthly. A wrong or missing priority sends tickets to the wrong queue without any alert.",
+    "question": "Which schema approach is best?",
+    "options": [
+      "Loosen it to free text and map the spellings inside the router",
+      "Keep a required enum and change the schema and router together",
+      "Make it optional with a default value of medium priority",
+      "Add an other string that the router treats as medium priority"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that bad values misroute silently, so a strict enum fails loudly and forces the router to be updated alongside it. A is wrong because spelling variants slip through. C is wrong because defaults hide missing data. D is wrong because an escape hatch also misroutes quietly.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "schema-design"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-069",
+    "difficulty": "hard",
+    "scenario": "A support agent server could reuse one long-lived conversation for all customers to save on tokens. Privacy rules forbid one customer's data reaching another's prompt, but cost still matters.",
+    "question": "What design meets both constraints?",
+    "options": [
+      "Per-customer histories, plus a shared cached prefix free of customer data",
+      "Reuse one conversation and tell the system prompt to hide other customers",
+      "Reuse one conversation but clear it at midnight to start fresh",
+      "Issue a separate API key per customer to keep the histories apart"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is no cross-customer data, so histories stay separate while a shared static prefix still earns caching savings. B is wrong because the data is still in the prompt. C is wrong because customers overlap during the day. D is wrong because keys do not partition history.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "session-hygiene"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-070",
+    "difficulty": "hard",
+    "scenario": "A security team requires that just reviewed plugins run in the company's repositories. Developers keep adding public ones at their own scope, and the rule must hold even if a developer disagrees.",
+    "question": "Where should the control be set?",
+    "options": [
+      "A note in the project CLAUDE.md that lists the approved plugins",
+      "A settings.local.json file, so each developer keeps their own list",
+      "Project scope, since project plugins block installs at user scope",
+      "Managed settings with an allowlist of approved marketplaces"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that the rule must hold against a developer's choice, and managed settings sit above user and project files. A is wrong because CLAUDE.md is advice. B is wrong because a developer controls their own local file. C is wrong because project installs do not block user ones.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "plugins"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-071",
+    "difficulty": "easy",
+    "scenario": "Kestrel Logistics saw its extraction outputs change overnight. The production code names a short model alias that points at the newest dated snapshot for a model line.",
+    "question": "What should the team do?",
+    "options": [
+      "Keep the alias, because following it is the stable choice for production",
+      "Pin a dated model id and move to a new id after the evals pass",
+      "Add a retry so the output corrects itself on a second try",
+      "Ask the vendor to freeze the alias for the whole account"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: a pinned id gives the same model until you choose to change it, and evals show whether a new one is safe. A is wrong because the alias moves without notice. C is wrong because a retry repeats the new behaviour. D is wrong because aliases are shared pointers that an individual account cannot freeze.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "model-pinning"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-072",
+    "difficulty": "easy",
+    "scenario": "A team wants build commands and coding conventions in CLAUDE.md that every developer on the repository gets, and the file should be reviewed like code.",
+    "question": "Which level fits?",
+    "options": [
+      "The user-level file in each developer's home directory",
+      "CLAUDE.local.md, which is kept out of git by design",
+      "The managed policy file on each developer's machine",
+      "The project CLAUDE.md in the repository, committed to git"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a committed project file is shared with the team and goes through pull requests. A is wrong because home-directory files are personal and differ per developer. B is wrong because the local file is gitignored. C is wrong because the managed policy file is for organisation-wide guidance set by administrators.",
+    "tags": [
+      "configuration",
+      "comprehension",
+      "claude-md"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-073",
+    "difficulty": "medium",
+    "scenario": "A setting is set to different values in the user settings file, the shared project .claude/settings.json and the project local .claude/settings.local.json. No managed settings exist.",
+    "question": "Which value applies for a single-value setting?",
+    "options": [
+      "The shared project file, since it is committed with the repository",
+      "The user file, since the setting belongs to the developer",
+      "The project local file, since it ranks above shared project and user",
+      "The three values are merged together into one result"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: precedence runs managed, command line, project local, shared project, then user. A is wrong because the local file outranks the shared one. B is wrong because user is the lowest of these scopes. D is wrong because a single-value setting takes one winning value, not a merge.",
+    "tags": [
+      "comprehension",
+      "application",
+      "settings-precedence"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-074",
+    "difficulty": "medium",
+    "scenario": "The user settings file allows the Bash tool for git commands. The shared project settings file allows a test runner. A developer asks which of the two permission lists is used in the project.",
+    "question": "What is the correct answer?",
+    "options": [
+      "Both, since array settings are combined across scopes",
+      "The project list alone, since a higher scope replaces the lower",
+      "The user list alone, since that one was set first",
+      "Neither, because the two lists conflict and cause an error"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: array settings like permissions.allow merge across scopes rather than override each other. B is wrong because replacement applies to a few model keys. C is wrong because order of creation does not matter. D is wrong because merging is expected behaviour, not a conflict.",
+    "tags": [
+      "comprehension",
+      "application",
+      "settings-precedence"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-075",
+    "difficulty": "medium",
+    "scenario": "A CI run behaves differently from a laptop. The settings file names one model, but the CI image exports the ANTHROPIC_MODEL environment variable with another.",
+    "question": "Which model is used?",
+    "options": [
+      "The project settings file, as it is committed with the repo",
+      "The user settings file, as it belongs to the developer",
+      "Whichever model the Claude Code version uses as its default",
+      "The environment variable, which overrides the model key in any file"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: ANTHROPIC_MODEL overrides the model key set in any settings file, so CI should unset it or set the model deliberately. A is wrong because files rank below it. B is wrong because the user file is lower still. C is wrong because an explicit value exists and defaults apply when nothing is set.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "model-selection"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-076",
+    "difficulty": "medium",
+    "scenario": "A team edits its production prompt in an admin web page, and a recent edit made quality drop. Nobody can say what the previous version was.",
+    "question": "What practice would have prevented this?",
+    "options": [
+      "The admin page, so that edits take effect immediately for users",
+      "A versioned file in the repo, with a changelog and eval results",
+      "A shared chat document holding the newest prompt text",
+      "One file that is overwritten, backed up by the cloud provider"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: versioned files give history, review, a changelog and an easy revert, with evals showing the effect. A is wrong because live edits have no history or review. C is wrong because a chat document records no change reasons or versions. D is wrong because a backup is not a release history.",
+    "tags": [
+      "anti-pattern",
+      "application",
+      "prompt-versioning"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-077",
+    "difficulty": "medium",
+    "scenario": "A team installs a plugin from a marketplace that tracks a branch. After a maintainer pushes a change, behaviour differs between two laptops.",
+    "question": "How should the plugin source be set?",
+    "options": [
+      "Pin it to a full commit sha or version tag in the entry",
+      "Point it at the branch head so everyone gets the newest version",
+      "Point it at a branch name that the maintainer controls",
+      "Load it from each laptop's downloads folder on its own"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: a sha or tag fixes the code, so every laptop runs the same reviewed version until the pin is changed on purpose. B is wrong because the head moves. C is wrong because a branch name also moves. D is wrong because local folders differ between laptops.",
+    "tags": [
+      "configuration",
+      "application",
+      "plugin-pinning"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-078",
+    "difficulty": "medium",
+    "scenario": "A model id in production is listed as deprecated, with a retirement date six weeks away and a recommended replacement.",
+    "question": "What is the right plan?",
+    "options": [
+      "Wait for retirement and switch when requests start failing",
+      "Swap to the replacement now, untested, since quality is the same",
+      "Run the eval suite on the replacement, then migrate before retirement",
+      "Move to a short alias so that the switch happens automatically"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: deprecation is a maintenance event, so evals on the replacement show any change before the old id fails. A is wrong because retired ids fail requests. B is wrong because behaviour can differ between ids. D is wrong because aliases move without notice and untested.",
+    "tags": [
+      "best-practice",
+      "application",
+      "deprecation"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-079",
+    "difficulty": "hard",
+    "scenario": "Kestrel's extraction feeds invoicing with a tight schema. A manager asks to follow a floating alias so security and quality fixes arrive automatically, and says the evals can run later.",
+    "question": "What is the better policy?",
+    "options": [
+      "Follow the alias, because fixes arrive sooner and evals can follow",
+      "Pin the id and evaluate each new id in CI first",
+      "Pin the id and skip evals, since the weights do not change",
+      "Pin the id and stay on it until retirement, then switch"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is that invoicing needs reproducible output, and changes arrive under a new id, so adoption can be gated by evals. A is wrong because silent changes can break the schema. C is wrong because new ids still need checking. D is wrong because waiting for retirement gives no time to test.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "model-pinning"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-080",
+    "difficulty": "hard",
+    "scenario": "An organisation needs a rule that blocks reading a secrets directory. Some developers have local settings that allow broad reads, and no developer must be able to switch the rule off.",
+    "question": "Where should the rule be placed?",
+    "options": [
+      "A managed settings deny rule, which outranks local and project files",
+      "Shared project settings, relying on code review to protect the rule",
+      "Each developer's user settings file, kept in sync by hand",
+      "CLAUDE.md, written as a plain instruction to follow"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that no developer can disable it, and managed settings rank above every file a developer controls. B is wrong because a developer can still edit their branch or local file. C is wrong because user files are developer-controlled. D is wrong because CLAUDE.md is context, not enforcement.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "settings-precedence"
+    ]
+  }
+]

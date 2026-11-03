@@ -1,0 +1,142 @@
+[
+{
+"domain": 3,
+"id": "ccdv-d3-001",
+"difficulty": "easy",
+"scenario": "A developer on a ride-dispatch app keeps personal style preferences in ~/.claude/CLAUDE.md. The repository root has a CLAUDE.md with the team's build and test commands. They launch Claude Code from the repository root.",
+"question": "What does Claude Code do with the two CLAUDE.md files at launch?",
+"options": [
+"It loads both files and concatenates them into the context",
+"It loads the repository file and discards the user file because the project is closer",
+"It loads the user file and ignores the repository file because personal settings win",
+"It asks the developer to choose one file before the session starts"
+],
+"correct": 0,
+"explanation": "A is correct: CLAUDE.md files found for the working directory are all loaded and concatenated, not overridden, so both the personal and the team guidance reach Claude. B is wrong because closeness does not discard the user file. C is wrong because personal files do not outrank project files. D is wrong because no choice prompt exists.",
+"tags": [
+"scenario-based",
+"comprehension",
+"claude-md-hierarchy"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-002",
+"difficulty": "easy",
+"scenario": "A recipe app repository already has a hand-written CLAUDE.md that the team has refined for months. A new colleague wants to run /init to see what it produces, and the tech lead worries it will wipe the file.",
+"question": "What does /init do when a CLAUDE.md already exists?",
+"options": [
+"It overwrites the file with a freshly generated starting version",
+"It refuses to run until the existing file is deleted or renamed",
+"It writes a second file named CLAUDE.local.md and loads both",
+"It suggests improvements and leaves the file in place"
+],
+"correct": 3,
+"explanation": "D is correct: when a CLAUDE.md exists, /init proposes improvements rather than replacing it, so the team's months of refinement are safe. A is wrong because overwriting is exactly what the tech lead feared and does not happen. B is wrong because no deletion is demanded. C is wrong because CLAUDE.local.md is a personal file, not an /init output.",
+"tags": [
+"scenario-based",
+"comprehension",
+"repo-initialisation"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-003",
+"difficulty": "medium",
+"scenario": "A school timetable tool runs a nightly CI job that calls claude -p to run the test suite and summarise failures. The job stalls because git diff needs approval and nobody is watching the pipeline.",
+"question": "How should the pipeline let the run use git diff without a person approving it?",
+"options": [
+"Add a CLAUDE.md line saying that git diff commands are approved",
+"Pass --allowedTools with the rule \"Bash(git diff *)\" on the command line",
+"Switch to --output-format json, which skips permission prompts",
+"Keep the job as it is and have an engineer approve each step in the log"
+],
+"correct": 1,
+"explanation": "B is correct: headless runs start in Manual mode, and --allowedTools pre-approves a specific rule such as Bash(git diff *), so the job needs no human. A is wrong because CLAUDE.md is guidance and grants no permission. C is wrong because the output format only changes the shape of the result. D is wrong because an unattended pipeline has no one to approve.",
+"tags": [
+"troubleshooting",
+"application",
+"headless-mode"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-004",
+"difficulty": "medium",
+"scenario": "A developer on a hotel booking engine spent a long session debugging a payment crash, and the context is full of stack traces. The bug is fixed and committed. They now start an unrelated task, adding a CSV export to the reports page.",
+"question": "Which session command suits the start of the unrelated CSV task?",
+"options": [
+"/compact, to keep a summary of the debugging session",
+"/resume, to reopen the earlier payment session",
+"/clear, to begin the new task with no old context",
+"/rewind, to step back to before the first stack trace"
+],
+"correct": 2,
+"explanation": "C is correct: /clear between unrelated tasks gives the CSV work a clean context free of stack traces. A is wrong because /compact keeps a summary of debugging that the new task does not need. B is wrong because /resume reopens a past session rather than starting fresh. D is wrong because /rewind undoes steps within the same task.",
+"tags": [
+"scenario-based",
+"application",
+"session-commands"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-005",
+"difficulty": "medium",
+"scenario": "A wine-club shop repository contains both .claude/commands/deploy.md and .claude/skills/deploy/SKILL.md. Each file was added by a different teammate, and both were meant to create a /deploy shortcut.",
+"question": "What happens when a developer types /deploy?",
+"options": [
+"The command file runs because commands came first",
+"Claude Code reports a duplicate-name error and runs neither",
+"Both run in sequence, command first and then the skill",
+"The skill runs, as it wins over a command of that name"
+],
+"correct": 3,
+"explanation": "D is correct: custom commands were merged into skills, both create /deploy, and when both exist the skill takes precedence. A is wrong because age of the format does not give a command priority. B is wrong because there is a defined winner, not an error. C is wrong because one definition runs, not both.",
+"tags": [
+"scenario-based",
+"application",
+"skills-commands"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-006",
+"difficulty": "hard",
+"scenario": "An e-bike retailer keeps generated pricing fixtures in a folder that must not be edited by hand. CLAUDE.md already says not to touch it, yet in a long session Claude edited a fixture file. The team now needs the edit blocked whatever Claude decides.",
+"question": "What should the team do to guarantee the folder is protected?",
+"options": [
+"Move the sentence to the top of CLAUDE.md and write it in capitals",
+"Add a deny rule for edits to that folder in the shared settings.json",
+"Put the sentence in a path-scoped rule file so it loads when fixtures are open",
+"Copy the sentence into each developer's user-level CLAUDE.md file"
+],
+"correct": 1,
+"explanation": "B is correct: the deciding constraint is enforcement, and deny rules in settings.json block the action in every mode, whatever Claude decides. A is wrong because stronger wording is still guidance Claude can drift from. C is wrong because rule files are context that loads, not a lock. D is wrong because user-level files are also only guidance.",
+"tags": [
+"best-practice",
+"evaluation",
+"settings-vs-claude-md"
+]
+},
+{
+"domain": 3,
+"id": "ccdv-d3-007",
+"difficulty": "hard",
+"scenario": "A municipal permit portal team repeats a review of every permit-form change. It reads dozens of files, produces long intermediate output and should read but not edit. Running it in the main conversation keeps flooding the developer's context.",
+"question": "Which setup fits this repeatable review best?",
+"options": [
+"A custom slash command holding the review prompt, run in the main conversation",
+"A section in CLAUDE.md listing the review steps for Claude to follow each time",
+"A subagent in .claude/agents/ with its own context and read-only tools",
+"A /compact run after each review to shrink the output that flooded the context"
+],
+"correct": 2,
+"explanation": "C is correct: a repeatable workflow needing its own context and restricted tools is a subagent, so the file reading stays out of the main conversation. A is wrong because a command is a prompt shortcut that still runs in the main context. B is wrong because CLAUDE.md steps add guidance to context and restrict nothing. D is wrong because /compact cleans up afterwards.",
+"tags": [
+"comparison",
+"evaluation",
+"subagents"
+]
+}
+]

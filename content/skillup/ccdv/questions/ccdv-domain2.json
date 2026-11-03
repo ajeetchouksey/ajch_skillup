@@ -1,0 +1,652 @@
+[
+  {
+    "domain": 2,
+    "id": "ccdv-d2-001",
+    "difficulty": "easy",
+    "scenario": "Tideway Energy's product owner asks for a meter-reading anomaly summariser that is 'fast and cheap', and the team has not yet chosen a model.",
+    "question": "What should the team do first?",
+    "options": [
+      "Agree a latency target, daily volume and monthly budget with stakeholders and write them down",
+      "Choose the fastest model tier straight away and measure the real latency once the first version is running",
+      "Build a quick prototype with default settings and gather the detailed requirements from its demonstration",
+      "Pick the model with the largest context window so that no meter data is cut from the prompt when readings run long"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: 'fast' and 'cheap' are not testable, so numbers for latency, volume and budget guide the choice of tier and feature. B is wrong because it picks the model before the constraint is known. C is wrong because it finds constraints after design choices are made, forcing rework. D is wrong because window size is not the stated need and ignores latency and budget.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "requirements-gathering"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-002",
+    "difficulty": "easy",
+    "scenario": "A municipal permit portal will use Claude to summarise permit applications. The sponsor's acceptance criterion reads: 'summaries should be accurate and useful'.",
+    "question": "Which rewrite turns this into a criterion the team can test?",
+    "options": [
+      "The sponsor reviews a sample of summaries each month and approves them if they read well to a busy clerk",
+      "The summaries are accurate enough that clerks rarely need to open the original application to check a detail",
+      "On 200 labelled applications, the summary states the correct fee and decision in at least 95% of cases",
+      "The summary prompt tells the model to be accurate and to include the details that clerks usually find useful"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a labelled set and a numeric threshold convert directly into eval cases that run on every change. A is wrong because subjective monthly approval cannot be repeated automatically. B is wrong because 'rarely' has no number and no baseline. D is wrong because a prompt instruction states intent and does not test the result.",
+    "tags": [
+      "concept",
+      "comprehension",
+      "acceptance-criteria",
+      "evals"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-003",
+    "difficulty": "medium",
+    "scenario": "A wine-club shop must keep customer data processing inside the United States under its contract. The monthly budget was set assuming standard per-token prices.",
+    "question": "How should the requirements sheet capture this?",
+    "options": [
+      "Record it as a preference, since the default global routing is acceptable when data is encrypted in transit",
+      "Record US-only processing as a hard constraint, then add the 1.1x residency multiplier to the cost estimate",
+      "Leave it to the security review after launch and keep the budget as originally set for now",
+      "Record it as a model-selection issue and pick the cheapest tier to absorb the extra cost of compliance"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: residency changes where inference runs and what it costs: US-only inference carries a 1.1x multiplier on current models. A is wrong because global routing may process data outside the contract region, and encryption does not change location. C is wrong because finding the constraint after launch forces rework and a budget overrun. D is wrong because tier choice does not decide where processing happens.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "residency",
+      "compliance"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-004",
+    "difficulty": "medium",
+    "scenario": "A ride-dispatch app will summarise incident notes for dispatchers. A missed safety issue is costly, but a clumsy summary of a routine delay is harmless.",
+    "question": "Which requirement should the team record about errors?",
+    "options": [
+      "Aim for a zero error rate overall by choosing the largest model, so that no review step is needed",
+      "Apply a single accuracy target to the whole feature and add a review step once dispatchers complain",
+      "Instruct the model to state just what it is certain of, which removes the need for human review",
+      "Set an error rate per class of mistake and route high-impact cases to a person for review"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: tolerance differs by impact, so targets are set per mistake class and costly cases go to a human. A is wrong because no model reaches zero errors, and a bigger one does not remove review. B is wrong because one target hides the safety risk, and waiting for complaints means harm has happened. C is wrong because a prompt instruction cannot guarantee correctness or replace review.",
+    "tags": [
+      "best-practice",
+      "analysis",
+      "error-tolerance",
+      "human-review"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-005",
+    "difficulty": "medium",
+    "scenario": "A hotel booking engine's chat assistant must quote the correct cancellation terms. The team has a written acceptance criterion but no way to run it.",
+    "question": "How should they make the criterion testable?",
+    "options": [
+      "Write 100 guest questions with the expected terms and run them as an eval suite whenever a prompt or model changes",
+      "Ask two colleagues to read a handful of replies before launch and sign off if the replies look right",
+      "Add a line to the prompt asking the assistant to double-check the cancellation terms against the hotel policy before it answers",
+      "Track guest complaints for the first month and treat a low complaint count as evidence of accuracy"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: labelled cases with expected answers turn the criterion into a repeatable test that guards every later change. B is wrong because a handful of reads is small, subjective and not repeatable. C is wrong because a prompt line is an instruction and does not measure whether the quote is right. D is wrong because complaints arrive after guests are affected and show just a fraction of the errors.",
+    "tags": [
+      "best-practice",
+      "application",
+      "acceptance-criteria",
+      "evals"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-006",
+    "difficulty": "medium",
+    "scenario": "A film-festival ticketing site expects a spike in traffic when the programme is released. Before agreeing a design, the team must check that its API rate limits can cope.",
+    "question": "Which figures belong on the requirements sheet for that check?",
+    "options": [
+      "The expected number of registered users and the monthly downloads of the festival app, as a measure of the size of the audience",
+      "Peak requests per minute, plus typical input and output tokens per request, to compare with the request and token limits",
+      "The model's context window size and the date it was released, as these set the limits on a request",
+      "The number of prompt templates in the repository and how often the team deploys, as a measure of load"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: limits are measured in requests and tokens per minute, so peak rate and tokens per request are the inputs needed. A is wrong because audience size does not give a request or token rate. C is wrong because window size and release date do not describe load against rate limits. D is wrong because template count and deployment frequency describe the team, not traffic.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "volume",
+      "rate-limits"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-007",
+    "difficulty": "hard",
+    "scenario": "A crop-sensor dashboard shows farmers an AI summary of the latest field readings. Farmers open it on phones in the field. Two designs are proposed: pre-generated summaries, or summaries made on demand. The requirement is that a summary of current readings appears within 3 seconds of opening the page.",
+    "question": "Which design meets the requirement?",
+    "options": [
+      "Summaries pre-generated by hourly batch jobs, which gives the 50% discount and a ready answer on opening the page",
+      "An on-demand realtime call on a fast tier, streaming the summary so text appears as it is generated",
+      "An on-demand call on the strongest tier at high effort, because summary quality is what farmers value most",
+      "A queued job for each page view, with the dashboard polling until the summary is ready to show"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the deciding constraint is 3 seconds with current readings, which only a streamed realtime call on a fast tier can meet. A is wrong because batch results can be an hour old or take up to 24 hours. C is wrong because the strongest tier at high effort is slower and risks the target. D is wrong because a queue with polling adds waiting and shows nothing until the job ends.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "latency",
+      "realtime-vs-batch"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-008",
+    "difficulty": "hard",
+    "scenario": "A recipe app's company buys its cloud services through Amazon Bedrock under a procurement rule. The team wants the 50% batch discount for a weekly job that rewrites 30,000 recipe descriptions, and the job is not time-critical.",
+    "question": "Which plan fits the procurement rule?",
+    "options": [
+      "Stay on Bedrock and submit the job through Message Batches, since Bedrock offers the same features as the first-party API",
+      "Move this one job to the first-party API for the batch discount, and keep the other work on Bedrock",
+      "Stay on Bedrock, run the job as ordinary realtime calls, and budget without the batch discount",
+      "Stay on Bedrock and hold the job until batch support arrives, then plan the budget around the discount"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the stated constraint is the Bedrock channel, and the docs list Message Batches as unsupported there, so the plan has to use realtime calls and a budget without the discount. A is wrong because it assumes feature parity that the docs do not provide. B is wrong because it breaks the procurement rule that the requirement fixes. D is wrong because it waits on an unannounced feature and leaves the job undone.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "vendor-channel",
+      "batch-api"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-009",
+    "difficulty": "easy",
+    "scenario": "Mossgate Insurance's claims-summary prompt leaves a few summaries with an awkward heading. A developer proposes editing the live prompt in the console to fix it quickly.",
+    "question": "What is the best way to make this change?",
+    "options": [
+      "Edit the live prompt in the console, because wording is configuration and not code, and record the change afterwards",
+      "Edit the live prompt in the console now and run the eval suite on the new text once it is in production",
+      "Try the edit in a chat window and, if the replies look good, paste it into production without a release",
+      "Edit the prompt file in the repository, run the eval suite and release the new version through the normal deployment path"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: a prompt is a release artefact, so it is versioned, tested by evals and deployed in a way that can be rolled back. A is wrong because a live edit leaves no tested version to return to if quality drops. B is wrong because testing after release exposes customers to regressions before anyone knows about them. C is wrong because one chat window is not an eval and bypasses version control.",
+    "tags": [
+      "anti-pattern",
+      "comprehension",
+      "prompt-release",
+      "life-cycle"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-010",
+    "difficulty": "easy",
+    "scenario": "A school timetable tool's dashboard shows healthy servers, low latency and no errors. Teachers report that the AI-written clash explanations have become vaguer over the last month.",
+    "question": "What is missing from the monitoring?",
+    "options": [
+      "Quality checks that sample live outputs and score them against the eval criteria over time",
+      "More servers, because vaguer explanations show that the service is short of capacity under load",
+      "Tighter uptime alerts, since monitoring covers the infrastructure and output quality is out of its scope",
+      "A lower request rate limit, so that each request gets more of the model's attention and time per reply"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: infrastructure metrics can stay green while quality drifts, so sampled outputs need scoring against the same criteria as the evals. B is wrong because capacity affects speed and errors, not how vague the wording is. C is wrong because uptime alerts would not have caught a change in quality. D is wrong because rate limits do not change the care a model gives each request.",
+    "tags": [
+      "troubleshooting",
+      "comprehension",
+      "monitoring",
+      "drift"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-011",
+    "difficulty": "medium",
+    "scenario": "A podcast transcript tool keeps its summary prompts in text files. A pull request changes one prompt file and touches no application code.",
+    "question": "What should the CI pipeline do for this pull request?",
+    "options": [
+      "Skip the checks, since unit tests cover code and a text file cannot break the build",
+      "Run the eval suite because the prompt file changed, and block the merge if scores fall below the agreed threshold",
+      "Run the eval suite on a nightly schedule after the merge and open a ticket if scores fall",
+      "Run the linter and unit tests and ask a reviewer to read the new prompt wording closely"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: evals act as tests for prompts, so a changed prompt file triggers them before merge and a drop in score fails the check. A is wrong because a prompt change can alter behaviour even though the build passes. C is wrong because a nightly run finds the regression after it has merged and shipped. D is wrong because code tests and a read-through cannot measure output quality.",
+    "tags": [
+      "best-practice",
+      "application",
+      "evals-in-ci",
+      "prompt-release"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-012",
+    "difficulty": "medium",
+    "scenario": "A library catalogue service receives a notice that its pinned model is deprecated, with a replacement named and a retirement date 75 days away. The model still works today.",
+    "question": "How should the team treat the notice?",
+    "options": [
+      "As low priority, because a deprecated model keeps working and the team can act on the retirement day",
+      "As an urgent swap: point production at the replacement today, since models in the same family behave identically on any prompt",
+      "As a maintenance task: run the eval suite on the replacement, fix prompt differences and roll out before the retirement date",
+      "As unnecessary, because the vendor updates an existing model ID in place and the service will keep working"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: deprecation is a dated warning and retired models fail requests, so migration is planned, evaluated and finished before that date. A is wrong because waiting for retirement means failed requests while the team tests. B is wrong because an untested swap can change behaviour, and families do not behave identically. D is wrong because an existing ID stays fixed, and updates arrive under a new ID.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "deprecation",
+      "maintenance"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-013",
+    "difficulty": "medium",
+    "scenario": "An e-bike retailer's product-description generator has not changed in three months, yet the share of descriptions rejected by editors has crept up. Catalogue content and customer wording have shifted over that time.",
+    "question": "What practice should the team add?",
+    "options": [
+      "Rely on the pinned model ID, since a fixed ID means output quality cannot move over time",
+      "Watch the error rate and latency dashboards, which would reveal any change in output quality",
+      "Re-run the eval suite once a year when the contract renews and compare it with last year's result",
+      "Score a sample of live outputs on a schedule against a fixed baseline, and alert when the pass rate drops"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: drift shows up as slowly falling quality on live inputs, so regular scoring of sampled traffic against a baseline catches it early. A is wrong because inputs change even when the model ID is fixed, and serving behaviour can shift slightly. B is wrong because error and latency charts say nothing about the quality of the text. C is wrong because an annual check finds a year of drift too late.",
+    "tags": [
+      "best-practice",
+      "analysis",
+      "monitoring",
+      "drift"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-014",
+    "difficulty": "hard",
+    "scenario": "An escape-room booking site's assistant sends refund-decision emails to customers. A revised prompt passes the offline evals, but a wrong email cannot be recalled once sent, and refunds are paid on its wording.",
+    "question": "Which release strategy fits?",
+    "options": [
+      "A canary release to a small share of traffic, with per-version monitoring and a quick switch back to the old prompt",
+      "A big-bang release at a quiet hour, with a rollback to the old prompt if complaints arrive",
+      "A blue-green cutover of the full traffic at once, keeping the old prompt live on standby so that rollback is instant",
+      "A release to the whole customer base after a second round of offline evals on a larger sample"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: the deciding constraint is that sent emails cannot be undone, so exposure must be limited before it is known to be safe. B is wrong because a big-bang puts every customer at risk before any signal arrives. C is wrong because rollback is instant, but the emails already sent stay wrong. D is wrong because more offline evals cannot reveal how real customers' cases behave.",
+    "tags": [
+      "scenario-based",
+      "evaluation",
+      "staged-rollout",
+      "rollback"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-015",
+    "difficulty": "hard",
+    "scenario": "A hotel booking engine's assistant states a wrong cancellation window, and legal wants a fix within hours. The fix is a one-line prompt-file change. The full eval suite takes 40 minutes.",
+    "question": "What is the right way to get the fix out?",
+    "options": [
+      "Edit the live prompt now and add the change to the repository after the incident, because the fix is one line",
+      "Release it as a hotfix through the pipeline, running a fast eval subset on cancellation cases and keeping the old version for rollback",
+      "Skip the evals for this release, since a one-line change cannot affect other behaviour elsewhere in the prompt, and deploy straight away",
+      "Hold the fix for the next scheduled release in two weeks so that the full eval suite runs without time pressure"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: urgency shortens the path but does not remove it: a targeted eval and a retained old version keep the fix tested and reversible. A is wrong because a live edit has no tested or revertible version. C is wrong because one line can still change other behaviour, and skipping evals removes the safety net. D is wrong because a two-week wait leaves customers with the wrong window.",
+    "tags": [
+      "best-practice",
+      "evaluation",
+      "hotfix",
+      "life-cycle"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-016",
+    "difficulty": "easy",
+    "scenario": "Brindle Travel's itinerary chat answers the first question well, but when a traveller asks 'make day two shorter', the reply ignores the earlier plan. The code sends only the newest message on each call.",
+    "question": "What is the fix?",
+    "options": [
+      "Reuse one client object across requests so that the API links the calls into a session and recalls the plan",
+      "Move the traveller's earlier requests into a longer system prompt that is sent once at start-up",
+      "Send the earlier user and assistant turns together with the new message on every request",
+      "Raise max_tokens so that the model has room to remember the plan it produced earlier in the conversation"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the Messages API is stateless, so the full history must be resent each time for the model to see the earlier plan. A is wrong because the API keeps no session, so a shared client does not carry context. B is wrong because a system prompt sent once at start-up is not stored for later calls. D is wrong because max_tokens limits output length and does not provide memory.",
+    "tags": [
+      "troubleshooting",
+      "comprehension",
+      "stateless-api",
+      "messages-api"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-017",
+    "difficulty": "easy",
+    "scenario": "A recipe app asks Claude for a full shopping list. Users see lists that stop mid-item, and the response's stop_reason is 'max_tokens'. The max_tokens value is set to 200.",
+    "question": "What does this result mean, and what is the fix?",
+    "options": [
+      "The model judged the list complete, so the cut is a display fault and the app's text field should be checked",
+      "The request timed out at the proxy, so the call should move to the batch API, where a long request is allowed to run for longer",
+      "The context window is full, so a new conversation should start with a shortened history resent",
+      "The output reached the token ceiling, so raise max_tokens or ask for a shorter list, and check stop_reason on each reply"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: stop_reason 'max_tokens' means generation hit the limit set on the request, so the ceiling or the requested length changes. A is wrong because a finished list would report end_turn, not max_tokens. B is wrong because a timeout is a different failure and batch does not suit a user-facing app. C is wrong because a full window reports a different stop reason, and 200 tokens is far from the window.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "stop-reasons",
+      "max-tokens"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-018",
+    "difficulty": "easy",
+    "scenario": "An e-bike retailer wants Claude to read the part number from a customer's photo of a damaged brake lever. The developer plans to paste the photo's web address into the text of the user message.",
+    "question": "How should the photo be supplied?",
+    "options": [
+      "Add an image content block to the user message, with a base64 or URL source, next to a text block holding the question",
+      "Keep the web address in the text and rely on the API to fetch and read the image automatically",
+      "Put the base64 data into the system prompt as plain text so that it applies to the later requests too, saving repeat uploads",
+      "Send the photo as an assistant-role message so that the model treats it as its own earlier output"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: images are content blocks in a user message, alongside text blocks, with a base64, URL or file source. B is wrong because a link in text is just text, and the API does not fetch it as an image. C is wrong because base64 pasted as plain text is not an image block and wastes tokens. D is wrong because the assistant role is for the model's own turns, not user-supplied input.",
+    "tags": [
+      "configuration",
+      "application",
+      "vision",
+      "content-blocks"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-019",
+    "difficulty": "easy",
+    "scenario": "A wine-club shop's tasting-notes assistant takes about 20 seconds to produce a long answer. Shoppers see a blank panel until the whole reply arrives, and many leave.",
+    "question": "Which change best improves what shoppers experience?",
+    "options": [
+      "Move the request to the batch API to cut cost, since shoppers care mostly about price",
+      "Stream the response and render text deltas as they arrive, so that words appear within moments",
+      "Lower max_tokens until the reply is short enough to return within a few seconds",
+      "Raise the client timeout so that the long request completes without being cut off"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: streaming shows text as it is generated, so waiting users see progress at once even if the total time is unchanged. A is wrong because batch results can take far longer and do not suit a user waiting. C is wrong because a smaller ceiling truncates the answer and does not remove the blank wait. D is wrong because a longer timeout avoids a cut-off but the panel stays blank.",
+    "tags": [
+      "scenario-based",
+      "application",
+      "streaming",
+      "user-latency"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-020",
+    "difficulty": "medium",
+    "scenario": "A crop-sensor service stores every HTTP 200 reply as a finished summary. Some rows are empty or cut short, and the logs show stop_reason values of 'refusal' and 'max_tokens' on those calls.",
+    "question": "What change makes the pipeline robust?",
+    "options": [
+      "Treat a 200 status as success and add a retry loop that repeats any call that returned empty text",
+      "Catch these cases through the SDK's exception handling, since the API reports them as error status codes rather than as normal replies",
+      "Read stop_reason on each response, store end_turn results as complete, and handle refusal and max_tokens as separate outcomes",
+      "Set max_tokens to the maximum value and ignore refusals, which appear when prompts are malformed"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: a refusal or truncation still arrives as HTTP 200, so the stop reason separates finished replies from incomplete ones. A is wrong because retrying a refusal repeats the outcome, and 200 does not mean complete. B is wrong because these cases come back as normal responses and raise no exception. D is wrong because refusals follow policy, not malformed prompts, and a larger ceiling does not remove them.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "stop-reasons",
+      "error-handling"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-021",
+    "difficulty": "medium",
+    "scenario": "A film-festival chat streams replies to the browser. Occasionally a reply stops half-way with no message, although the code already catches HTTP errors from the initial request.",
+    "question": "What is the most likely gap?",
+    "options": [
+      "The SDK drops streams that last longer than 30 seconds, so the handler should switch to non-streamed calls for longer answers",
+      "Streaming does not report failures, so the app should compare the final text length with the max_tokens value",
+      "A mid-reply stop means the model finished early, so the app can retry without reading the stop reason",
+      "Errors can arrive as events inside a stream that began with status 200, so the stream handler needs its own error handling"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: once a 200 response has started, a failure such as an overloaded error is sent as a stream event that bypasses HTTP error handling. A is wrong because no 30-second cut-off is documented, and non-streamed calls bring back the blank wait. B is wrong because streams do report errors as events. C is wrong because an early stop is not normal completion.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "streaming",
+      "error-handling"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-022",
+    "difficulty": "medium",
+    "scenario": "A hotel group reaches Claude through Amazon Bedrock. A prototype that sent guest-supplied photos by public URL worked against the first-party API but fails on Bedrock.",
+    "question": "What should the developer change?",
+    "options": [
+      "Fetch the image in the application and send it as a base64 image source, because URL sources are not available there",
+      "Keep the URL source and add a Files API file_id, which Bedrock supports for images as it does on the first-party API",
+      "Send the URL in the text block, since Bedrock reads links in text but not in image blocks",
+      "Move the images into the system prompt, where Bedrock accepts hosted links as part of the instructions"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: on Bedrock only base64 image sources are available, so the access path changes how the image is sent. B is wrong because Bedrock supports neither URL sources nor the Files API. C is wrong because a link in text is not read as an image on any path. D is wrong because the system prompt does not fetch hosted links.",
+    "tags": [
+      "comparison",
+      "application",
+      "vision",
+      "vendor-channel"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-023",
+    "difficulty": "medium",
+    "scenario": "A podcast tool turns on thinking for a hard summarising task and sets max_tokens to 1,000. Replies often end with stop_reason 'max_tokens' although the visible text is short, because thinking text is not shown.",
+    "question": "What explains this, and what is the fix?",
+    "options": [
+      "Hidden thinking is free and outside the limit, so the fault lies in the prompt and a shorter prompt will fix the truncation",
+      "Thinking tokens count toward max_tokens and are billed as output, so raise max_tokens to leave room for the visible answer",
+      "Thinking needs a budget_tokens value of 500 to stay within max_tokens, which should be added to the request",
+      "Stop reasons are unreliable when thinking is on, so the app should ignore them and compare text lengths"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: thinking is generated, billed and limited like output, so a small ceiling can be used up before the answer is written. A is wrong because thinking is billed and counts toward the ceiling even when hidden. C is wrong because manual budget_tokens is deprecated and rejected on newer models. D is wrong because the reason is reliable and here it reports the truncation correctly.",
+    "tags": [
+      "troubleshooting",
+      "analysis",
+      "thinking",
+      "max-tokens"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-024",
+    "difficulty": "medium",
+    "scenario": "A municipal permit portal sends a 20,000-token policy handbook in the system prompt on every question. Just the short citizen question changes between requests, and traffic is steady.",
+    "question": "How should the request be structured to cut cost?",
+    "options": [
+      "Put the citizen question first and the handbook last, so that the changing text is the part that gets cached for later reuse",
+      "Send the handbook in the first request and omit it afterwards, since the API retains it between calls",
+      "Mark the handbook block with cache_control and keep the citizen question after it, so later requests read the cached prefix",
+      "Insert the current time at the start of the system prompt so that each request is easy to tell apart"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: caching applies to a stable prefix, so the unchanging handbook goes first with a breakpoint and the varying question follows. A is wrong because a changing start breaks the prefix, so nothing stable gets cached. B is wrong because the API is stateless, so the handbook would be missing from later requests. D is wrong because a timestamp at the start changes the prefix each time and defeats the cache.",
+    "tags": [
+      "best-practice",
+      "application",
+      "prompt-caching",
+      "cost"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-025",
+    "difficulty": "medium",
+    "scenario": "An escape-room site's booking assistant answers customers while they wait in the chat. Finance wants to halve the model bill and suggests moving the assistant to the batch API for its 50% discount.",
+    "question": "What is the best response?",
+    "options": [
+      "Accept the proposal, since batches usually finish within an hour and customers will tolerate the wait",
+      "Accept the proposal but add the 1-hour cache TTL, which makes batch results return faster for chat",
+      "Reject any saving, because realtime pricing is fixed and caching does not apply to chat prompts that vary by customer or session",
+      "Keep the chat on synchronous streaming calls, and cut cost with prompt caching for the shared prefix and a suitable tier"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: customers are waiting and batch can take up to 24 hours, so savings must come from caching and tier choice on the realtime path. A is wrong because an hour or more of waiting is not acceptable in live chat. B is wrong because a longer cache TTL does not speed up batch processing. C is wrong because caching does apply to chat prefixes.",
+    "tags": [
+      "anti-pattern",
+      "evaluation",
+      "batch-vs-realtime",
+      "prompt-caching"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-026",
+    "difficulty": "medium",
+    "scenario": "A wine-club shop submits a batch of label-copy requests and matches results to products by line position in the results file. After a run in which a few requests errored or expired, some products received the wrong copy.",
+    "question": "What should the team do?",
+    "options": [
+      "Give each request a unique custom_id and match results on it, handling the succeeded, errored, canceled and expired types",
+      "Resubmit the whole batch whenever one request errors, so that the file stays in step with the product list",
+      "Match on the product name found in the generated text, since the model repeats the name in its copy",
+      "Keep matching by line position and fill gaps for errored items using the request counts in the batch summary once processing ends"
+    ],
+    "correct": 0,
+    "explanation": "A is correct: each batch result carries its request's custom_id and a result type, so matching on the id survives errors and expiries. B is wrong because resubmitting everything wastes cost and any new error breaks alignment again. C is wrong because generated text can omit or change the name. D is wrong because counts say how many failed, not which ones.",
+    "tags": [
+      "troubleshooting",
+      "application",
+      "batch-api",
+      "custom-id"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-027",
+    "difficulty": "medium",
+    "scenario": "A school software team moves from the first-party API to Claude in Microsoft Foundry. Their client code works, but they are unsure what to send in the model field.",
+    "question": "What value belongs in the model field?",
+    "options": [
+      "The Foundry resource name, because the resource holds the billing and security settings",
+      "The name of the deployment created in the Foundry resource, which defaults to the model ID",
+      "The model ID prefixed with 'anthropic.', as used for Bedrock model identifiers",
+      "The name of the Azure region, with the model chosen by the endpoint address"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: Foundry resources hold billing and security, while deployments are the model instances, so the deployment name is what the request names. A is wrong because the resource is the container, not the model instance. C is wrong because the 'anthropic.' prefix belongs to Bedrock identifiers. D is wrong because a region name does not select a model and the endpoint does not choose one.",
+    "tags": [
+      "configuration",
+      "comprehension",
+      "vendor-channel",
+      "foundry"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-028",
+    "difficulty": "medium",
+    "scenario": "A library catalogue agent uses thinking and calls tools in a loop. To save tokens, a developer rewrites each thinking block into a short note before sending the history back after tool results.",
+    "question": "What is wrong with this?",
+    "options": [
+      "No problem, because thinking is private to the model and the API ignores it when history is resent",
+      "The rewrite is fine if the note sits in a text block, since text blocks are checked by signature",
+      "Thinking blocks carry a signature and have to be passed back complete and unmodified within a tool-use turn",
+      "Thinking blocks should be dropped, because resent history takes the final text block of each turn"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: each thinking block has an encrypted signature, so editing or replacing one breaks the continuation of the tool-use turn. A is wrong because the API reads the signature when history is resent, so it is not ignored. B is wrong because text blocks carry no signature, and a rewritten note is not a valid substitute. D is wrong because dropping blocks also breaks the unmodified pass-back during a tool-use turn.",
+    "tags": [
+      "anti-pattern",
+      "analysis",
+      "thinking",
+      "tool-use-loop"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-029",
+    "difficulty": "hard",
+    "scenario": "A film-festival site has a live programme-advice chat and a Sunday job that re-tags 25,000 catalogue entries, with results needed by Monday morning. One engineer proposes a single path for both to keep the code simple.",
+    "question": "Which design best fits both workloads?",
+    "options": [
+      "Send both through Message Batches, taking the 50% discount for the whole product and its weekend job",
+      "Stream the chat through realtime calls, and send the Sunday re-tagging as Message Batches",
+      "Send both through realtime calls, so that one code path serves the chat and the weekend job",
+      "Send the chat through Message Batches with a 1-hour cache TTL, and the re-tagging through realtime calls"
+    ],
+    "correct": 1,
+    "explanation": "B is correct: the chat needs answers in seconds while the re-tagging can wait, so each path uses the mode that fits its tolerance. A is wrong because chat users would wait far too long for batch results. C is wrong because it pays full price for work that tolerates delay, to save a little code. D is wrong because it reverses the split and leaves the live chat on the slow path.",
+    "tags": [
+      "comparison",
+      "evaluation",
+      "batch-vs-realtime",
+      "architecture"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-030",
+    "difficulty": "hard",
+    "scenario": "A finance team requires a hard ceiling on the cost of each request for a reasoning-heavy report feature on an Opus-tier model. A developer proposes thinking 'enabled' with budget_tokens of 4,000, or setting effort to low.",
+    "question": "Which configuration enforces the ceiling?",
+    "options": [
+      "Send thinking 'enabled' with budget_tokens of 4,000, which caps thinking spend on current models and the cost of each call",
+      "Set effort to low, because effort is a firm cap on the number of tokens that a single request is allowed to use",
+      "Use adaptive thinking with output_config.effort to set depth, and set max_tokens as the strict limit, since thinking counts toward it",
+      "Send thinking 'disabled' so that no thinking tokens are billed, and keep max_tokens high so that the answer has plenty of room to finish cleanly"
+    ],
+    "correct": 2,
+    "explanation": "C is correct: the deciding constraint is a hard ceiling, and max_tokens is the strict limit, while effort is soft guidance and thinking tokens count toward the limit. A is wrong because manual budget_tokens is deprecated and rejected on current models. B is wrong because effort guides depth but does not guarantee a cap. D is wrong because current Opus-tier models reject 'disabled', and a high max_tokens removes the ceiling.",
+    "tags": [
+      "configuration",
+      "evaluation",
+      "thinking",
+      "cost-control"
+    ]
+  },
+  {
+    "domain": 2,
+    "id": "ccdv-d2-031",
+    "difficulty": "hard",
+    "scenario": "A hotel group's concierge chat caches a long conversation history. To save cost, the code switches output_config.effort between low and high on alternate turns, and the cache-read share of input has dropped sharply.",
+    "question": "What should the team change?",
+    "options": [
+      "Add more explicit cache breakpoints, since breakpoints are what stop effort changes from invalidating the cached entries in the history",
+      "Move to the 1-hour cache TTL, because the entries are expiring between turns when effort changes",
+      "Keep alternating effort but send the history as one text block, which the cache treats as unchanged",
+      "Fix one effort and thinking configuration for a conversation, chosen per route, so that the cached message prefix stays valid"
+    ],
+    "correct": 3,
+    "explanation": "D is correct: the deciding constraint is that changing effort or thinking settings invalidates the cached messages, so stable settings per conversation protect the saving. A is wrong because breakpoints do not prevent invalidation when the settings change. B is wrong because a longer lifetime does not help when each switch starts a new prefix. C is wrong because reshaping the history still changes the prefix and misses the cache.",
+    "tags": [
+      "troubleshooting",
+      "evaluation",
+      "prompt-caching",
+      "effort"
+    ]
+  }
+]

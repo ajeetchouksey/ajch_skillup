@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "2.0",
+  "id": "ccdv-scenario-002",
+  "title": "Launching a Refund Support Assistant",
+  "description": "Beacon Bike Rentals is launching a support assistant that changes bookings and requests refunds. The learner chooses between a workflow and an agent, enforces a spending cap outside the prompt, sharpens confusable tools, keeps constraints alive in long chats and diagnoses a wrong tool argument from a trace.",
+  "examId": "ccdv",
+  "difficulty": "hard",
+  "estimatedMinutes": 20,
+  "domains": [
+    1,
+    4,
+    8
+  ],
+  "taskIds": [
+    "1.1",
+    "1.2",
+    "1.3",
+    "8.1",
+    "4.1"
+  ],
+  "scenario": {
+    "background": "Beacon Bike Rentals cannot launch its support assistant unless it pays no refund above the limit that finance has approved, and the launch is fixed for the start of the summer booking peak. The assistant will handle refund and date-change requests, which follow a written policy, and open-ended questions about bookings, routes and equipment. It reaches booking data through two internal tools and can trigger payouts through a refund tool in the company's payment system. Conversations often run past thirty turns because customers keep changing their plans. The team has one sprint to build it, and the on-call rota covers the first weekend.",
+    "characters": [
+      {
+        "name": "Tamar Okoye",
+        "role": "Support lead",
+        "concern": "Wants the assistant to resolve as many requests as possible without handing customers to staff, so the queue shrinks at launch."
+      },
+      {
+        "name": "Ravi Shah",
+        "role": "Platform engineer",
+        "concern": "Wants a design that is simple to test and debug in one sprint, with no moving parts that cannot be explained."
+      },
+      {
+        "name": "Elena Voss",
+        "role": "Finance controller",
+        "concern": "Needs a guarantee that no refund above 150 pounds is paid without a person approving it."
+      },
+      {
+        "name": "Joel Park",
+        "role": "Site reliability engineer",
+        "concern": "Wants every failure to leave a trace that shows what the model produced and what each system received."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "ccdv-scenario-002-q1",
+      "stem": "Tamar wants one autonomous agent to handle every request. Ravi points out that every refund goes through the same checks in the same order. How should the team structure the refund flow?",
+      "options": [
+        "Give one agent loop every request type and let it decide how to process each refund, because that is the simplest thing to maintain",
+        "Build a supervisor agent that delegates to five specialist subagents, one per policy rule, and merges their answers into a decision",
+        "Use a fixed workflow for the refund steps and keep an agent loop only for the open-ended questions about bookings and routes",
+        "Leave refund requests to staff and automate nothing for them, because money is involved and mistakes are costly to reverse"
+      ],
+      "correct": 2,
+      "explanation": "C is correct: the refund steps are predictable, and a workflow runs predefined code paths, while an agent suits open-ended problems where the number of steps cannot be predicted. A adds unpredictability and cost to a known sequence. B multiplies model calls and failure points for fixed checks. D gives up safe automation, when code can check each step."
+    },
+    {
+      "id": "ccdv-scenario-002-q2",
+      "stem": "The refund steps now run as a fixed workflow. Elena insists that no refund above 150 pounds is paid without a person approving it. Where should the team enforce that cap?",
+      "options": [
+        "In a pre-tool-call hook on the refund tool that denies amounts above the cap and routes the case to a person",
+        "In a system prompt rule written in capitals that tells the assistant to refuse any refund above the approved limit, placed at the very top",
+        "In a lower sampling temperature, so the model follows the written refund policy more consistently across its replies to customers",
+        "In the model's own judgement, with finance auditing the refund ledger at the end of each month for anything unusual or out of pattern"
+      ],
+      "correct": 0,
+      "explanation": "A is correct: a hook runs in your own code before the call and can deny it, so the cap holds whatever the model decides, and the deciding constraint is a guarantee, not a tendency. B is only context, which the model can misread or be talked out of. C changes sampling, not compliance. D finds breaches only after the money has gone."
+    },
+    {
+      "id": "ccdv-scenario-002-q3",
+      "stem": "In testing, the assistant often calls find_rental when a customer quotes a booking reference, and lookup_booking when they ask about bikes. Both descriptions currently say 'Finds rental information'. What is the best fix?",
+      "options": [
+        "Add a third tool, search_anything, that wraps both calls so the model has one obvious choice for any customer question it receives",
+        "Rename the two tools to clearer names but keep the existing descriptions, since the names are what the model reads first and weighs most",
+        "Add a prompt line telling the model to call both tools on each question and then pick whichever returned result looks more plausible",
+        "Rewrite each description to say what the tool does, when to use it and when not to, with errors that suggest a next step"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: detailed descriptions are the most important factor in tool performance, and error results that explain the next step let the model recover. A creates a third overlapping tool with the same ambiguity. B leaves the identical descriptions that caused the confusion. C doubles tool calls and latency, and makes the model guess which result to trust."
+    },
+    {
+      "id": "ccdv-scenario-002-q4",
+      "stem": "Customers who say early that a voucher expires on 31 August often see the date ignored by turn 25, and some chats pass 40 turns. Joel wants the loop kept. What should Ravi change?",
+      "options": [
+        "Keep the full history indefinitely, since the model can read the earlier turns and will find the voucher date whenever it is needed",
+        "Keep the loop, add a turn cap that hands over to a person, and carry a short summary of stated constraints forward",
+        "Move to an agent framework, because its built-in memory will decide which customer constraints are worth remembering over time",
+        "Reset the context at the start of each turn and ask the customer to restate their constraints whenever they matter again"
+      ],
+      "correct": 1,
+      "explanation": "B is correct: recall falls as context grows, so a small, curated summary of constraints keeps what matters in view, and a turn cap bounds cost and hands hard cases to staff. A relies on recall that degrades in long contexts. C adds abstraction without deciding what to remember. D throws away the conversation and burdens the customer."
+    },
+    {
+      "id": "ccdv-scenario-002-q5",
+      "stem": "After launch, a 90-pound refund goes to the wrong booking, and the cap hook allowed it because the amount was under 150 pounds. Joel has traces of the model output and the tool input. What first?",
+      "options": [
+        "Rewrite the system prompt to stress that booking identifiers should be copied with great care from the customer message into tool calls",
+        "Retry the booking lookup several times until the call returns a booking, then continue with the refund as normal once it succeeds",
+        "Move the assistant to a larger model tier, since a stronger model is less likely to mistype an identifier in a tool call",
+        "Compare the id in the model's tool call with the input the tool received, then fix the schema or integration"
+      ],
+      "correct": 3,
+      "explanation": "D is correct: the trace separates a model error from an integration error. If the model emitted the wrong id, tighten the tool schema or the description sharpened earlier; if the harness altered it, fix the integration. A, B and C guess at causes without evidence, and retrying a lookup could confirm the wrong booking."
+    }
+  ],
+  "keyLearnings": [
+    "Use a fixed workflow when the steps are known in advance, and keep an agent loop for work whose steps cannot be predicted.",
+    "Enforce hard business limits in code that runs outside the model, such as a hook that denies the call and routes to a person, because prompts and sampling settings only influence behaviour.",
+    "Tool descriptions that state what a tool does, when to use it and when not to, plus errors that say what to try next, resolve most tool confusion.",
+    "When a tool call is wrong, compare what the model emitted with what the tool received before changing prompts, schemas or models."
+  ]
+}
